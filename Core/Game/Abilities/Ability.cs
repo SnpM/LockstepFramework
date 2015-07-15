@@ -4,10 +4,11 @@ using System;
 
 namespace Lockstep
 {
+	[Serializable]
 /// <summary>
 /// Template for abilities.
 /// </summary>
-	public abstract class Ability
+	public abstract class Ability : MonoBehaviour
 	{
 		public abstract void Initialize (LSAgent agent);
 

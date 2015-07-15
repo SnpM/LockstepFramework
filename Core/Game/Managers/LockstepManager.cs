@@ -32,6 +32,7 @@ namespace Lockstep
 
 			PhysicsManager.Simulate ();
 			CoroutineManager.Simulate ();
+			InputManager.FrameReset ();
 			FrameCount++;
 		}
 

@@ -8,10 +8,8 @@ namespace Lockstep
 	/// </summary>
 	public class LSAgent : MonoBehaviour
 	{
-		public AbilCode[] _Abilities;
 		public Ability[] Abilities;
 		public ActiveAbility[] ActiveAbilities;
-		public uint AbilityExists;
 		public int AbilitiesLength;
 		public LSBody Body;
 		public ushort GlobalID;
@@ -20,18 +18,12 @@ namespace Lockstep
 
 		public void Initialize ()
 		{
-			AbilitiesLength = _Abilities.Length;
-			Abilities = new Ability[AbilitiesLength];
+			Abilities = this.GetComponents<Ability> ();
+			AbilitiesLength = Abilities.Length;
 			ActiveAbilities = new ActiveAbility[InputManager.InputCount];
-			for (i = 0; i < _Abilities.Length; i++)
+			for (i = 0; i < Abilities.Length; i++)
 			{
-				abilCode = _Abilities[i];
-
-
-				Ability ability = (Ability) AbilityManager.CreateAbility (abilCode);
-				AbilityManager.CreateAbility (AbilCode.Print);
-
-				Abilities[(int)abilCode] = ability;
+				Ability ability = Abilities[i];
 				ability.Initialize (this);
 
 				ActiveAbility activeAbility = ability as ActiveAbility;

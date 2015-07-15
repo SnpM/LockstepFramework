@@ -22,6 +22,8 @@ public class Print : ActiveAbility {
 
 	}
 
+	public long ASDF;
+
 	public override InputCode ListenInput {
 		get {
 			return InputCode.Q;
