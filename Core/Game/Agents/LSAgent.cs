@@ -18,6 +18,10 @@ namespace Lockstep
 
 		public void Initialize ()
 		{
+			this.transform = GetComponent<Transform> ();
+			this.gameObject = GetComponent<GameObject> ();
+			this.renderer = GetComponent<Renderer> ();
+
 			Abilities = this.GetComponents<Ability> ();
 			AbilitiesLength = Abilities.Length;
 			ActiveAbilities = new ActiveAbility[InputManager.InputCount];
@@ -60,6 +64,9 @@ namespace Lockstep
 			PhysicsManager.Dessimilate (Body);
 		}
 
+		public Transform transform;
+		public GameObject gameObject;
+		public Renderer renderer;
 		static int i, j;
 		static AbilCode abilCode;
 	}

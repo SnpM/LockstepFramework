@@ -30,6 +30,16 @@ namespace Lockstep
 			this.x = FixedMath.Create (vec2.x);
 			this.y = FixedMath.Create (vec2.y);
 		}
+		public Vector2d (float xFloat, float yFloat)
+		{
+			this.x = FixedMath.Create (xFloat);
+			this.y = FixedMath.Create (yFloat);
+		}
+		public Vector2d (Vector3 vec)
+		{
+			this.x = FixedMath.Create (vec.x);
+			this.y = FixedMath.Create (vec.z);
+		}
 	#endregion
 
 

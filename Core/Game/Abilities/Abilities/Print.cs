@@ -9,7 +9,7 @@ public class Print : ActiveAbility {
 
 	public override void Simulate ()
 	{
-		Debug.Log (LockstepManager.FrameCount);
+
 	}
 
 	public override void Deactivate ()

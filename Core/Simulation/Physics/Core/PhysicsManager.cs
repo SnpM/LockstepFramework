@@ -76,7 +76,6 @@ namespace Lockstep
 
 			if (CollisionIterationCount == 0) {
 
-
 				for (i = 0; i < PeakCount; i++) {
 					if (SimObjectExists [i]) {
 						LSBody b1 = SimObjects [i];

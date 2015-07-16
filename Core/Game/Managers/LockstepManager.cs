@@ -20,11 +20,14 @@ namespace Lockstep
 			FrameManager.Initialize ();
 			AgentController.Initialize (Instance.AllAgentCodes, Instance.AgentObjects);
 			PhysicsManager.Initialize ();
+			InputManager.Initialize ();
+			PlayerController.Initialize ();
 		}
 
 		public static void Simulate ()
 		{
 			FrameManager.EarlySimulate ();
+			PlayerController.Simulate ();
 			NetworkManager.Simulate ();
 			FrameManager.Simulate ();
 			AgentController.Simulate ();
@@ -32,14 +35,15 @@ namespace Lockstep
 
 			PhysicsManager.Simulate ();
 			CoroutineManager.Simulate ();
-			InputManager.FrameReset ();
+			InputManager.Simulate ();
 			FrameCount++;
 		}
 
 		public static void Visualize ()
 		{
 			PhysicsManager.Visualize ();
-
+			InputManager.Visualize ();
+			PlayerController.Visualize ();
 		}
 
 

@@ -137,9 +137,7 @@ namespace Lockstep
 				VelocityChanged = false;
 			}
 			
-			
 			if (VelocityMagnitude != 0) {
-				
 				Position.x += Velocity.x;
 				Position.y += Velocity.y;
 				PositionChanged = true;
