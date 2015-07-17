@@ -18,17 +18,18 @@ namespace Lockstep
 			FrameCount = 0;
 			NetworkManager.Initialize ();
 			FrameManager.Initialize ();
-			AgentController.Initialize (Instance.AllAgentCodes, Instance.AgentObjects);
+			AgentController.Initialize (Instance.AgentObjects);
 			PhysicsManager.Initialize ();
 			InputManager.Initialize ();
-			PlayerController.Initialize ();
+			PlayerManager.Initialize ();
 		}
 
 		public static void Simulate ()
 		{
-			FrameManager.EarlySimulate ();
-			PlayerController.Simulate ();
+			//FrameManager.EarlySimulate ();
+			PlayerManager.Simulate ();
 			NetworkManager.Simulate ();
+			if (!FrameManager.CanAdvanceFrame) return;
 			FrameManager.Simulate ();
 			AgentController.Simulate ();
 
@@ -45,7 +46,7 @@ namespace Lockstep
 		{
 			PhysicsManager.Visualize ();
 			InputManager.Visualize ();
-			PlayerController.Visualize ();
+			PlayerManager.Visualize ();
 			AgentController.Visualize ();
 		}
 
@@ -53,7 +54,6 @@ namespace Lockstep
 		#region Instance Settings
 
 		public GameObject[] AgentObjects;
-		public AgentCode[] AllAgentCodes;
 		public GameObject SelectionRing;
 
 		void Awake ()

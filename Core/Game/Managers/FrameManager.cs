@@ -7,20 +7,59 @@ namespace Lockstep
 {
 	public static class FrameManager
 	{
-		public static Dictionary<int,Frame> Frames = new Dictionary<int, Frame> (30000);
+		static int i;
+
+		const int StartCapacity = 30000;
+		public static bool[] HasFrame = new bool[StartCapacity];
+		public static Frame[] Frames = new Frame[StartCapacity];
+		public static int Capacity = StartCapacity;
+
+		public static int ForeSight = 0;
+		public static int NextFrame;
+
+		public static bool CanAdvanceFrame {get{return ForeSight > 0;}}
 
 		public static void Initialize ()
 		{
+			ForeSight = 0;
+			NextFrame = 0;
+		}
 
-		}
-		public static void EarlySimulate ()
-		{
-			Frames.Add (LockstepManager.FrameCount, new Frame ());
-		}
 		public static void Simulate ()
 		{
-			Frame curFrame = Frames[LockstepManager.FrameCount];
+			ForeSight--;
+			Frame frame = Frames[LockstepManager.FrameCount];
+			if (frame.Commands != null)
+			for (i = 0; i < frame.Commands.Count; i++)
+			{
 
+			}
+		}
+
+		public static void CheckForesight ()
+		{
+
+		}
+		
+		public static void AddFrame (int index, Frame frame)
+		{
+			if (index >= Capacity)
+			{
+				Capacity *= 2;
+				Array.Resize (ref Frames,Capacity);
+				Array.Resize (ref HasFrame, Capacity);
+			}
+			Frames[index] = frame;
+			HasFrame[index] = true;
+
+			if (index == NextFrame) {
+				ForeSight++;
+				NextFrame++;
+				while (HasFrame[NextFrame])
+				{
+					NextFrame++;
+				}
+			}
 		}
 	}
 	public class Frame {

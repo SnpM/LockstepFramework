@@ -24,22 +24,27 @@ namespace Lockstep
 		public static void Simulate ()
 		{
 			if (Offline) {
-				ReceivedBytes.AddRange (BitConverter.GetBytes(LockstepManager.FrameCount));
-				for(i = 0; i < OutCommands.Count; i++)
-				{
-					ReceivedBytes.AddRange (OutCommands[i].Serialized);
+				ReceivedBytes.AddRange (BitConverter.GetBytes (LockstepManager.FrameCount));
+				for (i = 0; i < OutCommands.Count; i++) {
+					ReceivedBytes.AddRange (OutCommands [i].Serialized);
 				}
 			} else {
 
 			}
 
-			Frame frame = FrameManager.Frames [LockstepManager.FrameCount];
-			int frameCount = BitConverter.ToInt32 (ReceivedBytes.innerArray,0);
+			int frameCount = BitConverter.ToInt32 (ReceivedBytes.innerArray, 0);
 			Index = 4;
-			while (Index < ReceivedBytes.Count) {
-				Command com = new Command();
-				Index += com.Reconstruct (ReceivedBytes.innerArray, Index);
-				frame.AddCommand (com);
+
+			Frame frame;
+			if (!FrameManager.HasFrame[frameCount]) {
+				frame = new Frame ();
+				FrameManager.AddFrame (frameCount, frame);
+
+				while (Index < ReceivedBytes.Count) {
+					Command com = new Command ();
+					Index += com.Reconstruct (ReceivedBytes.innerArray, Index);
+					frame.AddCommand (com);
+				}
 			}
 
 			ReceivedBytes.FastClear ();

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 namespace Lockstep {
-public class PlayerController  : MonoBehaviour{
+public class PlayerManager  : MonoBehaviour{
 		public static FastList<AgentController> agentControllers = new FastList<AgentController>();
 		public static Camera mainCamera;
 
@@ -33,6 +33,13 @@ public class PlayerController  : MonoBehaviour{
 				NetworkManager.SendCommand (com);
 			}
 		}
+
+		public static void AddAgentController(AgentController agentController)
+		{
+			agentControllers.Add (agentController);
+		}
+
+
 
 		#region Instance Behaviors
 		public GUIStyle SelectionBoxStyle = new GUIStyle();

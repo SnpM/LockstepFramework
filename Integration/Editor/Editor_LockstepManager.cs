@@ -47,7 +47,6 @@ public class Editor_LockstepManager : Editor
 			EditorGUILayout.EndVertical ();
 			EditorGUILayout.EndHorizontal ();
 		}
-		Target.AllAgentCodes = AllAgentCodes;
 
 		#endregion
 		if (EditorGUI.EndChangeCheck ())

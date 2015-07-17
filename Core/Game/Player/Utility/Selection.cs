@@ -12,11 +12,11 @@ namespace Lockstep
 		public AgentController LeAgentController;
 		public FastList<LSAgent> selectedAgents;
 		public ulong Header;
-		public byte[] Data;
+		public byte[] Data = new byte[64];
 
 		public void SerializeFromSelectionManager ()
 		{
-			Data = new byte[64];
+			Array.Clear (Data,0,64);
 			Header = 0;
 			for (i = 0; i < SelectedAgents.PeakCount; i++) {
 				if (SelectedAgents.arrayAllocated [i]) {
@@ -32,7 +32,8 @@ namespace Lockstep
 
 		public void Serialize (FastList<LSAgent> selectedAgents)
 		{
-			Data = new byte[64];
+			Array.Clear (Data,0,64);
+
 			Header = 0;
 			for (i = 0; i < selectedAgents.Count; i++) {
 				LSAgent agent = selectedAgents.innerArray [i];

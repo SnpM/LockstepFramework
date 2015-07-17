@@ -22,8 +22,9 @@ namespace Lockstep
 		public static bool Boxing;
 		private static bool InitializeBoxing;
 		private static float InitializeTime;
-		private const float MinimumClickTimeToBox = .15f;
-		private const float MinimumBoxArea = 4;
+		private static float BoxingTime;
+		private const float MinimumClickTimeToBox = .1f;
+		private const float MinimumBoxArea = 2;
 
 		public static void Initialize ()
 		{
@@ -44,6 +45,7 @@ namespace Lockstep
 
 
 			if (Boxing) {
+				BoxingTime += Time.deltaTime;
 				if (MousePosition != BoxEnd) {
 					Vector2 RaycastTopLeft;
 					Vector2 RaycastTopRight;
@@ -83,8 +85,8 @@ namespace Lockstep
 				MousedAgent = null;
 				ClearBox ();
 
-				for (i = 0; i < PlayerController.agentControllers.Count; i++) {
-					AgentController agentController = PlayerController.agentControllers [i];
+				for (i = 0; i < PlayerManager.agentControllers.Count; i++) {
+					AgentController agentController = PlayerManager.agentControllers [i];
 					foreach (LSAgent agent in agentController.ActiveAgents.Values) {
 						if (agent.renderer.isVisible) {
 
@@ -140,24 +142,15 @@ namespace Lockstep
 					if (Input.GetMouseButton (0)) {
 						BoxEnd = MousePosition;
 						float Area = BoxEnd.x > BoxStart.x ? BoxEnd.x - BoxStart.x : BoxStart.x - BoxEnd.x;
-						if (Area == 0) Area = 1f;
-						if (BoxEnd.y > BoxStart.y)
-						{
-							float AreaMul = (BoxEnd.y - BoxStart.y);
-							if (AreaMul == 0) AreaMul = 1f;
-							Area *= AreaMul;
-						}
-						else
-						{
-							float AreaMul = (BoxStart.y - BoxEnd.y);
-							if (AreaMul == 0) AreaMul = 1f;
-							Area *= AreaMul;
-						}
+						float AreaMul = BoxEnd.y > BoxStart.y ? BoxEnd.y - BoxStart.y : BoxStart.y - BoxEnd.y;
+						Area *= AreaMul;
 						if (Area >= MinimumBoxArea) {
 							Boxing = true;
+							InitializeBoxing = false;
+							InitializeTime = 0f;
 						}
 						else {
-							QuickSelect ();
+							return;
 						}
 					}
 					else {
@@ -270,7 +263,7 @@ namespace Lockstep
 
 		private static Vector2 GetWorldPos (Vector2 ScreenPos)
 		{
-			ray = PlayerController.mainCamera.ScreenPointToRay (ScreenPos);
+			ray = PlayerManager.mainCamera.ScreenPointToRay (ScreenPos);
 			if (Physics.Raycast (
 				ray,
 				out hit)) {
@@ -296,8 +289,8 @@ namespace Lockstep
 				MousedAgent.IsHighlighted = false;
 				MousedAgent = null;
 			}
-			for (i = 0; i < PlayerController.agentControllers.Count; i++) {
-				AgentController agentController = PlayerController.agentControllers [i];
+			for (i = 0; i < PlayerManager.agentControllers.Count; i++) {
+				AgentController agentController = PlayerManager.agentControllers [i];
 				foreach (LSAgent agent in agentController.ActiveAgents.Values) {
 					if (agent.renderer.isVisible)
 					{
