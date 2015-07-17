@@ -17,9 +17,10 @@ public class Editor_LockstepManager : Editor
 		TitleStyle.fontStyle = FontStyle.Bold;
 		LockstepManager Target = (LockstepManager)target;
 		EditorGUI.BeginChangeCheck (); 
+
+		Target.SelectionRing = (GameObject)EditorGUILayout.ObjectField ("Selection Ring Object", Target.SelectionRing,typeof(GameObject),false);
+
 		#region AgentObjects
-
-
 		ShowAgentObjects = EditorGUILayout.Foldout (ShowAgentObjects, "Spawnable Agents");
 
 		if (ShowAgentObjects) {

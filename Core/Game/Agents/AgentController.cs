@@ -34,6 +34,7 @@ namespace Lockstep
 			PeakGlobalID = 0;
 			GlobalActiveAgents = new Dictionary<ushort, LSAgent> (1024);
 			InstanceManagers.Clear ();
+
 		}
 		public static Dictionary<ushort,LSAgent> GlobalActiveAgents;
 		private static FastStack<ushort> OpenGlobalIDs = new FastStack<ushort> ();
@@ -53,6 +54,13 @@ namespace Lockstep
 			for (i = 0; i < InstanceManagers.Count; i++)
 			{
 				InstanceManagers[i].SimulateLocal ();
+			}
+		}
+		public static void Visualize ()
+		{
+			for (i = 0; i < InstanceManagers.Count; i++)
+			{
+				InstanceManagers[i].VisualizeLocal ();
 			}
 		}
 		#endregion
@@ -78,6 +86,13 @@ namespace Lockstep
 				agent.Simulate ();
 			}
 		}
+		public void VisualizeLocal ()
+		{
+			foreach (LSAgent agent in ActiveAgents.Values)
+			{
+				agent.Visualize ();
+			}
+		}
 
 		public LSAgent CreateAgent (AgentCode agentType)
 		{
@@ -100,6 +115,10 @@ namespace Lockstep
 			curAgent.GlobalID = globalID;
 
 			curAgent.Initialize ();
+
+			RingController ringController = Instantiate (LockstepManager.Instance.SelectionRing).GetComponent<RingController> ();
+			ringController.Initialize (curAgent);
+			curAgent.ringController = ringController;
 
 			return curAgent;
 		}

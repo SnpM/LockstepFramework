@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine.Networking;
-using DarkRift;
 
 namespace Lockstep
 {
@@ -16,7 +15,6 @@ namespace Lockstep
 		
 		public static void Initialize ()
 		{
-			DarkRiftAPI.onDataDetailed += HandleonDataDetailed;
 		}
 
 		static void HandleonDataDetailed (ushort sender, byte tag, ushort subject, object data)
@@ -34,14 +32,12 @@ namespace Lockstep
 			}
 			else
 			{
-				DarkRift.DarkRiftAPI.Recieve ();
 				BufferedBytes.FastClear ();
 				BufferedBytes.AddRange (BitConverter.GetBytes (LockstepManager.FrameCount));
 				for (i = 0; i < BufferedCommands.Count; i++)
 				{
 					BufferedBytes.AddRange (BufferedCommands[i].Serialized);
 				}
-				DarkRiftAPI.SendMessageToServer (0,0,BufferedBytes.innerArray);
 
 				Frame frame = FrameManager.Frames[LockstepManager.FrameCount];
 				while (Index < ReceivedBytes.Count)

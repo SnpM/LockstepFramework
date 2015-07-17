@@ -22,7 +22,10 @@ public class PlayerController  : MonoBehaviour{
 
 		public static void Visualize ()
 		{
-			SelectionManager.Visualize ();
+			System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+			sw.Start ( );
+			SelectionManager.Update ();
+			sw.Stop ();
 		}
 
 		#region Instance Behaviors

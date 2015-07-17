@@ -6,7 +6,7 @@ namespace Lockstep
 {
 	public class LockstepManager : MonoBehaviour
 	{
-		private static LockstepManager Instance;
+		public static LockstepManager Instance;
 		public const long Timestep = FixedMath.One / 32;
 		public const int NetworkingIterationSpread = 2;
 		public static int FrameCount;
@@ -44,6 +44,7 @@ namespace Lockstep
 			PhysicsManager.Visualize ();
 			InputManager.Visualize ();
 			PlayerController.Visualize ();
+			AgentController.Visualize ();
 		}
 
 
@@ -51,6 +52,7 @@ namespace Lockstep
 
 		public GameObject[] AgentObjects;
 		public AgentCode[] AllAgentCodes;
+		public GameObject SelectionRing;
 
 		void Awake ()
 		{
