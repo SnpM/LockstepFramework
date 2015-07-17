@@ -43,5 +43,7 @@ namespace Lockstep
 			PeakCount = 0;
 			Count = 0;
 		}
+
+
 	}
 }

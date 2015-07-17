@@ -6,6 +6,7 @@ namespace Lockstep
 {
 	public class Writer
 	{
+		static int i, length;
 		public FastList<byte> canvas;
 		public Writer (FastList<byte> Canvas)
 		{
@@ -15,6 +16,11 @@ namespace Lockstep
 		public void Write (byte value)
 		{
 			canvas.Add (value);
+		}
+
+		public void Write (byte[] values)
+		{
+			canvas.AddRange (values);
 		}
 
 		public void Write (ushort value)
@@ -37,9 +43,15 @@ namespace Lockstep
 			canvas.AddRange (BitConverter.GetBytes (value));
 		}
 
+		public void Write (ulong value)
+		{
+			canvas.AddRange (BitConverter.GetBytes (value));
+		}
+
 		public void Write (bool value)
 		{
 			canvas.AddRange (BitConverter.GetBytes (value));
 		}
+
 	}
 }

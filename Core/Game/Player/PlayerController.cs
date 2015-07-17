@@ -22,10 +22,16 @@ public class PlayerController  : MonoBehaviour{
 
 		public static void Visualize ()
 		{
-			System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-			sw.Start ( );
 			SelectionManager.Update ();
-			sw.Stop ();
+			if (Input.GetMouseButtonDown(1))
+			{
+				Command com = new Command(agentControllers[0].ControllerID,InputCode.M);
+				Selection select = new Selection();
+				select.SerializeFromSelectionManager ();
+				com.Select = select;
+				com.Position = new Vector2d(SelectionManager.MouseWorldPosition);
+				NetworkManager.SendCommand (com);
+			}
 		}
 
 		#region Instance Behaviors

@@ -48,6 +48,7 @@ namespace Lockstep
 			return PeakGlobalID++;
 		}
 
+		public static Dictionary<ushort,AgentController> AccessInstanceManagers = new Dictionary<ushort, AgentController>();
 		public static FastList<AgentController> InstanceManagers = new FastList<AgentController> ();
 		public static void Simulate ()
 		{

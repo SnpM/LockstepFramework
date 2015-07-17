@@ -18,6 +18,14 @@ public class Reader {
 		return ret;
 	}
 
+	public byte[] ReadBytes (int ReadLength)
+	{
+		byte[] RetBytes = new byte[ReadLength];
+		Array.Copy (source,count,RetBytes,0,ReadLength);
+		count += ReadLength;
+		return RetBytes;
+	}
+
 	public bool ReadBool ()
 	{
 		bool ret = BitConverter.ToBoolean (source,count);
@@ -48,7 +56,14 @@ public class Reader {
 
 	public long ReadLong ()
 	{
-		long ret = BitConverter.ToInt16 (source,count);
+		long ret = BitConverter.ToInt64 (source,count);
+		count += 8;
+		return ret;
+	}
+
+	public ulong ReadULong ()
+	{
+		ulong ret = BitConverter.ToUInt64 (source, count);
 		count += 8;
 		return ret;
 	}

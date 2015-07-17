@@ -32,10 +32,12 @@ namespace Lockstep
 			FrameManager.Simulate ();
 			AgentController.Simulate ();
 
+			//Custom code goes here
 
 			PhysicsManager.Simulate ();
 			CoroutineManager.Simulate ();
 			InputManager.Simulate ();
+			SelectionManager.Simulate ();
 			FrameCount++;
 		}
 

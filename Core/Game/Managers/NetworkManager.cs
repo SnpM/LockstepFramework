@@ -9,8 +9,7 @@ namespace Lockstep
 	public static class NetworkManager
 	{
 		public static bool Offline = true;
-		private static FastList<Command> BufferedCommands = new FastList<Command> ();
-		private static FastList<byte> BufferedBytes = new FastList<byte> ();
+		private static FastList<Command> OutCommands = new FastList<Command> ();
 		private static FastList<byte> ReceivedBytes = new FastList<byte> ();
 		
 		public static void Initialize ()
@@ -24,37 +23,32 @@ namespace Lockstep
 
 		public static void Simulate ()
 		{
-			if (Offline)
-			{
-				Frame frame = FrameManager.Frames[LockstepManager.FrameCount];
-
-				frame.AddCommands (BufferedCommands.innerArray, 0, BufferedCommands.Count);
-			}
-			else
-			{
-				BufferedBytes.FastClear ();
-				BufferedBytes.AddRange (BitConverter.GetBytes (LockstepManager.FrameCount));
-				for (i = 0; i < BufferedCommands.Count; i++)
+			if (Offline) {
+				ReceivedBytes.AddRange (BitConverter.GetBytes(LockstepManager.FrameCount));
+				for(i = 0; i < OutCommands.Count; i++)
 				{
-					BufferedBytes.AddRange (BufferedCommands[i].Serialized);
+					ReceivedBytes.AddRange (OutCommands[i].Serialized);
 				}
+			} else {
 
-				Frame frame = FrameManager.Frames[LockstepManager.FrameCount];
-				while (Index < ReceivedBytes.Count)
-				{
-					frame.AddCommand (new Command ());
-					Index += frame.Commands[frame.Commands.Count - 1].Reconstruct (ReceivedBytes.innerArray, Index);
-				}
-				ReceivedBytes.FastClear ();
 			}
 
+			Frame frame = FrameManager.Frames [LockstepManager.FrameCount];
+			int frameCount = BitConverter.ToInt32 (ReceivedBytes.innerArray,0);
+			Index = 4;
+			while (Index < ReceivedBytes.Count) {
+				Command com = new Command();
+				Index += com.Reconstruct (ReceivedBytes.innerArray, Index);
+				frame.AddCommand (com);
+			}
 
-			BufferedCommands.FastClear ();
+			ReceivedBytes.FastClear ();
+			OutCommands.FastClear ();
 		}
 
 		public static void SendCommand (Command com)
 		{
-			BufferedCommands.Add (com);
+			OutCommands.Add (com);
 		}
 
 		static int i, j, Index;

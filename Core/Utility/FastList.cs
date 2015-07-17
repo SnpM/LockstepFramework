@@ -52,7 +52,7 @@ namespace Lockstep
 		public void AddRange (T[] items)
 		{
 			ArrayLength = items.Length;
-			EnsureCapacity (Count + ArrayLength + 1);
+			EnsureCapacity (Capacity + ArrayLength + 1);
 			for (i = 0; i < ArrayLength; i++)
 			{
 				innerArray[Count++] = items[i];
@@ -120,12 +120,18 @@ namespace Lockstep
 
 		private void EnsureCapacity (int min)
 		{
-			if (Count >= Capacity) {
+			if (Capacity < min)
+			{
+				Capacity = min;
+				if (Count >= Capacity) {
+					Capacity *= 2;
+				}
+				Array.Resize (ref innerArray, Capacity);
+			}
+			else if (Count >= Capacity)
+			{
 				Capacity *= 2;
-				if (Capacity < min) Capacity = min;
-				T[] newItems = new T[Capacity];
-				Array.Copy (innerArray, 0, newItems, 0, Count);
-				innerArray = newItems;
+				Array.Resize (ref innerArray, Capacity);
 			}
 		}
 

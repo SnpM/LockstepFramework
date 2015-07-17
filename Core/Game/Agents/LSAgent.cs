@@ -54,7 +54,7 @@ namespace Lockstep
 
 		public void Activate (Command com)
 		{
-			ActiveAbility activeAbility = (ActiveAbility)Abilities [(int)com.KeyInput];
+			ActiveAbility activeAbility = (ActiveAbility)Abilities [(int)com.LeInput];
 			if (activeAbility != null) {
 				activeAbility.Execute (com);
 			}

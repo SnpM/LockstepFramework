@@ -5,14 +5,23 @@ using System.Collections;
 
 namespace Lockstep
 {
-
 	public class Command
 	{
-		public KeyCode KeyInput;
+		public Command ()
+		{
+
+		}
+		public Command (byte controllerID, InputCode inputCode)
+		{
+			ControllerID = controllerID;
+			LeInput = inputCode;
+		}
+
+		public byte ControllerID;
+		public InputCode LeInput;
 
 		public bool HasPosition;
 		public Vector2d _position;
-
 		public Vector2d Position {
 			get { return _position;}
 			set {
@@ -35,6 +44,7 @@ namespace Lockstep
 
 		public bool HasFlag;
 		public bool _flag;
+
 		public bool Flag {
 			get { return _flag;}
 			set {
@@ -56,6 +66,7 @@ namespace Lockstep
 
 		public bool HasCount;
 		public int _count;
+
 		public int Count {
 			get { return _count;}
 			set {
@@ -64,15 +75,17 @@ namespace Lockstep
 			}
 		}
 
-		/*
+		public bool HasSelect;
+		public Selection _select;
 
-		Positions in bitmask:
-		Position: 0
-		Target: 1
-		Flag: 2
-		Coord: 3
+		public Selection Select {
+			get { return _select;}
+			set {
+				_select = value;
+				HasSelect = true;
+			}
+		}
 
-		*/
 
 		static Reader reader = new Reader ();
 
@@ -81,42 +94,48 @@ namespace Lockstep
 		/// </summary>
 		public int Reconstruct (byte[] Source, int StartIndex)
 		{
-			reader.Initialize (Source,StartIndex);
 
-			KeyInput = (KeyCode)reader.ReadInt ();
+			reader.Initialize (Source, StartIndex);
+
+			ControllerID = reader.ReadByte ();
+			LeInput = (InputCode)reader.ReadByte ();
 
 			ValuesMask = reader.ReadUInt ();
 
-			HasPosition = GetMaskBool(ValuesMask,DataType.Position);
-			HasTarget = GetMaskBool (ValuesMask,DataType.Target);
-			HasFlag = GetMaskBool (ValuesMask,DataType.Flag);
-			HasCoord = GetMaskBool (ValuesMask,DataType.Coord);
-			HasCount = GetMaskBool (ValuesMask,DataType.Count);
+			HasPosition = GetMaskBool (ValuesMask, DataType.Position);
+			HasTarget = GetMaskBool (ValuesMask, DataType.Target);
+			HasFlag = GetMaskBool (ValuesMask, DataType.Flag);
+			HasCoord = GetMaskBool (ValuesMask, DataType.Coord);
+			HasCount = GetMaskBool (ValuesMask, DataType.Count);
+			HasSelect = GetMaskBool (ValuesMask, DataType.Select);
 
-			if (HasPosition)
-			{
-				_position.x = reader.ReadLong ();
-				_position.y = reader.ReadLong ();
+			if (HasPosition) {
+				_position.x = reader.ReadInt ();
+				_position.y = reader.ReadInt ();
 			}
-			if (HasTarget)
-			{
-				_target = reader.ReadUShort( );
+			if (HasTarget) {
+				_target = reader.ReadUShort ();
 			}
-			if (HasFlag)
-			{
+			if (HasFlag) {
 				_flag = reader.ReadBool ();
 			}
-			if (HasCoord)
-			{
+			if (HasCoord) {
 				_coord.x = reader.ReadInt ();
 				_coord.y = reader.ReadInt ();
 			}
-			if (HasCount)
-			{
+			if (HasCount) {
 				_count = reader.ReadInt ();
 			}
 
-			return reader.count - StartIndex;;
+			if (HasSelect) {
+				Select = new Selection();
+				reader.count += Select.Reconstruct (
+					AgentController.InstanceManagers[ControllerID],
+					reader.source,
+					reader.count);
+			}
+
+			return reader.count - StartIndex;
 		}
 
 		static uint ValuesMask;
@@ -128,7 +147,8 @@ namespace Lockstep
 				serializeList.FastClear ();
 
 				//Essential Information
-				writer.Write ((int)KeyInput);
+				writer.Write (ControllerID);
+				writer.Write ((byte)LeInput);
 
 				//Header 
 				ValuesMask = 
@@ -136,14 +156,15 @@ namespace Lockstep
 					(HasTarget ? (uint)DataType.Target : (uint)0) |
 					(HasFlag ? (uint)DataType.Flag : (uint)0) |
 					(HasCoord ? (uint)DataType.Coord : (uint)0) |
-					(HasCount ? (uint)DataType.Count : (uint)0)
-					;
+					(HasCount ? (uint)DataType.Count : (uint)0) |
+					(HasSelect ? (uint)DataType.Select : (uint)0);
+
 				writer.Write (ValuesMask);
 
 				//Position
 				if (HasPosition) {
-					writer.Write (_position.x);
-					writer.Write (_position.y);
+					writer.Write ((int)_position.x);
+					writer.Write ((int)_position.y);
 				}
 
 				//Target
@@ -162,6 +183,17 @@ namespace Lockstep
 					writer.Write (_coord.y);
 				}
 
+				if (HasSelect) {
+					writer.Write (_select.Header);
+					for (i = 0; i < 64; i++)
+					{
+						if (_select.Data[i] != 0)
+						{
+							writer.Write (_select.Data[i]);
+						}
+					}
+				}
+
 				return serializeList.ToArray ();
 			}
 		}
@@ -170,13 +202,18 @@ namespace Lockstep
 		{
 			return (mask & (uint)dataType) == (uint)dataType;
 		}
+
+		static int i;
 	}
-	public enum DataType : uint{
+
+	public enum DataType : uint
+	{
 		Position = 1 << 0,
 		Flag = 1 << 1,
 		Target = 1 << 2,
 		Coord = 1 << 3,
-		Count = 1 << 4
+		Count = 1 << 4,
+		Select = 1 << 5
 	}
 
 }

@@ -6,6 +6,8 @@ namespace Lockstep
 {
 	public static class SelectionManager
 	{
+		public static bool Changed;
+
 		public const int MaximumSelection = 512;
 		public static LSAgent MousedAgent;
 
@@ -30,7 +32,7 @@ namespace Lockstep
 
 		public static void Simulate ()
 		{
-
+			Changed = false;
 		}
 
 		public static bool CanClearSelection;

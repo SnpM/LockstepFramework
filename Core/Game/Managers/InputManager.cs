@@ -116,7 +116,7 @@ namespace Lockstep
 		public KeyCode keyCode;
 	}
 
-	public enum InputCode : int
+	public enum InputCode : byte
 	{
 		Q,
 		W,

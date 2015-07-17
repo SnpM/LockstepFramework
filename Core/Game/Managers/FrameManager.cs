@@ -20,6 +20,7 @@ namespace Lockstep
 		public static void Simulate ()
 		{
 			Frame curFrame = Frames[LockstepManager.FrameCount];
+
 		}
 	}
 	public class Frame {
