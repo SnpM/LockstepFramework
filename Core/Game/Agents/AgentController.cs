@@ -75,13 +75,13 @@ namespace Lockstep
 
 
 		#region Instance
-		public const int MaxAgents = 256;
-		public Dictionary<ushort,LSAgent> ActiveAgents;
+		public const int MaxAgents = 512;
+		public LSAgent[] Agents = new LSAgent[MaxAgents];
+		public bool[] AgentActive = new bool[MaxAgents];
 		public byte ControllerID;
 
 		public void InitializeLocal ()
 		{
-			ActiveAgents = new Dictionary<ushort, LSAgent> (256);
 			OpenLocalIDs.FastClear ();
 			PeakLocalID = 0;
 			ControllerID = (byte)InstanceManagers.Count;
@@ -90,16 +90,27 @@ namespace Lockstep
 
 		public void SimulateLocal ()
 		{
-			foreach (LSAgent agent in ActiveAgents.Values)
+			for (i = 0; i < MaxAgents; i++)
 			{
-				agent.Simulate ();
+				if (AgentActive[i])
+					Agents[i].Simulate ();
 			}
 		}
 		public void VisualizeLocal ()
 		{
-			foreach (LSAgent agent in ActiveAgents.Values)
+			for (i = 0; i < MaxAgents;i++)
 			{
-				agent.Visualize ();
+				if (AgentActive[i])
+					Agents[i].Visualize();
+			}
+		}
+
+		public void Execute (Command com)
+		{
+			Selection selection = com.Select;
+			for (i = 0; i < selection.selectedAgentLocalIDs.Count; i++)
+			{
+				Agents[selection.selectedAgentLocalIDs[i]].Execute (com);
 			}
 		}
 
@@ -116,7 +127,8 @@ namespace Lockstep
 
 			localID = GenerateLocalID ();
 			curAgent.LocalID = localID;
-			ActiveAgents.Add (localID, curAgent);
+			Agents[localID] = curAgent;
+			AgentActive[localID] = true;
 
 			globalID = GenerateGlobalID ();
 			curAgent.GlobalID = globalID;
@@ -135,6 +147,7 @@ namespace Lockstep
 			agent.Deactivate ();
 			CachedAgents[(int)agent.MyAgentCode].Add (agent);
 			OpenLocalIDs.Add (agent.LocalID);
+			AgentActive[agent.LocalID] = false;
 		}
 
 		private FastStack<ushort> OpenLocalIDs = new FastStack<ushort> ();

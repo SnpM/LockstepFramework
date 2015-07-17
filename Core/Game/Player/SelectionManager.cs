@@ -7,10 +7,8 @@ namespace Lockstep
 	public static class SelectionManager
 	{
 		public static bool Changed;
-
 		public const int MaximumSelection = 512;
 		public static LSAgent MousedAgent;
-
 		public static Vector2 MousePosition;
 		public static Vector2 MouseWorldPosition;
 		public static Vector2 BoxStart;
@@ -37,6 +35,7 @@ namespace Lockstep
 		}
 
 		public static bool CanClearSelection;
+
 		public static void Update ()
 		{
 			MousePosition = Input.mousePosition;
@@ -87,36 +86,36 @@ namespace Lockstep
 
 				for (i = 0; i < PlayerManager.agentControllers.Count; i++) {
 					AgentController agentController = PlayerManager.agentControllers [i];
-					foreach (LSAgent agent in agentController.ActiveAgents.Values) {
-						if (agent.renderer.isVisible) {
-
-							if (MousedAgent == null)
-							{
-								dif = new Vector2(
-									agent.transform.position.x - MouseWorldPosition.x,
-									agent.transform.position.z - MouseWorldPosition.y);
-								if ((dif.x * dif.x + dif.y * dif.y) <= (agent.SelectionRadius * agent.SelectionRadius))
-								{
-									MouseOver(agent);
-									BoxAgent (agent);
-									continue;
+					for (j = 0; j < AgentController.MaxAgents; j++) {
+						if (agentController.AgentActive [j]) {
+							curAgent = agentController.Agents [j];
+							if (curAgent.renderer.isVisible) {
+								if (MousedAgent == null) {
+									dif = new Vector2 (
+									curAgent.transform.position.x - MouseWorldPosition.x,
+									curAgent.transform.position.z - MouseWorldPosition.y);
+									if ((dif.x * dif.x + dif.y * dif.y) <= (curAgent.SelectionRadius * curAgent.SelectionRadius)) {
+										MouseOver (curAgent);
+										BoxAgent (curAgent);
+										continue;
+									}
 								}
-							}
 
-							Vector2 agentPos = new Vector2 (agent.transform.position.x, agent.transform.position.z);
-							Edge = Box_TopRight - Box_TopLeft;
-							Point = agentPos - Box_TopLeft;
-							if (DotEdge () < 0) {
-								Edge = Box_BottomRight - Box_TopRight;
-								Point = agentPos - Box_TopRight;
+								Vector2 agentPos = new Vector2 (curAgent.transform.position.x, curAgent.transform.position.z);
+								Edge = Box_TopRight - Box_TopLeft;
+								Point = agentPos - Box_TopLeft;
 								if (DotEdge () < 0) {
-									Edge = Box_BottomLeft - Box_BottomRight;
-									Point = agentPos - Box_BottomRight;
+									Edge = Box_BottomRight - Box_TopRight;
+									Point = agentPos - Box_TopRight;
 									if (DotEdge () < 0) {
-										Edge = Box_TopLeft - Box_BottomLeft;
-										Point = agentPos - Box_BottomLeft;
+										Edge = Box_BottomLeft - Box_BottomRight;
+										Point = agentPos - Box_BottomRight;
 										if (DotEdge () < 0) {
-											BoxAgent (agent);
+											Edge = Box_TopLeft - Box_BottomLeft;
+											Point = agentPos - Box_BottomLeft;
+											if (DotEdge () < 0) {
+												BoxAgent (curAgent);
+											}
 										}
 									}
 								}
@@ -148,21 +147,17 @@ namespace Lockstep
 							Boxing = true;
 							InitializeBoxing = false;
 							InitializeTime = 0f;
-						}
-						else {
+						} else {
 							return;
 						}
-					}
-					else {
+					} else {
 						QuickSelect ();
 					}
 					InitializeBoxing = false;
 					InitializeTime = 0f;
-				}
-				else {
+				} else {
 					GetMousedAgent ();
-					if (Input.GetMouseButtonUp (0))
-					{
+					if (Input.GetMouseButtonUp (0)) {
 						QuickSelect ();
 					}
 				}
@@ -185,54 +180,58 @@ namespace Lockstep
 
 		public static void SelectAgent (LSAgent agent)
 		{
-			if (agent == null) return;
+			if (agent == null)
+				return;
 			SelectedAgents.Add (agent);
 			agent.IsSelected = true;
 		}
 
 		public static void UnselectAgent (LSAgent agent)
 		{
-			if (agent == null) return;
+			if (agent == null)
+				return;
 			SelectedAgents.Remove (agent);
 			agent.IsSelected = false;
 		}
 
 		public static void BoxAgent (LSAgent agent)
 		{
-			if (agent == null) return;
+			if (agent == null)
+				return;
 			BoxedAgents.Add (agent);
 			agent.IsHighlighted = true;
 		}
 
 		public static void UnboxAgent (LSAgent agent)
 		{
-			if (agent == null) return;
+			if (agent == null)
+				return;
 			BoxedAgents.Remove (agent);
 			agent.IsHighlighted = false;
 		}
+
 		private static void SelectBoxedAgents ()
 		{
-			for (i = 0; i < BoxedAgents.PeakCount; i++)
-			{
-				if (BoxedAgents.arrayAllocated[i])
-					SelectAgent(BoxedAgents.innerArray[i]);
+			for (i = 0; i < BoxedAgents.PeakCount; i++) {
+				if (BoxedAgents.arrayAllocated [i])
+					SelectAgent (BoxedAgents.innerArray [i]);
 			}
 		}
+
 		public static void ClearSelection ()
 		{
-			for (i = 0; i < SelectedAgents.PeakCount; i++)
-			{
-				if (SelectedAgents.arrayAllocated[i])
-					SelectedAgents.innerArray[i].IsSelected = false;
+			for (i = 0; i < SelectedAgents.PeakCount; i++) {
+				if (SelectedAgents.arrayAllocated [i])
+					SelectedAgents.innerArray [i].IsSelected = false;
 			}
 			SelectedAgents.FastClear ();
 		}
+
 		public static void ClearBox ()
 		{
-			for (i = 0; i < BoxedAgents.PeakCount; i++)
-			{
-				if (BoxedAgents.arrayAllocated[i])
-					BoxedAgents.innerArray[i].IsHighlighted = false;
+			for (i = 0; i < BoxedAgents.PeakCount; i++) {
+				if (BoxedAgents.arrayAllocated [i])
+					BoxedAgents.innerArray [i].IsHighlighted = false;
 			}
 			BoxedAgents.FastClear ();
 		}
@@ -258,6 +257,7 @@ namespace Lockstep
 		}
 
 		static int i, j;
+		static LSAgent curAgent;
 		static RaycastHit hit;
 		static Ray ray;
 
@@ -281,31 +281,36 @@ namespace Lockstep
 		{
 			return Point.x * -Edge.y + Point.y * Edge.x;
 		}
+
 		static Vector2 dif;
+
 		private static void GetMousedAgent ()
 		{
-			if (MousedAgent != null)
-			{
+			if (MousedAgent != null) {
 				MousedAgent.IsHighlighted = false;
 				MousedAgent = null;
 			}
 			for (i = 0; i < PlayerManager.agentControllers.Count; i++) {
 				AgentController agentController = PlayerManager.agentControllers [i];
-				foreach (LSAgent agent in agentController.ActiveAgents.Values) {
-					if (agent.renderer.isVisible)
+				for (j = 0; j < AgentController.MaxAgents; j++)
+				{
+					if (agentController.AgentActive[j])
 					{
-						dif = new Vector2(
-							agent.transform.position.x - MouseWorldPosition.x,
-						    agent.transform.position.z - MouseWorldPosition.y);
-						if ((dif.x * dif.x + dif.y * dif.y) <= (agent.SelectionRadius * agent.SelectionRadius))
-						{
-							MouseOver (agent);
-							break;
+						curAgent = agentController.Agents[j];
+						if (curAgent.renderer.isVisible) {
+							dif = new Vector2 (
+								curAgent.transform.position.x - MouseWorldPosition.x,
+							    curAgent.transform.position.z - MouseWorldPosition.y);
+							if ((dif.x * dif.x + dif.y * dif.y) <= (curAgent.SelectionRadius * curAgent.SelectionRadius)) {
+								MouseOver (curAgent);
+								break;
+							}
 						}
 					}
 				}
 			}
 		}
+
 		private static void MouseOver (LSAgent agent)
 		{
 			MousedAgent = agent;

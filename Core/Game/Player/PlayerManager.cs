@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 namespace Lockstep {
 public class PlayerManager  : MonoBehaviour{
 		public static FastList<AgentController> agentControllers = new FastList<AgentController>();
+		public static bool[] HasAgentController = new bool[4];
 		public static Camera mainCamera;
 
 		private static bool FirstInitialize = true;
@@ -37,6 +39,11 @@ public class PlayerManager  : MonoBehaviour{
 		public static void AddAgentController(AgentController agentController)
 		{
 			agentControllers.Add (agentController);
+			if (agentController.ControllerID >= HasAgentController.Length)
+			{
+				Array.Resize (ref HasAgentController, HasAgentController.Length * 2);
+			}
+			HasAgentController[agentController.ControllerID] = true;
 		}
 
 

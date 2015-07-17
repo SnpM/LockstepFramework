@@ -9,10 +9,8 @@ using Lockstep.Integration;
 public class Editor_LSAgent : Editor
 {
 	static bool ShowDetail;
-	bool[] ShowDetailAbility;
 	public override void OnInspectorGUI ()
 	{
-		base.DrawDefaultInspector ();
-
+		LSAgent agent = (LSAgent)target;
 	}
 }

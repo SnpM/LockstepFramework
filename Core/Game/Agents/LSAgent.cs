@@ -9,8 +9,8 @@ namespace Lockstep
 	public class LSAgent : MonoBehaviour
 	{
 		public Ability[] Abilities;
+		public int AbilityCount;
 		public ActiveAbility[] ActiveAbilities;
-		public int AbilitiesLength;
 		public LSBody Body;
 		public ushort GlobalID;
 		public ushort LocalID;
@@ -25,9 +25,10 @@ namespace Lockstep
 			this.renderer = GetComponent<Renderer> ();
 
 			Abilities = this.GetComponents<Ability> ();
-			AbilitiesLength = Abilities.Length;
+
+			AbilityCount = Abilities.Length;
 			ActiveAbilities = new ActiveAbility[InputManager.InputCount];
-			for (i = 0; i < Abilities.Length; i++) {
+			for (i = 0; i < AbilityCount; i++) {
 				Ability ability = Abilities [i];
 				ability.Initialize (this);
 
@@ -43,7 +44,7 @@ namespace Lockstep
 
 		public void Simulate ()
 		{
-			for (i = 0; i < AbilitiesLength; i++) {
+			for (i = 0; i < AbilityCount; i++) {
 				Abilities [i].Simulate ();
 			}
 		}
@@ -52,9 +53,12 @@ namespace Lockstep
 			ringController.Visualize ();
 		}
 
-		public void Activate (Command com)
+		static byte leIndex;
+		public void Execute (Command com)
 		{
-			ActiveAbility activeAbility = (ActiveAbility)Abilities [(int)com.LeInput];
+			leIndex = (byte)com.LeInput;
+			Debug.Log (leIndex);
+			ActiveAbility activeAbility = (ActiveAbility)ActiveAbilities [leIndex];
 			if (activeAbility != null) {
 				activeAbility.Execute (com);
 			}

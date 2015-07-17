@@ -32,7 +32,9 @@ namespace Lockstep
 			if (frame.Commands != null)
 			for (i = 0; i < frame.Commands.Count; i++)
 			{
-
+				Command com = frame.Commands[i];
+				AgentController controller = AgentController.InstanceManagers[com.ControllerID];
+				controller.Execute (com);
 			}
 		}
 

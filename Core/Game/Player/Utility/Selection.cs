@@ -10,7 +10,7 @@ namespace Lockstep
 		static int i, j;
 		static int BigIndex, SmallIndex;
 		public AgentController LeAgentController;
-		public FastList<LSAgent> selectedAgents;
+		public FastList<int> selectedAgentLocalIDs;
 		public ulong Header;
 		public byte[] Data = new byte[64];
 
@@ -57,10 +57,10 @@ namespace Lockstep
 			Header = BitConverter.ToUInt64 (source, curIndex);
 			curIndex += 8;
 
-			if (selectedAgents == null)
-				selectedAgents = new FastList<LSAgent> (64);
+			if (selectedAgentLocalIDs == null)
+				selectedAgentLocalIDs = new FastList<int> (64);
 			else
-				selectedAgents.FastClear ();
+				selectedAgentLocalIDs.FastClear ();
 
 			for (i = 0; i < 64; i++) {
 				castedBigIndex = (ulong)1 << i;
@@ -70,7 +70,7 @@ namespace Lockstep
 						castedSmallIndex = (byte)(1 << j);
 						if ((CullGroup & (castedSmallIndex)) == castedSmallIndex)
 						{
-							selectedAgents.Add (agentController.ActiveAgents [(ushort)(i * 8 + j)]);
+							selectedAgentLocalIDs.Add (i * 8 + j);
 						}
 					}
 				}
@@ -81,9 +81,9 @@ namespace Lockstep
 		public override string ToString ()
 		{
 			string s = "Selected Agents: ";
-			if (selectedAgents != null) {
-				for (i = 0; i < selectedAgents.Count; i++) {
-					s += selectedAgents [i].LocalID.ToString () + ", ";
+			if (selectedAgentLocalIDs != null) {
+				for (i = 0; i < selectedAgentLocalIDs.Count; i++) {
+					s += selectedAgentLocalIDs [i].ToString () + ", ";
 				}
 			}
 			return s;
