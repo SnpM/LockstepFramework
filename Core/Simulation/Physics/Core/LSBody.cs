@@ -136,7 +136,7 @@ namespace Lockstep
 				VelocityMagnitude = Velocity.Magnitude ();
 				VelocityChanged = false;
 			}
-			
+
 			if (VelocityMagnitude != 0) {
 				Position.x += Velocity.x;
 				Position.y += Velocity.y;

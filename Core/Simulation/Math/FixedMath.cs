@@ -135,13 +135,13 @@ namespace Lockstep
 			if (0 == f1) {
 				return 0;
 			}
-			 n = (f1 / 2) + 1;
-			 n1 = (n + (f1 / n)) / 2;  
+			 n = (f1 >> 1) + 1;
+			 n1 = (n + (f1 / n)) >> 1;  
 			while (n1 < n) {  
 				n = n1;  
-				n1 = (n + (f1 / n)) / 2;  
+				n1 = (n + (f1 / n)) >> 1;  
 			} 
-			return n << SHIFT_AMOUNT / 2;  
+			return n << (SHIFT_AMOUNT / 2);  
 		}
 	#endregion
 

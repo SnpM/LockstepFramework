@@ -86,6 +86,20 @@ namespace Lockstep
 			this.x = (this.x << FixedMath.SHIFT_AMOUNT) / mag;
 			this.y = (this.y << FixedMath.SHIFT_AMOUNT) /  mag;
 		}
+		public void Normalize (out long Distance)
+		{
+			Distance = this.Magnitude ();
+			if (Distance == 0)
+			{
+				return;
+			}
+			else if (Distance == FixedMath.One)
+			{
+				return;
+			}
+			this.x = (this.x << FixedMath.SHIFT_AMOUNT) / Distance;
+			this.y = (this.y << FixedMath.SHIFT_AMOUNT) / Distance;
+		}
 		/// <summary>
 		/// Lerp this vector to target by amount.
 		/// </summary>
