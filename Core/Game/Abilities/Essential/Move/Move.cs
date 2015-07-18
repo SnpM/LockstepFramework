@@ -22,6 +22,8 @@ public class Move : ActiveAbility
 
 	public override void Initialize (LSAgent agent)
 	{
+		MyMovementGroupID = -1;
+
 		Body = agent.Body;
 		Body.Mover = this;
 		Body.OnContact += HandleCollisionEnter;

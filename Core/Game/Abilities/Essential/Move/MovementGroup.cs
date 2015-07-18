@@ -29,9 +29,10 @@ public class MovementGroup {
 			moveGroup = new MovementGroup();
 		}
 		moveGroup.IndexID = ActiveGroups.Count;
-		moveGroup.Initialize (com);
 		ActiveGroups.Add (moveGroup);
 		LastCreatedGroup = moveGroup;
+		moveGroup.Initialize (com);
+
 		return moveGroup;
 	}
 
@@ -91,7 +92,14 @@ public class MovementGroup {
 			GroupPosition /= Movers.Count;
 
 			GroupDirection = Destination - GroupPosition;
-			GroupDirection.Normalize ();
+
+			for (i = 0; i < Movers.Count; i++)
+			{
+				Move mover = Movers[i];
+				mover.Destination = mover.Body.Position + GroupDirection;
+				mover.StartMove ();
+			}
+
 		}
 		else {
 			for (i = 0; i < Movers.Count;i++)
