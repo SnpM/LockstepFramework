@@ -97,6 +97,7 @@ public class MovementGroup {
 			{
 				Move mover = Movers[i];
 				mover.Destination = mover.Body.Position + GroupDirection;
+				mover.IsFormationMoving = true;
 				mover.StartMove ();
 			}
 
@@ -106,6 +107,7 @@ public class MovementGroup {
 			{
 				Move mover = Movers[i];
 				mover.Destination = Destination;
+				mover.IsFormationMoving = false;
 				mover.StartMove ();
 			}
 		}

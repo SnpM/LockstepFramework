@@ -15,6 +15,7 @@ public class Move : ActiveAbility
 	public Vector2d Destination;
 	public MovementGroup MyMovementGroup;
 	public int MyMovementGroupID = -1;
+	public bool IsFormationMoving;
 	private Vector2d MovementDirection;
 	public LSBody Body;
 	private long timescaledSpeed;
@@ -93,7 +94,7 @@ public class Move : ActiveAbility
 	private void HandleCollision (LSBody other)
 	{
 		if (other.Mover != null) {
-			if (IsMoving) {
+			if (IsMoving && !IsFormationMoving) {
 				if (!other.Mover.IsMoving && other.Mover.MyMovementGroupID == MyMovementGroupID) {
 					StopMove ();
 				}
