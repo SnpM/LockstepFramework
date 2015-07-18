@@ -49,6 +49,7 @@ public class MovementGroup
 	#endregion;
 
 	const int MinimumGroupSize = 3;
+	const long MaximumDistDif = FixedMath.One * 4;
 	static int i, j, count, smallIndex, bigIndex, hash;
 	public FastList<Move> Movers;
 	public int MoversCount;
@@ -63,7 +64,6 @@ public class MovementGroup
 		Movers = new FastList<Move> (com._select.selectedAgentLocalIDs.Count);
 		Destination = com._position;
 		CalculatedBehaviors = false;
-		Debug.Log (IndexID);
 	}
 
 	public void Add (Move mover)
@@ -119,7 +119,7 @@ public class MovementGroup
 				if (currentSqrDistance > biggestSqrDistance) {
 					currentDistance = FixedMath.Sqrt (currentSqrDistance);
 					DistDif = currentDistance - Radius;
-					if (DistDif > FixedMath.One * 8) {
+					if (DistDif > MaximumDistDif * MoversCount / 128) {
 						ExecuteGroupIndividualMove ();
 						return;
 					}
@@ -139,7 +139,7 @@ public class MovementGroup
 				Move mover = Movers [i];
 				mover.Destination = mover.Body.Position + GroupDirection;
 				mover.IsFormationMoving = true;
-				mover.closingDistanceMultiplier = FixedMath.One / 4;
+				mover.closingDistanceMultiplier = FixedMath.One * 2 / 5;
 				mover.StartMove ();
 			}
 

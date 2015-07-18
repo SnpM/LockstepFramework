@@ -4,10 +4,17 @@ using Lockstep;
 
 public class Move : ActiveAbility
 {
-	#region Static Movement Management
+	#region Behavior
+	const long SteeringWeight = FixedMath.One * 3/4;
+	const int MinimumOtherStopTime = (int)(FixedMath.One / LockstepManager.Timestep / 4);
+	#endregion
 
+	#region Static Movement Variables
+	static Vector2d steering;
+	static int i, j;
+	static long sqrDistance;
+	static Vector2d Offset;
 	#endregion;
-
 
 	#region Instance Stuff
 	public long Speed;
@@ -21,6 +28,7 @@ public class Move : ActiveAbility
 	private long timescaledSpeed;
 	private long closingDistance;
 	public long closingDistanceMultiplier;
+	public int StopTime;
 
 	public override void Initialize (LSAgent agent)
 	{
@@ -28,9 +36,7 @@ public class Move : ActiveAbility
 
 		Body = agent.Body;
 		Body.Mover = this;
-		Body.OnContact += HandleCollisionEnter;
 		Body.OnContact += HandleCollision;
-		Body.OnContactExit += HandleCollisionExit;
 
 		timescaledSpeed = ((Speed * LockstepManager.Timestep) >> FixedMath.SHIFT_AMOUNT);
 		closingDistance = agent.Body.Radius;
@@ -39,21 +45,38 @@ public class Move : ActiveAbility
 	public override void Simulate ()
 	{
 		if (IsMoving) {
+
 			MovementDirection = Destination - Body.Position;
 			long distance;
 			MovementDirection.Normalize (out distance);
 
 			if (distance > closingDistance) {
-				Body.Velocity = MovementDirection * timescaledSpeed;
+				Body.Velocity += (MovementDirection * timescaledSpeed - Body.Velocity) * SteeringWeight;
 			} else {
-				Body.Velocity = MovementDirection * ((timescaledSpeed * distance) / (closingDistance));
-				if (distance <((closingDistance * closingDistanceMultiplier) >> FixedMath.SHIFT_AMOUNT)) {
+				Body.Velocity += (MovementDirection * ((timescaledSpeed * distance) / (closingDistance)) - Body.Velocity) * SteeringWeight;
+				if (distance < ((closingDistance * closingDistanceMultiplier) >> FixedMath.SHIFT_AMOUNT)) {
 					StopMove ();
 				}
 			}
-		
+			
 			Body.VelocityChanged = true;
 		}
+		else {
+
+			if (TouchingObjects.Count > 0) Body.Velocity /= TouchingObjects.Count;
+
+			Body.Velocity -= Body.Velocity * SteeringWeight;
+
+			StopTime++;
+		}
+		TouchingObjects.FastClear ();
+	}
+
+	private void ApplySteeringForces ()
+	{
+		steering -= Body.Velocity;
+		steering *= SteeringWeight;
+		Body.Velocity += steering;
 	}
 
 	public override void Deactivate ()
@@ -75,11 +98,10 @@ public class Move : ActiveAbility
 	public void StopMove ()
 	{
 		IsMoving = false;
-		Body.Velocity = Vector2d.zero;
-		if (MyMovementGroup != null)
-		{
+		if (MyMovementGroup != null) {
 			MyMovementGroup.Remove (this);
 		}
+		StopTime = 0;
 	}
 
 	public void StartMove ()
@@ -87,31 +109,19 @@ public class Move : ActiveAbility
 		IsMoving = true;
 	}
 
-	FastBucket<Move> TouchingObjects = new FastBucket<Move> ();
-
-	private void HandleCollisionEnter (LSBody other)
-	{
-		if (other.Mover != null) {
-			TouchingObjects.Add (other.Mover);
-		}
-	}
+	FastList<Move> TouchingObjects = new FastList<Move> ();
 
 	private void HandleCollision (LSBody other)
 	{
 		if (other.Mover != null) {
-			if (IsMoving && !IsFormationMoving) {
-				if (!other.Mover.IsMoving && other.Mover.MyMovementGroupID == MyMovementGroupID) {
+			TouchingObjects.Add (other.Mover);
+			if (IsMoving) {
+				if (!other.Mover.IsMoving &&
+				    other.Mover.MyMovementGroupID == MyMovementGroupID &&
+				    other.Mover.StopTime > MinimumOtherStopTime) {
 					StopMove ();
 				}
 			}
-		}
-	}
-
-	private void HandleCollisionExit (LSBody other)
-	{
-		if (other.Mover != null) {
-			TouchingObjects.Remove (other.Mover);
-			
 		}
 	}
 

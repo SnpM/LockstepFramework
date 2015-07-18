@@ -109,7 +109,8 @@ namespace Lockstep
 
 						if (depth < 0)
 							return;
-						
+
+
 						DistX = (DistX * depth / dist);
 						DistY = (DistY * depth / dist);
 
@@ -129,14 +130,45 @@ namespace Lockstep
 							
 						}
 						else  {
-							DistX /= 2;
-							DistY /= 2;
-							Body1.Position.x += DistX;
-							Body1.Position.y += DistY;
-							Body1.PositionChanged = true;
-							Body2.Position.x -= DistX;
-							Body2.Position.y -= DistY;
-							Body2.PositionChanged = true;
+							DistX /= 4;
+							DistY /= 4;
+
+							if (Body1.Velocity.Dot (Body2.Velocity.x, Body2.Velocity.y) < 0)
+							{
+								if (Body1.Mover != null)
+								{
+									Body1.Velocity.x += DistX;
+									Body1.Velocity.y += DistY;
+									Body1.VelocityChanged = true;
+								}
+								else {
+									Body1.Position.x += DistX;
+									Body1.Position.y += DistY;
+									Body1.PositionChanged = true;
+								}
+								if (Body2.Mover != null)
+								{
+									Body2.Velocity.x -= DistX;
+									Body2.Velocity.y -= DistY;
+									Body2.VelocityChanged = true;
+								}
+								else {
+									Body2.Position.x -= DistX;
+									Body2.Position.y -= DistY;
+									Body2.PositionChanged = true;
+								}
+							}
+							else {
+								Body1.Position.x += DistX;
+								Body1.Position.y += DistY;
+								Body1.PositionChanged = true;
+								Body2.Position.x -= DistX;
+								Body2.Position.y -= DistY;
+								Body2.PositionChanged = true;
+							}
+
+
+
 						}
 						break;
 					case CollisionType.Circle_AABox:
@@ -172,12 +204,17 @@ namespace Lockstep
 					if (Body2.OnContactEnter != null)
 						Body2.OnContactEnter (Body1);
 					IsColliding = true;
+
+				}
+				else {
+
 				}
 
 				DistributeCollision ();
 			} else {
 
 				if (IsColliding) {
+
 					if (Body1.OnContactExit != null) {
 						Body1.OnContactExit (Body2);
 					}
@@ -185,6 +222,10 @@ namespace Lockstep
 						Body2.OnContactExit (Body1);
 					}
 					IsColliding = false;
+
+				}
+				else {
+
 				}
 			}
 
@@ -433,7 +474,7 @@ namespace Lockstep
 			}
 
 			//Resolving
-			if (Vector2d.Dot (PenetrationX,PenetrationY,circle.Velocity.x,circle.Velocity.y) <= 0)
+			if (Vector2d.Dot (PenetrationX,PenetrationY,circle.Velocity.x,circle.Velocity.y) < 0)
 			{
 				return;
 			}

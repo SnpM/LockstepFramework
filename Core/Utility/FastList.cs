@@ -36,9 +36,6 @@ namespace Lockstep
 
 		private void Initialize ()
 		{
-
-			Capacity = DefaultCapacity;
-
 			innerArray = new T[Capacity];
 			Count = 0;
 		}
@@ -47,12 +44,13 @@ namespace Lockstep
 		{
 			EnsureCapacity (Count + 1);
 			innerArray [Count++] = item;
+
 		}
 
 		public void AddRange (T[] items)
 		{
 			ArrayLength = items.Length;
-			EnsureCapacity (Capacity + ArrayLength + 1);
+			EnsureCapacity (Count + ArrayLength + 1);
 			for (i = 0; i < ArrayLength; i++)
 			{
 				innerArray[Count++] = items[i];
@@ -79,9 +77,9 @@ namespace Lockstep
 		public void RemoveAt (int index)
 		{
 			Count--;
+			innerArray [index] = default(T);
 			Array.Copy (innerArray, index + 1, innerArray, index, Count - index);
 			
-			innerArray [Count] = default(T);
 		}
 
 		public T[] ToArray ()
@@ -122,15 +120,10 @@ namespace Lockstep
 		{
 			if (Capacity < min)
 			{
-				Capacity = min;
-				if (Count >= Capacity) {
-					Capacity *= 2;
-				}
-				Array.Resize (ref innerArray, Capacity);
-			}
-			else if (Count >= Capacity)
-			{
 				Capacity *= 2;
+				if (Capacity < min) {
+					Capacity = min;
+				}
 				Array.Resize (ref innerArray, Capacity);
 			}
 		}

@@ -5,7 +5,7 @@ using Lockstep;
 
 namespace Lockstep
 {
-	public class AgentController : MonoBehaviour
+	public class AgentController
 	{
 		#region Static Stuff
 		static int i,j;
@@ -122,7 +122,7 @@ namespace Lockstep
 				curAgent = cache.Pop ();
 			}
 			else {
-				curAgent = Instantiate (AgentObjects[(int)agentCode]).GetComponent<LSAgent> ();
+				curAgent = GameObject.Instantiate (AgentObjects[(int)agentCode]).GetComponent<LSAgent> ();
 			}
 
 			localID = GenerateLocalID ();
@@ -135,7 +135,7 @@ namespace Lockstep
 
 			curAgent.Initialize ();
 
-			RingController ringController = Instantiate (LockstepManager.Instance.SelectionRing).GetComponent<RingController> ();
+			RingController ringController = GameObject.Instantiate (LockstepManager.Instance.SelectionRing).GetComponent<RingController> ();
 			ringController.Initialize (curAgent);
 			curAgent.ringController = ringController;
 
