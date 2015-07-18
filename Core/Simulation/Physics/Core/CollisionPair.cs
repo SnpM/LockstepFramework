@@ -75,6 +75,7 @@ namespace Lockstep
 		}
 
 		static long dist, depth;
+
 		public void DistributeCollision ()
 		{
 			if (!Active)
@@ -115,50 +116,30 @@ namespace Lockstep
 						DistY = (DistY * depth / dist);
 
 						//Resolving collision
-						if (Body1.Immovable)
-						{
+						if (Body1.Immovable) {
 							Body2.Position.x -= DistX;
 							Body2.Position.y -= DistY;
 							
 							Body2.PositionChanged = true;
-						}
-						else if (Body2.Immovable)
-						{
+						} else if (Body2.Immovable) {
 							Body1.Position.x += DistX;
 							Body1.Position.y += DistY;
 							Body1.PositionChanged = true;
 							
-						}
-						else  {
+						} else {
 							DistX /= 4;
 							DistY /= 4;
 
-							if (Body1.Velocity.Dot (Body2.Velocity.x, Body2.Velocity.y) < 0)
-							{
-								if (Body1.Mover != null)
-								{
-									Body1.Velocity.x += DistX;
-									Body1.Velocity.y += DistY;
-									Body1.VelocityChanged = true;
-								}
-								else {
-									Body1.Position.x += DistX;
-									Body1.Position.y += DistY;
-									Body1.PositionChanged = true;
-								}
-								if (Body2.Mover != null)
-								{
-									Body2.Velocity.x -= DistX;
-									Body2.Velocity.y -= DistY;
-									Body2.VelocityChanged = true;
-								}
-								else {
-									Body2.Position.x -= DistX;
-									Body2.Position.y -= DistY;
-									Body2.PositionChanged = true;
-								}
-							}
-							else {
+							if (Body1.Velocity.Dot (Body2.Velocity.x, Body2.Velocity.y) < 0) {
+
+								Body1.Velocity.x += DistX;
+								Body1.Velocity.y += DistY;
+								Body1.VelocityChanged = true;
+
+								Body2.Velocity.x -= DistX;
+								Body2.Velocity.y -= DistY;
+								Body2.VelocityChanged = true;
+							} else {
 								Body1.Position.x += DistX;
 								Body1.Position.y += DistY;
 								Body1.PositionChanged = true;
@@ -205,8 +186,7 @@ namespace Lockstep
 						Body2.OnContactEnter (Body1);
 					IsColliding = true;
 
-				}
-				else {
+				} else {
 
 				}
 
@@ -223,8 +203,7 @@ namespace Lockstep
 					}
 					IsColliding = false;
 
-				}
-				else {
+				} else {
 
 				}
 			}
@@ -374,6 +353,7 @@ namespace Lockstep
 		}
 
 		static long Mag;
+
 		public void HandleImmovableCircleBoxCollision (LSBody imov, LSBody mov)
 		{
 
@@ -474,26 +454,21 @@ namespace Lockstep
 			}
 
 			//Resolving
-			if (Vector2d.Dot (PenetrationX,PenetrationY,circle.Velocity.x,circle.Velocity.y) < 0)
-			{
+			if (Vector2d.Dot (PenetrationX, PenetrationY, circle.Velocity.x, circle.Velocity.y) < 0) {
 				return;
 			}
 			
 			circle.Position.x -= PenetrationX;//(PenetrationX * Multiplier) >> FixedMath.SHIFT_AMOUNT;
 			circle.Position.y -= PenetrationY;//(PenetrationY * Multiplier) >> FixedMath.SHIFT_AMOUNT;
 			
-			if (LeCollisionType != CollisionType.Circle_AABox)
-			{
+			if (LeCollisionType != CollisionType.Circle_AABox) {
 				Mag = FixedMath.Sqrt ((PenetrationX * PenetrationX + PenetrationY * PenetrationY) >> FixedMath.SHIFT_AMOUNT);
 				PenetrationX = (PenetrationX << FixedMath.SHIFT_AMOUNT) / Mag;
 				PenetrationY = (PenetrationY << FixedMath.SHIFT_AMOUNT) / Mag;
-			}
-			else {
-				if (PenetrationX != 0){
+			} else {
+				if (PenetrationX != 0) {
 					PenetrationX = PenetrationX > 0 ? FixedMath.One : -FixedMath.One;
-				}
-				else if (PenetrationY != 0)
-				{
+				} else if (PenetrationY != 0) {
 					PenetrationY = PenetrationY > 0 ? FixedMath.One : -FixedMath.One;
 				}			
 			}

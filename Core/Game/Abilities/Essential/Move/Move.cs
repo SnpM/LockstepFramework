@@ -6,7 +6,7 @@ public class Move : ActiveAbility
 {
 	#region Behavior
 	const long SteeringWeight = FixedMath.One * 3/4;
-	const int MinimumOtherStopTime = (int)(FixedMath.One / LockstepManager.Timestep / 4);
+	const int MinimumOtherStopTime = (int)(FixedMath.One / LockstepManager.Timestep / 8);
 	#endregion
 
 	#region Static Movement Variables
