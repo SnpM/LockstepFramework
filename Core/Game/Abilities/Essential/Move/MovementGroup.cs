@@ -6,54 +6,52 @@ public class MovementGroup
 {
 
 	#region Static Containers
-	public static FastList<MovementGroup> ActiveGroups = new FastList<MovementGroup> ();
+	public static int ActiveGroupCapacity = 512;
+	public static MovementGroup[] ActiveGroups = new MovementGroup[ActiveGroupCapacity];
+	public static int ActiveGroupPeakCount = 0;
+	private static FastStack<int> ActiveGroupOpenSlots = new FastStack<int>(ActiveGroupCapacity);
 	public static FastStack<MovementGroup> InactiveGroups = new FastStack<MovementGroup> ();
 	public static MovementGroup LastCreatedGroup;
 
 	public static void Simulate ()
 	{
-		for (i = 0; i < ActiveGroups.Count; i++) {
-			moveGroup = ActiveGroups [i];
-			moveGroup.CalculateAndExecuteBehaviors ();
-			InactiveGroups.Add (moveGroup);
+		for (i = 0; i < ActiveGroupPeakCount; i++) {
+			if (ActiveGroups[i] != null)
+			{
+				moveGroup = ActiveGroups [i];
+				moveGroup.LocalSimulate();
+			}
 		}
-		ActiveGroups.FastClear ();
-
 	}
 
 	static MovementGroup moveGroup;
+	static int slotIndex;
 
 	public static MovementGroup CreateGroup (Command com)
 	{
-		if (InactiveGroups.Count > 0) {
-			moveGroup = InactiveGroups.Pop ();
-		} else {
-			moveGroup = new MovementGroup ();
+		moveGroup = InactiveGroups.Count > 0 ? InactiveGroups.Pop () : new MovementGroup();
+		slotIndex = ActiveGroupOpenSlots.Count > 0 ? ActiveGroupOpenSlots.Pop () : ActiveGroupPeakCount++;
+
+		if (slotIndex == ActiveGroupCapacity)
+		{
+			ActiveGroupCapacity *= 2;
+			System.Array.Resize (ref ActiveGroups, ActiveGroupCapacity);
 		}
-		moveGroup.IndexID = ActiveGroups.Count;
-		ActiveGroups.Add (moveGroup);
+
+		moveGroup.IndexID = slotIndex;
+		ActiveGroups[slotIndex] = (moveGroup);
 		LastCreatedGroup = moveGroup;
 		moveGroup.Initialize (com);
-
 		return moveGroup;
 	}
 
-	public static void DeactivateGroup (MovementGroup group)
-	{
-		for (i = 0; i < group.Movers.Count; i++) {
-			group.Movers [i].MyMovementGroup = null;
-		}
-		group.Movers.FastClear ();
-		ActiveGroups.RemoveAt (group.IndexID);
-		InactiveGroups.Add (group);
-		group.IndexID = -1;
-	}
 
 	#endregion;
 
 	const int MinimumGroupSize = 3;
 	static int i, j, count, smallIndex, bigIndex, hash;
 	public FastList<Move> Movers;
+	public int MoversCount;
 	public Vector2d GroupDirection;
 	public Vector2d GroupPosition;
 	public Vector2d Destination;
@@ -64,23 +62,40 @@ public class MovementGroup
 	{
 		Movers = new FastList<Move> (com._select.selectedAgentLocalIDs.Count);
 		Destination = com._position;
+		CalculatedBehaviors = false;
+		Debug.Log (IndexID);
 	}
 
 	public void Add (Move mover)
 	{
-		if (mover.MyMovementGroup != null) {
-			mover.MyMovementGroup.Remove (mover);
+		if (mover.MyMovementGroup != null)
+		{
+			mover.MyMovementGroup.Movers.Remove (mover);
 		}
 		mover.MyMovementGroup = this;
 		mover.MyMovementGroupID = IndexID;
 		Movers.Add (mover);
+		MoversCount++;
 	}
 
 	public void Remove (Move mover)
 	{
-		mover.MyMovementGroup = null;
-		mover.MyMovementGroupID = -1;
-		Movers.Remove (mover);
+		MoversCount--;
+	}
+
+	private bool CalculatedBehaviors;
+	public void LocalSimulate ()
+	{
+
+		if (!CalculatedBehaviors)
+		{
+			CalculateAndExecuteBehaviors ();
+			CalculatedBehaviors = true;
+		}
+		if (Movers.Count == 0)
+		{
+			Deactivate ();
+		}
 	}
 
 	static long biggestSqrDistance;
@@ -90,7 +105,7 @@ public class MovementGroup
 
 	public void CalculateAndExecuteBehaviors ()
 	{
-		if (Movers.Count > 2) {
+		if (Movers.Count >= MinimumGroupSize) {
 			for (i = 0; i < Movers.Count; i++) {
 				Move mover = Movers [i];
 				GroupPosition += mover.Body.Position;
@@ -137,6 +152,23 @@ public class MovementGroup
 				mover.StartMove ();
 			}
 		}
+	}
+
+	public void Deactivate ()
+	{
+
+		for (i = 0; i < Movers.Count; i++) {
+			Move mover = Movers [i];
+			mover.MyMovementGroup = null;
+			mover.MyMovementGroupID = -1;
+		}
+		Movers.FastClear ();
+		ActiveGroups[this.IndexID] = null;
+		ActiveGroupOpenSlots.Add (this.IndexID);
+		InactiveGroups.Add (this);
+		CalculatedBehaviors = false;
+		this.IndexID = -1;
+
 	}
 
 	private void ExecuteGroupIndividualMove ()

@@ -76,6 +76,10 @@ public class Move : ActiveAbility
 	{
 		IsMoving = false;
 		Body.Velocity = Vector2d.zero;
+		if (MyMovementGroup != null)
+		{
+			MyMovementGroup.Remove (this);
+		}
 	}
 
 	public void StartMove ()

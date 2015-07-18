@@ -53,13 +53,25 @@ namespace Lockstep
 		{
 			leIndex = Array.IndexOf (innerArray, item);
 			if (leIndex >= 0) {
-				shiftedIndex = (ulong)1 << leIndex;
-				OpenSlots.Add (leIndex);
-				arrayAllocation ^= shiftedIndex;
-				Count--;
+				RemoveAt(leIndex);
 			}
 		}
+		public void RemoveAt (int index)
+		{
+			shiftedIndex = (ulong)1 << index;
+			OpenSlots.Add (index);
+			arrayAllocation ^= shiftedIndex;
+			Count--;
+		}
 
+		public T this [int index] {
+			get {
+				return innerArray [index];
+			}
+			set {
+				innerArray [index] = value;
+			}
+		}
 		public void Clear ()
 		{
 			for (i = 0; i < Capacity; i++) {
