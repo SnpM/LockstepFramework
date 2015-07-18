@@ -19,7 +19,8 @@ public class Move : ActiveAbility
 	private Vector2d MovementDirection;
 	public LSBody Body;
 	private long timescaledSpeed;
-	private long stoppingDistance;
+	private long closingDistance;
+	public long closingDistanceMultiplier;
 
 	public override void Initialize (LSAgent agent)
 	{
@@ -32,7 +33,7 @@ public class Move : ActiveAbility
 		Body.OnContactExit += HandleCollisionExit;
 
 		timescaledSpeed = ((Speed * LockstepManager.Timestep) >> FixedMath.SHIFT_AMOUNT);
-		stoppingDistance = agent.Body.Radius;
+		closingDistance = agent.Body.Radius;
 	}
 
 	public override void Simulate ()
@@ -42,11 +43,11 @@ public class Move : ActiveAbility
 			long distance;
 			MovementDirection.Normalize (out distance);
 
-			if (distance > stoppingDistance) {
+			if (distance > closingDistance) {
 				Body.Velocity = MovementDirection * timescaledSpeed;
 			} else {
-				Body.Velocity = MovementDirection * ((timescaledSpeed * distance) / (stoppingDistance));
-				if (distance < stoppingDistance / 4) {
+				Body.Velocity = MovementDirection * ((timescaledSpeed * distance) / (closingDistance));
+				if (distance <((closingDistance * closingDistanceMultiplier) >> FixedMath.SHIFT_AMOUNT)) {
 					StopMove ();
 				}
 			}

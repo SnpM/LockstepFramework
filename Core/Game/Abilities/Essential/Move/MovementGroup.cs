@@ -105,7 +105,7 @@ public class MovementGroup
 					currentDistance = FixedMath.Sqrt (currentSqrDistance);
 					DistDif = currentDistance - Radius;
 					if (DistDif > FixedMath.One * 8) {
-						ExecuteIndividualMove ();
+						ExecuteGroupIndividualMove ();
 						return;
 					}
 					biggestSqrDistance = currentSqrDistance;
@@ -113,7 +113,7 @@ public class MovementGroup
 				}
 			}
 			if (GroupPosition.SqrDistance (Destination.x, Destination.y) < (biggestSqrDistance * 5 / 4)) {
-				ExecuteIndividualMove ();
+				ExecuteGroupIndividualMove ();
 				return;
 			}
 
@@ -124,18 +124,26 @@ public class MovementGroup
 				Move mover = Movers [i];
 				mover.Destination = mover.Body.Position + GroupDirection;
 				mover.IsFormationMoving = true;
+				mover.closingDistanceMultiplier = FixedMath.One / 4;
 				mover.StartMove ();
 			}
 
 		} else {
-			ExecuteIndividualMove ();
+			for (i = 0; i < Movers.Count; i++) {
+				Move mover = Movers [i];
+				mover.closingDistanceMultiplier = FixedMath.One / 4;
+				mover.Destination = Destination;
+				mover.IsFormationMoving = false;
+				mover.StartMove ();
+			}
 		}
 	}
 
-	private void ExecuteIndividualMove ()
+	private void ExecuteGroupIndividualMove ()
 	{
 		for (i = 0; i < Movers.Count; i++) {
 			Move mover = Movers [i];
+			mover.closingDistanceMultiplier = FixedMath.One * 3 / 5;
 			mover.Destination = Destination;
 			mover.IsFormationMoving = false;
 			mover.StartMove ();
