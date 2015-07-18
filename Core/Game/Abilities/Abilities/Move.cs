@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Lockstep;
-public class Print : ActiveAbility {
+public class Move : ActiveAbility {
 	public override void Initialize (LSAgent agent)
 	{
 
@@ -19,20 +19,15 @@ public class Print : ActiveAbility {
 
 	public override void Execute (Command com)
 	{
-
+		Debug.Log (Speed);
 	}
 
-	public long ASDF;
+	public long Speed;
 
 	public override InputCode ListenInput {
 		get {
-			return InputCode.Q;
+			return InputCode.M;
 		}
 	} 
 
-	public override AbilCode Code {
-		get {
-			return AbilCode.Print;
-		}
-	}
 }

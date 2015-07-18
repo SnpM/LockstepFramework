@@ -14,8 +14,8 @@ namespace Lockstep
 
 		public abstract void Simulate ();
 	
-		public abstract AbilCode Code {get;}
-
 		public abstract void Deactivate ();
+
+
 	}
 }

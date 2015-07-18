@@ -57,7 +57,6 @@ namespace Lockstep
 		public void Execute (Command com)
 		{
 			leIndex = (byte)com.LeInput;
-			Debug.Log (leIndex);
 			ActiveAbility activeAbility = (ActiveAbility)ActiveAbilities [leIndex];
 			if (activeAbility != null) {
 				activeAbility.Execute (com);
@@ -120,6 +119,5 @@ namespace Lockstep
 		public GameObject gameObject;
 		public Renderer renderer;
 		static int i, j;
-		static AbilCode abilCode;
 	}
 }
