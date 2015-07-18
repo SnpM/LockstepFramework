@@ -86,19 +86,19 @@ namespace Lockstep
 			this.x = (this.x << FixedMath.SHIFT_AMOUNT) / mag;
 			this.y = (this.y << FixedMath.SHIFT_AMOUNT) /  mag;
 		}
-		public void Normalize (out long Distance)
+		public void Normalize (out long mag)
 		{
-			Distance = this.Magnitude ();
-			if (Distance == 0)
+			mag = this.Magnitude ();
+			if (mag == 0)
 			{
 				return;
 			}
-			else if (Distance == FixedMath.One)
+			else if (mag == FixedMath.One)
 			{
 				return;
 			}
-			this.x = (this.x << FixedMath.SHIFT_AMOUNT) / Distance;
-			this.y = (this.y << FixedMath.SHIFT_AMOUNT) / Distance;
+			this.x = (this.x << FixedMath.SHIFT_AMOUNT) / mag;
+			this.y = (this.y << FixedMath.SHIFT_AMOUNT) / mag;
 		}
 		/// <summary>
 		/// Lerp this vector to target by amount.
@@ -158,6 +158,15 @@ namespace Lockstep
 			temp2 = this.y - otherY;
 			temp2 *= temp2;
 			return (FixedMath.Sqrt ((temp1 + temp2) >> FixedMath.SHIFT_AMOUNT));
+		}
+		public long SqrDistance (long otherX, long otherY)
+		{
+
+			temp1 = this.x - otherX;
+			temp1 *= temp1;
+			temp2 = this.y - otherY;
+			temp2 *= temp2;
+			return ((temp1 + temp2) >> FixedMath.SHIFT_AMOUNT);
 		}
 	#endregion
 
