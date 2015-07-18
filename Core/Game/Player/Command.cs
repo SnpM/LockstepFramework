@@ -17,6 +17,8 @@ namespace Lockstep
 			LeInput = inputCode;
 		}
 
+		public bool Used;
+
 		public byte ControllerID;
 		public InputCode LeInput;
 

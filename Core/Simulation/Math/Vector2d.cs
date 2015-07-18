@@ -235,6 +235,11 @@ namespace Lockstep
 		}
 
 		#endregion
+
+		public long GetLongHashCode ()
+		{
+			return x * 31 + y * 7;
+		}
 	}
 
 

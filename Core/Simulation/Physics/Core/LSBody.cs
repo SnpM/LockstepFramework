@@ -49,6 +49,7 @@ namespace Lockstep
 		public CollisionFunction OnContactEnter;
 		public CollisionFunction OnContact;
 		public CollisionFunction OnContactExit;
+		public Move Mover;
 		#endregion
 
 		#region State Information

@@ -66,7 +66,6 @@ namespace Lockstep
 				DoPhysics = false;
 			else
 				DoPhysics = !(Body1.IsTrigger || Body2.IsTrigger) && (!Body1.Immovable || !Body2.Immovable);
-
 			Active = true;
 		}
 
@@ -86,7 +85,9 @@ namespace Lockstep
 					Body1.OnContact (Body2);
 				if (Body2.OnContact != null)
 					Body2.OnContact (Body1);
+
 				if (DoPhysics) {
+
 					switch (LeCollisionType) {
 					case CollisionType.Circle_Circle:
 						DistX = Body1.Position.x - Body2.Position.x;
@@ -100,6 +101,7 @@ namespace Lockstep
 
 							Body1.PositionChanged = true;
 
+
 							return;
 						}
 						
@@ -110,7 +112,6 @@ namespace Lockstep
 						
 						DistX = (DistX * depth / dist);
 						DistY = (DistY * depth / dist);
-
 
 						//Resolving collision
 						if (Body1.Immovable)
@@ -136,8 +137,6 @@ namespace Lockstep
 							Body2.Position.x -= DistX;
 							Body2.Position.y -= DistY;
 							Body2.PositionChanged = true;
-
-
 						}
 						break;
 					case CollisionType.Circle_AABox:

@@ -33,7 +33,9 @@ namespace Lockstep
 			FrameManager.Simulate ();
 			AgentController.Simulate ();
 
-			//Custom code goes here
+			#region Custom Behaviors
+			MovementGroup.Simulate ();
+			#endregion
 
 			PhysicsManager.Simulate ();
 			CoroutineManager.Simulate ();
