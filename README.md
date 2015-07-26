@@ -35,7 +35,7 @@ License
 --------
 The MIT License (MIT)
 
-Copyright (c) 2015 Inkhorn Games and John Pan
+Copyright (c) 2015 John Pan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
