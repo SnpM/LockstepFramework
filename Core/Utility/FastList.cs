@@ -1,4 +1,11 @@
-﻿using System.Collections;
+﻿//=======================================================================
+// Copyright (c) 2015 John Pan
+// Distributed under the MIT License.
+// (See accompanying file LICENSE or copy at
+// http://opensource.org/licenses/MIT)
+//=======================================================================
+
+using System.Collections;
 using System;
 
 namespace Lockstep
