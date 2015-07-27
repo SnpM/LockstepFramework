@@ -117,17 +117,23 @@ namespace Lockstep
 			this.x = targetx * amount + this.x * (1 - amount);
 			this.y = targety * amount + this.y * (1 - amount);
 		}
-		public void Rotate (long sin, long cos)
+		public void Rotate (long cos, long sin)
 		{
-			temp1 = (this.x * cos + this.y * sin) >> FixedMath.SHIFT_AMOUNT;
-			this.y = (this.x * -sin + this.y * cos) >> FixedMath.SHIFT_AMOUNT;
+			temp1 = (this.x * sin + this.y * cos) >> FixedMath.SHIFT_AMOUNT;
+			this.y = (this.x * -cos + this.y * sin) >> FixedMath.SHIFT_AMOUNT;
+			this.x = temp1;
+		}
+		public void RotateInverse (long cos, long sin)
+		{
+			temp1 = (this.x * sin + this.y * -cos) >> FixedMath.SHIFT_AMOUNT;
+			this.y = (this.x * cos + this.y * sin) >> FixedMath.SHIFT_AMOUNT;
 			this.x = temp1;
 		}
 		public void RotateRight ()
 		{
 			temp1 = this.x;
-			this.x = -this.y;
-			this.y = temp1;
+			this.x = this.y;
+			this.y = -temp1;
 		}
 		public void Reflect (long axisX, long axisY)
 		{

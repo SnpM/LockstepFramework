@@ -103,6 +103,8 @@ namespace Lockstep
 				outputPath.Add (endNode);
 				return true;
 			}
+			System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+			sw.Start ();
 
 			GridHeap.FastClear ();
 			GridClosedSet.FastClear ();
@@ -153,6 +155,7 @@ namespace Lockstep
 						//outputPath.Add (currentNode);
 					}
 					outputPath.Add (endNode);
+
 					return true;
 				}
 

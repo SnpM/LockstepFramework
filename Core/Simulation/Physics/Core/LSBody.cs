@@ -4,7 +4,6 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
-
 using UnityEngine;
 using System.Collections;
 
@@ -48,7 +47,8 @@ namespace Lockstep
 		public Transform cachedTransform;
 		public GameObject cachedGameObject;
 		[System.NonSerialized]
-		public bool FirstInitialize = true;
+		public bool
+			FirstInitialize = true;
 
 		public delegate void CollisionFunction (LSBody other);
 
@@ -59,22 +59,49 @@ namespace Lockstep
 		#endregion
 
 		#region State Information
-		[SerializeField]
-		public Vector2d
-			Position;
-		[SerializeField]
-		public Vector2d
-			Rotation;
-		public Vector2d
-			Velocity;
+		public Vector2d Position;
+		public Vector2d Rotation;
+		public Vector2d Velocity;
+		public Vector2d LocalPosition;
+		public Vector2d LocalRotation;
+
 		public long VelocityMagnitude;
 		public bool VelocityChanged;
 		public bool PositionChanged;
 		public bool RotationChanged;
 		public bool PositionChangedBuffer;
 		public bool RotationChangedBuffer;
+		public bool SetPositionBuffer;
+		public bool SetRotationBuffer;
+
 		public int[] LocatedPartitions = new int[4];
 		public bool[] LocatedPartitionExists = new bool[4];
+
+		public bool HasParent;
+		public Vector2d LastPosition;
+		public Vector2d Offset;
+
+		public LSBody Parent {
+			get {
+				return HasParent ? _parent : null;
+			}
+			set {
+				if (value == null) {
+					HasParent = false;
+				} else {
+					if (_parent != value) {
+						HasParent = true;
+						_parent = value;
+						LocalPosition = (Position - _parent.Position);
+						LocalPosition.RotateInverse (_parent.Rotation.x, _parent.Rotation.y);
+						LocalRotation = Rotation;
+						LocalRotation.RotateInverse (_parent.Rotation.x, _parent.Rotation.y);
+					}
+				}
+			}
+		}
+
+		private LSBody _parent;
 		#endregion
 
 		public void Initialize ()
@@ -94,6 +121,8 @@ namespace Lockstep
 				cachedGameObject = base.gameObject;
 				cachedTransform = base.transform;
 			}
+
+			HasParent = false;
 
 			PositionChanged = true;
 			RotationChanged = true;
@@ -115,37 +144,71 @@ namespace Lockstep
 
 		public void EarlySimulate ()
 		{
-			if (VelocityChanged) {
-				VelocityMagnitude = Velocity.Magnitude ();
-				VelocityChanged = false;
-			}
+			if (HasParent) {
 
-			if (VelocityMagnitude != 0) {
-				Position.x += Velocity.x;
-				Position.y += Velocity.y;
-				PositionChanged = true;
-			}
+			} else {
+				if (VelocityChanged) {
+					VelocityMagnitude = Velocity.Magnitude ();
+					VelocityChanged = false;
+					if (VelocityMagnitude != 0)
+					{
+						Rotation = Velocity / VelocityMagnitude;
+						RotationChanged = true;
+					}
+				}
 
-			if (PositionChanged)
-			{
+				if (VelocityMagnitude != 0) {
+					Position.x += Velocity.x;
+					Position.y += Velocity.y;
+					PositionChanged = true;
+				}
+			}
+			if (PositionChanged) {
 				Partition.PartitionObject (this);
+				Offset = Position - LastPosition;
+				LastPosition = Position;
+				PositionChangedBuffer = true;
+			} else {
+				PositionChangedBuffer = false;
+			}
+			if (RotationChanged) {
+				RotationChangedBuffer = true;
+			} else {
+				RotationChangedBuffer = false;
 			}
 		}
 
 		public void Simulate ()
 		{
-			if (PositionChanged || RotationChanged) {
+			if (HasParent)
+			{
+				if (_parent.RotationChangedBuffer)
+				{
+					Position = LocalPosition;
+					Position.Rotate (_parent.Rotation.x,_parent.Rotation.y);
+					Position += _parent.Position;
 
+					Rotation = LocalRotation;
+					Rotation.Rotate (_parent.Rotation.x,_parent.Rotation.y);
+					RotationChanged = true;
+					PositionChanged = true;
+				}
+				else if (_parent.PositionChangedBuffer) {
+					Position += _parent.Offset;
+					PositionChanged = true;
+				}
+			}
+			if (PositionChanged || RotationChanged) {
 				if (PositionChanged) {
 					FuturePosition.x = Position.x + Velocity.x * PhysicsManager.ColSpreadMul;
 					FuturePosition.y = Position.y + Velocity.y * PhysicsManager.ColSpreadMul;
-					PositionChangedBuffer = true;
+					SetPositionBuffer = true;
 				} else {
 
 				}
 
 				if (RotationChanged) {
-					RotationChangedBuffer = true;
+					SetRotationBuffer = true;
 				} else {
 				}
 
@@ -161,14 +224,14 @@ namespace Lockstep
 
 		public void Visualize ()
 		{
-			if (PositionChangedBuffer) {
+			if (SetPositionBuffer) {
 				this.cachedTransform.position = Position.ToVector3 (transform.position.y);
-				PositionChangedBuffer = false;
+				SetPositionBuffer = false;
 			}
 
-			if (RotationChangedBuffer) {
-				this.cachedTransform.rotation = Quaternion.LookRotation (Rotation.ToVector3(0f));
-				RotationChangedBuffer = false;
+			if (SetRotationBuffer) {
+				this.cachedTransform.rotation = Quaternion.LookRotation (Rotation.ToVector3 (0f));
+				SetRotationBuffer = false;
 			}
 
 		}
@@ -177,6 +240,27 @@ namespace Lockstep
 		{
 			Position.x = x;
 			Position.y = y;
+			PositionChanged = true;
+			if (HasParent)
+			{
+				LocalPosition = Position - _parent.Position;
+				LocalPosition.RotateInverse(_parent.Rotation.x,_parent.Rotation.y);
+			}
+		}
+
+		public void SetLocalPosition (long x, long y)
+		{
+			if (HasParent)
+			{
+				LocalPosition = Position - _parent.Position;
+				LocalPosition.RotateInverse(_parent.Rotation.x,_parent.Rotation.y);
+			}
+			else {
+				LocalPosition.x = x;
+				LocalPosition.y = y;
+				Position.x = x;
+				Position.y = y;
+			}
 			PositionChanged = true;
 		}
 
@@ -197,7 +281,6 @@ namespace Lockstep
 		#region Collider
 
 		public uint RaycastVersion;
-		
 		public Vector2d[]
 			RotatedPoints;
 		public Vector2d[]
@@ -205,7 +288,6 @@ namespace Lockstep
 		public Vector2d[]
 			EdgeNorms;
 		public Vector2d FuturePosition;
-
 		public long XMin;
 		public long XMax;
 		public long YMin;

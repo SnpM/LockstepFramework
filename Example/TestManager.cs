@@ -17,25 +17,40 @@ public class TestManager : MonoBehaviour
 
 		LockstepManager.Initialize ();
 		GridManager.Generate ();
-		const int mid = 32;
+		const int count = 32;
 
+		/*
+		for (int i = -count; i < count; i++)
+		{
+			for (int j = -count; j < count; j++)
+			{
+				if (i * i + j * j < 16) continue;
+				if (LSUtility.GetRandom (2) == 0)
+				{
+					Vector2d pos = new Vector2d(i,j);
+					GridManager.GetNode(pos.x,pos.y).Unwalkable = true;
+					Instantiate(TestWall).GetComponent<LSBody>().Initialize(pos);
+				}
+			}
+		}*/
 
-		LSBody wall = Instantiate (TestWall).GetComponent<LSBody> ();
+		/*LSBody wall = Instantiate (TestWall).GetComponent<LSBody> ();
 		wall.Initialize (new Vector2d (-32 + 14, 0));
 		for (long i = wall.XMin; i <= wall.XMax; i+= FixedMath.One) {
 			for (long j = wall.YMin; j <= wall.YMax; j+= FixedMath.One) {
 				GridManager.GetNode (i, j).Unwalkable = true;
 			}
-		}
+		}*/
+
 		GridManager.Initialize ();
-		AgentController controller = AgentController.Create ();
-		LSAgent agent = null;
-		for (int i = 0; i < 512; i++) {
+		controller = AgentController.Create ();
+		for (int i = 0; i < 1; i++) {
 			agent = controller.CreateAgent (AgentCode.Minion);
 		}
 		PlayerManager.AddAgentController (controller);
-
 	}
+	AgentController controller;
+	LSAgent agent;
 
 	void FixedUpdate ()
 	{
@@ -45,6 +60,11 @@ public class TestManager : MonoBehaviour
 	void Update ()
 	{
 		LockstepManager.Visualize ();
+		if (Input.GetKeyDown (KeyCode.Space))
+		{
+			LSAgent temp = controller.CreateAgent (AgentCode.Minion);
+			temp.Body.Parent = agent.Body;
+		}
 	}
 
 	void OnGUI ()

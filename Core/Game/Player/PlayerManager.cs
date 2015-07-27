@@ -62,10 +62,6 @@ public class PlayerManager  : MonoBehaviour{
 			SelectionManager.DrawBox (SelectionBoxStyle);
 		}
 
-		void OnDrawGizmos ()
-		{
-			SelectionManager.DrawRealWorldBox ();
-		}
 		#endregion
 	}
 }
