@@ -24,7 +24,6 @@ namespace Lockstep
 		public int Weight;
 		public GridNode[] NeighborNodes = new GridNode[8];
 		static uint[] NeighborUnwalkableVersions = new uint[8];
-		public static uint _Version;
 		public Vector2d WorldPos;
 		public bool Obstructed;
 		public bool IsVertex;
@@ -42,7 +41,7 @@ namespace Lockstep
 		
 		#region Variables for data structures
 		public uint HeapIndex;
-		public bool HeapContained;
+		public uint HeapVersion;
 		public uint ClosedSetVersion;
 		#endregion
 		static GridNode ()
@@ -76,7 +75,6 @@ namespace Lockstep
 
 		private void GenerateNeighbors ()
 		{
-			_Version++;
 			for (i = -1; i <= 1; i++) {
 				checkX = gridX + i;
 				if (checkX >= 0 && checkX < GridManager.NodeCount) {
@@ -91,7 +89,6 @@ namespace Lockstep
 
 							if (checkNode.Unwalkable) {
 								Obstructed = true;
-								NeighborUnwalkableVersions [GetUnwalkableIndex (i, j)] = _Version;
 							}
 
 							//if ((i != 0 && j != 0)) continue;
@@ -101,26 +98,8 @@ namespace Lockstep
 				}
 			}
 
-			//CheckIsVertex ();
 
 		}
-
-		private void CheckIsVertex ()
-		{
-			if (GetNeighborUnwalkable (-1, -1) && !GetNeighborUnwalkable (-1, 0) && !GetNeighborUnwalkable (0, -1)) {
-				IsVertex = true;
-
-			} else if (GetNeighborUnwalkable (-1, 1) && !GetNeighborUnwalkable (-1, 0) && !GetNeighborUnwalkable (0, 1)) {
-				IsVertex = true;
-
-			} else if (GetNeighborUnwalkable (1, -1) && !GetNeighborUnwalkable (1, 0) && !GetNeighborUnwalkable (0, -1)) {
-				IsVertex = true;
-
-			} else if (GetNeighborUnwalkable (1, 1) && !GetNeighborUnwalkable (1, 0) && !GetNeighborUnwalkable (0, 1)) {
-				IsVertex = true;
-			}
-		}
-
 		public static int GetNeighborIndex (int _i, int _j)
 		{
 			/*
@@ -141,21 +120,6 @@ namespace Lockstep
 			return leIndex;
 		}
 
-		private static int GetUnwalkableIndex (int _i, int _j)
-		{
-			leIndex = (_i + 1) * 3 + (_j + 1);
-			if (leIndex > 3)
-				leIndex--;
-			return leIndex;
-		}
-
-		public bool GetNeighborUnwalkable (int _i, int _j)
-		{
-			leIndex = (_i + 1) * 3 + (_j + 1);
-			if (leIndex > 3)
-				leIndex--;
-			return NeighborUnwalkableVersions [leIndex] == _Version;
-		}
 
 		static int dstX;
 		static int dstY;

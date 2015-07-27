@@ -62,6 +62,7 @@ namespace Lockstep
 		}
 		public static bool FindPath (Vector2d End, GridNode startNode, GridNode endNode, FastList<Vector2d> outputVectorPath)
 		{
+
 			if (startNode.Unwalkable || endNode.Unwalkable) return false;
 			if (FindPath (startNode, endNode, OutputPath)) {
 				outputVectorPath.FastClear ();
@@ -70,6 +71,7 @@ namespace Lockstep
 					outputVectorPath.Add (OutputPath [i].WorldPos);
 				}
 				outputVectorPath.Add (End);
+
 				return true;
 			}
 			return false;

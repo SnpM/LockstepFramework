@@ -2,7 +2,7 @@
 using System.Collections;
 namespace Lockstep {
 	public static class GridClosedSet {
-		public static uint _Version;
+		public static uint _Version = 1;
 
 		public static void Add (GridNode item)
 		{

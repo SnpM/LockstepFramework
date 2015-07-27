@@ -89,13 +89,16 @@ public class Move : ActiveAbility
 						}
 					} else {
 						if (Pathfinder.NeedsPath (CurrentNode, DestinationNode)) {
-							if (Pathfinder.FindPath (Body.Position, Destination, MyPath)) {
+							if (Pathfinder.FindPath (Destination,CurrentNode,DestinationNode, MyPath)) {
 								HasPath = true;	
 								PathIndex = 0;
 							} else {
 								if (IsFormationMoving) {
 									StartMove (MyMovementGroup.Destination);
 									IsFormationMoving = false;
+								}
+								else {
+
 								}
 							}
 							RepathCount = RepathRate;
@@ -108,16 +111,15 @@ public class Move : ActiveAbility
 				else {
 					HasPath = false;
 					if (IsFormationMoving) {
-						Destination = MyMovementGroup.Destination;
+						StartMove (MyMovementGroup.Destination);
 						IsFormationMoving = false;
 					}
 				}
 			} else {
 
 				if (HasPath) {
-					if (StraightPath == false) {
 						RepathCount--;
-					}
+					
 				} else {
 					RepathCount--;
 				}
