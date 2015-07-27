@@ -97,6 +97,9 @@ public class Move : ActiveAbility
 									StartMove (MyMovementGroup.Destination);
 									IsFormationMoving = false;
 								}
+								else {
+
+								}
 							}
 							RepathCount = RepathRate;
 						} else {
@@ -108,16 +111,15 @@ public class Move : ActiveAbility
 				else {
 					HasPath = false;
 					if (IsFormationMoving) {
-						Destination = MyMovementGroup.Destination;
+						StartMove (MyMovementGroup.Destination);
 						IsFormationMoving = false;
 					}
 				}
 			} else {
 
 				if (HasPath) {
-					if (StraightPath == false) {
 						RepathCount--;
-					}
+					
 				} else {
 					RepathCount--;
 				}

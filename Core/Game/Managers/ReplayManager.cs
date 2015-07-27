@@ -45,6 +45,7 @@ namespace Lockstep
 			            saveBytes,
 			            saveBytes.Length - 4,
 			            4);
+			Debug.Log (saveBytes.Length);
 			File.WriteAllBytes (ToFilePath (Name), saveBytes);
 		}
 

@@ -195,7 +195,6 @@ namespace Lockstep
 						}
 					}
 				}
-
 				return serializeList.ToArray ();
 			}
 		}

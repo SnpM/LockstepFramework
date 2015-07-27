@@ -44,7 +44,6 @@ namespace Lockstep
 					for (i = 0; i < OutCommands.Count; i++) {
 						ReceivedBytes.AddRange (OutCommands [i].Serialized);
 					}
-
 					break;
 				}
 
@@ -62,6 +61,7 @@ namespace Lockstep
 				if (!FrameManager.HasFrame [frameCount]) {
 					ReceivedFrameCount++;
 					if (ReceivedBytes.Count > 4) {
+
 						RecordedBytes.AddRange (BitConverter.GetBytes ((ushort)ReceivedBytes.Count));
 						RecordedBytes.AddRange (ReceivedBytes);
 						LastRecordedFrame = ReceivedFrameCount;
