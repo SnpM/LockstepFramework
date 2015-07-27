@@ -4,7 +4,6 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
-
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,7 +19,6 @@ namespace Lockstep
 
 		public static void Initialize ()
 		{
-
 			Time.fixedDeltaTime = FixedMath.ToFloat (Timestep);
 			FrameCount = 0;
 			LSUtility.Initialize (1);
@@ -40,14 +38,18 @@ namespace Lockstep
 
 		public static void Simulate ()
 		{
-			if (!Initialized) return;
+			if (!Initialized)
+				return;
 
 			ReplayManager.Simulate ();
 			PlayerManager.Simulate ();
 			NetworkManager.Simulate ();
-			if (!FrameManager.CanAdvanceFrame)
-			{
+
+			if (!FrameManager.CanAdvanceFrame) {
 				return;
+			}
+			else {
+
 			}
 			FrameManager.Simulate ();
 
@@ -68,33 +70,37 @@ namespace Lockstep
 
 		public static void Visualize ()
 		{
-			if (!Initialized) return;
+			if (!Initialized)
+				return;
 			PhysicsManager.Visualize ();
 			InputManager.Visualize ();
 			PlayerManager.Visualize ();
 			AgentController.Visualize ();
 		}
 
-
 		public static bool Initialized = false;
+
 		public static void End ()
 		{
 			Initialized = false;
-
 		}
 
 
 		#region Instance Settings
 
 		[SerializeField]
-		public GameObject[] AgentObjects;
+		public GameObject[]
+			AgentObjects;
 		[SerializeField]
-		public GameObject SelectionRing;
+		public GameObject
+			SelectionRing;
 
 		void Awake ()
 		{
 			Instance = this;
 		}
+
+
 		#endregion
 	}
 }
