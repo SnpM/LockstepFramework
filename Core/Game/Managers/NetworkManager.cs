@@ -36,8 +36,6 @@ namespace Lockstep
 
 			}
 
-
-
 			int frameCount = BitConverter.ToInt32 (ReceivedBytes.innerArray, 0);
 			Index = 4;
 
@@ -61,6 +59,7 @@ namespace Lockstep
 
 		public static void SendCommand (Command com)
 		{
+
 			OutCommands.Add (com);
 		}
 

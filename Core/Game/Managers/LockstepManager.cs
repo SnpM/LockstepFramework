@@ -41,7 +41,8 @@ namespace Lockstep
 		public static void Simulate ()
 		{
 			if (!Initialized) return;
-			//FrameManager.EarlySimulate ();
+
+			ReplayManager.Simulate ();
 			PlayerManager.Simulate ();
 			NetworkManager.Simulate ();
 			if (!FrameManager.CanAdvanceFrame)

@@ -12,11 +12,11 @@ namespace Lockstep
 {
 	public static class GridManager
 	{
-		public const int NodeCount = 64;
+		public const int NodeCount = 128;
 		public static GridNode[] Grid;
 		public static LayerMask UnwalkableMask;
-		public const long OffsetX = FixedMath.One * -32;
-		public const long OffsetY = FixedMath.One * -32;
+		public const long OffsetX = FixedMath.One * -64;
+		public const long OffsetY = FixedMath.One * -64;
 
 		public static void Generate ()
 		{

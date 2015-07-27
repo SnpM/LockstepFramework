@@ -95,7 +95,6 @@ namespace Lockstep
 							}
 
 							//if ((i != 0 && j != 0)) continue;
-
 							NeighborNodes [GetNeighborIndex (i, j)] = checkNode;
 						}
 					}
@@ -189,7 +188,6 @@ namespace Lockstep
 				dstX = gridX - HeuristicTargetX;
 			else
 				dstX = HeuristicTargetX - gridX;
-
 			if (gridY > HeuristicTargetY)
 				dstY = gridY - HeuristicTargetY;
 			else
