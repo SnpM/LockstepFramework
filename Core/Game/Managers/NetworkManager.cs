@@ -11,15 +11,23 @@ namespace Lockstep
 		public static SendState sendState = SendState.Autosend;
 		private static FastList<Command> OutCommands = new FastList<Command> ();
 		public static FastList<byte> ReceivedBytes = new FastList<byte> ();
-		public static FastList<byte> RecordedBytes = new FastList<byte> (30000);
+		public static int ReceivedFrameCount;
 		public static int IterationCount;
-		
+
+
+		#region Recording
+		public static FastList<byte> RecordedBytes = new FastList<byte> (30000);
+		public static int LastRecordedFrame;
+		#endregion
+
 		public static void Initialize ()
 		{
 			RecordedBytes.FastClear ();
 			ReceivedBytes.FastClear ();
 			OutCommands.FastClear ();
 			IterationCount = LockstepManager.NetworkingIterationSpread;
+			ReceivedFrameCount = 0;
+			LastRecordedFrame = 0;
 		}
 
 		static void HandleonDataDetailed (ushort sender, byte tag, ushort subject, object data)
@@ -42,10 +50,8 @@ namespace Lockstep
 
 				if (ReceivedBytes.Count < 4)
 					return;
-				else if (ReceivedBytes.Count != 4) {
-					RecordedBytes.AddRange (BitConverter.GetBytes ((ushort)ReceivedBytes.Count));
-					RecordedBytes.AddRange (ReceivedBytes);
-				}
+
+
 
 				int frameCount = BitConverter.ToInt32 (ReceivedBytes.innerArray, 0);
 				Index = 4;
@@ -54,6 +60,13 @@ namespace Lockstep
 
 				Frame frame;
 				if (!FrameManager.HasFrame [frameCount]) {
+					ReceivedFrameCount++;
+					if (ReceivedBytes.Count > 4) {
+						RecordedBytes.AddRange (BitConverter.GetBytes ((ushort)ReceivedBytes.Count));
+						RecordedBytes.AddRange (ReceivedBytes);
+						LastRecordedFrame = ReceivedFrameCount;
+					}
+
 					frame = new Frame ();
 					FrameManager.AddFrame (frameCount, frame);
 

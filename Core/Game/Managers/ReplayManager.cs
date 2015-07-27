@@ -15,10 +15,11 @@ namespace Lockstep
 		public static bool IsPlayingBack;
 		public static byte[] PlaybackBytes;
 		public static int PlaybackPosition;
+
 		private static int LastFrameCount;
 		private static int LastFrameByteCount;
 		private static bool IsWaitingOnFrame;
-		private static int TotalPlaybackFrameCount;
+		private static int RemainingFrameCount;
 
 		public static void Play (string Name)
 		{
@@ -26,6 +27,8 @@ namespace Lockstep
 			NetworkManager.sendState = SendState.None;
 			PlaybackBytes = File.ReadAllBytes (ToFilePath (Name));
 			PlaybackPosition = 0;
+			RemainingFrameCount = 0;
+			IsWaitingOnFrame = false;
 		}
 
 		public static void Stop ()
@@ -37,7 +40,11 @@ namespace Lockstep
 		{
 			byte[] saveBytes = new byte[NetworkManager.RecordedBytes.Count + 4];
 			Array.Copy (NetworkManager.RecordedBytes.innerArray, saveBytes, NetworkManager.RecordedBytes.Count);
-			Array.Copy (BitConverter.GetBytes (LockstepManager.FrameCount),0,saveBytes,saveBytes.Length - 5,4);
+			Array.Copy (BitConverter.GetBytes (NetworkManager.ReceivedFrameCount - NetworkManager.LastRecordedFrame),
+			            0,
+			            saveBytes,
+			            saveBytes.Length - 4,
+			            4);
 			File.WriteAllBytes (ToFilePath (Name), saveBytes);
 		}
 
@@ -68,17 +75,17 @@ namespace Lockstep
 					}
 					else if (PlaybackPosition < PlaybackBytes.Length)
 					{
-						TotalPlaybackFrameCount = BitConverter.ToInt32 (PlaybackBytes,PlaybackPosition);
+						RemainingFrameCount = BitConverter.ToInt32 (PlaybackBytes,PlaybackBytes.Length - 4);
 						PlaybackPosition += 4;
-
-						TotalPlaybackFrameCount--;
-						NetworkManager.ReceivedBytes.AddRange (BitConverter.GetBytes (LockstepManager.FrameCount));
 					}
-					else if (TotalPlaybackFrameCount > 0){
-						TotalPlaybackFrameCount--;
+
+					if (RemainingFrameCount > 0)
+					{
+						RemainingFrameCount--;
 						NetworkManager.ReceivedBytes.AddRange (BitConverter.GetBytes (LockstepManager.FrameCount));
 					}
 				}
+
 			}
 		}
 
