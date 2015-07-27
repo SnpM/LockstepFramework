@@ -11,12 +11,12 @@ namespace Lockstep
 		public static SendState sendState = SendState.Autosend;
 		private static FastList<Command> OutCommands = new FastList<Command> ();
 		public static FastList<byte> ReceivedBytes = new FastList<byte> ();
-		public static FastList<byte> AllReceivedBytes = new FastList<byte> (30000);
+		public static FastList<byte> RecordedBytes = new FastList<byte> (30000);
 		public static int IterationCount;
 		
 		public static void Initialize ()
 		{
-			AllReceivedBytes.FastClear ();
+			RecordedBytes.FastClear ();
 			ReceivedBytes.FastClear ();
 			OutCommands.FastClear ();
 			IterationCount = LockstepManager.NetworkingIterationSpread;
@@ -29,48 +29,48 @@ namespace Lockstep
 
 		public static void Simulate ()
 		{
-			if (IterationCount == 0)
-			{
-			switch (sendState) {
-			case SendState.Autosend:
-				ReceivedBytes.AddRange (BitConverter.GetBytes (LockstepManager.FrameCount));
-				for (i = 0; i < OutCommands.Count; i++) {
-					ReceivedBytes.AddRange (OutCommands [i].Serialized);
+			if (IterationCount == 0) {
+				switch (sendState) {
+				case SendState.Autosend:
+					ReceivedBytes.AddRange (BitConverter.GetBytes (LockstepManager.FrameCount));
+					for (i = 0; i < OutCommands.Count; i++) {
+						ReceivedBytes.AddRange (OutCommands [i].Serialized);
+					}
+
+					break;
 				}
 
-				break;
-			}
-
-				if (ReceivedBytes.Count < 4) return;
-
-			AllReceivedBytes.AddRange (BitConverter.GetBytes ((ushort)ReceivedBytes.Count));
-			AllReceivedBytes.AddRange (ReceivedBytes);
-
-			int frameCount = BitConverter.ToInt32 (ReceivedBytes.innerArray, 0);
-			Index = 4;
-
-			FrameManager.EnsureCapacity (frameCount + 1);
-
-			Frame frame;
-			if (!FrameManager.HasFrame [frameCount]) {
-				frame = new Frame ();
-				FrameManager.AddFrame (frameCount, frame);
-
-				while (Index < ReceivedBytes.Count) {
-					Command com = new Command ();
-					Index += com.Reconstruct (ReceivedBytes.innerArray, Index);
-					frame.AddCommand (com);
+				if (ReceivedBytes.Count < 4)
+					return;
+				else if (ReceivedBytes.Count != 4) {
+					RecordedBytes.AddRange (BitConverter.GetBytes ((ushort)ReceivedBytes.Count));
+					RecordedBytes.AddRange (ReceivedBytes);
 				}
-			}
 
-			ReceivedBytes.FastClear ();
-			OutCommands.FastClear ();
+				int frameCount = BitConverter.ToInt32 (ReceivedBytes.innerArray, 0);
+				Index = 4;
+
+				FrameManager.EnsureCapacity (frameCount + 1);
+
+				Frame frame;
+				if (!FrameManager.HasFrame [frameCount]) {
+					frame = new Frame ();
+					FrameManager.AddFrame (frameCount, frame);
+
+					while (Index < ReceivedBytes.Count) {
+						Command com = new Command ();
+						Index += com.Reconstruct (ReceivedBytes.innerArray, Index);
+						frame.AddCommand (com);
+					}
+				}
+
+				ReceivedBytes.FastClear ();
+				OutCommands.FastClear ();
 
 				IterationCount = LockstepManager.NetworkingIterationSpread - 1;
-			}
-			else {
+			} else {
 				IterationCount--;
-				FrameManager.AddFrame (LockstepManager.FrameCount, new Frame());
+				FrameManager.AddFrame (LockstepManager.FrameCount, new Frame ());
 			}
 		}
 

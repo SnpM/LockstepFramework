@@ -89,7 +89,7 @@ public class Move : ActiveAbility
 						}
 					} else {
 						if (Pathfinder.NeedsPath (CurrentNode, DestinationNode)) {
-							if (Pathfinder.FindPath (Body.Position, Destination, MyPath)) {
+							if (Pathfinder.FindPath (Destination,CurrentNode,DestinationNode, MyPath)) {
 								HasPath = true;	
 								PathIndex = 0;
 							} else {
