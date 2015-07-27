@@ -1,13 +1,14 @@
 ﻿using System.IO;
 using System;
 using UnityEngine;
+
 namespace Lockstep
 {
 	public static class ReplayManager
 	{
 		#region Settings
 		static readonly string Path = UnityEngine.Application.persistentDataPath;
-		static readonly char FileSeperator = System.IO.Path.DirectorySeparatorChar;
+		static readonly char PathSeperator = System.IO.Path.DirectorySeparatorChar;
 		const string FileExtension = ".replay";
 		#endregion
 
@@ -19,7 +20,7 @@ namespace Lockstep
 		{
 			IsPlayingBack = true;
 			NetworkManager.sendState = SendState.None;
-			PlaybackBytes = File.ReadAllBytes(Path + Name + FileExtension);
+			PlaybackBytes = File.ReadAllBytes (ToFilePath (Name));
 			PlaybackPosition = 0;
 		}
 
@@ -32,26 +33,32 @@ namespace Lockstep
 		{
 			byte[] saveBytes = new byte[NetworkManager.AllReceivedBytes.Count];
 			Array.Copy (NetworkManager.AllReceivedBytes.innerArray, saveBytes, NetworkManager.AllReceivedBytes.Count);
-			File.WriteAllBytes (Path + Name + FileExtension, NetworkManager.AllReceivedBytes.innerArray);
+			File.WriteAllBytes (ToFilePath (Name), saveBytes);
 		}
 
 		public static void Simulate ()
 		{
-			if (IsPlayingBack == true)
-			{
-				if (PlaybackPosition < PlaybackBytes.Length)
-				{
-					ushort FrameByteCount = BitConverter.ToUInt16(PlaybackBytes,PlaybackPosition);
-					PlaybackPosition += 2;
-					NetworkManager.ReceivedBytes.AddRange (PlaybackBytes,PlaybackPosition,(int) FrameByteCount);
-					PlaybackPosition += FrameByteCount;
+			if (IsPlayingBack == true) {
+				if (NetworkManager.IterationCount == 0) {
+					if (PlaybackPosition < PlaybackBytes.Length) {
+						ushort FrameByteCount = BitConverter.ToUInt16 (PlaybackBytes, PlaybackPosition);
+						PlaybackPosition += 2;
+						NetworkManager.ReceivedBytes.AddRange (PlaybackBytes, PlaybackPosition, (int)FrameByteCount);
+						PlaybackPosition += FrameByteCount;
+					}
 				}
 			}
 		}
 
+		public static string ToFilePath (string Name)
+		{
+			return Path + PathSeperator + Name + FileExtension;
+		}
 
 	}
-	public enum RecordState {
+
+	public enum RecordState
+	{
 		None,
 		Record,
 		Playback

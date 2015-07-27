@@ -12,12 +12,14 @@ namespace Lockstep
 		private static FastList<Command> OutCommands = new FastList<Command> ();
 		public static FastList<byte> ReceivedBytes = new FastList<byte> ();
 		public static FastList<byte> AllReceivedBytes = new FastList<byte> (30000);
+		public static int IterationCount;
 		
 		public static void Initialize ()
 		{
 			AllReceivedBytes.FastClear ();
 			ReceivedBytes.FastClear ();
 			OutCommands.FastClear ();
+			IterationCount = LockstepManager.NetworkingIterationSpread;
 		}
 
 		static void HandleonDataDetailed (ushort sender, byte tag, ushort subject, object data)
@@ -27,6 +29,8 @@ namespace Lockstep
 
 		public static void Simulate ()
 		{
+			if (IterationCount == 0)
+			{
 			switch (sendState) {
 			case SendState.Autosend:
 				ReceivedBytes.AddRange (BitConverter.GetBytes (LockstepManager.FrameCount));
@@ -36,6 +40,9 @@ namespace Lockstep
 
 				break;
 			}
+
+				if (ReceivedBytes.Count < 4) return;
+
 			AllReceivedBytes.AddRange (BitConverter.GetBytes ((ushort)ReceivedBytes.Count));
 			AllReceivedBytes.AddRange (ReceivedBytes);
 
@@ -58,6 +65,13 @@ namespace Lockstep
 
 			ReceivedBytes.FastClear ();
 			OutCommands.FastClear ();
+
+				IterationCount = LockstepManager.NetworkingIterationSpread - 1;
+			}
+			else {
+				IterationCount--;
+				FrameManager.AddFrame (LockstepManager.FrameCount, new Frame());
+			}
 		}
 
 		public static void SendCommand (Command com)
