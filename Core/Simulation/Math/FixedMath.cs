@@ -6,7 +6,7 @@ namespace Lockstep
 	public static class FixedMath
 	{
 	#region Meta
-		public const int SHIFT_AMOUNT = 16;
+		public const int SHIFT_AMOUNT = 20;
 		public const long One = 1 << SHIFT_AMOUNT;
 		public const long Half = One / 2;
 		public const float OneF = (float)One;

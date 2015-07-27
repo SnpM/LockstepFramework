@@ -152,7 +152,8 @@ namespace Lockstep
 					VelocityChanged = false;
 					if (VelocityMagnitude != 0)
 					{
-						Rotation = Velocity / VelocityMagnitude;
+						Rotation = (Rotation + Velocity / VelocityMagnitude) / 2;
+						Rotation.Normalize ();
 						RotationChanged = true;
 					}
 				}
