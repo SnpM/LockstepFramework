@@ -147,19 +147,17 @@ public class MovementGroup
 
 			for (i = 0; i < Movers.Count; i++) {
 				Move mover = Movers [i];
-				mover.Destination = mover.Body.Position + GroupDirection;
 				mover.IsFormationMoving = true;
 				mover.closingDistanceMultiplier = FixedMath.One * 2 / 5;
-				mover.StartMove ();
+				mover.StartMove (mover.Body.Position + GroupDirection);
 			}
 
 		} else {
 			for (i = 0; i < Movers.Count; i++) {
 				Move mover = Movers [i];
 				mover.closingDistanceMultiplier = FixedMath.One / 4;
-				mover.Destination = Destination;
 				mover.IsFormationMoving = false;
-				mover.StartMove ();
+				mover.StartMove (Destination);
 			}
 		}
 	}
@@ -186,9 +184,8 @@ public class MovementGroup
 		for (i = 0; i < Movers.Count; i++) {
 			Move mover = Movers [i];
 			mover.closingDistanceMultiplier = FixedMath.One * 3 / 5;
-			mover.Destination = Destination;
 			mover.IsFormationMoving = false;
-			mover.StartMove ();
+			mover.StartMove (Destination);
 		}
 	}
 }
