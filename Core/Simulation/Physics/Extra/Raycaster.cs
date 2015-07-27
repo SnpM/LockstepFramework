@@ -5,7 +5,7 @@ namespace Lockstep
 {
 	public class Raycaster
 	{
-		public static uint _Version;
+		public static uint _Version = 1;
 		public LSBody Hit;
 		public FastList<LSBody> Hits = new FastList<LSBody> ();
 		public FastList<Vector2d> HitPoints = new FastList<Vector2d> ();

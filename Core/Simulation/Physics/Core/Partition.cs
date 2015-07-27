@@ -21,7 +21,7 @@ namespace Lockstep
 		public const long OffsetY = -(1 << ShiftSize) * Count / 2;
 		#endregion
 
-		public static uint _Version;
+		public static uint _Version = 1;
 		public static PartitionNode[] Nodes = new PartitionNode[Count * Count];
 		static long i, j, k, o, p;
 

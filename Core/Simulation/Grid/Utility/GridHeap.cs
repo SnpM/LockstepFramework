@@ -16,14 +16,14 @@ namespace Lockstep
 	
 		public static GridNode[] items = new GridNode[GridManager.NodeCount * GridManager.NodeCount];
 		public static uint Count;
-	
+		public static uint _Version = 1;
 	
 		public static void Add (GridNode item)
 		{
 			item.HeapIndex = Count;
 			items [Count++] = item;
 			SortUp (item);
-			item.HeapContained = true;
+			item.HeapVersion = _Version;
 		}
 
 		static GridNode curNode;
@@ -34,7 +34,7 @@ namespace Lockstep
 			items [0] = items [--Count];
 			items [0].HeapIndex = 0;
 			SortDown (items [0]);
-			curNode.HeapContained = false;
+			curNode.HeapVersion--;
 			return curNode;
 		}
 	
@@ -45,16 +45,13 @@ namespace Lockstep
 	
 		public static bool Contains (GridNode item)
 		{
-			return item.HeapContained;
+			return item.HeapVersion == _Version;
 		}
 
 		static uint i;
 		public static void FastClear ()
 		{
-			for (i = 0; i < Count; i++)
-			{
-				items[i].HeapContained = false;
-			}
+			_Version++;
 			Count = 0;
 		}
 	
