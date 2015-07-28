@@ -142,6 +142,10 @@ namespace Lockstep
 			}
 			return n << (SHIFT_AMOUNT / 2);
 		}
+		public static long Abs (long f1)
+		{
+			return f1 < 0 ? -f1 : f1;
+		}
 
 	#endregion
 

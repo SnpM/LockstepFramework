@@ -165,6 +165,10 @@ namespace Lockstep
 		{
 			return (this.x * otherX + this.y * otherY) >> FixedMath.SHIFT_AMOUNT;
 		}
+		public long Cross (long otherX, long otherY)
+		{
+			return (this.x * otherY - this.y * otherX) >> FixedMath.SHIFT_AMOUNT;
+		}
 
 		static long temp1;
 		static long temp2;
@@ -200,6 +204,10 @@ namespace Lockstep
 		public static long Dot (long v1x, long v1y, long v2x, long v2y)
 		{
 			return (v1x * v2x + v1y * v2y) >> FixedMath.SHIFT_AMOUNT;
+		}
+		public static long Cross (long v1x, long v1y, long v2x, long v2y)
+		{
+			return (v1x * v2y - v1y * v2x) >> FixedMath.SHIFT_AMOUNT;
 		}
 	#endregion
 

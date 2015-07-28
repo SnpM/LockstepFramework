@@ -138,6 +138,7 @@ public class Move : ActiveAbility
 			if (StraightPath) {
 				TargetPos = Destination;
 			} else if (HasPath) {
+				if (PathIndex >= MyPath.Count) PathIndex = MyPath.Count;
 				TargetPos = MyPath [PathIndex];
 			} else {
 				TargetPos = Destination;
@@ -223,7 +224,6 @@ public class Move : ActiveAbility
 			IsMoving = true;
 
 			Pathfinder.GetPathNode (Destination.x, Destination.y, out DestinationNode);
-			Turner.StartTurn (Destination - Body.Position);
 		}
 
 	}

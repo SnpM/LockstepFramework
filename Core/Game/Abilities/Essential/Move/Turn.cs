@@ -6,8 +6,8 @@ public class Turn : Ability
 {
 	#region Static Helpers
 	static Vector2d tempVec;
-	static long prevDot;
-	static long leDot;
+	static long sideCheck1;
+	static long sideCheck2;
 	static long sqrMag;
 	#endregion
 
@@ -34,33 +34,33 @@ public class Turn : Ability
 
 			sqrMag = TargetRotation.SqrMagnitude ();
 			if (sqrMag != 0) {
+				sideCheck1 = Body.Rotation.Cross (TargetRotation.x, TargetRotation.y);
+				if (sideCheck1 != 0) {
+					tempVec = Body.Rotation.rotatedRight ();
 
-				tempVec = Body.Rotation.rotatedRight ();
-				prevDot = tempVec.Dot (TargetRotation.x, TargetRotation.y);
-				if (prevDot != 0) {
-					if (prevDot > 0) {
+					if (sideCheck1 < 0) {
 						Body.Rotation.Lerp (tempVec.x, tempVec.y, timescaledTurnRate);
 					} else {
 						Body.Rotation.Lerp (-tempVec.x, -tempVec.y, timescaledTurnRate);
 					}
 					tempVec = Body.Rotation.rotatedRight ();
-					leDot = tempVec.Dot (TargetRotation.x, TargetRotation.y);
-					if (leDot != 0) {
-						if (leDot > 0) {
-							if (prevDot < 0) {
-								/*
-								Body.VelocityMagnitude = FixedMath.Sqrt (sqrMag);
-								Body.Rotation = Body.Velocity;
-								Body.Rotation /= Body.VelocityMagnitude;*/
+					sideCheck2 = Body.Rotation.Cross (TargetRotation.x, TargetRotation.y);
+					if (sideCheck2 != 0) {
+						if (sideCheck2 > 0) {
+							if (sideCheck1 < 0) {
+								Body.Rotation = TargetRotation;
 								TargetReached = true;
+								Body.RotationChanged = true;
+
+								return;
+
 							}
 						} else {
-							if (prevDot > 0) {
-								/*
-								Body.VelocityMagnitude = FixedMath.Sqrt (sqrMag);
-								Body.Rotation = Body.Velocity;
-								Body.Rotation /= Body.VelocityMagnitude;*/
+							if (sideCheck1 > 0) {
+								Body.Rotation = TargetRotation;
 								TargetReached = true;
+								Body.RotationChanged = true;
+								return;
 							}
 						}
 					}
@@ -78,11 +78,18 @@ public class Turn : Ability
 				}
 			}
 		}
+		else {
+			if ((TargetRotation.Cross (Body.Velocity.x, Body.Velocity.y)) != 0)
+			{
+				StartTurn (Body.Velocity);
+			}
+		}
 	}
 
 	public void StartTurn (Vector2d targetRotation)
 	{
 		TargetRotation = targetRotation;
+		TargetRotation.Normalize();
 		TargetReached = false;
 	}
 
