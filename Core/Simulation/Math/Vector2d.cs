@@ -250,7 +250,14 @@ namespace Lockstep
 		{
 			return new Vector2d (v1.x >> shift, v1.y >> shift);
 		}
-
+		public static bool operator == (Vector2d v1, Vector2d v2)
+		{
+			return v1.x == v2.x && v1.y == v2.y;
+		}
+		public static bool operator != (Vector2d v1, Vector2d v2)
+		{
+			return v1.x != v2.x || v1.y != v2.y;
+		}
 		#endregion
 
 		public long GetLongHashCode ()

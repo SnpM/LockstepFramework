@@ -56,12 +56,14 @@ public class Turn : Ability
 					}
 					Body.Rotation.Normalize ();
 					Body.RotationChanged = true;
-					
+
 				} else {
 					if (Body.Rotation.Dot (Body.Velocity.x, Body.Velocity.y) < 0) {
 						tempVec = Body.Rotation;
 						tempVec.RotateRight ();
 						Body.Rotation.Lerp (tempVec.x, tempVec.y, TurnRate);
+						Body.Rotation.Normalize();
+						Body.RotationChanged = true;
 					}
 				}
 			}

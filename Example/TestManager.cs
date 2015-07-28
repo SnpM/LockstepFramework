@@ -49,7 +49,6 @@ public class TestManager : MonoBehaviour
 		}
 		PlayerManager.AddAgentController (controller);
 
-
 	}
 	AgentController controller;
 	LSAgent agent;
