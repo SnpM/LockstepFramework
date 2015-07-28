@@ -77,6 +77,9 @@ public class Turn : Ability
 					}
 				}
 			}
+			else {
+				TargetReached = true;
+			}
 		}
 		else {
 			if ((TargetRotation.Cross (Body.Velocity.x, Body.Velocity.y)) != 0)

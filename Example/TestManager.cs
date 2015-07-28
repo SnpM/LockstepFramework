@@ -44,7 +44,7 @@ public class TestManager : MonoBehaviour
 
 		GridManager.Initialize ();
 		controller = AgentController.Create ();
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 256; i++) {
 			agent = controller.CreateAgent (AgentCode.Minion);
 		}
 		PlayerManager.AddAgentController (controller);

@@ -37,8 +37,6 @@ public class Move : ActiveAbility
 
 
 	private long timescaledSpeed;
-
-
 	public bool IsMoving;
 	public Vector2d Destination;
 	public Vector2d TargetPos;
@@ -60,7 +58,7 @@ public class Move : ActiveAbility
 	public FastList<Vector2d> MyPath = new FastList<Vector2d> ();
 	public bool HasPath;
 	public bool StraightPath;
-	private bool ViablePath;
+	private bool ViableDestination;
 
 	public override void Initialize (LSAgent agent)
 	{
@@ -77,46 +75,61 @@ public class Move : ActiveAbility
 		closingDistance = agent.Body.Radius;
 
 		RepathCount = LSUtility.GetRandom (RepathRate);
+		ViableDestination = false;
 	}
 
 	public override void Simulate ()
 	{
 		if (IsMoving) {
 			if (RepathCount <= 0) {
-				Pathfinder.GetPathNode (Body.Position.x, Body.Position.y, out CurrentNode);
-				ViablePath =
-					System.Object.ReferenceEquals (CurrentNode, null) == false &&
-					System.Object.ReferenceEquals (DestinationNode, null) == false;
-				if (ViablePath) {
-					if (StraightPath) {
-						if (Pathfinder.NeedsPath (CurrentNode, DestinationNode)) {
-							if (Pathfinder.FindPath (Destination, CurrentNode, DestinationNode, MyPath)) {
-								HasPath = true;
-								PathIndex = 0;
-							}
-							StraightPath = false;
-							RepathCount = RepathRate;
-						} else {
-							RepathCount = StraightRepathRate;
-						}
-					} else {
-						if (Pathfinder.NeedsPath (CurrentNode, DestinationNode)) {
-							if (Pathfinder.FindPath (Destination, CurrentNode, DestinationNode, MyPath)) {
-								HasPath = true;	
-								PathIndex = 0;
-							} else {
-								if (IsFormationMoving) {
-									StartMove (MyMovementGroup.Destination);
-									IsFormationMoving = false;
+				if (ViableDestination) {
+					if (Pathfinder.GetPathNode (Body.Position.x, Body.Position.y, out CurrentNode)) {
+						if (StraightPath) {
+							if (Pathfinder.NeedsPath (CurrentNode, DestinationNode)) {
+								if (Pathfinder.FindPath (Destination, CurrentNode, DestinationNode, MyPath)) {
+									HasPath = true;
+									PathIndex = 0;
 								} else {
-
+									if (IsFormationMoving) {
+										StartMove (MyMovementGroup.Destination);
+										IsFormationMoving = false;
+									}
 								}
+								StraightPath = false;
+								RepathCount = RepathRate;
+							} else {
+								RepathCount = StraightRepathRate;
 							}
-							RepathCount = RepathRate;
 						} else {
-							StraightPath = true;
-							RepathCount = StraightRepathRate;
+							if (Pathfinder.NeedsPath (CurrentNode, DestinationNode)) {
+								if (Pathfinder.FindPath (Destination, CurrentNode, DestinationNode, MyPath)) {
+									HasPath = true;	
+									PathIndex = 0;
+								} else {
+									if (IsFormationMoving) {
+										StartMove (MyMovementGroup.Destination);
+										IsFormationMoving = false;
+									} else {
+
+									}
+								}
+								RepathCount = RepathRate;
+							} else {
+								if (StraightPath == false)
+								{
+									if (IsFormationMoving)
+									{
+										StartMove (MyMovementGroup.Destination);
+										IsFormationMoving = false;
+									}
+								}
+								StraightPath = true;
+								RepathCount = StraightRepathRate;
+							}
 						}
+					}
+					else {
+
 					}
 				} else {
 					HasPath = false;
@@ -138,7 +151,8 @@ public class Move : ActiveAbility
 			if (StraightPath) {
 				TargetPos = Destination;
 			} else if (HasPath) {
-				if (PathIndex >= MyPath.Count) PathIndex = MyPath.Count;
+				if (PathIndex >= MyPath.Count)
+					PathIndex = MyPath.Count;
 				TargetPos = MyPath [PathIndex];
 			} else {
 				TargetPos = Destination;
@@ -177,10 +191,6 @@ public class Move : ActiveAbility
 		TouchingObjects.FastClear ();
 	}
 
-
-
-
-
 	public override void Deactivate ()
 	{
 
@@ -195,15 +205,17 @@ public class Move : ActiveAbility
 
 		MovementGroup.LastCreatedGroup.Add (this);
 
-
+		if (StraightPath)
+			RepathCount /= 4;
+		else
+			RepathCount /= 2;
 	}
-
+	
 	public void StopMove ()
 	{
 		IsMoving = false;
-		if (MyMovementGroup != null) {
-			MyMovementGroup.Remove (this);
-		}
+		MyMovementGroup.Remove (this);
+
 		StopTime = 0;
 	}
 
@@ -212,10 +224,6 @@ public class Move : ActiveAbility
 		if (destination.x == Destination.x && destination.y == Destination.y) {
 			
 		} else {
-			if (StraightPath)
-				RepathCount /= 4;
-			else
-				RepathCount /= 2;
 
 			HasPath = false;
 			BadPathCount = 0;
@@ -223,7 +231,7 @@ public class Move : ActiveAbility
 			Destination = destination;
 			IsMoving = true;
 
-			Pathfinder.GetPathNode (Destination.x, Destination.y, out DestinationNode);
+			ViableDestination = Pathfinder.GetPathNode (Destination.x, Destination.y, out DestinationNode);
 		}
 
 	}

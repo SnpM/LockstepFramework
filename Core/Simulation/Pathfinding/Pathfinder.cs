@@ -283,23 +283,29 @@ namespace Lockstep
 			}
 			return true;
 		}
+		static int xSign, ySign;
 		public static bool GetPathNode (long X, long Y, out GridNode returnNode)
 		{
 			returnNode = GridManager.GetNode(X,Y);
 			if (returnNode.Unwalkable)
 			{
-				for (i = 0; i < 8; i++) {
-					currentNode = returnNode.NeighborNodes [i];
-					if (System.Object.ReferenceEquals (currentNode, null) == false && currentNode.Unwalkable == false) {
-						returnNode = currentNode;
-						break;
+				xSign = X > returnNode.WorldPos.x ? 1 : -1;
+				ySign = Y > returnNode.WorldPos.y ? 1 : -1;
+
+				currentNode = GridManager.GetNode (returnNode.gridX + xSign, returnNode.gridY + ySign);
+				if (currentNode == null || currentNode.Unwalkable)
+				{
+					currentNode = GridManager.GetNode (returnNode.gridX + xSign, returnNode.gridY);
+					if (currentNode == null || currentNode.Unwalkable)
+					{
+						currentNode = GridManager.GetNode (returnNode.gridX, returnNode.gridY + ySign);
+						if (currentNode == null || currentNode.Unwalkable)
+						{
+							return false;
+						}
 					}
 				}
-				if (returnNode.Unwalkable)
-				{
-					returnNode = null;
-					return false;
-				}
+				returnNode = currentNode;
 			}
 			return true;
 		}
