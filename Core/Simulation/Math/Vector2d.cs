@@ -67,6 +67,8 @@ namespace Lockstep
 		/// </summary>
 		public long Magnitude ()
 		{
+			temp1 = (this.x * this.x + this.y * this.y) >> FixedMath.SHIFT_AMOUNT;
+			if (temp1 == 0) return 0;
 			return FixedMath.Sqrt ((this.x * this.x + this.y * this.y) >> FixedMath.SHIFT_AMOUNT);
 		}
 		/// <summary>
@@ -74,6 +76,7 @@ namespace Lockstep
 		/// </summary>
 		public void Normalize ()
 		{
+
 			tempMag = this.Magnitude ();
 			if (tempMag == 0)
 			{
@@ -134,6 +137,14 @@ namespace Lockstep
 			temp1 = this.x;
 			this.x = this.y;
 			this.y = -temp1;
+		}
+
+		static Vector2d retVec = Vector2d.zero;
+		public Vector2d rotatedRight ()
+		{
+			retVec.x = y;
+			retVec.y = -x;
+			return retVec;
 		}
 		public void Reflect (long axisX, long axisY)
 		{

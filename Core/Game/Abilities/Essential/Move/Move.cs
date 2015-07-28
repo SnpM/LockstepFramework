@@ -30,6 +30,15 @@ public class Move : ActiveAbility
 	public long Speed;
 	#endregion
 
+	#region Communicators
+	public LSBody Body;
+	public Turn Turner;
+	#endregion
+
+
+	private long timescaledSpeed;
+
+
 	public bool IsMoving;
 	public Vector2d Destination;
 	public Vector2d TargetPos;
@@ -41,9 +50,6 @@ public class Move : ActiveAbility
 	public int MyMovementGroupID = -1;
 	public bool IsFormationMoving;
 	private Vector2d MovementDirection;
-	public LSBody Body;
-	private long timescaledSpeed;
-	private long timescaledTurnRate;
 	private long distance;
 	private long closingDistance;
 	public long closingDistanceMultiplier;
@@ -63,6 +69,9 @@ public class Move : ActiveAbility
 		Body = agent.Body;
 		Body.Mover = this;
 		Body.OnContact += HandleCollision;
+
+
+		Turner = agent.GetAbility<Turn> ();
 
 		timescaledSpeed = ((Speed * LockstepManager.Timestep) >> FixedMath.SHIFT_AMOUNT);
 		closingDistance = agent.Body.Radius;
@@ -214,6 +223,7 @@ public class Move : ActiveAbility
 			IsMoving = true;
 
 			Pathfinder.GetPathNode (Destination.x, Destination.y, out DestinationNode);
+			Turner.StartTurn (Destination - Body.Position);
 		}
 
 	}

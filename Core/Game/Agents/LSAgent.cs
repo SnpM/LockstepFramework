@@ -25,28 +25,29 @@ namespace Lockstep
 			cachedGameObject = base.gameObject;
 			cachedRenderer = GetComponent<Renderer> ();
 
-			Abilities = this.GetComponents<Ability> ();
+			if (Body == null) {
+				Body = GetComponent<LSBody>();
+			}
+			Body.Initialize ();
 
+			Abilities = this.GetComponents<Ability> ();
 			AbilityCount = Abilities.Length;
 			ActiveAbilities = new ActiveAbility[InputManager.InputCount];
-			for (i = 0; i < AbilityCount; i++) {
-				Ability ability = Abilities [i];
+			for (iterator = 0; iterator < AbilityCount; iterator++) {
+				Ability ability = Abilities [iterator];
 				ability.Initialize (this);
-
 				ActiveAbility activeAbility = ability as ActiveAbility;
 				if (activeAbility != null) {
 					ActiveAbilities [(int)activeAbility.ListenInput] = activeAbility;
 				}
 			}
-			if (Body != null) {
-				Body.Initialize ();
-			}
+
 		}
 
 		public void Simulate ()
 		{
-			for (i = 0; i < AbilityCount; i++) {
-				Abilities [i].Simulate ();
+			for (iterator = 0; iterator < AbilityCount; iterator++) {
+				Abilities [iterator].Simulate ();
 			}
 		}
 		public void Visualize ()
@@ -81,7 +82,7 @@ namespace Lockstep
 			return null;
 		}
 
-		public System.Object GetAbility (Type AbilityType)
+		/*public System.Object GetAbility (Type AbilityType)
 		{
 			for (i = 0; i < AbilityCount; i++)
 			{
@@ -91,7 +92,7 @@ namespace Lockstep
 				}
 			}
 			return null;
-		}
+		}*/
 		
 		#region Utility Variables
 		public bool IsSelected {
@@ -143,6 +144,6 @@ namespace Lockstep
 		public Transform cachedTransform;
 		public GameObject cachedGameObject;
 		public Renderer cachedRenderer;
-		static int i, j;
+		static int i, j, iterator;
 	}
 }

@@ -7,7 +7,7 @@ namespace Lockstep
 {
 	public class Command
 	{
-		const int CompressionShift = 8;
+		const int CompressionShift = 4;
 		public Command ()
 		{
 
