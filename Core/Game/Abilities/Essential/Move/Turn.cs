@@ -22,7 +22,6 @@ public class Turn : Ability
 
 	public override void Initialize (LSAgent agent)
 	{
-		Debug.Log ("asdf");
 		Body = agent.Body;
 		timescaledTurnRate = TurnRate * LockstepManager.Timestep >> FixedMath.SHIFT_AMOUNT;
 		TargetReached = true;
