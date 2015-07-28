@@ -53,9 +53,7 @@ namespace Lockstep
 			}
 			FrameManager.Simulate ();
 
-			#region Custom Behaviors
-			MovementGroup.Simulate ();
-			#endregion
+			OnSimulate ();
 
 			AgentController.Simulate ();
 
@@ -85,6 +83,9 @@ namespace Lockstep
 			Initialized = false;
 		}
 
+
+		public static event SimulationEvent OnSimulate;
+		public delegate void SimulationEvent ();
 
 		#region Instance Settings
 
