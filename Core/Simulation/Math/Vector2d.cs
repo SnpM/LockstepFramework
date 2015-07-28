@@ -114,8 +114,8 @@ namespace Lockstep
 			} else if (amount <= 0) {
 				return;
 			}
-			this.x = targetx * amount + this.x * (1 - amount);
-			this.y = targety * amount + this.y * (1 - amount);
+			this.x = (targetx * amount + this.x * (FixedMath.One - amount)) >> FixedMath.SHIFT_AMOUNT;
+			this.y = (targety * amount + this.y * (FixedMath.One - amount)) >> FixedMath.SHIFT_AMOUNT;
 		}
 		public void Rotate (long cos, long sin)
 		{

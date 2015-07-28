@@ -150,12 +150,7 @@ namespace Lockstep
 				if (VelocityChanged) {
 					VelocityMagnitude = Velocity.Magnitude ();
 					VelocityChanged = false;
-					if (VelocityMagnitude != 0)
-					{
-						Rotation = (Rotation + Velocity / VelocityMagnitude) / 2;
-						Rotation.Normalize ();
-						RotationChanged = true;
-					}
+
 				}
 
 				if (VelocityMagnitude != 0) {
@@ -255,14 +250,8 @@ namespace Lockstep
 			{
 				LocalPosition = Position - _parent.Position;
 				LocalPosition.RotateInverse(_parent.Rotation.x,_parent.Rotation.y);
+				PositionChanged = true;
 			}
-			else {
-				LocalPosition.x = x;
-				LocalPosition.y = y;
-				Position.x = x;
-				Position.y = y;
-			}
-			PositionChanged = true;
 		}
 
 		public void SetRotation (long x, long y)

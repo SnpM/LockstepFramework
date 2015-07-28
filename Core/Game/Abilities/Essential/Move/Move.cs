@@ -18,18 +18,20 @@ public class Move : ActiveAbility
 	#endregion
 
 	#region Static Movement Variables
-	static Vector2d steering;
 	static int i, j;
 	static long sqrDistance;
 	static Vector2d Offset;
+	static long prevDot;
+	static long leDot;
+	static Vector2d tempVec;
 	#endregion;
 
-	#region Instance Stuff
+	#region Defined Variables
 	public long Speed;
+	#endregion
+
 	public bool IsMoving;
-
 	public Vector2d Destination;
-
 	public Vector2d TargetPos;
 	public Vector2d LastTargetPos;
 	public Vector2d TargetDirection;
@@ -41,6 +43,7 @@ public class Move : ActiveAbility
 	private Vector2d MovementDirection;
 	public LSBody Body;
 	private long timescaledSpeed;
+	private long timescaledTurnRate;
 	private long distance;
 	private long closingDistance;
 	public long closingDistanceMultiplier;
@@ -71,7 +74,7 @@ public class Move : ActiveAbility
 	{
 		if (IsMoving) {
 			if (RepathCount <= 0) {
-				Pathfinder.GetPathNode(Body.Position.x,Body.Position.y,out CurrentNode);
+				Pathfinder.GetPathNode (Body.Position.x, Body.Position.y, out CurrentNode);
 				ViablePath =
 					System.Object.ReferenceEquals (CurrentNode, null) == false &&
 					System.Object.ReferenceEquals (DestinationNode, null) == false;
@@ -89,15 +92,14 @@ public class Move : ActiveAbility
 						}
 					} else {
 						if (Pathfinder.NeedsPath (CurrentNode, DestinationNode)) {
-							if (Pathfinder.FindPath (Destination,CurrentNode,DestinationNode, MyPath)) {
+							if (Pathfinder.FindPath (Destination, CurrentNode, DestinationNode, MyPath)) {
 								HasPath = true;	
 								PathIndex = 0;
 							} else {
 								if (IsFormationMoving) {
 									StartMove (MyMovementGroup.Destination);
 									IsFormationMoving = false;
-								}
-								else {
+								} else {
 
 								}
 							}
@@ -107,8 +109,7 @@ public class Move : ActiveAbility
 							RepathCount = StraightRepathRate;
 						}
 					}
-				}
-				else {
+				} else {
 					HasPath = false;
 					if (IsFormationMoving) {
 						StartMove (MyMovementGroup.Destination);
@@ -118,7 +119,7 @@ public class Move : ActiveAbility
 			} else {
 
 				if (HasPath) {
-						RepathCount--;
+					RepathCount--;
 					
 				} else {
 					RepathCount--;
@@ -166,12 +167,9 @@ public class Move : ActiveAbility
 		TouchingObjects.FastClear ();
 	}
 
-	private void ApplySteeringForces ()
-	{
-		steering -= Body.Velocity;
-		steering *= SteeringWeight;
-		Body.Velocity += steering;
-	}
+
+
+
 
 	public override void Deactivate ()
 	{
@@ -247,11 +245,9 @@ public class Move : ActiveAbility
 		}
 	}
 
-
 	public override InputCode ListenInput {
 		get {
 			return InputCode.M;
 		}
 	}
-	#endregion
 }

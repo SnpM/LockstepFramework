@@ -48,6 +48,8 @@ public class TestManager : MonoBehaviour
 			agent = controller.CreateAgent (AgentCode.Minion);
 		}
 		PlayerManager.AddAgentController (controller);
+
+
 	}
 	AgentController controller;
 	LSAgent agent;
