@@ -127,10 +127,16 @@ namespace Lockstep
 						Body2.Position.x -= DistX;
 						Body2.Position.y -= DistY;
 						Body2.PositionChanged = true;
+						Body2.Velocity.x -= DistX;
+						Body2.Velocity.y -= DistY;
+						Body2.VelocityChanged = true;
 					} else if (physicsFavor == PhysicsFavor.Favor2) {
 						Body1.Position.x += DistX;
 						Body1.Position.y += DistY;
 						Body1.PositionChanged = true;
+						Body1.Velocity.x += DistX;
+						Body1.Velocity.y += DistY;
+						Body1.VelocityChanged = true;
 					} else {
 						DistX /= 4;
 						DistY /= 4;
@@ -144,6 +150,8 @@ namespace Lockstep
 							Body2.Velocity.y -= DistY;//FixedMath.Mul(DistY, Body2.VelocityMagnitude);
 							Body2.VelocityChanged = true;
 
+							DistX /= 4;
+							DistY /= 4;
 							Body1.Position.x += DistX;
 							Body1.Position.y += DistY;
 							Body2.Position.x -= DistX;
