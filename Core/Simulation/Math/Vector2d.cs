@@ -67,6 +67,8 @@ namespace Lockstep
 		/// </summary>
 		public long Magnitude ()
 		{
+			temp1 = (this.x * this.x + this.y * this.y) >> FixedMath.SHIFT_AMOUNT;
+			if (temp1 == 0) return 0;
 			return FixedMath.Sqrt ((this.x * this.x + this.y * this.y) >> FixedMath.SHIFT_AMOUNT);
 		}
 		/// <summary>
@@ -74,6 +76,7 @@ namespace Lockstep
 		/// </summary>
 		public void Normalize ()
 		{
+
 			tempMag = this.Magnitude ();
 			if (tempMag == 0)
 			{
@@ -114,20 +117,34 @@ namespace Lockstep
 			} else if (amount <= 0) {
 				return;
 			}
-			this.x = targetx * amount + this.x * (1 - amount);
-			this.y = targety * amount + this.y * (1 - amount);
+			this.x = (targetx * amount + this.x * (FixedMath.One - amount)) >> FixedMath.SHIFT_AMOUNT;
+			this.y = (targety * amount + this.y * (FixedMath.One - amount)) >> FixedMath.SHIFT_AMOUNT;
 		}
-		public void Rotate (long sin, long cos)
+		public void Rotate (long cos, long sin)
 		{
-			temp1 = (this.x * cos + this.y * sin) >> FixedMath.SHIFT_AMOUNT;
-			this.y = (this.x * -sin + this.y * cos) >> FixedMath.SHIFT_AMOUNT;
+			temp1 = (this.x * sin + this.y * cos) >> FixedMath.SHIFT_AMOUNT;
+			this.y = (this.x * -cos + this.y * sin) >> FixedMath.SHIFT_AMOUNT;
+			this.x = temp1;
+		}
+		public void RotateInverse (long cos, long sin)
+		{
+			temp1 = (this.x * sin + this.y * -cos) >> FixedMath.SHIFT_AMOUNT;
+			this.y = (this.x * cos + this.y * sin) >> FixedMath.SHIFT_AMOUNT;
 			this.x = temp1;
 		}
 		public void RotateRight ()
 		{
 			temp1 = this.x;
-			this.x = -this.y;
-			this.y = temp1;
+			this.x = this.y;
+			this.y = -temp1;
+		}
+
+		static Vector2d retVec = Vector2d.zero;
+		public Vector2d rotatedRight ()
+		{
+			retVec.x = y;
+			retVec.y = -x;
+			return retVec;
 		}
 		public void Reflect (long axisX, long axisY)
 		{
@@ -147,6 +164,10 @@ namespace Lockstep
 		public long Dot (long otherX, long otherY)
 		{
 			return (this.x * otherX + this.y * otherY) >> FixedMath.SHIFT_AMOUNT;
+		}
+		public long Cross (long otherX, long otherY)
+		{
+			return (this.x * otherY - this.y * otherX) >> FixedMath.SHIFT_AMOUNT;
 		}
 
 		static long temp1;
@@ -183,6 +204,10 @@ namespace Lockstep
 		public static long Dot (long v1x, long v1y, long v2x, long v2y)
 		{
 			return (v1x * v2x + v1y * v2y) >> FixedMath.SHIFT_AMOUNT;
+		}
+		public static long Cross (long v1x, long v1y, long v2x, long v2y)
+		{
+			return (v1x * v2y - v1y * v2x) >> FixedMath.SHIFT_AMOUNT;
 		}
 	#endregion
 
@@ -244,7 +269,14 @@ namespace Lockstep
 		{
 			return new Vector2d (v1.x >> shift, v1.y >> shift);
 		}
-
+		public static bool operator == (Vector2d v1, Vector2d v2)
+		{
+			return v1.x == v2.x && v1.y == v2.y;
+		}
+		public static bool operator != (Vector2d v1, Vector2d v2)
+		{
+			return v1.x != v2.x || v1.y != v2.y;
+		}
 		#endregion
 
 		public long GetLongHashCode ()

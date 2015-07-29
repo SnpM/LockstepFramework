@@ -17,6 +17,11 @@ public class Editor_Ability : Editor {
 			Move Target = (Move)target;
 			LSEditorUtility.FixedNumberField ("Speed", ref Target.Speed);
 		}
+		if (T == typeof (Turn))
+		{
+			Turn Target = (Turn)target;
+			LSEditorUtility.FixedNumberField("Turn Rate", ref Target.TurnRate);
+		}
 
 		if (EditorGUI.EndChangeCheck ())
 		{

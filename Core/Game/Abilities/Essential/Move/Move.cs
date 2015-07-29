@@ -18,18 +18,27 @@ public class Move : ActiveAbility
 	#endregion
 
 	#region Static Movement Variables
-	static Vector2d steering;
 	static int i, j;
 	static long sqrDistance;
 	static Vector2d Offset;
+	static long prevDot;
+	static long leDot;
+	static Vector2d tempVec;
 	#endregion;
 
-	#region Instance Stuff
+	#region Defined Variables
 	public long Speed;
+	#endregion
+
+	#region Communicators
+	public LSBody Body;
+	public Turn Turner;
+	#endregion
+
+
+	private long timescaledSpeed;
 	public bool IsMoving;
-
 	public Vector2d Destination;
-
 	public Vector2d TargetPos;
 	public Vector2d LastTargetPos;
 	public Vector2d TargetDirection;
@@ -39,8 +48,6 @@ public class Move : ActiveAbility
 	public int MyMovementGroupID = -1;
 	public bool IsFormationMoving;
 	private Vector2d MovementDirection;
-	public LSBody Body;
-	private long timescaledSpeed;
 	private long distance;
 	private long closingDistance;
 	public long closingDistanceMultiplier;
@@ -51,7 +58,7 @@ public class Move : ActiveAbility
 	public FastList<Vector2d> MyPath = new FastList<Vector2d> ();
 	public bool HasPath;
 	public bool StraightPath;
-	private bool ViablePath;
+	private bool ViableDestination;
 
 	public override void Initialize (LSAgent agent)
 	{
@@ -61,54 +68,70 @@ public class Move : ActiveAbility
 		Body.Mover = this;
 		Body.OnContact += HandleCollision;
 
+
+		Turner = agent.GetAbility<Turn> ();
+
 		timescaledSpeed = ((Speed * LockstepManager.Timestep) >> FixedMath.SHIFT_AMOUNT);
 		closingDistance = agent.Body.Radius;
 
 		RepathCount = LSUtility.GetRandom (RepathRate);
+		ViableDestination = false;
 	}
 
 	public override void Simulate ()
 	{
 		if (IsMoving) {
 			if (RepathCount <= 0) {
-				Pathfinder.GetPathNode(Body.Position.x,Body.Position.y,out CurrentNode);
-				ViablePath =
-					System.Object.ReferenceEquals (CurrentNode, null) == false &&
-					System.Object.ReferenceEquals (DestinationNode, null) == false;
-				if (ViablePath) {
-					if (StraightPath) {
-						if (Pathfinder.NeedsPath (CurrentNode, DestinationNode)) {
-							if (Pathfinder.FindPath (Destination, CurrentNode, DestinationNode, MyPath)) {
-								HasPath = true;
-								PathIndex = 0;
-							}
-							StraightPath = false;
-							RepathCount = RepathRate;
-						} else {
-							RepathCount = StraightRepathRate;
-						}
-					} else {
-						if (Pathfinder.NeedsPath (CurrentNode, DestinationNode)) {
-							if (Pathfinder.FindPath (Destination,CurrentNode,DestinationNode, MyPath)) {
-								HasPath = true;	
-								PathIndex = 0;
+				if (ViableDestination) {
+					if (Pathfinder.GetPathNode (Body.Position.x, Body.Position.y, out CurrentNode)) {
+						if (StraightPath) {
+							if (Pathfinder.NeedsPath (CurrentNode, DestinationNode)) {
+								if (Pathfinder.FindPath (Destination, CurrentNode, DestinationNode, MyPath)) {
+									HasPath = true;
+									PathIndex = 0;
+								} else {
+									if (IsFormationMoving) {
+										StartMove (MyMovementGroup.Destination);
+										IsFormationMoving = false;
+									}
+								}
+								StraightPath = false;
+								RepathCount = RepathRate;
 							} else {
-								if (IsFormationMoving) {
-									StartMove (MyMovementGroup.Destination);
-									IsFormationMoving = false;
-								}
-								else {
-
-								}
+								RepathCount = StraightRepathRate;
 							}
-							RepathCount = RepathRate;
 						} else {
-							StraightPath = true;
-							RepathCount = StraightRepathRate;
+							if (Pathfinder.NeedsPath (CurrentNode, DestinationNode)) {
+								if (Pathfinder.FindPath (Destination, CurrentNode, DestinationNode, MyPath)) {
+									HasPath = true;	
+									PathIndex = 0;
+								} else {
+									if (IsFormationMoving) {
+										StartMove (MyMovementGroup.Destination);
+										IsFormationMoving = false;
+									} else {
+
+									}
+								}
+								RepathCount = RepathRate;
+							} else {
+								if (StraightPath == false)
+								{
+									if (IsFormationMoving)
+									{
+										StartMove (MyMovementGroup.Destination);
+										IsFormationMoving = false;
+									}
+								}
+								StraightPath = true;
+								RepathCount = StraightRepathRate;
+							}
 						}
 					}
-				}
-				else {
+					else {
+
+					}
+				} else {
 					HasPath = false;
 					if (IsFormationMoving) {
 						StartMove (MyMovementGroup.Destination);
@@ -118,7 +141,7 @@ public class Move : ActiveAbility
 			} else {
 
 				if (HasPath) {
-						RepathCount--;
+					RepathCount--;
 					
 				} else {
 					RepathCount--;
@@ -128,6 +151,8 @@ public class Move : ActiveAbility
 			if (StraightPath) {
 				TargetPos = Destination;
 			} else if (HasPath) {
+				if (PathIndex >= MyPath.Count)
+					PathIndex = MyPath.Count;
 				TargetPos = MyPath [PathIndex];
 			} else {
 				TargetPos = Destination;
@@ -166,13 +191,6 @@ public class Move : ActiveAbility
 		TouchingObjects.FastClear ();
 	}
 
-	private void ApplySteeringForces ()
-	{
-		steering -= Body.Velocity;
-		steering *= SteeringWeight;
-		Body.Velocity += steering;
-	}
-
 	public override void Deactivate ()
 	{
 
@@ -187,15 +205,17 @@ public class Move : ActiveAbility
 
 		MovementGroup.LastCreatedGroup.Add (this);
 
-
+		if (StraightPath)
+			RepathCount /= 4;
+		else
+			RepathCount /= 2;
 	}
-
+	
 	public void StopMove ()
 	{
 		IsMoving = false;
-		if (MyMovementGroup != null) {
-			MyMovementGroup.Remove (this);
-		}
+		MyMovementGroup.Remove (this);
+
 		StopTime = 0;
 	}
 
@@ -204,10 +224,6 @@ public class Move : ActiveAbility
 		if (destination.x == Destination.x && destination.y == Destination.y) {
 			
 		} else {
-			if (StraightPath)
-				RepathCount /= 4;
-			else
-				RepathCount /= 2;
 
 			HasPath = false;
 			BadPathCount = 0;
@@ -215,7 +231,7 @@ public class Move : ActiveAbility
 			Destination = destination;
 			IsMoving = true;
 
-			Pathfinder.GetPathNode (Destination.x, Destination.y, out DestinationNode);
+			ViableDestination = Pathfinder.GetPathNode (Destination.x, Destination.y, out DestinationNode);
 		}
 
 	}
@@ -247,11 +263,9 @@ public class Move : ActiveAbility
 		}
 	}
 
-
 	public override InputCode ListenInput {
 		get {
 			return InputCode.M;
 		}
 	}
-	#endregion
 }

@@ -101,7 +101,7 @@ namespace Lockstep
 			if (Body2.OnContact != null)
 				Body2.OnContact (Body1);
 
-			if (DoPhysics) {
+			if (DoPhysics && Body1.HasParent == false && Body2.HasParent == false) {
 				switch (LeCollisionType) {
 				case CollisionType.Circle_Circle:
 					DistX = Body1.Position.x - Body2.Position.x;

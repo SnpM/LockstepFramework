@@ -15,7 +15,7 @@ namespace Lockstep
 	{
 		#region Settings
 		public const int Count = 18;
-		public const int ShiftSize = FixedMath.SHIFT_AMOUNT + 3;
+		public const int ShiftSize = FixedMath.SHIFT_AMOUNT + 2;
 		public const long OffsetX = -(1 << ShiftSize) * Count / 2;
 		public const long testX = -FixedMath.One * 32;
 		public const long OffsetY = -(1 << ShiftSize) * Count / 2;

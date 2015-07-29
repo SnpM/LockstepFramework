@@ -41,6 +41,7 @@ namespace Lockstep
 
 		public static GridNode GetNode (int xGrid, int yGrid)
 		{
+			if (xGrid < 0 || xGrid >= NodeCount || yGrid < 0 || yGrid >= NodeCount) return null;
 			return Grid [GetGridIndex(xGrid,yGrid)];
 		}
 
@@ -51,7 +52,7 @@ namespace Lockstep
 		{
 			indexX = (int)((xPos + FixedMath.Half - 1 - OffsetX) >> FixedMath.SHIFT_AMOUNT);
 			indexY = (int)((yPos + FixedMath.Half - 1 - OffsetY) >> FixedMath.SHIFT_AMOUNT);
-			return (Grid[GetGridIndex (indexX, indexY)]);
+			return (GetNode (indexX, indexY));
 		}
 
 		public static int GetGridIndex (int xGrid, int yGrid)

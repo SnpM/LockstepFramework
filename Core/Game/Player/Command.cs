@@ -7,6 +7,7 @@ namespace Lockstep
 {
 	public class Command
 	{
+		const int CompressionShift = 4;
 		public Command ()
 		{
 
@@ -112,8 +113,8 @@ namespace Lockstep
 			HasSelect = GetMaskBool (ValuesMask, DataType.Select);
 
 			if (HasPosition) {
-				_position.x = reader.ReadInt ();
-				_position.y = reader.ReadInt ();
+				_position.x = reader.ReadInt () << CompressionShift;
+				_position.y = reader.ReadInt () << CompressionShift;
 			}
 			if (HasTarget) {
 				_target = reader.ReadUShort ();
@@ -165,8 +166,8 @@ namespace Lockstep
 
 				//Position
 				if (HasPosition) {
-					writer.Write ((int)_position.x);
-					writer.Write ((int)_position.y);
+					writer.Write ((int)(_position.x >> CompressionShift));
+					writer.Write ((int)(_position.y >> CompressionShift));
 				}
 
 				//Target

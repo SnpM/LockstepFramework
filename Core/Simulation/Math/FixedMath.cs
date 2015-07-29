@@ -125,24 +125,28 @@ namespace Lockstep
 			return f1 % f2;
 		}
 
-		static long n, n1;
 		/// <summary>
 		/// Square root.
 		/// </summary>
 		/// <param name="f1">f1.</param>
+
+		static long n, n1;
 		public static long Sqrt (long f1)
 		{
-			if (0 == f1) {
-				return 0;
+			if (f1 == 0) return 0;
+			n = (f1 >> 1) + 1;
+			n1 = (n + (f1 / n)) >> 1;
+			while (n1 < n) {
+				n = n1;
+				n1 = (n + (f1 / n)) >> 1;
 			}
-			 n = (f1 >> 1) + 1;
-			 n1 = (n + (f1 / n)) >> 1;  
-			while (n1 < n) {  
-				n = n1;  
-				n1 = (n + (f1 / n)) >> 1;  
-			} 
-			return n << (SHIFT_AMOUNT / 2);  
+			return n << (SHIFT_AMOUNT / 2);
 		}
+		public static long Abs (long f1)
+		{
+			return f1 < 0 ? -f1 : f1;
+		}
+
 	#endregion
 
 	#region Helpful
