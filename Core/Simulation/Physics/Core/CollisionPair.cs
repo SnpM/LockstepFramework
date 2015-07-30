@@ -127,11 +127,18 @@ namespace Lockstep
 						Body2.Position.x -= DistX;
 						Body2.Position.y -= DistY;
 						Body2.PositionChanged = true;
+						Body2.Velocity.x -= DistX;
+						Body2.Velocity.y -= DistY;
+						Body2.VelocityChanged = true;
 					} else if (physicsFavor == PhysicsFavor.Favor2) {
 						Body1.Position.x += DistX;
 						Body1.Position.y += DistY;
 						Body1.PositionChanged = true;
+						Body1.Velocity.x += DistX;
+						Body1.Velocity.y += DistY;
+						Body1.VelocityChanged = true;
 					} else {
+
 						DistX /= 4;
 						DistY /= 4;
 						if (Body1.Velocity.Dot (Body2.Velocity.x, Body2.Velocity.y) <= 0)
@@ -144,6 +151,8 @@ namespace Lockstep
 							Body2.Velocity.y -= DistY;//FixedMath.Mul(DistY, Body2.VelocityMagnitude);
 							Body2.VelocityChanged = true;
 
+							//DistX /= 4;
+							//DistY /= 4;
 							Body1.Position.x += DistX;
 							Body1.Position.y += DistY;
 							Body2.Position.x -= DistX;
@@ -243,6 +252,7 @@ namespace Lockstep
 				break;
 			
 			case CollisionType.Circle_Polygon:
+				//Not supported
 				return false;
 				if (CheckCircle ()) {
 					if (Body1.Shape == ColliderType.Circle) {
@@ -257,6 +267,7 @@ namespace Lockstep
 
 			//Check
 			case CollisionType.AABox_AABox:
+				//Not supported
 				return false;
 				if (DoPhysics) {
 					if (CheckCircle ()) {
@@ -272,6 +283,7 @@ namespace Lockstep
 				break;
 
 			case CollisionType.AABox_Polygon:
+				//Not supported
 				return false;
 				if (CheckCircle ()) {
 					if (Body1.Shape == ColliderType.AABox) {
@@ -287,6 +299,7 @@ namespace Lockstep
 				break;
 
 			case CollisionType.Polygon_Polygon:
+				//Not supported
 				return false;
 				if (CheckCircle ()) {
 					if (CheckPoly_Poly (Body1, Body2)) {

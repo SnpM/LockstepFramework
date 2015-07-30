@@ -13,6 +13,44 @@ namespace Lockstep
 {
 	public class GridNode
 	{
+		#region Constructor	
+		static GridNode ()
+		{
+			for (i = -1; i <= 1; i++) {
+				for (j = -1; j <= 1; j++) {
+					
+					if (i == 0 && j == 0)
+						continue;
+					if ((i != 0 && j != 0))
+						continue;
+				}
+			}
+		}
+		
+		public GridNode (int _x, int _y)
+		{
+			gridX = _x;
+			gridY = _y;
+			gridIndex = gridX * GridManager.NodeCount + gridY;
+			WorldPos.x = gridX * FixedMath.One + GridManager.OffsetX;
+			WorldPos.y = gridY * FixedMath.One + GridManager.OffsetY;
+		}
+		
+		public void Initialize ()
+		{
+			GenerateNeighbors ();
+		}
+		#endregion
+
+
+		#region Collection Helpers
+		public uint ClosedSetVersion;
+		public uint HeapVersion;
+		public uint HeapIndex;
+		#endregion
+
+
+		#region Pathfinding
 		public int gridX;
 		public int gridY;
 		public int gridIndex;
@@ -23,10 +61,8 @@ namespace Lockstep
 		public bool Unwalkable;
 		public int Weight;
 		public GridNode[] NeighborNodes = new GridNode[8];
-		static uint[] NeighborUnwalkableVersions = new uint[8];
 		public Vector2d WorldPos;
 		public bool Obstructed;
-		public bool IsVertex;
 		public static readonly bool[] IsNeighborDiagnal = new bool[] {
 			true,
 			false,
@@ -37,68 +73,32 @@ namespace Lockstep
 			false,
 			true
 		};
-
-		
-		#region Variables for data structures
-		public uint HeapIndex;
-		public uint HeapVersion;
-		public uint ClosedSetVersion;
-		#endregion
-		static GridNode ()
-		{
-			for (i = -1; i <= 1; i++) {
-				for (j = -1; j <= 1; j++) {
-					
-					if (i == 0 && j == 0)
-						continue;
-					if ((i != 0 && j != 0))
-						continue;
- 				}
-			}
-		}
-
-		public GridNode (int _x, int _y)
-		{
-			gridX = _x;
-			gridY = _y;
-			gridIndex = gridX * GridManager.NodeCount + gridY;
-			WorldPos.x = gridX * FixedMath.One + GridManager.OffsetX;
-			WorldPos.y = gridY * FixedMath.One + GridManager.OffsetY;
-		}
-
-		public void Initialize ()
-		{
-			GenerateNeighbors ();
-		}
-
-		static int i, j, checkX, checkY, leIndex;
-
 		private void GenerateNeighbors ()
 		{
 			for (i = -1; i <= 1; i++) {
 				checkX = gridX + i;
 				if (checkX >= 0 && checkX < GridManager.NodeCount) {
 					for (j = -1; j <= 1; j++) {
-
+						
 						checkY = gridY + j;
 						if (checkY >= 0 && checkY < GridManager.NodeCount) {
 							GridNode checkNode = GridManager.Grid [GridManager.GetGridIndex (checkX, checkY)];
-
+							
 							if (i == 0 && j == 0)
 								continue;
-
+							
 							if (checkNode.Unwalkable) {
 								Obstructed = true;
 							}
-
+							
 							//if ((i != 0 && j != 0)) continue;
 							NeighborNodes [GetNeighborIndex (i, j)] = checkNode;
 						}
 					}
 				}
 			}
-
-
+			
+			
 		}
 		public static int GetNeighborIndex (int _i, int _j)
 		{
@@ -119,13 +119,13 @@ namespace Lockstep
 				leIndex--;
 			return leIndex;
 		}
-
-
+		
+		
 		static int dstX;
 		static int dstY;
 		public static int HeuristicTargetX;
 		public static int HeuristicTargetY;
-
+		
 		public void CalculateHeuristic ()
 		{
 			/*
@@ -146,7 +146,7 @@ namespace Lockstep
 
 			fCost = gCost + hCost;
 */
-
+			
 			/*
 			if (gridX > HeuristicTargetX)
 				dstX = gridX - HeuristicTargetX;
@@ -160,7 +160,7 @@ namespace Lockstep
 			hCost = (dstX + dstY) * 100;
 			fCost = gCost + hCost;
 			*/
-
+			
 			if (gridX > HeuristicTargetX)
 				dstX = gridX - HeuristicTargetX;
 			else
@@ -170,15 +170,35 @@ namespace Lockstep
 				dstY = gridY - HeuristicTargetY;
 			else
 				dstY = HeuristicTargetY - gridY;
-
+			
 			if (dstX > dstY)
 				this.hCost = dstY * 141 + (dstX - dstY) * 100;
 			else
 				this.hCost = dstX * 141 + (dstY - dstX) * 100;
-
+			
 			fCost = gCost + hCost;
-
+			
 		}
+		#endregion
+
+
+		#region Influence
+		public InfluencerBucket LocatedAgents;
+		public bool Add (LSInfluencer influencer)
+		{
+			if (System.Object.ReferenceEquals (LocatedAgents,null))
+			{
+				LocatedAgents = new InfluencerBucket();
+			}
+			return LocatedAgents.Add(influencer);
+		}
+		public void Remove (LSInfluencer influencer)
+		{
+			LocatedAgents.Remove (influencer);
+		}
+		#endregion
+
+		static int i, j, checkX, checkY, leIndex;
 
 		public override int GetHashCode ()
 		{
@@ -190,5 +210,9 @@ namespace Lockstep
 			return obj.gridIndex == this.gridIndex;
 		}
 
+		public override string ToString ()
+		{
+			return "(" + gridX.ToString () + ", " + gridY.ToString () + ")";
+		}
 	}
 }

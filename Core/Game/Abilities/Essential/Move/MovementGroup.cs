@@ -5,6 +5,10 @@ using System;
 
 public class MovementGroup
 {
+	static MovementGroup()
+	{
+		LockstepManager.OnSimulate += Simulate;
+	}
 
 	#region Static Containers
 	public static int ActiveGroupCapacity = 512;

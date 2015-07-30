@@ -109,20 +109,10 @@ public class Move : ActiveAbility
 									if (IsFormationMoving) {
 										StartMove (MyMovementGroup.Destination);
 										IsFormationMoving = false;
-									} else {
-
 									}
 								}
 								RepathCount = RepathRate;
 							} else {
-								if (StraightPath == false)
-								{
-									if (IsFormationMoving)
-									{
-										StartMove (MyMovementGroup.Destination);
-										IsFormationMoving = false;
-									}
-								}
 								StraightPath = true;
 								RepathCount = StraightRepathRate;
 							}
@@ -152,7 +142,7 @@ public class Move : ActiveAbility
 				TargetPos = Destination;
 			} else if (HasPath) {
 				if (PathIndex >= MyPath.Count)
-					PathIndex = MyPath.Count;
+					PathIndex = MyPath.Count - 1;
 				TargetPos = MyPath [PathIndex];
 			} else {
 				TargetPos = Destination;

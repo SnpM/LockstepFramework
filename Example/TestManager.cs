@@ -19,7 +19,7 @@ public class TestManager : MonoBehaviour
 		GridManager.Generate ();
 		const int count = 32;
 
-
+		/*
 		for (int i = -count; i < count; i++)
 		{
 			for (int j = -count; j < count; j++)
@@ -32,7 +32,7 @@ public class TestManager : MonoBehaviour
 					Instantiate(TestWall).GetComponent<LSBody>().Initialize(pos);
 				}
 			}
-		}
+		}*/
 
 		/*LSBody wall = Instantiate (TestWall).GetComponent<LSBody> ();
 		wall.Initialize (new Vector2d (-32 + 14, 0));
@@ -44,7 +44,7 @@ public class TestManager : MonoBehaviour
 
 		GridManager.Initialize ();
 		controller = AgentController.Create ();
-		for (int i = 0; i < 256; i++) {
+		for (int i = 0; i < 5; i++) {
 			agent = controller.CreateAgent (AgentCode.Minion);
 		}
 		PlayerManager.AddAgentController (controller);

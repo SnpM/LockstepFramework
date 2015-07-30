@@ -77,6 +77,7 @@ namespace Lockstep
 		public LSAgent[] Agents = new LSAgent[MaxAgents];
 		public bool[] AgentActive = new bool[MaxAgents];
 		public byte ControllerID;
+		public FastList<AllegianceType> DiplomacyFlags = new FastList<AllegianceType>();
 
 		public void InitializeLocal ()
 		{
@@ -84,6 +85,11 @@ namespace Lockstep
 			PeakLocalID = 0;
 			ControllerID = (byte)InstanceManagers.Count;
 			InstanceManagers.Add (this);
+
+			while (DiplomacyFlags.Count < InstanceManagers.Count)
+			{
+				DiplomacyFlags.Add (AllegianceType.Neutral);
+			}
 		}
 
 		public void SimulateLocal ()
@@ -94,6 +100,7 @@ namespace Lockstep
 					Agents[i].Simulate ();
 			}
 		}
+
 		public void VisualizeLocal ()
 		{
 			for (i = 0; i < MaxAgents;i++)
@@ -102,6 +109,7 @@ namespace Lockstep
 					Agents[i].Visualize();
 			}
 		}
+
 
 		public void Execute (Command com)
 		{
@@ -131,7 +139,7 @@ namespace Lockstep
 			globalID = GenerateGlobalID ();
 			curAgent.GlobalID = globalID;
 
-			curAgent.Initialize ();
+			curAgent.Initialize (this);
 
 			RingController ringController = GameObject.Instantiate (LockstepManager.Instance.SelectionRing).GetComponent<RingController> ();
 			ringController.Initialize (curAgent);
@@ -160,6 +168,17 @@ namespace Lockstep
 				return PeakLocalID++;
 			}
 		}
+
+		public void SetAllegiance (AgentController otherController, AllegianceType allegianceType)
+		{
+			DiplomacyFlags[otherController.ControllerID] = allegianceType;
+		}
 		#endregion
+	}
+
+	public enum AllegianceType : byte {
+		Neutral,
+		Friendly,
+		Enemy
 	}
 }

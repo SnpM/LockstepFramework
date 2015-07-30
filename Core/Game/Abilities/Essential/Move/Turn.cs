@@ -51,7 +51,6 @@ public class Turn : Ability
 								Body.Rotation = TargetRotation;
 								TargetReached = true;
 								Body.RotationChanged = true;
-
 								return;
 
 							}
@@ -64,6 +63,9 @@ public class Turn : Ability
 							}
 						}
 					}
+					else {
+						TargetReached = true;
+					}
 
 					Body.Rotation.Normalize ();
 					Body.RotationChanged = true;
@@ -74,6 +76,10 @@ public class Turn : Ability
 						Body.Rotation.Lerp (tempVec.x, tempVec.y, TurnRate);
 						Body.Rotation.Normalize ();
 						Body.RotationChanged = true;
+
+					}
+					else {
+						TargetReached = true;
 					}
 				}
 			}

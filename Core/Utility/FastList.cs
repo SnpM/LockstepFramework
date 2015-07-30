@@ -133,7 +133,7 @@ namespace Lockstep
 			}
 		}
 
-		private void EnsureCapacity (int min)
+		public void EnsureCapacity (int min)
 		{
 			if (Capacity < min)
 			{

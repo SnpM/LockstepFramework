@@ -18,9 +18,13 @@ namespace Lockstep
 		public AgentCode MyAgentCode;
 		public float SelectionRadius = 1f;
 		public RingController ringController;
+		public LSInfluencer Influencer;
+		public AgentController MyAgentController;
 
-		public void Initialize ()
+		public void Initialize (AgentController controller)
 		{
+			MyAgentController = controller;
+
 			cachedTransform = base.transform;
 			cachedGameObject = base.gameObject;
 			cachedRenderer = GetComponent<Renderer> ();
@@ -29,6 +33,11 @@ namespace Lockstep
 				Body = GetComponent<LSBody>();
 			}
 			Body.Initialize ();
+			if (Influencer == null)
+			{
+				Influencer = new LSInfluencer();
+			}
+			Influencer.Initialize (this);
 
 			Abilities = this.GetComponents<Ability> ();
 			AbilityCount = Abilities.Length;
@@ -41,13 +50,29 @@ namespace Lockstep
 					ActiveAbilities [(int)activeAbility.ListenInput] = activeAbility;
 				}
 			}
-
+			delta = InfluenceManager.GenerateDeltaCount(5);
+			Debug.Log (delta);
 		}
 
+		int delta;
 		public void Simulate ()
 		{
+			Influencer.Simulate ();
 			for (iterator = 0; iterator < AbilityCount; iterator++) {
 				Abilities [iterator].Simulate ();
+			}
+
+			if (LocalID == 0)
+			
+			{
+				FastList<LSAgent> agents = new FastList<LSAgent>();
+				 Influencer.ScanAll (delta,agents);
+				string s = "";
+				for (i = 0; i < agents.Count;i++)
+				{
+					s += agents[i].LocalID + ", ";
+				}
+				Debug.Log (s);
 			}
 		}
 		public void Visualize ()
@@ -68,7 +93,13 @@ namespace Lockstep
 
 		public void Deactivate ()
 		{
+			for (iterator = 0; iterator < AbilityCount; iterator++)
+			{
+				Abilities[iterator].Deactivate();
+			}
 			PhysicsManager.Dessimilate (Body);
+			Influencer.Deactivate ();
+
 		}
 
 		public T GetAbility<T> () where T : Ability
