@@ -37,6 +37,25 @@ namespace Lockstep
 			return (int)((0x7FFFFFFF & (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)))) % Count);
 		}
 
+		public static void SetBitTrue (ref ulong mask, int bitIndex) 
+		{
+			mask |= (ulong)1 << bitIndex;
+		}
+
+		public static void SetBitFalse (ref ulong mask, int bitIndex)
+		{
+			mask ^= (ulong)1 << bitIndex;
+		}
+
+		public static bool GetBitTrue (ulong mask, int bitIndex)
+		{
+			return (mask & ((ulong)1 << bitIndex)) != 0;
+		}
+
+		public static bool GetBitFalse (ulong mask, int bitIndex)
+		{
+			return (mask & ((ulong)1 << bitIndex)) == 0;
+		}
 
 	}
 }

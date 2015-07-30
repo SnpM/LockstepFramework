@@ -18,6 +18,7 @@ namespace Lockstep
 		public AgentCode MyAgentCode;
 		public float SelectionRadius = 1f;
 		public RingController ringController;
+		public LSInfluencer Influencer;
 
 		public void Initialize ()
 		{
@@ -29,6 +30,11 @@ namespace Lockstep
 				Body = GetComponent<LSBody>();
 			}
 			Body.Initialize ();
+			if (Influencer == null)
+			{
+				Influencer = new LSInfluencer();
+			}
+			Influencer.Initialize (this);
 
 			Abilities = this.GetComponents<Ability> ();
 			AbilityCount = Abilities.Length;
@@ -41,11 +47,13 @@ namespace Lockstep
 					ActiveAbilities [(int)activeAbility.ListenInput] = activeAbility;
 				}
 			}
-
+			delta = new RangeDelta(5);
 		}
 
+		RangeDelta delta;
 		public void Simulate ()
 		{
+			Influencer.Simulate ();
 			for (iterator = 0; iterator < AbilityCount; iterator++) {
 				Abilities [iterator].Simulate ();
 			}
@@ -69,6 +77,7 @@ namespace Lockstep
 		public void Deactivate ()
 		{
 			PhysicsManager.Dessimilate (Body);
+			Influencer.Deactivate ();
 		}
 
 		public T GetAbility<T> () where T : Ability
