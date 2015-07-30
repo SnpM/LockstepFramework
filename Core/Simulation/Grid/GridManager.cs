@@ -57,10 +57,11 @@ namespace Lockstep
 
 		public static int GetGridIndex (int xGrid, int yGrid)
 		{
+			/*
 			if (xGrid < 0) xGrid = 0;
 			else if (xGrid >= NodeCount) xGrid = NodeCount - 1;
 			if (yGrid < 0) yGrid = 0;
-			else if (yGrid >= NodeCount) yGrid = NodeCount - 1;
+			else if (yGrid >= NodeCount) yGrid = NodeCount - 1;*/
 			return xGrid * NodeCount + yGrid;
 		}
 			

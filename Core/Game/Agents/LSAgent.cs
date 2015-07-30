@@ -19,9 +19,12 @@ namespace Lockstep
 		public float SelectionRadius = 1f;
 		public RingController ringController;
 		public LSInfluencer Influencer;
+		public AgentController MyAgentController;
 
-		public void Initialize ()
+		public void Initialize (AgentController controller)
 		{
+			MyAgentController = controller;
+
 			cachedTransform = base.transform;
 			cachedGameObject = base.gameObject;
 			cachedRenderer = GetComponent<Renderer> ();
@@ -56,6 +59,19 @@ namespace Lockstep
 			Influencer.Simulate ();
 			for (iterator = 0; iterator < AbilityCount; iterator++) {
 				Abilities [iterator].Simulate ();
+			}
+
+			if (LocalID == 0)
+			
+			{
+				FastList<LSAgent> agents = new FastList<LSAgent>();
+				Influencer.ScanAll (delta, agents);
+				string s = "";
+				for (i = 0; i < agents.Count; i ++)
+				{
+					s+=	agents[i].LocalID.ToString () + ", ";
+				}
+				Debug.Log (s);
 			}
 		}
 		public void Visualize ()

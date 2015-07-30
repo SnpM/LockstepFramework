@@ -9,4 +9,8 @@ public struct Coordinate {
 		x = X;
 		y = Y;
 	}
+	public override string ToString ()
+	{
+		return "(" + x.ToString () + ", " + y.ToString() + ")";
+	}
 }

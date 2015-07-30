@@ -252,6 +252,7 @@ namespace Lockstep
 				break;
 			
 			case CollisionType.Circle_Polygon:
+				//Not supported
 				return false;
 				if (CheckCircle ()) {
 					if (Body1.Shape == ColliderType.Circle) {
@@ -266,6 +267,7 @@ namespace Lockstep
 
 			//Check
 			case CollisionType.AABox_AABox:
+				//Not supported
 				return false;
 				if (DoPhysics) {
 					if (CheckCircle ()) {
@@ -281,6 +283,7 @@ namespace Lockstep
 				break;
 
 			case CollisionType.AABox_Polygon:
+				//Not supported
 				return false;
 				if (CheckCircle ()) {
 					if (Body1.Shape == ColliderType.AABox) {
@@ -296,6 +299,7 @@ namespace Lockstep
 				break;
 
 			case CollisionType.Polygon_Polygon:
+				//Not supported
 				return false;
 				if (CheckCircle ()) {
 					if (CheckPoly_Poly (Body1, Body2)) {

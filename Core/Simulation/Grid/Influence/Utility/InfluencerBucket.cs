@@ -1,5 +1,6 @@
 ﻿using System;
-
+using System.Collections;
+using System.Collections.Generic;
 namespace Lockstep
 {
 	public class InfluencerBucket
@@ -11,6 +12,7 @@ namespace Lockstep
 
 		#region Static helpers
 		static int leIndex;
+		static int i;
 		#endregion
 
 		public int PeakCount;
@@ -45,7 +47,64 @@ namespace Lockstep
 		{
 			leIndex = item.bucketIndex;
 			OpenSlots.Add (leIndex);
-			LSUtility.SetBitFalse(ref arrayAllocation,leIndex);
+
+			LSUtility.SetBitFalse (ref arrayAllocation, leIndex);
+			if (leIndex == PeakCount - 1)
+			{
+				PeakCount--;
+				for (i = leIndex - 1; i >= 0; i--)
+				{
+					if (LSUtility.GetBitTrue (arrayAllocation,i))
+					{
+						PeakCount--;
+					}
+				}
+			}
+			else {
+				LSUtility.SetBitFalse(ref arrayAllocation,leIndex);
+			}
 		}
+
+		public IEnumerator GetEnumerator ()
+		{
+			return new InfluenceBucketEnumerator(this);
+		}
+	}
+	public class InfluenceBucketEnumerator : IEnumerator {
+		#region Foreach Implementation
+		public InfluenceBucketEnumerator(InfluencerBucket bucket)
+		{
+			_bucket = bucket;
+		}
+		InfluencerBucket _bucket;
+		int position = -1;
+		
+		//IEnumerator
+		public bool MoveNext()
+		{
+			position++;
+			while (position <= _bucket.PeakCount)
+			{
+				if (LSUtility.GetBitTrue (_bucket.arrayAllocation, position))
+				{
+					break;
+				}
+				position++;
+			}
+			return (position < _bucket.PeakCount);
+		}
+		
+		//IEnumerable
+		public void Reset()
+		{position = -1;}
+		
+		
+		//IEnumerable
+		public object Current
+		{
+			get { return _bucket.innerArray[position];}
+		}
+		
+		#endregion
 	}
 }
