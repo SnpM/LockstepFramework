@@ -50,10 +50,11 @@ namespace Lockstep
 					ActiveAbilities [(int)activeAbility.ListenInput] = activeAbility;
 				}
 			}
-			delta = new RangeDelta(5);
+			delta = InfluenceManager.GenerateDeltaCount(5);
+			Debug.Log (delta);
 		}
 
-		RangeDelta delta;
+		int delta;
 		public void Simulate ()
 		{
 			Influencer.Simulate ();
@@ -65,11 +66,11 @@ namespace Lockstep
 			
 			{
 				FastList<LSAgent> agents = new FastList<LSAgent>();
-				Influencer.ScanAll (delta, agents);
+				 Influencer.ScanAll (delta,agents);
 				string s = "";
-				for (i = 0; i < agents.Count; i ++)
+				for (i = 0; i < agents.Count;i++)
 				{
-					s+=	agents[i].LocalID.ToString () + ", ";
+					s += agents[i].LocalID + ", ";
 				}
 				Debug.Log (s);
 			}
@@ -92,8 +93,13 @@ namespace Lockstep
 
 		public void Deactivate ()
 		{
+			for (iterator = 0; iterator < AbilityCount; iterator++)
+			{
+				Abilities[iterator].Deactivate();
+			}
 			PhysicsManager.Dessimilate (Body);
 			Influencer.Deactivate ();
+
 		}
 
 		public T GetAbility<T> () where T : Ability

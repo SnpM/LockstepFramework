@@ -44,7 +44,7 @@ namespace Lockstep
 
 		public static void SetBitFalse (ref ulong mask, int bitIndex)
 		{
-			mask ^= (ulong)1 << bitIndex;
+			mask &= ~((ulong)1 << bitIndex);
 		}
 
 		public static bool GetBitTrue (ulong mask, int bitIndex)

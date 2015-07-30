@@ -8,7 +8,6 @@ namespace Lockstep
 		#region Static Helpers
 		static InfluencerBucket tempBucket;
 		static GridNode tempNode;
-		static InfluenceCoordinate tempCoordinate;
 		static LSAgent tempAgent;
 		static int i, j;
 		#endregion
@@ -25,8 +24,6 @@ namespace Lockstep
 		{
 			Agent = agent;
 			Body = agent.Body;
-			if (LocatedNode != null)
-				LocatedNode.Remove (this);
 			LocatedNode = GridManager.GetNode (Body.Position.x, Body.Position.y);
 			LocatedNode.Add (this);
 		}
@@ -45,13 +42,14 @@ namespace Lockstep
 		}
 
 		#region Scanning
-		public LSAgent Scan (RangeDelta deltas,
+		public LSAgent Scan (int deltaCount,
 		                     bool CheckAllegiance = false,
 		                     AllegianceType allegianceType = AllegianceType.Neutral)
 		{
-			for (i = 0; i < deltas.coordinates.Length; i++) {
-				tempCoordinate = deltas.coordinates [i];
-				tempNode = GridManager.GetNode (LocatedNode.gridX + tempCoordinate.x, LocatedNode.gridY + tempCoordinate.y);
+			for (i = 0; i < deltaCount; i++) {
+				tempNode = GridManager.GetNode (
+					LocatedNode.gridX + DeltaCache.CacheX[i],
+					LocatedNode.gridY + DeltaCache.CacheY[i]);
 
 				if (tempNode != null && tempNode.LocatedAgents != null) {
 					tempBucket = tempNode.LocatedAgents;
@@ -72,15 +70,14 @@ namespace Lockstep
 			}
 			return null;
 		}
-		public void ScanAll (RangeDelta deltas,
-		                     FastList<LSAgent> outputAgents,
-		                     bool CheckAllegiance = false,
-		                     AllegianceType allegianceType = AllegianceType.Neutral)
+		public void ScanAll (int deltaCount, FastList<LSAgent> outputAgents,
+		                      bool CheckAllegiance = false,
+		                      AllegianceType allegianceType = AllegianceType.Neutral)
 		{
-			outputAgents.FastClear ();
-			for (i = 0; i < deltas.coordinates.Length; i++) {
-				tempCoordinate = deltas.coordinates [i];
-				tempNode = GridManager.GetNode (LocatedNode.gridX + tempCoordinate.x, LocatedNode.gridY + tempCoordinate.y);
+			for (i = 0; i < deltaCount; i++) {
+				tempNode = GridManager.GetNode (
+					LocatedNode.gridX + DeltaCache.CacheX[i],
+					LocatedNode.gridY + DeltaCache.CacheY[i]);
 				
 				if (tempNode != null && tempNode.LocatedAgents != null) {
 					tempBucket = tempNode.LocatedAgents;
@@ -93,7 +90,7 @@ namespace Lockstep
 									if (Agent.MyAgentController.DiplomacyFlags
 									    [tempAgent.MyAgentController.ControllerID] != allegianceType) continue;
 								}
-								outputAgents.Add(tempAgent);
+								outputAgents.Add (tempAgent);
 							}
 						}
 					}
