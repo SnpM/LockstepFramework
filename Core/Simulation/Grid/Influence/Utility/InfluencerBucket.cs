@@ -54,14 +54,11 @@ namespace Lockstep
 				PeakCount--;
 				for (i = leIndex - 1; i >= 0; i--)
 				{
-					if (LSUtility.GetBitTrue (arrayAllocation,i))
+					if (LSUtility.GetBitFalse (arrayAllocation,i))
 					{
 						PeakCount--;
 					}
 				}
-			}
-			else {
-				LSUtility.SetBitFalse(ref arrayAllocation,leIndex);
 			}
 		}
 
