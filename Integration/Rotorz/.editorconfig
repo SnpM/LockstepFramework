@@ -1,0 +1,12 @@
+; Grab the EditorConfig extension for Visual Studio:
+; https://visualstudiogallery.msdn.microsoft.com/c8bccfe2-650c-4b42-bc5c-845e21f96328
+
+; Top-most EditorConfig file
+root = true
+
+; Unix-style newlines with a newline ending every file
+[*]
+end_of_line = LF
+insert_final_newline = true
+indent_style = tab
+indent_size = 4

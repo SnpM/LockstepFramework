@@ -12,23 +12,21 @@ namespace Lockstep
 {
 	public class CollisionPair
 	{
-		public LSBody Body1;
-		public LSBody Body2;
+        public LSBody Body1;
+        public LSBody Body2;
 		private long CacheSqrDistance;
 		private CollisionType LeCollisionType;
 		public bool IsColliding;
 		private bool DoPhysics = true;
 		public bool Active;
 		public uint PartitionVersion;
-		private PhysicsFavor physicsFavor;
 		public static long DistX;
 		public static long DistY;
 		public static long PenetrationX;
 		public static long PenetrationY;
 		public static CollisionPair CurrentCollisionPair;
 
-		public void Initialize (LSBody b1, LSBody b2)
-		{
+        public void Initialize(LSBody b1, LSBody b2) {
 			PartitionVersion = 0;
 			Body1 = b1;
 			Body2 = b2;
@@ -71,18 +69,9 @@ namespace Lockstep
 				}
 			}
 
+			DoPhysics = ((Body1.IsTrigger || Body2.IsTrigger) == false);
 			if (DoPhysics) {
-				if (Body1.Immovable) {
-					physicsFavor = PhysicsFavor.Favor1;
-				} else if (Body2.Immovable) {
-					physicsFavor = PhysicsFavor.Favor2;
-				} else if (Body1.Priority > Body2.Priority) {
-					physicsFavor = PhysicsFavor.Favor1;
-				} else if (Body2.Priority > Body1.Priority) {
-					physicsFavor = PhysicsFavor.Favor2;
-				} else {
-					physicsFavor = PhysicsFavor.Same;
-				}
+
 			}
 			Active = true;
 		}
@@ -96,9 +85,11 @@ namespace Lockstep
 
 		private void DistributeCollision ()
 		{
-			if (Body1.OnContact != null)
+
+
+			if (Body1.OnContact .IsNotNull ())
 				Body1.OnContact (Body2);
-			if (Body2.OnContact != null)
+			if (Body2.OnContact .IsNotNull ())
 				Body2.OnContact (Body1);
 
 			if (DoPhysics && Body1.HasParent == false && Body2.HasParent == false) {
@@ -109,62 +100,68 @@ namespace Lockstep
 					dist = FixedMath.Sqrt ((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT);
 						
 					if (dist == 0) {
-						Body1.Position.x += (LSUtility.GetRandom (1 << (FixedMath.SHIFT_AMOUNT - 2)) + 1);
-						Body1.Position.y -= (LSUtility.GetRandom (1 << (FixedMath.SHIFT_AMOUNT - 2)) + 1);
-						return;
+						DistX = (LSUtility.GetRandom (1 << (FixedMath.SHIFT_AMOUNT - 1)) + 1);
+						DistY -= (LSUtility.GetRandom (1 << (FixedMath.SHIFT_AMOUNT - 1)) + 1);
+						dist = FixedMath.Sqrt ((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT).Max (FixedMath.One);
 					}
-						
+
+
 					depth = (Body1.Radius + Body2.Radius - dist);
 
-					if (depth < 0)
+					if (depth <= 0)
+					{
 						return;
+					}
+					DistX = (DistX * depth / dist ) / 2L;
+					DistY = (DistY * depth / dist ) / 2L;
 
-					DistX = (DistX * depth / dist);
-					DistY = (DistY * depth / dist);
-
+					const bool applyVelocity = true;
 					//Resolving collision
-					if (physicsFavor == PhysicsFavor.Favor1) {
+					if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority)) {
 						Body2.Position.x -= DistX;
 						Body2.Position.y -= DistY;
-						Body2.PositionChanged = true;
-						Body2.Velocity.x -= DistX;
-						Body2.Velocity.y -= DistY;
-						Body2.VelocityChanged = true;
-					} else if (physicsFavor == PhysicsFavor.Favor2) {
+                        Body2.PositionChanged = true;
+						if (applyVelocity)
+						{
+						Body2._velocity.x -= DistX;
+						Body2._velocity.y -= DistY;
+                        Body2.VelocityChanged = true;
+						}
+					} else if (Body2.Immovable || Body2.Priority > Body1.Priority) {
+
 						Body1.Position.x += DistX;
 						Body1.Position.y += DistY;
-						Body1.PositionChanged = true;
-						Body1.Velocity.x += DistX;
-						Body1.Velocity.y += DistY;
-						Body1.VelocityChanged = true;
-					} else {
-
-						DistX /= 4;
-						DistY /= 4;
-						if (Body1.Velocity.Dot (Body2.Velocity.x, Body2.Velocity.y) <= 0)
+                        Body1.PositionChanged = true;
+						if (applyVelocity)
 						{
-							Body1.Velocity.x += DistX;//FixedMath.Mul(DistX, Body1.VelocityMagnitude);
-							Body1.Velocity.y += DistY;//FixedMath.Mul(DistY, Body1.VelocityMagnitude);
-							Body1.VelocityChanged = true;
-
-							Body2.Velocity.x -= DistX;//FixedMath.Mul(DistX, Body2.VelocityMagnitude);
-							Body2.Velocity.y -= DistY;//FixedMath.Mul(DistY, Body2.VelocityMagnitude);
-							Body2.VelocityChanged = true;
-
-							//DistX /= 4;
-							//DistY /= 4;
-							Body1.Position.x += DistX;
-							Body1.Position.y += DistY;
-							Body2.Position.x -= DistX;
-							Body2.Position.y -= DistY;
-						} else {
-							Body1.Position.x += DistX;
-							Body1.Position.y += DistY;
-							Body2.Position.x -= DistX;
-							Body2.Position.y -= DistY;
+						Body1._velocity.x += DistX;
+						Body1._velocity.y += DistY;
+                        Body1.VelocityChanged = true;
 						}
-						Body1.PositionChanged = true;
-						Body2.PositionChanged = true;
+					} else {
+						DistX /= 2;
+						DistY /= 2;
+
+						Body1.Position.x += DistX;
+						Body1.Position.y += DistY;
+						Body2.Position.x -= DistX;
+						Body2.Position.y -= DistY;
+						
+                        Body1.PositionChanged = true;
+                        Body2.PositionChanged = true;
+						if (applyVelocity)
+						{
+
+							DistX /= 8;
+							DistY /= 8;
+							Body1._velocity.x += DistX;
+							Body1._velocity.y += DistY;
+							Body1.VelocityChanged = true;
+							
+							Body2._velocity.x -= DistX;
+							Body2._velocity.y -= DistY;
+							Body2.VelocityChanged = true;
+						}
 					}
 					break;
 				case CollisionType.Circle_AABox:
@@ -185,15 +182,16 @@ namespace Lockstep
 
 		public void CheckAndDistributeCollision ()
 		{
-			if (!Active)
+
+			if (!Active || Body1.HasParent || Body2.HasParent)
 				return;
 			CurrentCollisionPair = this;
 
 			if (CheckCollision ()) {
 				if (IsColliding == false) {
-					if (Body1.OnContactEnter != null)
+					if (Body1.OnContactEnter .IsNotNull ())
 						Body1.OnContactEnter (Body2);
-					if (Body2.OnContactEnter != null)
+					if (Body2.OnContactEnter .IsNotNull ())
 						Body2.OnContactEnter (Body1);
 					IsColliding = true;
 				} else {
@@ -202,10 +200,10 @@ namespace Lockstep
 				DistributeCollision ();
 			} else {
 				if (IsColliding) {
-					if (Body1.OnContactExit != null) {
+					if (Body1.OnContactExit .IsNotNull ()) {
 						Body1.OnContactExit (Body2);
 					}
-					if (Body2.OnContactExit != null) {
+					if (Body2.OnContactExit .IsNotNull ()) {
 						Body2.OnContactExit (Body1);
 					}
 					IsColliding = false;
@@ -217,7 +215,7 @@ namespace Lockstep
 		}
 		public bool CheckCollision ()
 		{
-			if (!(Body1.PositionChanged || Body2.PositionChanged || Body1.RotationChanged || Body2.RotationChanged)) {
+            if ((Body1.PositionChanged || Body2.PositionChanged || Body1.PositionChangedBuffer || Body2.PositionChangedBuffer) == false) {
 				return IsColliding;
 			}
 
@@ -237,7 +235,6 @@ namespace Lockstep
 
 						if (Body1.Shape == ColliderType.AABox) {
 							if (CheckCircle_Box (Body1, Body2)) {
-
 								return true;
 							}
 
@@ -321,13 +318,13 @@ namespace Lockstep
 				return true;
 			}
 
-			if (Body1.VelocityMagnitude != 0 || Body2.VelocityMagnitude != 0) {
+			/*if (Body1.VelocityFastMagnitude != 0 || Body2.VelocityFastMagnitude != 0) {
 				DistX = Body1.FuturePosition.x - Body2.FuturePosition.x;
 				DistY = Body1.FuturePosition.y - Body2.FuturePosition.y;
 				if ((DistX * DistX + DistY * DistY) <= CacheSqrDistance) {
 					return true;
 				}
-			}
+			}*/
 
 			return false;
 		}
@@ -343,7 +340,7 @@ namespace Lockstep
 					}
 				}
 			}
-			if (Body1.VelocityMagnitude != 0 || Body2.VelocityMagnitude != 0) {
+			/*if (Body1.VelocityFastMagnitude != 0 || Body2.VelocityFastMagnitude != 0) {
 				if (Body1.FutureXMin < Body2.FutureXMax) {
 					if (Body1.FutureXMax > Body2.FutureXMin) {
 						if (Body1.FutureYMin < Body2.FutureYMax) {
@@ -353,19 +350,11 @@ namespace Lockstep
 						}
 					}
 				}
-			}
+			}*/
 			return false;
 		}
 
-		static long Mag;
-
-		public void HandleImmovableCircleBoxCollision (LSBody imov, LSBody mov)
-		{
-
-		}
-
-		public static bool CheckBox_Poly (LSBody box, LSBody poly)
-		{
+        public static bool CheckBox_Poly(LSBody box, LSBody poly) {
 			bool Right = poly.Position.x > box.Position.x;
 			bool Top = poly.Position.y > box.Position.y;
 			bool xPassed = false;
@@ -396,8 +385,7 @@ namespace Lockstep
 			return false;
 		}
 
-		public static bool CheckCircle_Poly (LSBody circle, LSBody poly)
-		{
+        public static bool CheckCircle_Poly(LSBody circle, LSBody poly) {
 			int EdgeCount = poly.EdgeNorms.Length;
 			for (int i = 0; i < EdgeCount; i++) {
 				Vector2d axis = poly.EdgeNorms [i];
@@ -425,8 +413,7 @@ namespace Lockstep
 		static bool Collided;
 		static long xAbs, yAbs;
 
-		public void DistributeCircle_Box (LSBody box, LSBody circle)
-		{
+        public void DistributeCircle_Box(LSBody box, LSBody circle) {
 			xMore = circle.Position.x > box.Position.x;
 			yMore = circle.Position.y > box.Position.y;
 
@@ -453,15 +440,14 @@ namespace Lockstep
 			//Resolving
 			circle.Position.x -= PenetrationX;//(PenetrationX * Multiplier) >> FixedMath.SHIFT_AMOUNT;
 			circle.Position.y -= PenetrationY;//(PenetrationY * Multiplier) >> FixedMath.SHIFT_AMOUNT;
-			circle.Velocity.x -= PenetrationX;
-			circle.Velocity.y -= PenetrationY;
-			circle.VelocityChanged = true;
+			circle._velocity.x -= PenetrationX;
+			circle._velocity.y -= PenetrationY;
+            circle.VelocityChanged = true;
 			circle.PositionChanged = true;
 			circle.BuildBounds ();
 		}
 
-		public static bool CheckCircle_Box (LSBody box, LSBody circle)
-		{
+        public static bool CheckCircle_Box(LSBody box, LSBody circle) {
 			Collided = false;
 
 			xMore = circle.Position.x > box.Position.x;
@@ -509,8 +495,7 @@ namespace Lockstep
 			return Collided;
 		}
 
-		public static bool CheckPoly_Poly (LSBody poly1, LSBody poly2)
-		{
+        public static bool CheckPoly_Poly(LSBody poly1, LSBody poly2) {
 			int Poly1EdgeCount = poly1.EdgeNorms.Length;
 			int EdgeCount = Poly1EdgeCount + poly2.EdgeNorms.Length;
 			for (int i = 0; i < EdgeCount; i++) {
@@ -532,9 +517,7 @@ namespace Lockstep
 			return true;
 		}
 
-		public static void ProjectPolygon (long AxisX, long AxisY, LSBody Poly, out long Min, out long Max)
-		{
-
+		public static void ProjectPolygon (long AxisX, long AxisY, LSBody Poly, out long Min, out long Max) {
 			Min = Poly.RealPoints [0].Dot (AxisX, AxisY);
 			Max = Min;
 
@@ -579,11 +562,5 @@ namespace Lockstep
 			Polygon_Polygon
 		}
 
-		private enum PhysicsFavor
-		{
-			Same,
-			Favor1,
-			Favor2
-		}
 	}
 }

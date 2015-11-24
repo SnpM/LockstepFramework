@@ -1,221 +1,222 @@
-﻿using System;
-using System.IO;
-using UnityEngine;
-using System.Collections;
+﻿namespace Lockstep {
+    public class Command {
+        private const int CompressionShift = FixedMath.SHIFT_AMOUNT - 7;
+        private const int FloatToInt = 100;
+        private const float IntToFloat = 1f / FloatToInt;
 
-namespace Lockstep
-{
-	public class Command
-	{
-		const int CompressionShift = 4;
-		public Command ()
-		{
+        private static uint ValuesMask;
+        private static readonly FastList<byte> serializeList = new FastList<byte>();
+        private static readonly Writer writer = new Writer(serializeList);
+        private static readonly Reader reader = new Reader();
 
+        private Vector2d _position;
+        private ushort _target;
+        private bool _flag;
+        private Coordinate _coord;
+        private int _count;
+        private Selection _select;
+        private byte _groupID;
+        private float[] _transform;
+
+        public bool HasPosition { get; private set; }
+        public bool HasTarget { get; private set; }
+        public bool HasFlag { get; private set; }
+        public bool HasCoord { get; private set; }
+        public bool HasCount { get; private set; }
+        public bool HasSelect { get;  set; }
+        public bool HasGroupID { get; private set; }
+
+        public bool Used;
+        public byte ControllerID;
+        public InputCode LeInput;
+
+        public Command() {}
+
+        public Command(InputCode inputCode) {
+            LeInput = inputCode;
+        }
+		public Command(InputCode inputCode, byte controllerID) {
+			this.LeInput = inputCode;
+			this.ControllerID = controllerID;
 		}
-		public Command (byte controllerID, InputCode inputCode)
-		{
-			ControllerID = controllerID;
-			LeInput = inputCode;
-		}
+        public Vector2d Position {
+            get { return _position; }
+            set {
+                _position = value;
+                HasPosition = true;
+            }
+        }
 
-		public bool Used;
+        public ushort Target {
+            get { return _target; }
+            set {
+                _target = value;
+                HasTarget = true;
+            }
+        }
 
-		public byte ControllerID;
-		public InputCode LeInput;
+        public bool Flag {
+            get { return _flag; }
+            set {
+                _flag = value;
+                HasFlag = true;
+            }
+        }
 
-		public bool HasPosition;
-		public Vector2d _position;
-		public Vector2d Position {
-			get { return _position;}
-			set {
-				_position = value;
-				HasPosition = true;
-			}
-		}
+        public Coordinate Coord {
+            get { return _coord; }
+            set {
+                _coord = value;
+                HasCoord = true;
+            }
+        }
 
-		public bool HasTarget;
-		public ushort _target;
+        public int Count {
+            get { return _count; }
+            set {
+                _count = value;
+                HasCount = true;
+            }
+        }
 
-		public ushort Target {
+        public Selection Select {
+            get { return _select; }
+            set {
+                _select = value;
+                HasSelect = true;
+            }
+        }
 
-			get { return _target;}
-			set {
-				_target = value;
-				HasTarget = true;
-			}
-		}
-
-		public bool HasFlag;
-		public bool _flag;
-
-		public bool Flag {
-			get { return _flag;}
-			set {
-				_flag = value;
-				HasFlag = true;
-			}
-		}
-
-		public bool HasCoord;
-		public Coordinate _coord;
-
-		public Coordinate Coord {
-			get { return _coord;}
-			set {
-				_coord = value;
-				HasCoord = true;
-			}
-		}
-
-		public bool HasCount;
-		public int _count;
-
-		public int Count {
-			get { return _count;}
-			set {
-				_count = value;
-				HasCount = true;
-			}
-		}
-
-		public bool HasSelect;
-		public Selection _select;
-
-		public Selection Select {
-			get { return _select;}
-			set {
-				_select = value;
-				HasSelect = true;
-			}
-		}
+        public byte GroupID {
+            get { return _groupID; }
+            set {
+                _groupID = value;
+                HasGroupID = true;
+            }
+        }
 
 
-		static Reader reader = new Reader ();
+        /// <summary>
+        /// Reconstructs this command from a serialized command and returns the size of the command.
+        /// </summary>
+        public int Reconstruct(byte[] Source, int StartIndex) {
+            Used = false;
+            reader.Initialize(Source, StartIndex);
+            ControllerID = reader.ReadByte();
+            LeInput = (InputCode)reader.ReadByte();
+            ValuesMask = reader.ReadUInt();
 
-		/// <summary>
-		/// Reconstructs this command from a serialized command and returns the size of the command.
-		/// </summary>
-		public int Reconstruct (byte[] Source, int StartIndex)
-		{
+            HasPosition = GetMaskBool(ValuesMask, DataType.Position);
+            HasTarget = GetMaskBool(ValuesMask, DataType.Target);
+            HasFlag = GetMaskBool(ValuesMask, DataType.Flag);
+            HasCoord = GetMaskBool(ValuesMask, DataType.Coord);
+            HasCount = GetMaskBool(ValuesMask, DataType.Count);
+            HasSelect = GetMaskBool(ValuesMask, DataType.Select);
+            HasGroupID = GetMaskBool(ValuesMask, DataType.GroupID);
 
-			reader.Initialize (Source, StartIndex);
+            if (HasPosition) {
+                _position.x = reader.ReadShort() << CompressionShift;
+                _position.y = reader.ReadShort() << CompressionShift;
+            }
 
-			ControllerID = reader.ReadByte ();
-			LeInput = (InputCode)reader.ReadByte ();
+            if (HasTarget) {
+                _target = reader.ReadUShort();
+            }
 
-			ValuesMask = reader.ReadUInt ();
+            if (HasFlag) {
+                _flag = reader.ReadBool();
+            }
 
-			HasPosition = GetMaskBool (ValuesMask, DataType.Position);
-			HasTarget = GetMaskBool (ValuesMask, DataType.Target);
-			HasFlag = GetMaskBool (ValuesMask, DataType.Flag);
-			HasCoord = GetMaskBool (ValuesMask, DataType.Coord);
-			HasCount = GetMaskBool (ValuesMask, DataType.Count);
-			HasSelect = GetMaskBool (ValuesMask, DataType.Select);
+            if (HasCoord) {
+                _coord.x = reader.ReadInt();
+                _coord.y = reader.ReadInt();
+            }
 
-			if (HasPosition) {
-				_position.x = reader.ReadInt () << CompressionShift;
-				_position.y = reader.ReadInt () << CompressionShift;
-			}
-			if (HasTarget) {
-				_target = reader.ReadUShort ();
-			}
-			if (HasFlag) {
-				_flag = reader.ReadBool ();
-			}
-			if (HasCoord) {
-				_coord.x = reader.ReadInt ();
-				_coord.y = reader.ReadInt ();
-			}
-			if (HasCount) {
-				_count = reader.ReadInt ();
-			}
+            if (HasCount) {
+                _count = reader.ReadInt();
+            }
 
-			if (HasSelect) {
-				Select = new Selection();
-				reader.count += Select.Reconstruct (
-					AgentController.InstanceManagers[ControllerID],
-					reader.source,
-					reader.count);
-			}
+            if (HasSelect) {
+                Select = new Selection();
+                reader.count += Select.Reconstruct(reader.source, reader.count);
+            }
 
-			return reader.count - StartIndex;
-		}
+            if (HasGroupID) {
+                _groupID = reader.ReadByte();
+            }
 
-		static uint ValuesMask;
-		static FastList<byte> serializeList = new FastList<byte> ();
-		static Writer writer = new Writer (serializeList);
+            return reader.count - StartIndex;
+        }
 
-		public byte[] Serialized {
-			get {
-				serializeList.FastClear ();
+        private static bool GetMaskBool(uint mask, DataType dataType) {
+            return (mask & (uint)dataType) == (uint)dataType;
+        }
 
-				//Essential Information
-				writer.Write (ControllerID);
-				writer.Write ((byte)LeInput);
+        public byte[] Serialized {
+            get {
+                serializeList.FastClear();
 
-				//Header 
-				ValuesMask = 
-					(HasPosition ? (uint)DataType.Position : (uint)0) |
-					(HasTarget ? (uint)DataType.Target : (uint)0) |
-					(HasFlag ? (uint)DataType.Flag : (uint)0) |
-					(HasCoord ? (uint)DataType.Coord : (uint)0) |
-					(HasCount ? (uint)DataType.Count : (uint)0) |
-					(HasSelect ? (uint)DataType.Select : (uint)0);
+                //Essential Information
+                writer.Write(ControllerID);
+                writer.Write((byte)LeInput);
 
-				writer.Write (ValuesMask);
+                //Header 
+                ValuesMask = (HasPosition ? (uint)DataType.Position : (uint)0) 
+                           | (HasTarget ? (uint)DataType.Target : (uint)0) 
+                           | (HasFlag ? (uint)DataType.Flag : (uint)0) 
+                           | (HasCoord ? (uint)DataType.Coord : (uint)0) 
+                           | (HasCount ? (uint)DataType.Count : (uint)0) 
+                           | (HasSelect ? (uint)DataType.Select : (uint)0) 
+                           | (HasGroupID ? (uint)DataType.GroupID : (uint)0) ;
 
-				//Position
-				if (HasPosition) {
-					writer.Write ((int)(_position.x >> CompressionShift));
-					writer.Write ((int)(_position.y >> CompressionShift));
-				}
+                writer.Write(ValuesMask);
 
-				//Target
-				if (HasTarget) {
-					writer.Write (_target);
-				}
+                if (HasPosition) {
+                    writer.Write((short)(_position.x >> CompressionShift));
+                    writer.Write((short)(_position.y >> CompressionShift));
+                }
 
-				//Flag
-				if (HasFlag) {
-					writer.Write (_flag);
-				}
+                if (HasTarget) {
+                    writer.Write(_target);
+                }
 
-				//Coord
-				if (HasCoord) {
-					writer.Write (_coord.x);
-					writer.Write (_coord.y);
-				}
+                if (HasFlag) {
+                    writer.Write(_flag);
+                }
 
-				if (HasSelect) {
-					writer.Write (_select.Header);
-					for (i = 0; i < 64; i++)
-					{
-						if (_select.Data[i] != 0)
-						{
-							writer.Write (_select.Data[i]);
-						}
-					}
-				}
-				return serializeList.ToArray ();
-			}
-		}
+                if (HasCoord) {
+                    writer.Write(_coord.x);
+                    writer.Write(_coord.y);
+                }
 
-		public static bool GetMaskBool (uint mask, DataType dataType)
-		{
-			return (mask & (uint)dataType) == (uint)dataType;
-		}
+                if (HasCount) {
+                    writer.Write(_count);
+                }
 
-		static int i;
+                if (HasSelect) {
+                    writer.Write(_select.Header);
+					for (int i = 0; i < 64; i++) {
+                        if (_select.Data[i] != 0) {
+                            writer.Write(_select.Data[i]);
+                        }
+                    }
+                }
+
+                if (HasGroupID) {
+					writer.Write (_groupID);
+                }
+                return serializeList.ToArray();
+            }
+        }
+    }
+    [System.Flags]
+    public enum DataType : uint {
+        Position = 1 << 0,
+        Target = 1 << 1,
+        Flag = 1 << 2,
+        Coord = 1 << 3,
+        Count = 1 << 4,
+        Select = 1 << 5,
+        GroupID = 1 << 6
 	}
-
-	public enum DataType : uint
-	{
-		Position = 1 << 0,
-		Flag = 1 << 1,
-		Target = 1 << 2,
-		Coord = 1 << 3,
-		Count = 1 << 4,
-		Select = 1 << 5
-	}
-
 }
