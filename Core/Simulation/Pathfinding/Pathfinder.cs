@@ -237,8 +237,7 @@ namespace Lockstep
 				retX = (steep ? y : x);
 				retY = (steep ? x : y);
 					
-				currentNode = GridManager.Grid[retX * GridManager.NodeCount + retY];
-				if (currentNode.Unwalkable) {
+				if (GridManager.Grid [retX * GridManager.NodeCount + retY].Unwalkable) {
 					break;
 				} else if (x == x1) {
 					return false;

@@ -1,114 +1,67 @@
-﻿using System;
-using UnityEngine;
-
+﻿using UnityEngine;
+using System.Collections.Generic;
+using System;
 namespace Lockstep {
-	public class PlayerManager : MonoBehaviour {
-		[SerializeField]
-		private GUIStyle selectionBoxStyle = new GUIStyle();
-		[SerializeField]
-		private GameObject _orderMarker;
-		public static Marker OrderMarker {get; private set;}
-		
-		private static PlayerManager instance;
-		
-		public static SelectionSetting selectionSetting {get; private set;}
-		public static readonly FastBucket<AgentController> AgentControllers = new FastBucket<AgentController>();
-		public static AgentController MainController {get; private set;}
-		public static bool IsInterfacing {
-			get {
-				return InterfaceManager.IsGathering;
-			}
-		}
+public class PlayerManager  : MonoBehaviour{
+		public static FastList<AgentController> agentControllers = new FastList<AgentController>();
+		public static bool[] HasAgentController = new bool[4];
+		public static Camera mainCamera;
 
-		void Awake () {
-            instance = this;
-        }
-
-		
-		public static void Initialize(SelectionSetting selSetting = SelectionSetting.PC_RTS) {
-			AgentControllers.FastClear();
-			selectionSetting = selSetting;
-
-			OrderMarker = GameObject.Instantiate (instance._orderMarker).GetComponent<Marker> ();
-
-			InterfaceManager.Initialize ();
-		}
-		
-		public static void Simulate() {}
-		
-		public static void Visualize() {
-			switch (selectionSetting) {
-			case SelectionSetting.PC_RTS:
-				RtsCamera.Visualize ();
-				SelectionManager.Update();
-				CommandCard.Visualize ();
-				InterfaceManager.Visualize ();
-				break;
-			case SelectionSetting.Mobile:
-
-				break;
-			}
-		}
-		
-		public static int AgentControllerCount {
-			get { return AgentControllers.Count; }
-		}
-		
-		public static AgentController GetAgentController(int index) {
-			return AgentControllers[index];
-		}
-		
-		public static void AddController(AgentController agentController) {
-			agentController.PlayerIndex = AgentControllers.Add(agentController);
-			if (MainController == null) MainController = agentController;
-		}
-
-		public static bool ContainsController (AgentController controller) {
-			return controller.PlayerIndex < AgentControllers.PeakCount && AgentControllers[controller.PlayerIndex] == controller;
-		}
-		
-		public static AllegianceType GetAllegiance (AgentController otherController)
+		private static bool FirstInitialize = true;
+		public static void Initialize ()
 		{
-            if (Selector.MainSelectedAgent != null) return Selector.MainSelectedAgent.Controller.GetAllegiance(otherController);
-			if (MainController == null) return AllegianceType.Neutral;
-			return MainController.GetAllegiance (otherController);
-		}
-		public static AllegianceType GetAllegiance (LSAgent agent)
-		{
-			return PlayerManager.GetAllegiance (agent.Controller);
-		}
 
-		public static void SendCommand (Command com)
-		{
-			com.Select = new Selection ();
-			for (int i = 0; i < AgentControllers.Count; i++)
+			if (FirstInitialize)
 			{
-				AgentController cont = AgentControllers[i];
-				if (cont.SelectedAgents.Count > 0)
-				{
-					if (cont.SelectionChanged)
-					{
-						com.Select = new Selection(cont.SelectedAgents);
-						cont.SelectionChanged = false;
-					}
-					else {
-						com.HasSelect = false;
-					}
-					com.ControllerID = cont.ControllerID;
-					com.Select.Serialize (AgentControllers[i].SelectedAgents);
-					CommandManager.SendCommand (com);
-				}
+				FirstInitialize = false;
+			}
+			mainCamera = Camera.main;
+			agentControllers.FastClear ();
+			Array.Clear (HasAgentController,0,HasAgentController.Length);
+
+		}
+
+		public static void Simulate ()
+		{
+			SelectionManager.Simulate ();
+		}
+
+		public static void Visualize ()
+		{
+			SelectionManager.Update ();
+			if (Input.GetMouseButtonDown(1))
+			{
+
+				Command com = new Command(agentControllers[0].ControllerID,InputCode.M);
+				Selection select = new Selection();
+				select.SerializeFromSelectionManager ();
+				com.Select = select;
+				com.Position = new Vector2d(SelectionManager.MouseWorldPosition);
+				NetworkManager.SendCommand (com);
 			}
 		}
-		
-		private void OnGUI() {
-			switch (selectionSetting) {
-			case SelectionSetting.PC_RTS:
-				SelectionManager.DrawBox(selectionBoxStyle);
-				break;
-			case SelectionSetting.Mobile:
-				break;
+
+		public static void AddAgentController(AgentController agentController)
+		{
+			agentControllers.Add (agentController);
+			if (agentController.ControllerID >= HasAgentController.Length)
+			{
+				Array.Resize (ref HasAgentController, HasAgentController.Length * 2);
 			}
+			HasAgentController[agentController.ControllerID] = true;
 		}
+
+
+
+
+		#region Instance Behaviors
+		public GUIStyle SelectionBoxStyle = new GUIStyle();
+
+		void OnGUI ()
+		{
+			SelectionManager.DrawBox (SelectionBoxStyle);
+		}
+
+		#endregion
 	}
 }

@@ -15,14 +15,11 @@ namespace Lockstep
 		static FastStack<int> OpenSlots = new FastStack<int>();
 		static int HighCount;
 
-		static Coroutine coroutine;
+		static int i,j, leIndex;
+		static Coroutine coroutine; 
 
 		public static void Initialize ()
 		{
-			for (int i = 0; i < HighCount; i++)
-			{
-				while (Coroutines[i].Enumerator.MoveNext ());
-			}
 			Array.Clear (Coroutines,0,Coroutines.Length);
 			OpenSlots.FastClear ();
 			HighCount = 0;
@@ -30,7 +27,7 @@ namespace Lockstep
 
 		public static void Simulate ()
 		{
-			for (int i = 0; i < HighCount; i++)
+			for (i = 0; i < HighCount; i++)
 			{
 				coroutine = Coroutines[i];
 				if (coroutine.Active)
@@ -44,7 +41,7 @@ namespace Lockstep
 		{
 			if (OpenSlots.Count > 0)
 			{
-				int leIndex = OpenSlots.Pop();
+				leIndex = OpenSlots.Pop();
 				coroutine = Coroutines[leIndex];
 				coroutine.Initialize (enumerator);
 				coroutine.Index = leIndex;
@@ -58,22 +55,37 @@ namespace Lockstep
 				Coroutines[HighCount] = coroutine;
 				coroutine.Index = HighCount++;
 			}
+
 			return coroutine;
 		}
 
+
 		public static void StopCoroutine (Coroutine _coroutine)
 		{
-			int leIndex = _coroutine.Index;
+			leIndex = _coroutine.Index;
 			OpenSlots.Add (	leIndex);
 			_coroutine.End ();
-		}
 
-		#region ND coroutines
-		public static UnityEngine.Coroutine StartUnityCoroutine (IEnumerator enumerator)
-		{
-			return LockstepManager.UnityInstance.StartCoroutine (enumerator);
+			/*
+			//Lower HighCount as much as possible
+			if (_coroutine.Index == HighCount - 1)
+			{
+				HighCount--;
+				for (i = HighCount - 1; i >= 0; i--)
+				{
+					coroutine = Coroutines[i];
+					if (coroutine.Active == false)
+					{
+						HighCount--;
+					}
+					else {
+						break;
+					}
+				}
+			}
+			*/
+
 		}
-		#endregion
 	}
 
 	public class Coroutine
@@ -91,10 +103,13 @@ namespace Lockstep
 		}
 		public void Simulate ()
 		{
-			WaitFrames--;
 			if (WaitFrames > 0)
 			{
+				WaitFrames--;
 				return;
+			}
+			else {
+				WaitFrames--;
 			}
 			if (Enumerator.MoveNext ())
 			{
