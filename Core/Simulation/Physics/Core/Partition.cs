@@ -1,4 +1,4 @@
-﻿ //=======================================================================
+﻿//=======================================================================
 // Copyright (c) 2015 John Pan
 // Distributed under the MIT License.
 // (See accompanying file LICENSE or copy at
@@ -14,7 +14,7 @@ namespace Lockstep
 	public static class Partition
 	{
 		#region Settings
-		public const int Count = 128;
+		public const int Count = 18;
 		public const int ShiftSize = FixedMath.SHIFT_AMOUNT + 2;
 		public const long OffsetX = -(1 << ShiftSize) * Count / 2;
 		public const long testX = -FixedMath.One * 32;
@@ -23,31 +23,26 @@ namespace Lockstep
 
 		public static uint _Version = 1;
 		public static PartitionNode[] Nodes = new PartitionNode[Count * Count];
-		public static readonly FastBucket<PartitionNode> ActivatedNodes = new FastBucket<PartitionNode>();
+		static long i, j, k, o, p;
 
-		public static void Setup ()
+		public static void Initialize ()
 		{
-			_Version = 1;
-			for (int i = 0; i < Count * Count; i++) {
+			_Version = 0;
+			for (i = 0; i < Count * Count; i++) {
 				Nodes [i] = new PartitionNode ();
-			}
-		}
-
-		public static void Initialize () {
-			ActivatedNodes.FastClear ();
-			for (int i = 0; i < Count * Count; i++) {
-				Nodes[i].Initialize ();
 			}
 		}
 
 		static long GridXMin, GridXMax, GridYMin, GridYMax;
 
-        public static void UpdateObject(LSBody Body) {
+		public static void PartitionObject (LSBody Body)
+		{
 
-			GridXMin = (Body.XMin - OffsetX) >> ShiftSize;
-			GridXMax = ((Body.XMax - OffsetX) >> ShiftSize);
-			GridYMin = ((Body.YMin - OffsetY) >> ShiftSize);
-			GridYMax =((Body.YMax - OffsetY) >> ShiftSize);
+
+			GridXMin = Body.XMin <= Body.FutureXMin ? ((Body.XMin - OffsetX) >> ShiftSize) : ((Body.FutureXMin - OffsetX) >> ShiftSize);
+			GridXMax = Body.XMax >= Body.FutureXMax ? ((Body.XMax - OffsetX) >> ShiftSize) : ((Body.FutureXMax - OffsetX) >> ShiftSize);
+			GridYMin = Body.YMin <= Body.FutureXMin ? ((Body.YMin - OffsetY) >> ShiftSize) : ((Body.FutureYMin - OffsetY) >> ShiftSize);
+			GridYMax = Body.YMax >= Body.FutureYMax ? ((Body.YMax - OffsetY) >> ShiftSize) : ((Body.FutureYMax - OffsetY) >> ShiftSize);
 			#if UNITY_EDITOR
 			if (GridXMin < 0 || GridXMax >= Count || GridYMin < 0 || GridYMax >= Count)
 			{
@@ -59,17 +54,17 @@ namespace Lockstep
 				Body.PastGridXMax != GridXMax ||
 				Body.PastGridYMin != GridYMin ||
 				Body.PastGridYMax != GridYMax) {
-				for (long o = Body.PastGridXMin; o <= Body.PastGridXMax; o++) {
-					for (long p = Body.PastGridYMin; p <= Body.PastGridYMax; p++) {
-						PartitionNode node = Nodes [o * Count + p];
+				for (o = Body.PastGridXMin; o <= Body.PastGridXMax; o++) {
+					for (p = Body.PastGridYMin; p <= Body.PastGridYMax; p++) {
+						node = Nodes [o * Count + p];
 
 						node.Remove (Body.ID);
 					}
 				}
 
-				for (long i = GridXMin; i <= GridXMax; i++) {
-					for (long j = GridYMin; j <= GridYMax; j++) {
-						PartitionNode node = Nodes [i * Count + j];
+				for (i = GridXMin; i <= GridXMax; i++) {
+					for (j = GridYMin; j <= GridYMax; j++) {
+						node = Nodes [i * Count + j];
 
 						node.Add (Body.ID);
 					}
@@ -81,38 +76,39 @@ namespace Lockstep
 				Body.PastGridYMin = GridYMin;
 				Body.PastGridYMax = GridYMax;
 			}
+
+
+
 		}
 
-		public static void PartitionObject (LSBody Body) {
-			GridXMin = ((Body.XMin - OffsetX) >> ShiftSize);
-			GridXMax = ((Body.XMax - OffsetX) >> ShiftSize);
-			GridYMin = ((Body.YMin - OffsetY) >> ShiftSize);
-			GridYMax = ((Body.YMax - OffsetY) >> ShiftSize);
-			Body.PastGridXMin = GridXMin;
-			Body.PastGridXMax = GridXMax;
-			Body.PastGridYMin = GridYMin;
-			Body.PastGridYMax = GridYMax;
-			for (long i = GridXMin; i <= GridXMax; i++) {
-				for (long j = GridYMin; j <= GridYMax; j++) {
-					PartitionNode node = Nodes [i * Count + j];
-					node.Add (Body.ID);
-				}
-			}
-		}
-
-		static int id1, id2;
+		static PartitionNode node;
+		static int ListLength, id1, id2;
 		static CollisionPair pair;
 
 		public static void CheckAndDistributeCollisions ()
 		{
 
 			_Version++;
-			int activatedPeakCount = ActivatedNodes.PeakCount;
-			for (int i = 0; i < activatedPeakCount; i++) {
-				if (ActivatedNodes.arrayAllocation[i])
-				{
-					PartitionNode node = ActivatedNodes[i];
-					node.Distribute ();
+			for (i = 0; i < Count * Count; i++) {
+				node = Nodes [i];
+				ListLength = node.Count;
+				if (ListLength == 0)
+					continue;
+				for (j = 0; j < ListLength; j++) {
+					id1 = node.innerArray [j];
+					for (k = j + 1; k < ListLength; k++) {
+						id2 = node.innerArray [k];
+						if (id1 < id2) {
+							pair = PhysicsManager.CollisionPairs [id1 * PhysicsManager.MaxSimObjects + id2];
+						} else {
+							pair = PhysicsManager.CollisionPairs [id2 * PhysicsManager.MaxSimObjects + id1];
+						}
+						if (System.Object.ReferenceEquals (null, pair) == false && (pair.PartitionVersion != _Version)) {
+							pair.CheckAndDistributeCollision ();
+							pair.PartitionVersion = _Version;
+						}
+
+					}
 				}
 			}
 

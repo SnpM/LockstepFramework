@@ -23,11 +23,6 @@ namespace Lockstep
 			canvas.AddRange (values);
 		}
 
-		public void Write (short value)
-		{
-			canvas.AddRange (BitConverter.GetBytes(value));
-		}
-
 		public void Write (ushort value)
 		{
 			canvas.AddRange (BitConverter.GetBytes (value));

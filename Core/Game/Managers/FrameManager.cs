@@ -1,150 +1,93 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System;
 
 namespace Lockstep
 {
-    public static class FrameManager
-    {
-        private const int StartCapacity = 30000;
-        private static bool[] hasFrame = new bool[StartCapacity];
-        private static Frame[] frames = new Frame[StartCapacity];
-        private static int capacity = StartCapacity;
-        private static int _foreSight;
+	public static class FrameManager
+	{
+		static int i;
 
-        public static int ForeSight
-        {
-            get { return _foreSight;}
-            set
-            {
-                _foreSight = value;
+		const int StartCapacity = 10;
+		public static bool[] HasFrame = new bool[StartCapacity];
+		public static Frame[] Frames = new Frame[StartCapacity];
+		public static int Capacity = StartCapacity;
 
-                //Scaling for latency buffering
+		public static int ForeSight = 0;
+		public static int NextFrame;
 
-            }
-        }
+		public static bool CanAdvanceFrame {get{return ForeSight > 0;}}
 
-        public static void TweakFramerate()
-        {
-            if (CommandManager.sendType == SendState.Network && ClientManager.NetworkHelper.IsServer == false)
-            {
-                float scaler = (float)(ForeSight);
-                scaler -= 2;
-                scaler /= 32;
-                Time.timeScale = Mathf.Lerp(Time.timeScale, 1f + (scaler), .5f);
-            } else
-            {
-                //Time.timeScale = 1f;
-            }
-        }
+		public static void Initialize ()
+		{
+			ForeSight = 0;
+			NextFrame = 0;
+			Array.Clear (HasFrame,0,Capacity);
+			Array.Clear (Frames,0,Capacity);
+		}
 
-        private static int nextFrame;
+		public static void Simulate ()
+		{
+			ForeSight--;
+			Frame frame = Frames[LockstepManager.FrameCount];
+			if (frame.Commands != null)
+			{
+			for (i = 0; i < frame.Commands.Count; i++)
+			{
+				Command com = frame.Commands[i];
+				AgentController controller = AgentController.InstanceManagers[com.ControllerID];
+				controller.Execute (com);
+			}
+			}
+		}
 
-        public static bool FreeSimulate { get; private set; }
+		public static void AddFrame (int index, Frame frame)
+		{
+			Frames[index] = frame;
+			HasFrame[index] = true;
 
-        public static  int EndFrame { get; set; }
+			if (index == NextFrame) {
+				ForeSight++;
+				NextFrame++;
+				while (NextFrame < Capacity && HasFrame[NextFrame])
+				{
+					NextFrame++;
+				}
+			}
+		}
 
-        public static bool CanAdvanceFrame
-        {
-            get { return (FreeSimulate || ForeSight > 0 && (CommandManager.sendType != SendState.Network || ClientManager.GameStarted));}
-        }
+		public static void EnsureCapacity (int min)
+		{
+			if (Capacity < min)
+			{
+				Capacity *= 2;
+				if (Capacity < min) Capacity = min;
+				Array.Resize (ref Frames,Capacity);
+				Array.Resize (ref HasFrame, Capacity);
+			}
+		}
+	}
 
-        public static bool HasFrame(int frame)
-        {
-            return frame < capacity && hasFrame [frame];
-        }
+	public class Frame {
+		public FastList<Command> Commands;
 
-        public static void Initialize()
-        {
-            FreeSimulate = false;
-            EndFrame = -1;
+		public void AddCommand (Command com)
+		{
+			if (Commands == null)
+			{
+				Commands = new FastList<Command> ();
+			}
+			Commands.Add (com);
+		}
 
-            ForeSight = 0;
-            nextFrame = 0;
-            hasFrame.Clear();
-        }
-
-        public static void Simulate()
-        {
-            if (FreeSimulate)
-                return;
-            TweakFramerate();
-            ForeSight--;
-            Frame frame = frames [LockstepManager.InfluenceFrameCount];
-            if (frame.Commands .IsNotNull())
-            {
-                for (int i = 0; i < frame.Commands.Count; i++)
-                {
-                    Command com = frame.Commands [i];
-                    switch (com.LeInput)
-                    {
-                        case InputCode.Meta:
-                            MetaActionCode actionCode = (MetaActionCode)com.Target;
-                            int id = com.Count;
-                            switch (actionCode)
-                            {
-                                case MetaActionCode.NewPlayer:
-                                    AgentController controller = new AgentController();
-                                    if (id == ClientManager.ID)
-                                    {
-                                        PlayerManager.AddController(controller);
-                                    }
-                                    TeamManager.JoinTeam(controller);
-
-                                    break;
-                            }
-                            break;
-                        default:
-                            AgentController cont = AgentController.InstanceManagers [com.ControllerID];
-                            cont.Execute(com);
-                            break;
-                    }
-                }
-            }
-            if (LockstepManager.InfluenceFrameCount == EndFrame)
-            {
-                FreeSimulate = true;
-            }
-        }
-
-        public static void AddFrame(int frameCount, Frame frame)
-        {
-            EnsureCapacity(frameCount + 1);
-            frames [frameCount] = frame;
-            hasFrame [frameCount] = true;
-
-            while (HasFrame (nextFrame))
-            {
-                ForeSight++;
-                nextFrame++;
-            }
-        }
-
-        private static void EnsureCapacity(int min)
-        {
-            if (capacity < min)
-            {
-                capacity *= 2;
-                if (capacity < min)
-                {
-                    capacity = min;
-                }
-                Array.Resize(ref frames, capacity);
-                Array.Resize(ref hasFrame, capacity);
-            }
-        }
-    }
-
-    public class Frame
-    {
-        public FastList<Command> Commands;
-
-        public void AddCommand(Command com)
-        {
-            if (Commands == null)
-            {
-                Commands = new FastList<Command>(2);
-            }
-            Commands.Add(com);
-        }
-    }
+		public void AddCommands (Command[] coms, int startIndex, int count)
+		{
+			if (Commands == null)
+			{
+				Commands = new FastList<Command> ();
+			}
+			Commands.AddRange (coms,startIndex,count);
+		}
+	}
 }

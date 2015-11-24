@@ -1,135 +1,101 @@
+﻿using System.IO;
 using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
-using System.Collections;
 
 namespace Lockstep
 {
 	public static class ReplayManager
 	{
+		#region Settings
+		static readonly string Path = UnityEngine.Application.persistentDataPath;
+		static readonly char PathSeperator = System.IO.Path.DirectorySeparatorChar;
+		const string FileExtension = ".replay";
+		#endregion
 
-        #region public members
 		public static bool IsPlayingBack;
-		public static Replay CurrentReplay;
-        #endregion
+		public static byte[] PlaybackBytes;
+		public static int PlaybackPosition;
 
-        #region private members
-		private static UnityEngine.Coroutine streamer;
-        #endregion
+		private static int LastFrameCount;
+		private static int LastFrameByteCount;
+		private static bool IsWaitingOnFrame;
+		private static int RemainingFrameCount;
 
-		static ReplayManager ()
+		public static void Play (string Name)
 		{
-
-		}
-
-        #region public methods
-		const string DemoName = "Demo";
-
-		public static void Play ()
-		{
-			CurrentReplay = FileManager.RetrieveReplay (DemoName);
-			Play (CurrentReplay);
-		}
-
-		public static void Play (Replay replay)
-		{
-			CommandManager.sendType = SendState.None;
 			IsPlayingBack = true;
-			StartStreaming (replay);
+			NetworkManager.sendState = SendState.None;
+			PlaybackBytes = File.ReadAllBytes (ToFilePath (Name));
+			PlaybackPosition = 0;
+			RemainingFrameCount = 0;
+			IsWaitingOnFrame = false;
 		}
 
 		public static void Stop ()
 		{
-
-			if (IsPlayingBack)
-			{
-				AgentController.Deactivate ();
-				IsPlayingBack = false;
-				CommandManager.sendType = CommandManager.defaultSendState;
-				StopStreaming ();
-			}
+			IsPlayingBack = false;
 		}
 
-		public static Replay Save ()
+		public static void Save (string Name)
 		{
-			return Save (DateTime.UtcNow.ToString ());
+			byte[] saveBytes = new byte[NetworkManager.RecordedBytes.Count + 4];
+			Array.Copy (NetworkManager.RecordedBytes.innerArray, saveBytes, NetworkManager.RecordedBytes.Count);
+			Array.Copy (BitConverter.GetBytes (NetworkManager.ReceivedFrameCount - NetworkManager.LastRecordedFrame),
+			            0,
+			            saveBytes,
+			            saveBytes.Length - 4,
+			            4);
+			File.WriteAllBytes (ToFilePath (Name), saveBytes);
 		}
 
-		public static Replay Save (string name)
+		public static void Simulate ()
 		{
-			byte[] saveBytes = CommandManager.RecordedBytes.ToArray ();
-			CurrentReplay = new Replay ();
-			CurrentReplay.Content = saveBytes;
-			CurrentReplay.Name = name;
-			CurrentReplay.Date = DateTime.UtcNow;
-			CurrentReplay.FrameCount = LockstepManager.FrameCount;
-			CurrentReplay.LastCommandedFrameCount = CommandManager.LastCommandedFrameCount;
-			FileManager.SaveReplay (DemoName, CurrentReplay);
+			if (IsPlayingBack == true) {
+				if (NetworkManager.IterationCount == 0) {
+					if (PlaybackPosition < PlaybackBytes.Length - 4) {
+						if (IsWaitingOnFrame)
+						{
 
-			return CurrentReplay;
-		}
+						}
+						else {
+							LastFrameByteCount = (int)BitConverter.ToUInt16 (PlaybackBytes, PlaybackPosition);
+							PlaybackPosition += 2;
+							LastFrameCount = BitConverter.ToInt32 (PlaybackBytes,PlaybackPosition);
+						}
+						if (LockstepManager.FrameCount == LastFrameCount)
+						{
+							NetworkManager.ReceivedBytes.AddRange (PlaybackBytes, PlaybackPosition, LastFrameByteCount);
+							PlaybackPosition += LastFrameByteCount;
+							IsWaitingOnFrame = false;
+						}
+						else {
+							IsWaitingOnFrame = true;
+							NetworkManager.ReceivedBytes.AddRange (BitConverter.GetBytes (LockstepManager.FrameCount));
+						}
+					}
+					else if (PlaybackPosition < PlaybackBytes.Length)
+					{
+						RemainingFrameCount = BitConverter.ToInt32 (PlaybackBytes,PlaybackBytes.Length - 4);
+						PlaybackPosition += 4;
+					}
 
-		static FastList<byte> bufferBytes = new FastList<byte> ();
-
-		public static IEnumerator StreamPlayback (Replay playbackReplay)
-		{
-			int lastFrameByteCount = 0;
-			int playbackPosition = 0;
-			byte[] playbackBytes = playbackReplay.Content;
-            
-            bool getNextStream = true;
-			int frameCount = 0;
-			int nextFrame = -1;
-            
-            
-			yield return null;
-			FrameManager.EndFrame = playbackReplay.LastCommandedFrameCount;
-            
-            while (playbackPosition < playbackBytes.Length || frameCount <= nextFrame)
-			{
-				if (getNextStream == true)
-                {
-					bufferBytes.FastClear ();
-		            lastFrameByteCount = (int)BitConverter.ToUInt16 (playbackBytes, playbackPosition);
-					playbackPosition += 2;
-					nextFrame = BitConverter.ToInt32 (playbackBytes, playbackPosition);
-					bufferBytes.AddRange (playbackBytes, playbackPosition, lastFrameByteCount);
-					playbackPosition += lastFrameByteCount;
-					getNextStream = false;
+					if (RemainingFrameCount > 0)
+					{
+						RemainingFrameCount--;
+						NetworkManager.ReceivedBytes.AddRange (BitConverter.GetBytes (LockstepManager.FrameCount));
+					}
 				}
 
-				if (nextFrame == frameCount)
-				{
-					getNextStream = true;
-					CommandManager.ProcessPacket (bufferBytes);
-				}
-				else {
-					CommandManager.ProcessPacket (BitConverter.GetBytes (frameCount));
-                }
-                frameCount++;
-			}
-			yield break;
-		}
-
-
-		private static void StartStreaming (Replay replay)
-		{
-			StopStreaming ();
-			streamer = LockstepManager.UnityInstance.StartCoroutine (StreamPlayback (replay));
-		}
-
-		private static void StopStreaming ()
-		{
-			if (streamer .IsNotNull ()) {
-				LockstepManager.UnityInstance.StopCoroutine (streamer);
-				streamer = null;
 			}
 		}
-        #endregion
+
+		public static string ToFilePath (string Name)
+		{
+			return Path + PathSeperator + Name + FileExtension;
+		}
+
 	}
-    
+
 	public enum RecordState
 	{
 		None,

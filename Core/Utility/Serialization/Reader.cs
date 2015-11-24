@@ -33,13 +33,6 @@ public class Reader {
 		return ret;
 	}
 
-	public short ReadShort ()
-	{
-		short ret = BitConverter.ToInt16 (source,count);
-		count += 2;
-		return ret;
-	}
-
 	public ushort ReadUShort ()
 	{
 		ushort ret = BitConverter.ToUInt16 (source,count);

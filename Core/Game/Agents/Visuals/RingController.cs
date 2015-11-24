@@ -1,62 +1,46 @@
 ﻿using UnityEngine;
+using System.Collections;
+using Lockstep;
+public class RingController : MonoBehaviour {
+	private static Color SelectColor = new Color (0,1,0,.5f);
+	private static Color HighlightColor = new Color (0,1,0,.25f);
+	private static Color UnselectColor = new Color (0,1,0,.1f);
+	public Renderer cachedRenderer;
+	public Transform cachedTransform;
+	public Material cachedMaterial;
 
-namespace Lockstep {
-    public class RingController : MonoBehaviour {
-		static RingController () {
-			ringTemplate = LSUtility.ResourceLoadGO ("SelectionRing");
-		}
-		private static GameObject ringTemplate;
-		public static RingController Create () {
-			GameObject go = GameObject.Instantiate <GameObject> (ringTemplate);
-			RingController ringer = go.GetComponent<RingController> ();
-			return ringer;
-		}
+	private LSAgent Agent;
 
-        [SerializeField]
-        private readonly Color SelectColor = new Color(1, 1, 1, .35f);
-        [SerializeField]
-        private readonly Color HighlightColor = new Color(1, 1, 1, .2f);
-        [SerializeField]
-        private readonly Color UnselectColor = new Color(1, 1, 1, .1f);
+	public void Initialize (LSAgent agent)
+	{
+		if (this.cachedRenderer == null)
+			this.cachedRenderer = base.GetComponent<Renderer>();
+		cachedMaterial = this.cachedRenderer.material;
+		if (this.cachedTransform == null)
+			this.cachedTransform = base.GetComponent<Transform> ();
+		float scale = agent.SelectionRadius * 2;
+		transform.localScale = new Vector3(scale,scale,scale);
+		cachedMaterial.color = UnselectColor;
+		Agent = agent;
+	}
 
-        private Renderer cachedRenderer;
-        private Material cachedMaterial;
+	public void Visualize ()
+	{
+		transform.position = Agent.transform.position;
+	}
 
-		public void Setup(LSAgent agent) {
-			cachedRenderer = GetComponent<Renderer>();
-			cachedMaterial = cachedRenderer.material;
-			transform.parent = agent.VisualCenter;
-			transform.localPosition = Vector3.zero;
-			float size = agent.SelectionRadius * 2;
-			transform.localScale = new Vector3(size,size,1);
-		}
+	public void Select ()
+	{
+		cachedMaterial.color = SelectColor;
+	}
 
-        public void Initialize() {
-			Unselect ();
-        }
+	public void Unselect ()
+	{
+		cachedMaterial.color = UnselectColor;
+	}
 
-        public void Select() {
-            cachedRenderer.enabled = true;
-            cachedMaterial.color = SelectColor;
-        }
-
-        public void Highlight() {
-            cachedRenderer.enabled = true;
-            cachedMaterial.color = HighlightColor;
-        }
-
-        public void Unselect() {
-            if (cachedRenderer == null) return;
-            cachedRenderer.enabled = false;
-            cachedMaterial.color = UnselectColor;
-        }
-
-        public void Deactivate() {
-			Unselect ();
-        }
-
-        public bool IsEnabled {
-            get { return cachedRenderer.enabled; }
-        }
-    }
+	public void Highlight ()
+	{
+		cachedMaterial.color = HighlightColor;
+	}
 }

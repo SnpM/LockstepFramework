@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+
 public struct Coordinate {
 	public int x;
 	public int y;
@@ -15,11 +13,4 @@ public struct Coordinate {
 	{
 		return "(" + x.ToString () + ", " + y.ToString() + ")";
 	}
-
-#if UNITY_EDITOR
-	public void OnSerializeGUI () {
-		x = EditorGUILayout.IntField ("X", x);
-		y = EditorGUILayout.IntField ("Y", y);
-	}
-#endif
 }
