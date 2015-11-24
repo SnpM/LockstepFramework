@@ -4,104 +4,204 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
+
+#if UNITY_EDITOR
+#pragma warning disable 0168 // variable declared but not used.
+#pragma warning disable 0219 // variable assigned but not used.
+#pragma warning disable 0414 // private field assigned but not used.
+#endif
+
+using Lockstep.UI;
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+//using Lockstep.Integration;
+using Lockstep.Data;
+namespace Lockstep {
+    public static class LockstepManager {
+		public static readonly System.Diagnostics.Stopwatch SimulationTimer = new System.Diagnostics.Stopwatch();
+		public static long Ticks {get {return SimulationTimer.ElapsedTicks;}}
+		public static MonoBehaviour UnityInstance {get; private set;}
+        public const int FrameRate = 32;
+        public const int InfluenceResolution = 4;
+		public const float BaseDeltaTime = (float)(1d  / FrameRate);
 
-namespace Lockstep
-{
-	public class LockstepManager : MonoBehaviour
-	{
-		public static LockstepManager Instance;
-		public const long Timestep = FixedMath.One / 32;
-		public const int NetworkingIterationSpread = 2;
-		public static int FrameCount;
+		private static int InfluenceCount;
 
-		public static void Initialize ()
-		{
-			Time.fixedDeltaTime = FixedMath.ToFloat (Timestep);
-			FrameCount = 0;
-			LSUtility.Initialize (1);
-			CoroutineManager.Initialize ();
+		public static int InfluenceFrameCount {get; private set;}
+        public static int FrameCount { get; private set; }
+		public static bool Started {get; private set;}
 
-			NetworkManager.Initialize ();
-			FrameManager.Initialize ();
-			AgentController.Initialize (Instance.AgentObjects);
-			PhysicsManager.Initialize ();
-			InputManager.Initialize ();
-			PlayerManager.Initialize ();
 
-			MovementGroup.Initialize ();
+        public static void Setup() {
 
-			Initialized = true;
-		}
+			UnityInstance = GameObject.CreatePrimitive (PrimitiveType.Sphere).AddComponent<MonoBehaviour> ();
+            UnityInstance.GetComponent<Renderer>().enabled = false;
+			GameObject.DontDestroyOnLoad (UnityInstance.gameObject);
 
-		public static void Simulate ()
-		{
-			if (!Initialized)
-				return;
+			AbilityInterfacer.Setup ();
+         
+            AgentController.Setup();
+			TeamManager.Setup ();
 
-			ReplayManager.Simulate ();
-			PlayerManager.Simulate ();
-			NetworkManager.Simulate ();
+            ProjectileManager.Setup();
+            EffectManager.Setup();
+            BehaviourHelper.GlobalSetup();
+			PhysicsManager.Setup ();
+			ClientManager.Setup ();
+            InterfaceManager.Setup();
 
-			if (!FrameManager.CanAdvanceFrame) {
-				return;
+			Application.targetFrameRate = 30;
+			Time.fixedDeltaTime = BaseDeltaTime;
+			Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
+
+			InputManager.Setup ();
+        }
+
+		public static void Initialize() {
+
+			SimulationTimer.Reset ();
+			SimulationTimer.Start ();
+			LSDatabaseManager.Initialize();
+            LSUtility.Initialize(1);
+			Interfacing.Initialize ();
+			InfluenceCount = 0;
+			Time.timeScale = 1f;
+			Stalled = true;
+
+            FrameCount = 0;
+			InfluenceFrameCount = 0;
+
+            GridManager.Generate();
+            GridManager.Initialize();
+
+			TeamManager.Initialize ();
+
+            CoroutineManager.Initialize();
+			FrameManager.Initialize();
+
+            CommandManager.Initialize();
+			BehaviourHelper.GlobalInitialize();
+
+            AgentController.Initialize();
+			TeamManager.LateInitialize ();
+
+            PhysicsManager.Initialize();
+            PlayerManager.Initialize();
+            SelectionManager.Initialize();
+            InfluenceManager.Initialize();
+            ProjectileManager.Initialize();
+
+            LoadSceneObjects();
+
+			Started = true;
+            ClientManager.Initialize ();
+        }
+
+		static bool Stalled;
+        public static void Simulate() {
+			if (InfluenceCount == 0)
+			{
+				InfluenceSimulate ();
+				InfluenceCount = InfluenceResolution - 1;
+            	if (FrameManager.CanAdvanceFrame == false) {
+					Stalled = true;
+               		return;
+           		}
+				Stalled = false;
+				FrameManager.Simulate();
+				InfluenceFrameCount++;
 			}
 			else {
-
+				InfluenceCount--;
 			}
-			FrameManager.Simulate ();
-
-			OnSimulate ();
-
-			AgentController.Simulate ();
-
-
-
-			PhysicsManager.Simulate ();
-			CoroutineManager.Simulate ();
-			InputManager.Simulate ();
-			SelectionManager.Simulate ();
-			FrameCount++;
-		}
-
-		public static void Visualize ()
-		{
-			if (!Initialized)
+			if (Stalled){
+				//Debug.Log ("stalled");
 				return;
-			PhysicsManager.Visualize ();
-			InputManager.Visualize ();
-			PlayerManager.Visualize ();
-			AgentController.Visualize ();
+			}
+			if (FrameCount == 0) StartGame ();
+
+			BehaviourHelper.GlobalSimulate();
+			AgentController.Simulate();
+            PhysicsManager.Simulate();
+            CoroutineManager.Simulate();
+            InfluenceManager.Simulate();
+            ProjectileManager.Simulate();
+            TestManager.Simulate ();
+
+			TeamManager.Simulate ();
+
+			LateSimulate ();
+            FrameCount++;
+
+        }
+		private static void StartGame () {
+			GameManager.StartGame ();
+		}
+		private static void LateSimulate () {
+            BehaviourHelper.GlobalLateSimulate ();
+			AgentController.LateSimulate ();
+			PhysicsManager.LateSimulate ();
+		}
+		public static void InfluenceSimulate () {
+			PlayerManager.Simulate();
+			CommandManager.Simulate();
+			ClientManager.Simulate ();
 		}
 
-		public static bool Initialized = false;
+        public static void Visualize() {
+			PlayerManager.Visualize();
 
-		public static void End ()
-		{
-			Initialized = false;
+			BehaviourHelper.GlobalVisualize();
+			PhysicsManager.Visualize();
+			AgentController.Visualize();
+            ProjectileManager.Visualize();
+            EffectManager.Visualize();
+
+			TeamManager.Visualize ();
+
+			//LateVisualize ();
+        }
+
+		public static void LateVisualize () {
+			InputManager.Visualize();
 		}
 
+        public static void Deactivate() {
+            if (Started == false) return;
+            Selector.Clear();
+            AgentController.Deactivate();
+			BehaviourHelper.GlobalDeactivate ();
+            ProjectileManager.Deactivate();
+			ClientManager.Deactivate ();
 
-		public static event SimulationEvent OnSimulate;
-		public delegate void SimulationEvent ();
+			TeamManager.Deactivate ();
+            ClientManager.NetworkHelper.Disconnect ();
+			Started = false;
+        }
 
-		#region Instance Settings
-
-		[SerializeField]
-		public GameObject[]
-			AgentObjects;
-		[SerializeField]
-		public GameObject
-			SelectionRing;
-
-		void Awake ()
-		{
-			Instance = this;
+		public static void Quit () {
+			ClientManager.Quit ();
 		}
 
+        private static void LoadSceneObjects() {
+            LSSceneObject[] sceneObjects = GameObject.FindObjectsOfType<LSSceneObject>();
+            for (int i = 0; i < sceneObjects.Length; i++) {
+                sceneObjects[i].Initialize();
+            }
+        }
 
-		#endregion
-	}
+        public static int GetStateHash () {
+            int hash = LSUtility.PeekRandom (int.MaxValue);
+            hash += 1;
+            hash ^= AgentController.GetStateHash ();
+            hash += 1;
+            hash ^= ProjectileManager.GetStateHash ();
+            hash += 1;
+            return hash;
+        }
+    }
+
+    public enum SelectionSetting {
+        PC_RTS,
+        Mobile
+    }
 }

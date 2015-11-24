@@ -1,0 +1,13 @@
+# OS X
+*.DS_Store
+
+# Temp Files
+*~
+
+# Project
+_private
+bin
+obj
+*.suo
+*.userprefs
+*.pidb

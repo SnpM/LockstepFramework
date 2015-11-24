@@ -1,6 +1,12 @@
-﻿using UnityEngine;
+﻿//=======================================================================
+// Copyright (c) 2015 John Pan
+// Distributed under the MIT License.
+// (See accompanying file LICENSE or copy at
+// http://opensource.org/licenses/MIT)
+//=======================================================================
+using UnityEngine;
 using System.Collections;
-
+using System;
 namespace Lockstep
 {
 	public static class FixedMath
@@ -12,6 +18,9 @@ namespace Lockstep
 		public const float OneF = (float)One;
 		public const double OneD = (double)One;
 		public const long Pi = (355 * One)/113;
+		public const long MaxFixedNumber = long.MaxValue >> SHIFT_AMOUNT;
+		public const long TenDegrees = FixedMath.One * 1736 / 10000;
+		public const long Epsilon = 1 << (SHIFT_AMOUNT - 10);
 	#endregion
 
 	#region Constructors
@@ -84,7 +93,7 @@ namespace Lockstep
 		/// </summary>
 		/// <param name="f1">f1.</param>
 		/// <param name="f2">f2.</param>
-		public static long Add (long f1, long f2)
+		public static long Add (this long f1, long f2)
 		{
 			return f1 + f2;
 		}
@@ -93,7 +102,7 @@ namespace Lockstep
 		/// </summary>
 		/// <param name="f1">f1.</param>
 		/// <param name="f2">f2.</param>
-		public static long Sub (long f1, long f2)
+		public static long Sub (this long f1, long f2)
 		{
 			return f1 - f2;
 		}
@@ -102,16 +111,20 @@ namespace Lockstep
 		/// </summary>
 		/// <param name="f1">f1.</param>
 		/// <param name="f2">f2.</param>
-		public static long Mul (long f1, long f2)
+		public static long Mul (this long f1, long f2)
 		{
 			return (f1 * f2) >> SHIFT_AMOUNT;
+		}
+		public static long Mul (this long f1, int intr)
+		{
+			return (f1 * intr);
 		}
 		/// <summary>
 		/// Division.
 		/// </summary>
 		/// <param name="f1">f1.</param>
 		/// <param name="f2">f2.</param>
-		public static long Div (long f1, long f2)
+		public static long Div (this long f1, long f2)
 		{
 			return (f1 << SHIFT_AMOUNT) / f2;
 		}
@@ -120,7 +133,7 @@ namespace Lockstep
 		/// </summary>
 		/// <param name="f1">f1.</param>
 		/// <param name="f2">f2.</param>
-		public static long Mod (long f1, long f2)
+		public static long Mod (this long f1, long f2)
 		{
 			return f1 % f2;
 		}
@@ -142,9 +155,20 @@ namespace Lockstep
 			}
 			return n << (SHIFT_AMOUNT / 2);
 		}
-		public static long Abs (long f1)
+		public static long SinToCos (long sin)
+		{
+			return Sqrt (FixedMath.One - (sin * sin).Normalized ());
+		}
+		public static long Normalized (this long f1)
+		{
+			return f1 >> FixedMath.SHIFT_AMOUNT;
+		}
+		public static long Abs (this long f1)
 		{
 			return f1 < 0 ? -f1 : f1;
+		}
+		public static bool AbsMoreThan (this long f1, long f2) {
+			return f1.Abs () > f2;
 		}
 
 	#endregion
@@ -168,7 +192,7 @@ namespace Lockstep
 		}
 		public static long RoundToInteger (long f1)
 		{
-			return ((f1 + FixedMath.Half - 1) >> SHIFT_AMOUNT);
+			return ((f1 + FixedMath.Half - 1) >> SHIFT_AMOUNT) << SHIFT_AMOUNT;
 		}
 		/// <summary>
 		/// Ceil the specified fixed point number.
@@ -185,19 +209,44 @@ namespace Lockstep
 			else if (t <= 0) return from;
 			return (to * t + from * (One - t)) >> SHIFT_AMOUNT;
 		}
+
+		public static long Min (this long f1, long f2)
+		{
+			return f1 <= f2 ? f1 : f2;
+		}
+		public static long Max (this long f1, long f2)
+		{
+			return f1 >= f2 ? f1 : f2;
+		} 
+		public static double ToFormattedDouble (this long f1)
+		{
+			return Math.Round(FixedMath.ToDouble(f1), 2, MidpointRounding.AwayFromZero);
+		}
+		public static bool MoreThanEpsilon (this long f1)
+		{
+			return f1 > Epsilon || f1 < Epsilon;
+		}
 	#endregion
 
 	#region Convert
-		public static long ToInt (long f1)
+		public static int ToInt (this long f1)
 		{
-			return (f1 >> SHIFT_AMOUNT);
+			return (int)(f1 >> SHIFT_AMOUNT);
+		}
+		public static int RoundToInt (this long f1)
+		{
+			return (int)((f1 + Half - 1) >> SHIFT_AMOUNT);
+		}
+		public static int CeilToInt (this long f1)
+		{
+			return (int)((f1 + One - 1) >> SHIFT_AMOUNT);
 		}
 		/// <summary>
 		/// Convert to double.
 		/// </summary>
 		/// <returns>The double.</returns>
 		/// <param name="f1">f1.</param>
-		public static double ToDouble (long f1)
+		public static double ToDouble (this long f1)
 		{
 			return (f1 / OneD);
 		}
@@ -206,7 +255,7 @@ namespace Lockstep
 		/// </summary>
 		/// <returns>The float.</returns>
 		/// <param name="f1">f1.</param>
-		public static float ToFloat (long f1)
+		public static float ToFloat (this long f1)
 		{
 			return (float)(f1 / OneD);
 		}
@@ -215,7 +264,8 @@ namespace Lockstep
 		/// </summary>
 		/// <returns>The string.</returns>
 		/// <param name="f1">f1.</param>
-		public static string ToString (long f1)
+
+		public static string GetString (this long f1)
 		{
 			return (System.Math.Round((f1) / OneD, 4, System.MidpointRounding.AwayFromZero)).ToString ();
 		}
