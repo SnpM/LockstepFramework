@@ -1,11 +1,19 @@
 ﻿using UnityEngine;
-using System.Collections;
+using Lockstep.Data;
+namespace Lockstep {
+    public abstract class ActiveAbility : Ability {
 
-namespace Lockstep
-{
-	public abstract class ActiveAbility : Ability
-	{
-		public abstract void Execute (Command com);
-		public abstract InputCode ListenInput {get;}
-	}
+		public InputCode ListenInput {get; private set;}
+
+		protected sealed override void TemplateSetup ()
+		{
+			ListenInput = Interfacer.ListenInput;
+		}
+
+        public void Execute(Command com) {
+            OnExecute(com);
+        }
+
+        protected abstract void OnExecute(Command com);
+    }
 }
