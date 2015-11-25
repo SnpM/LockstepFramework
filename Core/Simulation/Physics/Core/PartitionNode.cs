@@ -4,66 +4,50 @@ using System;
 namespace Lockstep {
 public class PartitionNode {
 		
-		public readonly FastBucket<int> ContainedObjects = new FastBucket<int> ();
-		public int Count {get {return ContainedObjects.Count;}}
-		public int PeakCount {get {return ContainedObjects.PeakCount;}}
-		public void Initialize () { 
-			ContainedObjects.FastClear ();
-		}
-		int activationID;
-		public void Add(int item)
+		const int capacity = 512;
+		public int[] innerArray = new int[capacity];
+		public int Count = 0;
+
+		
+		public bool Add(int item)
 		{
-			if (Count == 0) {
-				activationID = Partition.ActivatedNodes.Add (this);
-			}
-			ContainedObjects.Add (item);
+			if (Count == capacity) return false;
+			innerArray[Count] = item;
+			Count++;
+			return true;
 		}
 		public void Remove(int item) {
-			if (ContainedObjects.Remove (item)) {
-				if (Count == 0) {
-					Partition.ActivatedNodes.RemoveAt (activationID);
-				}
+
+			int index = Array.IndexOf(innerArray, item, 0, Count);
+			if (index >= 0) {
+				RemoveAt(index);
 			}
 		}
+		public void RemoveAt(int index) {
+			Count--;
+			Array.Copy(innerArray, index + 1, innerArray, index, Count - index);
 
-		static int id1, id2;
-		static CollisionPair pair;
-		public void Distribute () {
-			int nodePeakCount = PeakCount;
-			for (int j = 0; j < nodePeakCount; j++) {
-				if (ContainedObjects.arrayAllocation[j])
-				{
-					id1 = this[j];
-					for (int k = j + 1; k < nodePeakCount; k++) {
-						if (ContainedObjects.arrayAllocation[k]) {
-							id2 = this [k];
-							if (id1 < id2) {
-								pair = PhysicsManager.CollisionPairs [id1 * PhysicsManager.MaxSimObjects + id2];
-							} else {
-								pair = PhysicsManager.CollisionPairs [id2 * PhysicsManager.MaxSimObjects + id1];
-							}
-							
-							if (System.Object.ReferenceEquals (null, pair) == false && (pair.PartitionVersion != Partition._Version)) {
-								pair.CheckAndDistributeCollision ();
-								pair.PartitionVersion = Partition._Version;
-							}
-						}
-					}
-				}
-			}
+			innerArray[Count] = -1;
 		}
-
 		public int this[int index]
 		{
 			get
 			{
-				return ContainedObjects[index];
+				return innerArray[index];
 			}
 			set
 			{
-				ContainedObjects[index] = value;
+				innerArray[index] = value;
 			}
 		}
-
+		
+		public override string ToString()
+		{
+			string output = string.Empty;
+			for (int i = 0; i < Count - 1; i++)
+				output += innerArray[i] + ", ";
+			
+			return output + innerArray[Count - 1];
+		}
 	}
 }

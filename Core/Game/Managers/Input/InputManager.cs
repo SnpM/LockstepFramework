@@ -1,55 +1,120 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-using Lockstep.UI;
-public class InputManager : MonoBehaviour {
-	public static readonly InputCode[] InputCodes = (InputCode[])Enum.GetValues(typeof(InputCode));
-	private static readonly UnityEngine.KeyCode[] mappedKeyCodes = new KeyCode[InputCodes.Length];
-	private static readonly uint[] cachedPressedDown = new uint[InputCodes.Length];
-	private static uint _Version;
-	public static void Setup () {
-		mappedKeyCodes[0] = KeyCode.Q;
-		mappedKeyCodes[1] = KeyCode.W;
-		mappedKeyCodes[2] = KeyCode.E;
-		mappedKeyCodes[3] = KeyCode.R;
-		mappedKeyCodes[4] = KeyCode.A;
-		mappedKeyCodes[5] = KeyCode.S;
-		mappedKeyCodes[6] = KeyCode.D;
-		mappedKeyCodes[7] = KeyCode.F;
-		mappedKeyCodes[8] = KeyCode.Z;
-		mappedKeyCodes[9] = KeyCode.X;
-		mappedKeyCodes[10] = KeyCode.C;
-		mappedKeyCodes[11] = KeyCode.V;
-	}
-	public static bool GetInputDown (InputCode inputCode) {
-		byte inputIndex = (byte)inputCode;
-		if (cachedPressedDown[inputIndex] == _Version)
+
+namespace Lockstep
+{
+	public static class InputManager
+	{
+		public static int InputCount = 0;
+		private static ulong PressedInputs;
+		private static ulong PressedDownInputs;
+		private static ulong PressedUpInputs;
+		public static FastList<InputPair> inputPairs = new FastList<InputPair> ();
+
+		public static void Initialize ()
 		{
-			return true;
+			PressedInputs = 0;
+			PressedDownInputs = 0;
+			PressedUpInputs = 0;
+			InputCount = 0;
+			inputPairs.FastClear ();
+
+			AddInput (InputCode.Q, KeyCode.Q);
+			AddInput (InputCode.W, KeyCode.W);
+			AddInput (InputCode.E, KeyCode.E);
+			AddInput (InputCode.R, KeyCode.R);
+			AddInput (InputCode.A, KeyCode.A);
+			AddInput (InputCode.S, KeyCode.S);
+			AddInput (InputCode.D, KeyCode.D);
+			AddInput (InputCode.F, KeyCode.F);
+			AddInput (InputCode.Z, KeyCode.Z);
+			AddInput (InputCode.X, KeyCode.X);
+			AddInput (InputCode.C, KeyCode.C);
+			AddInput (InputCode.V, KeyCode.V);
+			AddInput (InputCode.M, KeyCode.M);
 		}
-		bool pressedDown = Input.GetKeyDown (mappedKeyCodes[inputIndex]);
-		if (pressedDown)
+
+		public static void AddInput (InputCode inputCode, KeyCode keyCode)
 		{
-			cachedPressedDown[inputIndex] = _Version;
-			return true;
+			inputPairs.Add (new InputPair (inputCode, keyCode));
+			InputCount++;
 		}
-		return false;
-	}
-	public static void PressInputDown (InputCode inputCode) {
-		byte inputIndex = (byte)inputCode;
-		cachedPressedDown[inputIndex] = _Version;
+
+		public static void Simulate ()
+		{
+			PressedDownInputs = 0;
+			PressedUpInputs = 0;
+
+		}
+
+		public static void Visualize ()
+		{
+			for (i = 0; i < InputCount; i++) {
+				castedInputCode = (ulong)1 << (int)inputPairs [i].inputCode;
+				if ((PressedInputs & castedInputCode) == castedInputCode) {
+					if (Input.GetKeyUp (inputPairs [i].keyCode)) {
+						PressedUpInputs |= castedInputCode;
+						PressedDownInputs ^= castedInputCode;
+						PressedInputs ^= castedInputCode;
+					}
+				} else {
+					if (Input.GetKeyDown (inputPairs [i].keyCode)) {
+						PressedDownInputs |= castedInputCode;
+						PressedUpInputs ^= castedInputCode;
+						PressedInputs |= castedInputCode;
+					}
+				}
+			}
+		}
+
+		public static bool GetInput (InputCode inputCode)
+		{
+			castedInputCode = (ulong)1 << (int)inputCode;
+			return ((PressedInputs & castedInputCode) == castedInputCode);
+		}
+
+		public static bool GetInputDown (InputCode inputCode)
+		{
+			castedInputCode = (ulong)1 << (int)inputCode;
+			return ((PressedDownInputs & castedInputCode) == castedInputCode);
+		}
+
+		public static bool GetInputUp (InputCode inputcode)
+		{
+			castedInputCode = (ulong)1 << (int)inputcode;
+			return ((PressedUpInputs & castedInputCode) == castedInputCode);
+		}
+
+		public static void PressInputDown (InputCode inputCode)
+		{
+			castedInputCode = (ulong)1 << (int)inputCode;
+			PressedDownInputs |= castedInputCode;
+			PressedInputs |= castedInputCode;
+		}
+
+		public static void PressInputUp (InputCode inputCode)
+		{
+			castedInputCode = (ulong)1 << (int)inputCode;
+			PressedUpInputs |= castedInputCode;
+			PressedInputs ^= castedInputCode;
+		}
+
+		static int i, j;
+		static ulong castedInputCode;
 	}
 
-	const int InformationMouse = 0;
-	const int QuickMouse = 1;
-	public static bool GetInformationDown () {
-		return Input.GetMouseButtonDown (InformationMouse);
-	}
-	public static bool GetQuickDown () {
-		return Input.GetMouseButtonDown (QuickMouse);
-	}
-	public static void Visualize ()
+	public struct InputPair
 	{
-		_Version++;
+		public InputPair (InputCode input, KeyCode key)
+		{
+			inputCode = input;
+			keyCode = key;
+		}
+
+		public InputCode inputCode;
+		public KeyCode keyCode;
 	}
+
+
 }

@@ -39,7 +39,6 @@ namespace Lockstep
 		public void Initialize ()
 		{
 			GenerateNeighbors ();
-			LinkedScanNode = GridManager.GetScanNode (gridX / GridManager.ScanResolution, gridY / GridManager.ScanResolution);
 		}
 		#endregion
 
@@ -52,20 +51,10 @@ namespace Lockstep
 
 
 		#region Pathfinding
-		const int taxPerUnit = 25;
-
 		public int gridX;
 		public int gridY;
 		public int gridIndex;
-		public int gCost {
-			get {
-				return _gCost + Weight;
-			}
-			set {
-				_gCost = value;
-			}
-		}
-		private int _gCost;
+		public int gCost;
 		public int hCost;
 		public int fCost;
 		public GridNode parent;
@@ -186,6 +175,7 @@ namespace Lockstep
 				this.hCost = dstY * 141 + (dstX - dstY) * 100;
 			else
 				this.hCost = dstX * 141 + (dstY - dstX) * 100;
+			
 			fCost = gCost + hCost;
 			
 		}
@@ -193,19 +183,18 @@ namespace Lockstep
 
 
 		#region Influence
-		public int ScanX {get {return LinkedScanNode.X;}}
-		public int ScanY {get {return LinkedScanNode.Y;}}
-		public ScanNode LinkedScanNode;
-		const int weightPerUnit = 100;
-		public int Add (LSAgent influencer)
+		public InfluencerBucket LocatedAgents;
+		public bool Add (LSInfluencer influencer)
 		{
-			//Weight += weightPerUnit;
-			return LinkedScanNode.LocatedAgents.Add(influencer);
+			if (System.Object.ReferenceEquals (LocatedAgents,null))
+			{
+				LocatedAgents = new InfluencerBucket();
+			}
+			return LocatedAgents.Add(influencer);
 		}
-		public void RemoveAt (int index)
+		public void Remove (LSInfluencer influencer)
 		{
-			//Weight -= weightPerUnit;
-			LinkedScanNode.LocatedAgents.RemoveAt (index);
+			LocatedAgents.Remove (influencer);
 		}
 		#endregion
 
