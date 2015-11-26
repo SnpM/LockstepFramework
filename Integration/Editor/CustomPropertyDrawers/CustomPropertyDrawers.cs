@@ -3,7 +3,6 @@ using System;
 using UnityEditor;
 using UnityEngine;
 using System.Reflection;
-using SafeHandles;
 using Lockstep.Integration;
 using System.Collections.Generic;
 namespace Lockstep {

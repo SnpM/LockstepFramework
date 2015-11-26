@@ -25,7 +25,6 @@ namespace Lockstep {
             }
 #endif
             MainSettings = settings;
-            DebugConsole.Log (MainSettings != null ? MainSettings.ToString () : "null");
             if (MainSettings == null) {
                 throw new System.NullReferenceException ("No LockstepFrameworkSettings detected. Make sure there is one in the root directory of a Resources folder");
             }
