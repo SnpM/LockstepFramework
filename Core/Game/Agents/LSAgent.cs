@@ -64,6 +64,7 @@ namespace Lockstep
 
 			if (LocalID == 0)
 			
+<<<<<<< HEAD
 			{
 				FastList<LSAgent> agents = new FastList<LSAgent>();
 				 Influencer.ScanAll (delta,agents);
@@ -88,6 +89,82 @@ namespace Lockstep
 			ActiveAbility activeAbility = (ActiveAbility)ActiveAbilities [leIndex];
 			if (activeAbility != null) {
 				activeAbility.Execute (com);
+=======
+            LoadComponents ();
+
+
+			GameObject.DontDestroyOnLoad(gameObject);
+
+			setupAbilitys.FastClear();
+            
+            MyAgentCode = interfacer.GetAgentCode();
+            Interfacer = interfacer;
+            SpawnVersion = 1;
+            CheckCasting = true;
+
+            Influencer = new LSInfluencer();
+			if (_visualCenter == null)
+				_visualCenter = CachedTransform;
+
+            if (Animator .IsNotNull ()) {
+                Animator.Setup();
+            }
+
+
+			abilityManager.Setup(this);
+			Ringer = RingController.Create ();
+			if (Ringer .IsNotNull ())
+			Ringer.Setup (this);
+
+            Influencer.Setup(this);
+            Body.Setup(this);
+
+			SelectionRadiusSquared = _selectionRadius * _selectionRadius;
+            if (StatsBarer != null)
+			StatsBarer.Setup (this);
+        }
+
+		public void SessionReset () {
+			this.BoxVersion = 0;
+			this.SpawnVersion = 0;
+		}
+
+        public void Initialize(
+			AgentController controller,
+		    ushort localID,
+			ushort globalID,
+			Vector2d position = default (Vector2d)) {
+
+			LocalID = localID;
+			GlobalID = globalID;
+			Controller = controller;
+
+			IsActive = true;
+			CheckCasting = true;
+			Selectable = true;
+
+
+			CachedGameObject.SetActive (true);
+            if (Body .IsNotNull ()) {
+                Body.Initialize(position, Vector2d.up);
+            }
+
+            if (Influencer .IsNotNull ()) {
+                Influencer.Initialize();
+            }
+
+            if (Animator .IsNotNull ()) {
+                Animator.Initialize();
+            }
+
+            abilityManager.Initialize();
+            if (StatsBarer != null)
+			StatsBarer.Initialize ();
+			if (Ringer .IsNotNull ()) {
+				Ringer.Initialize ();
+				IsSelected = false;
+				IsHighlighted = false;
+>>>>>>> 4687b93def3d76d14fc8f9a5c09a4a19bd00020d
 			}
 		}
 
@@ -101,6 +178,26 @@ namespace Lockstep
 			Influencer.Deactivate ();
 
 		}
+<<<<<<< HEAD
+=======
+		[HideInInspector]
+		public bool VisualPositionChanged;
+		Vector3 lastVisualPosition;
+        public void Visualize() {
+			VisualPositionChanged = CachedTransform.hasChanged && lastVisualPosition != (lastVisualPosition = CachedTransform.position);
+			if (VisualPositionChanged) {
+				lastVisualPosition = CachedTransform.position;
+			}
+
+            abilityManager.Visualize();
+            if (Animator .IsNotNull ()) {
+                Animator.Visualize();
+            }
+            if (StatsBarer != null)
+			StatsBarer.Visualize ();
+
+        }
+>>>>>>> 4687b93def3d76d14fc8f9a5c09a4a19bd00020d
 
 		public T GetAbility<T> () where T : Ability
 		{
@@ -145,6 +242,13 @@ namespace Lockstep
 					}
 				}
 			}
+<<<<<<< HEAD
+=======
+
+            if (StatsBarer != null)
+			StatsBarer.Deactivate ();
+			if (Ringer .IsNotNull ()) Ringer.Deactivate ();
+>>>>>>> 4687b93def3d76d14fc8f9a5c09a4a19bd00020d
 		}
 
 		private bool _isSelected;
@@ -168,6 +272,7 @@ namespace Lockstep
 			}
 		}
 
+<<<<<<< HEAD
 		private bool _isHighlighted;
 		public uint BoxVersion;
 		public int SelectedAgentsIndex;
@@ -177,4 +282,48 @@ namespace Lockstep
 		public Renderer cachedRenderer;
 		static int i, j, iterator;
 	}
+=======
+        private void LoadComponents () {
+            _cachedTransform = base.transform;
+            _cachedGameObject = base.gameObject;
+            _body = GetComponent<LSBody> ();
+            _animator = GetComponent<LSAnimator> ();
+            _attachedAbilities = GetComponents<Ability> ();
+        }
+#if UNITY_EDITOR
+		public void RefreshComponents () {
+            LoadComponents ();
+			SerializedObject so = new SerializedObject (this);
+            so.Update ();
+            so.ApplyModifiedProperties ();
+		}
+        public override bool GetSerializedFieldNames(List<string> output)
+        {
+            base.GetSerializedFieldNames(output);
+            output.Add("_deathTime");
+            output.Add("_boxPriority");
+            output.Add("_selectionPriority");
+            output.Add("_selectionRadius");
+            output.Add("_statsBarOffset");
+            output.Add("_visualCenter");
+            return true;
+        }
+		/*protected override bool OnSerialize ()
+		{
+			LSEditorUtility.FrameCountField ("Death Time", ref _deathTime);
+			_boxPriority = EditorGUILayout.IntField ("Box Priority", _boxPriority);
+			this._selectionPriority = EditorGUILayout.IntField ("Selection Priority", _selectionPriority);
+			_selectionRadius = EditorGUILayout.FloatField ("Selection Radius", _selectionRadius);
+			this._statsBarOffset = EditorGUILayout.Vector3Field ("Stats Offset", this._statsBarOffset);
+			_visualCenter = (Transform)EditorGUILayout.ObjectField ("Visual Center", _visualCenter, typeof (Transform), true);
+			RefreshComponents ();
+			return true;
+		}*/
+		void Reset () {
+			_selectionRadius = 1f;
+			_visualCenter = transform;
+		}
+#endif
+    }
+>>>>>>> 4687b93def3d76d14fc8f9a5c09a4a19bd00020d
 }
