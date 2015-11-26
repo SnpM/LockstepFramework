@@ -4,60 +4,13 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
-namespace Lockstep
-{
-	public class LockstepManager : MonoBehaviour
-	{
-		public static LockstepManager Instance;
-		public const long Timestep = FixedMath.One / 32;
-		public const int NetworkingIterationSpread = 2;
-		public static int FrameCount;
+#if UNITY_EDITOR
+#pragma warning disable 0168 // variable declared but not used.
+#pragma warning disable 0219 // variable assigned but not used.
+#pragma warning disable 0414 // private field assigned but not used.
+#endif
 
-		public static void Initialize ()
-		{
-			Time.fixedDeltaTime = FixedMath.ToFloat (Timestep);
-			FrameCount = 0;
-			LSUtility.Initialize (1);
-			CoroutineManager.Initialize ();
-
-			NetworkManager.Initialize ();
-			FrameManager.Initialize ();
-			AgentController.Initialize (Instance.AgentObjects);
-			PhysicsManager.Initialize ();
-			InputManager.Initialize ();
-			PlayerManager.Initialize ();
-
-			MovementGroup.Initialize ();
-
-			Initialized = true;
-		}
-
-		public static void Simulate ()
-		{
-			if (!Initialized)
-				return;
-
-<<<<<<< HEAD
-			ReplayManager.Simulate ();
-			PlayerManager.Simulate ();
-			NetworkManager.Simulate ();
-
-			if (!FrameManager.CanAdvanceFrame) {
-				return;
-			}
-			else {
-
-			}
-			FrameManager.Simulate ();
-
-			OnSimulate ();
-
-			AgentController.Simulate ();
-=======
 using Lockstep.UI;
 using UnityEngine;
 //using Lockstep.Integration;
@@ -176,53 +129,82 @@ namespace Lockstep {
             InfluenceManager.Simulate();
             ProjectileManager.Simulate();
             TestManager.Simulate ();
->>>>>>> origin/develop
 
+			TeamManager.Simulate ();
 
+			LateSimulate ();
+            FrameCount++;
 
-			PhysicsManager.Simulate ();
-			CoroutineManager.Simulate ();
-			InputManager.Simulate ();
-			SelectionManager.Simulate ();
-			FrameCount++;
+        }
+		private static void StartGame () {
+			GameManager.StartGame ();
+		}
+		private static void LateSimulate () {
+            BehaviourHelper.GlobalLateSimulate ();
+			AgentController.LateSimulate ();
+			PhysicsManager.LateSimulate ();
+		}
+		public static void InfluenceSimulate () {
+			PlayerManager.Simulate();
+			CommandManager.Simulate();
+			ClientManager.Simulate ();
 		}
 
-		public static void Visualize ()
-		{
-			if (!Initialized)
-				return;
-			PhysicsManager.Visualize ();
-			InputManager.Visualize ();
-			PlayerManager.Visualize ();
-			AgentController.Visualize ();
+        public static void Visualize() {
+			PlayerManager.Visualize();
+
+			BehaviourHelper.GlobalVisualize();
+			PhysicsManager.Visualize();
+			AgentController.Visualize();
+            ProjectileManager.Visualize();
+            EffectManager.Visualize();
+
+			TeamManager.Visualize ();
+
+			//LateVisualize ();
+        }
+
+		public static void LateVisualize () {
+			InputManager.Visualize();
 		}
 
-		public static bool Initialized = false;
+        public static void Deactivate() {
+            if (Started == false) return;
+            Selector.Clear();
+            AgentController.Deactivate();
+			BehaviourHelper.GlobalDeactivate ();
+            ProjectileManager.Deactivate();
+			ClientManager.Deactivate ();
 
-		public static void End ()
-		{
-			Initialized = false;
+			TeamManager.Deactivate ();
+            ClientManager.NetworkHelper.Disconnect ();
+			Started = false;
+        }
+
+		public static void Quit () {
+			ClientManager.Quit ();
 		}
 
+        private static void LoadSceneObjects() {
+            LSSceneObject[] sceneObjects = GameObject.FindObjectsOfType<LSSceneObject>();
+            for (int i = 0; i < sceneObjects.Length; i++) {
+                sceneObjects[i].Initialize();
+            }
+        }
 
-		public static event SimulationEvent OnSimulate;
-		public delegate void SimulationEvent ();
+        public static int GetStateHash () {
+            int hash = LSUtility.PeekRandom (int.MaxValue);
+            hash += 1;
+            hash ^= AgentController.GetStateHash ();
+            hash += 1;
+            hash ^= ProjectileManager.GetStateHash ();
+            hash += 1;
+            return hash;
+        }
+    }
 
-		#region Instance Settings
-
-		[SerializeField]
-		public GameObject[]
-			AgentObjects;
-		[SerializeField]
-		public GameObject
-			SelectionRing;
-
-		void Awake ()
-		{
-			Instance = this;
-		}
-
-
-		#endregion
-	}
+    public enum SelectionSetting {
+        PC_RTS,
+        Mobile
+    }
 }

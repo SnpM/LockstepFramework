@@ -8,7 +8,9 @@ namespace Lockstep
 	[Serializable]
 	public struct Vector2d
 	{
+		[FixedNumber]
 		public long x;
+		[FixedNumber]
 		public long y;
 
 
@@ -54,6 +56,8 @@ namespace Lockstep
 			this.x += other.x;
 			this.y += other.y;
 		}
+
+
 		/// <summary>
 		/// This vector's square magnitude.
 		/// </summary>
@@ -67,16 +71,20 @@ namespace Lockstep
 		/// </summary>
 		public long Magnitude ()
 		{
-			temp1 = (this.x * this.x + this.y * this.y) >> FixedMath.SHIFT_AMOUNT;
+			temp1 = (this.x * this.x + this.y * this.y);
 			if (temp1 == 0) return 0;
-			return FixedMath.Sqrt ((this.x * this.x + this.y * this.y) >> FixedMath.SHIFT_AMOUNT);
+			temp1 >>= FixedMath.SHIFT_AMOUNT;
+			return FixedMath.Sqrt (temp1);
+		}
+		public long FastMagnitude ()
+		{
+			return this.x * this.x + this.y * this.y;
 		}
 		/// <summary>
 		/// Normalize this vector.
 		/// </summary>
 		public void Normalize ()
 		{
-
 			tempMag = this.Magnitude ();
 			if (tempMag == 0)
 			{
@@ -120,17 +128,16 @@ namespace Lockstep
 			this.x = (targetx * amount + this.x * (FixedMath.One - amount)) >> FixedMath.SHIFT_AMOUNT;
 			this.y = (targety * amount + this.y * (FixedMath.One - amount)) >> FixedMath.SHIFT_AMOUNT;
 		}
+
 		public void Rotate (long cos, long sin)
 		{
-			temp1 = (this.x * sin + this.y * cos) >> FixedMath.SHIFT_AMOUNT;
-			this.y = (this.x * -cos + this.y * sin) >> FixedMath.SHIFT_AMOUNT;
+			temp1 = (this.x * cos + this.y * sin) >> FixedMath.SHIFT_AMOUNT;
+			this.y = (this.x * -sin + this.y * cos) >> FixedMath.SHIFT_AMOUNT;
 			this.x = temp1;
 		}
 		public void RotateInverse (long cos, long sin)
 		{
-			temp1 = (this.x * sin + this.y * -cos) >> FixedMath.SHIFT_AMOUNT;
-			this.y = (this.x * cos + this.y * sin) >> FixedMath.SHIFT_AMOUNT;
-			this.x = temp1;
+			Rotate (cos, -sin);
 		}
 		public void RotateRight ()
 		{
@@ -140,11 +147,20 @@ namespace Lockstep
 		}
 
 		static Vector2d retVec = Vector2d.zero;
-		public Vector2d rotatedRight ()
+		public Vector2d rotatedRight
 		{
+			get {
 			retVec.x = y;
 			retVec.y = -x;
 			return retVec;
+			}
+		}
+		public Vector2d rotatedLeft {
+			get {
+				retVec.x = -y;
+				retVec.y = x;
+				return retVec;
+			}
 		}
 		public void Reflect (long axisX, long axisY)
 		{
@@ -182,6 +198,10 @@ namespace Lockstep
 			temp2 *= temp2;
 			return (FixedMath.Sqrt ((temp1 + temp2) >> FixedMath.SHIFT_AMOUNT));
 		}
+		public long Distance (Vector2d other)
+		{
+			return Distance (other.x,other.y);
+		}
 		public long SqrDistance (long otherX, long otherY)
 		{
 
@@ -190,6 +210,22 @@ namespace Lockstep
 			temp2 = this.y - otherY;
 			temp2 *= temp2;
 			return ((temp1 + temp2) >> FixedMath.SHIFT_AMOUNT);
+		}
+		/// <summary>
+		/// Returns a value that is greater if the distance is greater.
+		/// </summary>
+		/// <returns>The FastDistance.</returns>
+		public long FastDistance (long otherX, long otherY)
+		{
+			temp1 = this.x - otherX;
+			temp1 *= temp1;
+			temp2 = this.y - otherY;
+			temp2 *= temp2;
+			return (temp1 + temp2);
+		}
+		public bool NotZero ()
+		{
+			return x.MoreThanEpsilon () || y.MoreThanEpsilon ();
 		}
 	#endregion
 
@@ -225,20 +261,30 @@ namespace Lockstep
 		public Vector2 ToVector2 ()
 		{
 			return new Vector2 (
-				(float)Math.Round(FixedMath.ToDouble(this.x),2, MidpointRounding.AwayFromZero),
-				(float)Math.Round(FixedMath.ToDouble(this.y),2, MidpointRounding.AwayFromZero)
-				);
-		}
-		public Vector3 ToVector3 (float y)
-		{
-			return new Vector3 (
 				(float)FixedMath.ToDouble (this.x),
-			    y,
 				(float)FixedMath.ToDouble (this.y)
 				);
 		}
 
+	    public Vector3 ToVector3(float y) {
+	        return new Vector3((float)FixedMath.ToDouble(this.x), y, (float)FixedMath.ToDouble(this.y));
+	    }
+
+        public Vector3 ToScaledVector3(float y)
+        {
+			return ToVector3(y);
+            //return new Vector3((float)FixedMath.ToDouble(this.x) * LockstepManager.WorldScale, y, (float)FixedMath.ToDouble(this.y) * LockstepManager.WorldScale);
+        }
+
 		#endregion
+
+		public override bool Equals (object obj)
+		{
+			if (obj is Vector2d) {
+				return (Vector2d)obj == this;
+			}
+			return false;
+		}
 
 		#region Operators
 		public static Vector2d operator + (Vector2d v1, Vector2d v2)
@@ -283,6 +329,11 @@ namespace Lockstep
 		{
 			return x * 31 + y * 7;
 		}
+
+        public int GetStateHash () {
+            return (int)(GetLongHashCode () % int.MaxValue);
+        }
+
 	}
 
 

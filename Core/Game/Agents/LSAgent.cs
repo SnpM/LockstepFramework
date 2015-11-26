@@ -1,95 +1,201 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿//=======================================================================
+// Copyright (c) 2015 John Pan
+// Distributed under the MIT License.
+// (See accompanying file LICENSE or copy at
+// http://opensource.org/licenses/MIT)
+//=======================================================================
 using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Lockstep.UI;
+using Lockstep.Data;
+#if UNITY_EDITOR
+using UnityEditor;
+using Lockstep.Integration;
+#endif
+namespace Lockstep {
+	[RequireComponent (typeof (LSBody))]
+    /// <summary>
+    /// LSAgents manage abilities and interpret commands.
+    /// </summary>
+    public class LSAgent : CerealBehaviour, IMousable {
 
-namespace Lockstep
-{
-	/// <summary>
-	/// LSAgents manage abilities and interpret commands.
-	/// </summary>
-	public class LSAgent : MonoBehaviour
-	{
-		public Ability[] Abilities;
-		public int AbilityCount;
-		public ActiveAbility[] ActiveAbilities;
-		public LSBody Body;
-		public ushort GlobalID;
-		public ushort LocalID;
-		public AgentCode MyAgentCode;
-		public float SelectionRadius = 1f;
-		public RingController ringController;
-		public LSInfluencer Influencer;
-		public AgentController MyAgentController;
+        Vector3 IMousable.WorldPosition {
+            get {return this.Body.visualPosition;}
+        }
+        float IMousable.MousableRadius {
+            get {return this.SelectionRadius;}
+        }
 
-		public void Initialize (AgentController controller)
-		{
-			MyAgentController = controller;
+		static FastList<Ability> setupAbilitys = new FastList<Ability>();
 
-			cachedTransform = base.transform;
-			cachedGameObject = base.gameObject;
-			cachedRenderer = GetComponent<Renderer> ();
+		[SerializeField, FrameCount]
+        private int _deathTime = LockstepManager.FrameRate * 2;
 
-			if (Body == null) {
-				Body = GetComponent<LSBody>();
-			}
-			Body.Initialize ();
-			if (Influencer == null)
-			{
-				Influencer = new LSInfluencer();
-			}
-			Influencer.Initialize (this);
+        public AgentCode MyAgentCode { get; private set; }
 
-			Abilities = this.GetComponents<Ability> ();
-			AbilityCount = Abilities.Length;
-			ActiveAbilities = new ActiveAbility[InputManager.InputCount];
-			for (iterator = 0; iterator < AbilityCount; iterator++) {
-				Ability ability = Abilities [iterator];
-				ability.Initialize (this);
-				ActiveAbility activeAbility = ability as ActiveAbility;
-				if (activeAbility != null) {
-					ActiveAbilities [(int)activeAbility.ListenInput] = activeAbility;
-				}
-			}
-			delta = InfluenceManager.GenerateDeltaCount(5);
-			Debug.Log (delta);
+        [SerializeField, HideInInspector]
+        private AgentType _agentType;
+        public AgentType MyAgentType {
+            get {
+                return _agentType;
+            }
+        }
+
+        public event Action<LSAgent> onDeactivation;
+        public event Action<bool, bool> onInteraction;
+		public event Action<LSAgent> onBuildChild;
+        public ushort GlobalID { get; private set; }
+        public ushort LocalID { get; private set; }
+        public uint BoxVersion { get; set; }
+
+		[SerializeField]
+		private Vector3 _statsBarOffset = Vector3.up;
+		public Vector3 StatsBarOffset {get {return _statsBarOffset;}}
+
+		[SerializeField]
+		private int _boxPriority = 0;
+		public int BoxPriority {get {return _boxPriority;}}
+
+		[SerializeField]
+		private int _selectionPriority;
+		public int SelectionPriority {get {return _selectionPriority;}}
+
+		public bool Selectable {get; set;}
+		public bool CanSelect {get {return Selectable && IsVisible;}}
+
+
+
+		public Vector2 Position2 {get{return new Vector2(CachedTransform.position.x, CachedTransform.position.z);}}
+		public FastList<AbilityInterfacer> Interfacers {get {return abilityManager.Interfacers;}}
+
+		#region Pre-runtime generated
+		[SerializeField]
+		private Ability[] _attachedAbilities;
+		public Ability[] AttachedAbilities {get {return _attachedAbilities;}}
+		[SerializeField]
+		private LSBody _body;
+		public LSBody Body { get {return _body;} }
+		[SerializeField]
+		private LSAnimator _animator;
+		public LSAnimator Animator { get {return _animator;} }
+		[SerializeField]
+		private Transform _cachedTransform;
+		public Transform CachedTransform {get{return _cachedTransform;}}
+		[SerializeField]
+		private GameObject _cachedGameObject;
+		public GameObject CachedGameObject {get {return _cachedGameObject;}}
+		#endregion
+        public LSInfluencer Influencer { get; private set; }
+		public Health Healther { get {return abilityManager.Healther;} }
+		public Scan Scanner { get {return abilityManager.Scanner;} }
+		public Move Mover { get {return abilityManager.Mover;} }
+		public Turn Turner {get {return abilityManager.Turner;}}
+		public StatsBar StatsBarer{get; private set;}
+		public EnergyStore EnergyStorer {get {return abilityManager.EnergyStorer;}}
+		public RingController Ringer {get; private set;}
+		public bool IsActive { get; private set;}
+
+
+		public AgentTag Tag;
+
+        public bool CheckCasting { get; set; }
+        public bool IsCasting {
+            get {
+                return abilityManager.CheckCasting();
+            }
+        }
+		public bool UseEnergy (long energyCost) {
+			return EnergyStorer == null || EnergyStorer.Use (energyCost);
 		}
 
-		int delta;
-		public void Simulate ()
-		{
-			Influencer.Simulate ();
-			for (iterator = 0; iterator < AbilityCount; iterator++) {
-				Abilities [iterator].Simulate ();
-			}
+		public PlatformType Platform {
+			get { return CachedGameObject.layer == LayerMask.NameToLayer("Air") ? PlatformType.Air : PlatformType.Ground; }
+		}
 
-			if (LocalID == 0)
+
+        public uint SpawnVersion { get; private set; }
+        public AgentController Controller { get; private set; }  
+
+		public bool Controllable {
+			get {
+				return PlayerManager.ContainsController (Controller);
+			}
+		}
+
+        public bool IsSelected {
+            get { return isSelected; }
+            set {
+                if (isSelected != value) {
+                    isSelected = value;
+                    if (onInteraction .IsNotNull ()) {
+                        onInteraction(isSelected, isHighlighted);
+                    }
+					if (Ringer .IsNotNull ())
+					if (isSelected) {
+						Ringer.Select ();
+
+					}
+					else {
+						if (IsHighlighted)
+							Ringer.Highlight ();
+						else
+							Ringer.Unselect ();
+					}
+                }
+            }
+        }
+
+        public bool IsHighlighted {
+            get { return isHighlighted; }
+            set {
+                if (IsHighlighted != value) {
+                    isHighlighted = value;
+                    if (onInteraction .IsNotNull ()) {
+                        onInteraction(isSelected, isHighlighted);
+                    }
+					if (Ringer .IsNotNull ())
+					if (IsSelected == false) {
+						if (IsHighlighted) {
+							Ringer.Highlight ();
+						}
+						else {
+							Ringer.Unselect();
+						}
+					}
+                }
+            }
+        }
+
+        public bool IsVisible {
+            //get { return cachedRenderer == null || (cachedRenderer.enabled && cachedRenderer.isVisible); }
+            get { return true; } //TODO: Return true only if viable
+        }
+
+        public AllegianceType GetAllegiance(LSAgent other) {
+            return Controller.GetAllegiance(other.Controller);
+        }
+
+        public bool IsInjured {
+            get { return Healther.HealthAmount < Healther.MaxHealth; }
+        }
+
+        private bool isHighlighted;
+        private bool isSelected;
+		private readonly AbilityManager abilityManager = new AbilityManager();
+
+		[SerializeField]
+		private float _selectionRadius = 1f;
+		public float SelectionRadius {get {return _selectionRadius;}}
+		[SerializeField]
+		private Transform _visualCenter;
+		public Transform VisualCenter {get {return _visualCenter;}}
+		public float SelectionRadiusSquared {get; private set;}
+
+        public AgentInterfacer Interfacer {get; private set;}
+
+        public void Setup(AgentInterfacer interfacer) {
 			
-<<<<<<< HEAD
-			{
-				FastList<LSAgent> agents = new FastList<LSAgent>();
-				 Influencer.ScanAll (delta,agents);
-				string s = "";
-				for (i = 0; i < agents.Count;i++)
-				{
-					s += agents[i].LocalID + ", ";
-				}
-				Debug.Log (s);
-			}
-		}
-		public void Visualize ()
-		{
-			if (ringController != null)
-			ringController.Visualize ();
-		}
-
-		static byte leIndex;
-		public void Execute (Command com)
-		{
-			leIndex = (byte)com.LeInput;
-			ActiveAbility activeAbility = (ActiveAbility)ActiveAbilities [leIndex];
-			if (activeAbility != null) {
-				activeAbility.Execute (com);
-=======
             LoadComponents ();
 
 
@@ -164,22 +270,25 @@ namespace Lockstep
 				Ringer.Initialize ();
 				IsSelected = false;
 				IsHighlighted = false;
->>>>>>> origin/develop
 			}
-		}
+        }
 
-		public void Deactivate ()
-		{
-			for (iterator = 0; iterator < AbilityCount; iterator++)
-			{
-				Abilities[iterator].Deactivate();
+        public void Simulate() {
+
+            if (Influencer .IsNotNull ()) {
+                Influencer.Simulate();
+            }
+
+            abilityManager.Simulate();
+
+			if (IsCasting == false) {
+				SetState (AnimState.Idling);
 			}
-			PhysicsManager.Dessimilate (Body);
-			Influencer.Deactivate ();
 
+        }
+		public void LateSimulate () {
+			abilityManager.LateSimulate ();
 		}
-<<<<<<< HEAD
-=======
 		[HideInInspector]
 		public bool VisualPositionChanged;
 		Vector3 lastVisualPosition;
@@ -197,92 +306,102 @@ namespace Lockstep
 			StatsBarer.Visualize ();
 
         }
->>>>>>> origin/develop
 
-		public T GetAbility<T> () where T : Ability
-		{
-			T ret;
-			for (i = 0; i < AbilityCount; i++)
+        public void Execute(Command com) {
+            abilityManager.Execute(com);
+        }
+
+        public void StopCast(int exceptionID = -1) {
+            abilityManager.StopCast(exceptionID);
+        }
+
+		
+		public void Die (bool immediate = false) {
+			AgentController.DestroyAgent(this, immediate);
+			if (Animator .IsNotNull ())
 			{
-				ret = Abilities[i] as T;
-				if (System.Object.ReferenceEquals (ret,null) == false) return ret;
+				SetState (AnimState.Dying);
+				Animator.Visualize ();
 			}
-			return null;
 		}
 
-		/*public System.Object GetAbility (Type AbilityType)
-		{
-			for (i = 0; i < AbilityCount; i++)
-			{
-				if (Abilities[i].GetType() == AbilityType)
-				{
-					return (System.Object)Abilities[i];
-				}
+        public void Deactivate(bool Immediate = false) {
+			_Deactivate ();
+            if (Immediate == false) {
+                CoroutineManager.StartCoroutine(PoolDelayer());
+            } else {
+                Pool();
+            }
+        }
+		private void _Deactivate () {
+            IsActive = false;
+
+            IsSelected = false;
+			SpawnVersion++;
+			if (onDeactivation .IsNotNull ()) {
+				onDeactivation(this);
 			}
-			return null;
-		}*/
-		
-		#region Utility Variables
-		public bool IsSelected {
-			get {
-				return _isSelected;
+			
+			abilityManager.Deactivate();
+			
+			PhysicsManager.Dessimilate(Body);
+			if (Influencer .IsNotNull ()) {
+				Influencer.Deactivate();
 			}
-			set {
-				if (_isSelected != value) {
-					_isSelected = value;
-					if (ringController != null)
-					if (_isSelected) {
-						ringController.Select ();
-					} else {
-						if (IsHighlighted) {
-							ringController.Highlight ();
-						} else {
-							ringController.Unselect ();
-						}
-					}
-				}
-			}
-<<<<<<< HEAD
-=======
 
             if (StatsBarer != null)
 			StatsBarer.Deactivate ();
 			if (Ringer .IsNotNull ()) Ringer.Deactivate ();
->>>>>>> origin/develop
+		}
+        private IEnumerator<int> PoolDelayer() {
+            yield return _deathTime;
+            Pool();
+        }
+
+        private void Pool() {
+            AgentController.CacheAgent(this);
+			if (CachedGameObject .IsNotNull ())
+            CachedGameObject.SetActive (false);
+        }
+
+        public void SetState (AnimState animState) {
+            if (Animator .IsNotNull ()) {
+                Animator.CurrentAnimState = animState;
+            }
+        }
+
+        public void ApplyImpulse(AnimImpulse animImpulse) {
+            if (Animator .IsNotNull ()) {
+                Animator.ApplyImpulse(animImpulse);
+            }
+        }
+
+        public T GetAbility<T>() where T : Ability {
+            return abilityManager.GetAbility<T>();
+        }
+        public long GetStateHash () {
+            long hash = 3;
+            hash ^= this.GlobalID;
+            hash ^= this.LocalID;
+            hash ^= this.Body.Position.GetStateHash ();
+            hash ^= this.Body.Rotation.GetStateHash ();
+            hash ^= this.Body.Velocity.GetStateHash ();
+            return hash;
+        }
+
+		public LSAgent BuildChild (AgentCode agentCode, Vector2d localPos, float localHeight) {
+			LSAgent agent = this.Controller.CreateAgent (agentCode);
+			agent.Body.Parent = this.Body;
+			agent.Body.LocalPosition = localPos;
+			agent.Body.LocalRotation = Vector2d.up.rotatedRight;
+			agent.Body.visualPosition.y = localHeight + this.Body.LocalPosition.y;
+			agent.Body.UpdatePosition ();
+			agent.Body.UpdateRotation();
+			agent.Body.BuildChangedValues ();
+			if (onBuildChild .IsNotNull ()) onBuildChild (agent);
+			return agent;
 		}
 
-		private bool _isSelected;
-			
-		public bool IsHighlighted {
-			get {
-				return _isHighlighted;
-			}
-			set {
-				if (IsHighlighted != value) {
-					_isHighlighted = value;
-					if (ringController != null)
-					if (!_isSelected) {
-						if (_isHighlighted) {
-							ringController.Highlight ();
-						} else {
-							ringController.Unselect ();
-						}
-					}
-				}
-			}
-		}
-
-<<<<<<< HEAD
-		private bool _isHighlighted;
-		public uint BoxVersion;
-		public int SelectedAgentsIndex;
-		#endregion
-		public Transform cachedTransform;
-		public GameObject cachedGameObject;
-		public Renderer cachedRenderer;
-		static int i, j, iterator;
-	}
-=======
         private void LoadComponents () {
             _cachedTransform = base.transform;
             _cachedGameObject = base.gameObject;
@@ -325,5 +444,4 @@ namespace Lockstep
 		}
 #endif
     }
->>>>>>> origin/develop
 }

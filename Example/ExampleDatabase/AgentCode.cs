@@ -17,5 +17,5 @@ namespace Lockstep.Data {
         None = 0,
         
         TestAgent = 795752819,
-    } 
+    }
 }
