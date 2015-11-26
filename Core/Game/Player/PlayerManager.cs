@@ -39,7 +39,6 @@ namespace Lockstep {
 		public static void Visualize() {
 			switch (selectionSetting) {
 			case SelectionSetting.PC_RTS:
-				RtsCamera.Visualize ();
 				SelectionManager.Update();
 				CommandCard.Visualize ();
 				InterfaceManager.Visualize ();
