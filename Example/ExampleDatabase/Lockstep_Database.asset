@@ -15,7 +15,7 @@ MonoBehaviour:
   - _name: TestAgent
     _description: 
     _icon: {fileID: 0}
-    _prefab: {fileID: 100310, guid: 3a4b70ed6deb748bcb8b69b04a3f4030, type: 2}
+    _prefab: {fileID: 100310, guid: 7adf26d256267454bb6f9b55470051d7, type: 2}
   _projectileData: []
   _effectData: []
   _abilityData:

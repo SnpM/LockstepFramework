@@ -53,9 +53,15 @@ namespace Lockstep {
 
         private LSBody cachedBody;
 		private Turn cachedTurn;
-        private long timescaledSpeed;
+        private long timescaledSpeed {
+            get {
+                return ((this.Speed / LockstepManager.FrameRate) + this.AdditiveSpeedModifier).Mul(FixedMath.One + this.MultiplicativeSpeedModifier);
+            }
+        }
 		private long collisionStopTreshold;
 		private long timescaledAcceleration;
+        public long AdditiveSpeedModifier {get; set;}
+        public long MultiplicativeSpeedModifier {get; set;}
 
         private Vector2d lastTargetPos;
         private Vector2d targetDirection;
@@ -82,7 +88,6 @@ namespace Lockstep {
             cachedBody = Agent.Body;
             cachedBody.OnContact += HandleCollision;
 			cachedTurn = Agent.Turner;
-            timescaledSpeed = Speed / LockstepManager.FrameRate;
 			collisionStopTreshold = FixedMath.Mul (timescaledSpeed,CollisionStopTreshold);
 			collisionStopTreshold *= collisionStopTreshold;
 			timescaledAcceleration = Acceleration * 32 / LockstepManager.FrameRate;
