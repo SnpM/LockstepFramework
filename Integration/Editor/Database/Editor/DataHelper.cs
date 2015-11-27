@@ -10,30 +10,36 @@ using Rotorz.ReorderableList;
 namespace Lockstep.Data
 {
 
-	public sealed class DataHelper<TData> /*: IDataHelper<TData>*/ where TData : DataItem, new()
+	public sealed class DataHelper
 	{
 		public DataHelper (
+            Type targetType,
             EditorLSDatabase sourceEditor,
 			LSDatabase sourceDatabase,
+            string displayName,
             string dataCodeName,
-			string dataFieldName)
+			string dataFieldName,
+            SortInfo[] sorts)
 		{
+            Sorts = sorts;
+            this.TargetType = targetType;
             SourceEditor = sourceEditor;
+            this.DisplayName = displayName;
 			SourceDatabase = sourceDatabase;
             DataCodeName = dataCodeName;
             _dataFieldName = dataFieldName;
 
             FieldInfo info = sourceDatabase.GetType().GetField(_dataFieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            _getData = () => (TData[])info.GetValue(sourceDatabase);
+            _getData = () => (DataItem[])info.GetValue(sourceDatabase);
             _setData = (value) => info.SetValue(sourceDatabase, value);
 			if (Data == null)
-				Data = new TData[0];
-            DataItemAttribute dataAttribute = (DataItemAttribute)Attribute.GetCustomAttribute(typeof (TData), typeof (DataItemAttribute));
+				Data = new DataItem[0];
+            DataItemAttribute dataAttribute = (DataItemAttribute)Attribute.GetCustomAttribute(typeof (object), typeof (DataItemAttribute));
             _dataAttribute = dataAttribute ?? new DataItemAttribute ();
 
 
 		}
-
+        public string DisplayName {get; private set;}
         public string DataCodeName {
             get; private set;
         }
@@ -47,12 +53,14 @@ namespace Lockstep.Data
         public SerializedObject serializedObject {
             get {return SourceEditor.serializedObject;}
         }
+        public SortInfo[] Sorts {get; private set;}
+        public Type TargetType {get; private set;}
         public EditorLSDatabase SourceEditor {get; private set;}
         public LSDatabase SourceDatabase {get; private set;}
-		readonly Func<TData[]> _getData;
-		readonly Action<TData[]> _setData;
+		readonly Func<DataItem[]> _getData;
+		readonly Action<DataItem[]> _setData;
 
-		public TData[] Data { 
+        public DataItem[] Data { 
 			get {return _getData ();}
 			set {
 				_setData(value);
@@ -64,29 +72,31 @@ namespace Lockstep.Data
             get {return _dataAttribute.ListFlags;}
         }
 
-		public void Sort (Comparison<TData> comparison)
+		public void Sort (Comparison<DataItem> comparison)
 		{
             //EditorLSDatabase.FoldAll();
-			Array.Sort <TData>(Data, comparison);
+			Array.Sort (Data, comparison);
 		}
 
-		static List<TData> bufferData = new List<TData> ();
+
+
+        static List<DataItem> bufferData = new List<DataItem> ();
 		static HashSet<int> duplicateChecker = new HashSet<int> ();
 
         public void GenerateEnum () {
             this.CullDuplicates();
-            LSEditorUtility.GenerateEnum<TData> (
+            LSEditorUtility.GenerateEnum (
                 this.SourceEditor.MainWindow.DatabaseDirectory + "/",
                 DataCodeName,
                 this
                 );
         }
         private void CullDuplicates () {
-            TData[] data = Data;
+            DataItem[] data = Data;
             bufferData.Clear ();
             duplicateChecker.Clear ();
             for (int i = 0; i < data.Length; i++) {
-                TData item = data[i];
+                DataItem item = data[i];
                 int hash = item.Name.GetHashCode();
                 if (duplicateChecker.Contains (hash)) {
                     Debug.LogError ("Item [" + i + "]: Multiple items cannot have same hash code.");
@@ -105,9 +115,9 @@ namespace Lockstep.Data
             SourceDatabase.cerealObject().ApplyModifiedProperties();
         }
         private void CheckDuplicates () {
-            TData[] data = Data;
+            DataItem[] data = Data;
             for (int i = 0; i < data.Length; i++) {
-                TData item = data[i];
+                DataItem item = data[i];
                 int hash = item.Name.GetHashCode();
                 if (duplicateChecker.Contains (hash)) {
                     Debug.LogWarning ("Item [" + i + "]: Multiple items cannot have same hash code.");
@@ -127,7 +137,7 @@ namespace Lockstep.Data
                 GenerateFromTypes (DataAttribute.ScriptBaseType);
                 firstManage = false;
             }
-            TData[] data = Data;
+            DataItem[] data = Data;
             for (int i = 0; i < data.Length; i++) {
                 data[i].Manage();
             }
@@ -163,18 +173,18 @@ namespace Lockstep.Data
 
             Type scriptBaseType = _dataAttribute.ScriptBaseType;
             List<Type> filteredTypes = LSEditorUtility.GetFilteredTypes(scriptBaseType);
-            TData[] data = Data;
+            DataItem[] data = Data;
             HashSet<Type> lackingTypes = new HashSet<Type> (filteredTypes);
-            List<TData> bufferedData = new List<TData> ();
+            List<DataItem> bufferedData = new List<DataItem> ();
             for (int i = 0; i < data.Length; i++) {
-                TData item = data[i];
+                DataItem item = data[i];
                 ScriptDataItem scriptItem = item as ScriptDataItem;
                 if (lackingTypes.Remove(scriptItem.Script)) {
                     bufferedData.Add(item);
                 }
             }
             foreach (Type type in lackingTypes) {
-                TData item = new TData ();
+                DataItem item = (DataItem)Activator.CreateInstance ( (TargetType));
                 item.Inject (type);
                 item.Name = (type.Name);
                 bufferedData.Add(item);
@@ -191,7 +201,7 @@ namespace Lockstep.Data
                 return System.Object.ReferenceEquals (this, null) || DataProperty == null || DataProperty.isArray == false;
             return System.Object.ReferenceEquals (this, obj);
         }
-        public static bool operator == (DataHelper<TData> source, DataHelper<TData> other) {
+        public static bool operator == (DataHelper source, DataHelper other) {
             if (System.Object.ReferenceEquals(source, null))
                 return System.Object.ReferenceEquals (other, null);
 
@@ -199,7 +209,7 @@ namespace Lockstep.Data
                 return source.Equals (other);
 
         }
-        public static bool operator != (DataHelper<TData> source, DataHelper<TData> other) {
+        public static bool operator != (DataHelper source, DataHelper other) {
             return !(source == other);
         }
 	}

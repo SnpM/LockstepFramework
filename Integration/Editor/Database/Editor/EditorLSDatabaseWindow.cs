@@ -36,9 +36,7 @@ namespace Lockstep.Data {
             LoadDatabaseFromPath (DatabaseDirectory + "/" + LSDatabaseManager.DatabaseFileName);
         }
 
-        private DataEditType editorState = DataEditType.Agent;
         Vector2 scrollPos;
-        static readonly DataEditType[] DataEditTypes = (DataEditType[])Enum.GetValues (typeof(DataEditType));
         Rect windowRect = new Rect (0, 0, 500, 500);
 
         void OnGUI () {
@@ -87,45 +85,8 @@ namespace Lockstep.Data {
 
             scrollPos = EditorGUILayout.BeginScrollView (scrollPos);
 
-            EditorGUILayout.BeginVertical ();
-            EditorGUILayout.BeginHorizontal ();
-            for (int i = 0; i < DataEditTypes.Length; i++) {
-                DataEditType dataEditType = DataEditTypes [i];
-                if (GUILayout.Button (dataEditType.ToString ())) {
-                    editorState = dataEditType;
-                    break;
-                }
-            }
-            EditorGUILayout.EndHorizontal ();
-            GUIStyle style = new GUIStyle (EditorStyles.boldLabel);
-            style.alignment = TextAnchor.MiddleCenter;
-            EditorGUILayout.LabelField (editorState.ToString (), style);
+            databaseEditor.Draw ();
 
-            EditorGUI.BeginChangeCheck ();
-
-            switch (editorState) {
-                case DataEditType.Agent:
-                    databaseEditor.DrawAgentDatabase ();
-                    break;
-                case DataEditType.Projectile:
-                    databaseEditor.DrawProjectileDatabase ();
-                    break;
-                case DataEditType.Effect:
-                    databaseEditor.DrawEffectDatabase ();
-                    break;
-                case DataEditType.Ability:
-                    databaseEditor.DrawAbilityDatabase ();
-                    break;
-            }
-            
-            if (EditorGUI.EndChangeCheck ()) {
-                Save ();
-            }
-
-            if (GUILayout.Button ("Apply")) {
-                databaseEditor.Apply ();
-            }
-            EditorGUILayout.EndVertical ();
             EditorGUILayout.EndScrollView ();
         }
 
@@ -166,14 +127,6 @@ namespace Lockstep.Data {
             AssetDatabase.SaveAssets ();
         }
 
-
-
-        private enum DataEditType {
-            Agent,
-            Projectile,
-            Effect,
-            Ability
-        }
     }
 }
 #endif

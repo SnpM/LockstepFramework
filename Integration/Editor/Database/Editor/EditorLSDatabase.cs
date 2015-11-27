@@ -16,48 +16,53 @@ namespace Lockstep.Data
         {
             this.MainWindow = window;
             Database = database;
-            this.AgentDataModifier = CreateModifier<AgentInterfacer>(
+            CreateModifier<AgentInterfacer>(
+                "Agents",
                 "AgentCode",
-                "_agentData"
+                "_agentData",
+                new SortInfo(
+                "Order Units First",
+                (a) => (a as AgentInterfacer).SortDegreeFromAgentType(AgentType.Unit)
+                ),
+                new SortInfo(
+                "Order Buildings First",
+                (a) => (a as AgentInterfacer).SortDegreeFromAgentType(AgentType.Building)
+                )
             );
-            this.ProjectileDataModifier = CreateModifier<ProjectileDataItem>(
+             CreateModifier<ProjectileDataItem>(
+                "Projectiles",
                 "ProjectileCode",
                 "_projectileData"
             );
-            this.EffectDataModifier = CreateModifier<EffectDataItem>(
+           CreateModifier<EffectDataItem>(
+                "Effects",
                 "EffectCode",
                 "_effectData"
             );
-            this.AbilityDataModifier = CreateModifier<AbilityInterfacer>(
+            CreateModifier<AbilityInterfacer>(
+                "Abilities",
                 "AbilityCode",
                 "_abilityData"
             );
 
         }
 
-        private DataHelper<TData> CreateModifier<TData>(string dataCodeName, string dataFieldName) where TData : DataItem,new()
+        private DataHelper CreateModifier<TData>(string displayName, string dataCodeName, string dataFieldName, params SortInfo[] sorts) where TData : DataItem
         {
-            DataHelper<TData> helper = new DataHelper<TData>(this, Database, dataCodeName, dataFieldName);
+            DataHelper helper = new DataHelper(typeof(TData), this, Database, displayName, dataCodeName, dataFieldName, sorts);
+            this.DataHelpers.Add (helper);
             return helper;
         }
 
         public void Apply()
         {
-            this.AgentDataModifier.GenerateEnum();
-            this.ProjectileDataModifier.GenerateEnum();
-            this.EffectDataModifier.GenerateEnum();
-            this.AbilityDataModifier.GenerateEnum();
+            for (int i = 0; i < DataHelpers.Count; i++) {
+                DataHelpers[i].GenerateEnum ();
+            }
             AssetDatabase.Refresh();
         }
 
-        DataHelper<AgentInterfacer> AgentDataModifier { get; set; }
-
-        DataHelper<ProjectileDataItem> ProjectileDataModifier { get; set; }
-
-        DataHelper<EffectDataItem> EffectDataModifier { get; set; }
-
-        DataHelper<AbilityInterfacer> AbilityDataModifier { get; set; }
-    
+        private FastList<DataHelper> DataHelpers = new FastList<DataHelper>();
 
         static bool isSearching;
         static string lastSearchString;
@@ -67,8 +72,23 @@ namespace Lockstep.Data
         
         private static bool foldAllBuffer;
         private static bool foldAllBufferBuffer;
+        private int selectedHelperIndex;
 
-        private static void DrawDatabase<TData>(DataHelper<TData> dataHelper, params SortInfo<TData>[] sorts) where TData : DataItem, new()
+        public void Draw () {
+            EditorGUILayout.BeginVertical ();
+            EditorGUILayout.BeginHorizontal ();
+            if (DataHelpers.Count == 0) return;
+            for (int i = 0; i < DataHelpers.Count; i++) {
+                if (GUILayout.Button (DataHelpers[i].DisplayName)) {
+                    selectedHelperIndex = i;
+                }
+            }
+            EditorGUILayout.EndHorizontal ();
+            DrawDatabase (DataHelpers[selectedHelperIndex]);
+            EditorGUILayout.EndVertical ();
+        }
+
+        private static void DrawDatabase(DataHelper dataHelper)
         {
             dataHelper.serializedObject.Update();
             EditorGUI.BeginChangeCheck ();
@@ -110,9 +130,10 @@ namespace Lockstep.Data
                 dataHelper.Sort((a1, a2) => a1.Name.CompareTo(a2.Name));
             }
 
+            SortInfo[] sorts = dataHelper.Sorts;
             for (int i = 0; i < sorts.Length; i++)
             {
-                SortInfo<TData> sort = sorts [i];
+                SortInfo sort = sorts [i];
                 if (GUILayout.Button(sort.sortName))
                 {
                     dataHelper.Sort((a1,a2) => sort.degreeGetter(a1) - sort.degreeGetter(a2));
@@ -141,41 +162,8 @@ namespace Lockstep.Data
         }
 
 
-        public void DrawAgentDatabase()
-        {
-            if (AgentDataModifier != null)
-            {
-                DrawDatabase<AgentInterfacer>(
-                    AgentDataModifier,
-                    new SortInfo<AgentInterfacer>(
-                    "Order Units First",
-                    (a) => a.SortDegreeFromAgentType(AgentType.Unit)
-                ),
-                    new SortInfo<AgentInterfacer>(
-                    "Order Buildings First",
-                    (a) => a.SortDegreeFromAgentType(AgentType.Building)
-                )
-                );
-            }
-        }
 
-        public void DrawProjectileDatabase()
-        {
-            if (this.ProjectileDataModifier != null)
-                DrawDatabase<ProjectileDataItem>(this.ProjectileDataModifier);
-        }
-
-        public void DrawEffectDatabase()
-        {
-            if (this.EffectDataModifier != null)
-                DrawDatabase<EffectDataItem>(this.EffectDataModifier);
-        }
-
-        public void DrawAbilityDatabase()
-        {
-            if (this.AbilityDataModifier != null)
-                DrawDatabase <AbilityInterfacer>(this.AbilityDataModifier);
-        }
+   
     }
 }
 #endif

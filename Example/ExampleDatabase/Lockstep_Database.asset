@@ -95,7 +95,7 @@ MonoBehaviour:
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: Stats, Assembly-CSharp
+      _classRef: POC.Stats.Stats, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0

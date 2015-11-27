@@ -5,15 +5,15 @@ using System;
 
 namespace Lockstep.Data
 {
-    public struct SortInfo<T>
+    public struct SortInfo
     {
-        public SortInfo(string name, Func<T,int> leDegreeGetter)
+        public SortInfo(string name, Func<DataItem,int> leDegreeGetter)
         {
             this.sortName = name;
             this.degreeGetter = leDegreeGetter;
         }
 
         public string sortName;
-        public Func<T,int> degreeGetter;
+        public Func<DataItem,int> degreeGetter;
     }
 }
