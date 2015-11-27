@@ -2,21 +2,14 @@
 using UnityEngine;
 using System.Collections;
 using UnityEditor;
-
+using System;
 namespace Lockstep.Data
 {
     public class EditorLSDatabase
     {
-
-        public LSDatabase Database { get; private set; }
-        private SerializedObject _serializedObject;
-        public SerializedObject serializedObject {get {return _serializedObject ?? (_serializedObject = Database.cerealObject());}}
-        public EditorLSDatabaseWindow MainWindow {get; private set;}
-        public EditorLSDatabase(EditorLSDatabaseWindow window, LSDatabase database)
-        {
-            this.MainWindow = window;
-            Database = database;
-            CreateModifier<AgentInterfacer>(
+        static EditorLSDatabase() {
+            RegisterData(
+                typeof (AgentInterfacer),
                 "Agents",
                 "AgentCode",
                 "_agentData",
@@ -28,28 +21,49 @@ namespace Lockstep.Data
                 "Order Buildings First",
                 (a) => (a as AgentInterfacer).SortDegreeFromAgentType(AgentType.Building)
                 )
-            );
-             CreateModifier<ProjectileDataItem>(
+                );
+            RegisterData(
+                typeof(ProjectileDataItem),
                 "Projectiles",
                 "ProjectileCode",
                 "_projectileData"
-            );
-           CreateModifier<EffectDataItem>(
+                );
+            RegisterData(
+                typeof(EffectDataItem),
                 "Effects",
                 "EffectCode",
                 "_effectData"
-            );
-            CreateModifier<AbilityInterfacer>(
-                "Abilities",
+                );
+            RegisterData(
+                typeof(AbilityInterfacer),
+                "Abilitas",
                 "AbilityCode",
                 "_abilityData"
-            );
-
+                );
         }
 
-        private DataHelper CreateModifier<TData>(string displayName, string dataCodeName, string dataFieldName, params SortInfo[] sorts) where TData : DataItem
+        public LSDatabase Database { get; private set; }
+        private SerializedObject _serializedObject;
+        public SerializedObject serializedObject {get {return _serializedObject ?? (_serializedObject = Database.cerealObject());}}
+        public EditorLSDatabaseWindow MainWindow {get; private set;}
+        public EditorLSDatabase(EditorLSDatabaseWindow window, LSDatabase database)
         {
-            DataHelper helper = new DataHelper(typeof(TData), this, Database, displayName, dataCodeName, dataFieldName, sorts);
+            this.MainWindow = window;
+            Database = database;
+
+            for (int i = 0; i < DataItemInfos.Count; i++) {
+                DataItemInfo info = DataItemInfos[i];
+                CreateDataHelper (info);
+            }
+        }
+        public static void RegisterData(Type targetType, string displayName, string dataCodeName, string dataFieldName, params SortInfo[] sorts) 
+        {
+            DataItemInfos.Add (new DataItemInfo (targetType, displayName, dataCodeName, dataFieldName, sorts));
+        }
+        private DataHelper CreateDataHelper(DataItemInfo info) 
+        {
+            DataHelper helper = new DataHelper(info.TargetType, this, Database, info.DisplayName,
+                                               info.CodeName, info.FieldName, info.Sorts);
             this.DataHelpers.Add (helper);
             return helper;
         }
@@ -62,7 +76,8 @@ namespace Lockstep.Data
             AssetDatabase.Refresh();
         }
 
-        private FastList<DataHelper> DataHelpers = new FastList<DataHelper>();
+        private static readonly FastList<DataItemInfo> DataItemInfos = new FastList<DataItemInfo>();
+        private readonly FastList<DataHelper> DataHelpers = new FastList<DataHelper>();
 
         static bool isSearching;
         static string lastSearchString;
@@ -161,9 +176,27 @@ namespace Lockstep.Data
             foldAllBuffer = true;
         }
 
+        public struct DataItemInfo {
+            public DataItemInfo (
+                Type targetType,
+                string displayName,
+                string codeName,
+                string fieldName,
+                SortInfo[] sorts)
+            {
+                this.TargetType = targetType;
+                this.DisplayName = displayName;
+                this.CodeName = codeName;
+                this.FieldName = fieldName;
+                this.Sorts = sorts;
+            }
+            public Type TargetType;
+            public string DisplayName;
+            public string CodeName;
+            public string FieldName;
+            public SortInfo[] Sorts;
+        }
 
-
-   
     }
 }
 #endif

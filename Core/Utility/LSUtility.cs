@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-
+using System.Reflection;
 namespace Lockstep
 {
 	public static class LSUtility
@@ -15,6 +15,10 @@ namespace Lockstep
 		const uint Y = 842502087, Z = 3579807591, W = 273326509;
 		public static uint Seed = 1;
 		private static uint y = Y, z = Z, w;
+
+        static LSUtility() {
+
+        }
 
 		public static void Initialize (uint seed)
 		{

@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Reflection;
+using System;
 
 public class FixedNumberAttribute : PropertyAttribute {
 	public bool Timescaled = false;
@@ -17,3 +19,4 @@ public class VisualizeAttribute : PropertyAttribute {
 }
 public class LocalVisualizeAttribute : PropertyAttribute {}
 public class HideInInspectorGUI : PropertyAttribute {}
+
