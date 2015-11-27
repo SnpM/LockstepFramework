@@ -8,7 +8,7 @@ using UnityEditor;
 namespace Lockstep.Data {
     public class RegisterDataAttribute : Attribute {
         public static IEnumerable<EditorLSDatabase.DataItemInfo> GetDataItemInfos () {
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies() ()) {
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
                 foreach (Type type in assembly.GetTypes ()) {
                     object[] attributes = type.GetCustomAttributes (typeof(RegisterDataAttribute), false);
                     for (int i = 0; i < attributes.Length; i++) {
