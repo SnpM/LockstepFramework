@@ -6,7 +6,7 @@ using System;
 namespace Lockstep.Data
 {
     [System.Serializable]
-    public class DataItem
+    public class DataItem : ScriptableObject
     {
         public DataItem() {}
 
