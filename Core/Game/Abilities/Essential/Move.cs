@@ -55,7 +55,7 @@ namespace Lockstep {
 		private Turn cachedTurn;
         private long timescaledSpeed {
             get {
-                return ((this.Speed / LockstepManager.FrameRate) + this.AdditiveSpeedModifier).Mul(FixedMath.One + this.MultiplicativeSpeedModifier);
+                return ((this.Speed + this.AdditiveSpeedModifier)/LockstepManager.FrameRate).Mul(FixedMath.One + this.MultiplicativeSpeedModifier);
             }
         }
 		private long collisionStopTreshold;

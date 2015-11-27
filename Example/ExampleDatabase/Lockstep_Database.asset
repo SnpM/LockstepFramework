@@ -48,7 +48,7 @@ MonoBehaviour:
     _icon: {fileID: 0}
     _script:
       _classRef: Lockstep.Move, Assembly-CSharp
-    _listenInput: 4
+    _listenInput: 6
     _informationGather: 1
     _markType: 0
   - _name: Scan
@@ -88,6 +88,14 @@ MonoBehaviour:
     _icon: {fileID: 0}
     _script:
       _classRef: SetHeight, Assembly-CSharp
+    _listenInput: 15
+    _informationGather: 0
+    _markType: 0
+  - _name: Stats
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: Stats, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0

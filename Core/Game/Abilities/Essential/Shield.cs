@@ -111,7 +111,7 @@ namespace Lockstep
 			}
 			IsShielding = ShieldAmount > 0;
 
-			Agent.StatsBarer.SetFill (StatType.Shield,(float)(ShieldAmount / (double)MaxShield));
+			Agent.StatsBarer.SetFill (StatBarType.Shield,(float)(ShieldAmount / (double)MaxShield));
         }
 	}
 }

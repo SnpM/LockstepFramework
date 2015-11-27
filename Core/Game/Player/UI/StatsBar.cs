@@ -33,12 +33,12 @@ namespace Lockstep.UI
 			this.gameObject.name = agent.ToString ();
 		}
 
-		private static StatType[] statTypes = (StatType[])Enum.GetValues (typeof(StatType));
+		private static StatBarType[] statTypes = (StatBarType[])Enum.GetValues (typeof(StatBarType));
 
 		public void Initialize ()
 		{
 			gameObject.SetActive (true);
-			foreach (StatType statType in statTypes) {
+			foreach (StatBarType statType in statTypes) {
 				SetFill (statType, 1f);
 			}
 			UpdatePos ();
@@ -78,17 +78,17 @@ namespace Lockstep.UI
 			transform.localScale = tempScale;
 		}
 
-		public void SetFill (StatType statType, float amount)
+		public void SetFill (StatBarType statType, float amount)
 		{
 			BarElement element = null;
 			switch (statType) {
-			case StatType.Shield:
+			case StatBarType.Shield:
 				element = _shield;
 				break;
-			case StatType.Health:
+			case StatBarType.Health:
 				element = _health;
 				break;
-			case StatType.Energy:
+			case StatBarType.Energy:
 				element = _energy;
 				break;
 			}
@@ -110,7 +110,7 @@ namespace Lockstep.UI
 		}
 	}
 
-	public enum StatType
+	public enum StatBarType
 	{
 		Shield,
 		Health,
