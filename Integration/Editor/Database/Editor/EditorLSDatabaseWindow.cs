@@ -40,7 +40,6 @@ namespace Lockstep.Data {
         Rect windowRect = new Rect (0, 0, 500, 500);
 
         void OnGUI () {
-
             if (Application.isPlaying) {
                 EditorGUILayout.LabelField ("Cannot modify database during runtime", EditorStyles.boldLabel);
                 return;

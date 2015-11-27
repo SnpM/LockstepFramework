@@ -11,9 +11,6 @@ namespace Lockstep.Data
 {
 	public static class LSDatabaseManager
 	{
-        public class DataItemInfo {
-
-        }
 
         public const string DatabaseFileName = "Lockstep_Database.asset";
 

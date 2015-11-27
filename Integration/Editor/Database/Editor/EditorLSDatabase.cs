@@ -36,7 +36,7 @@ namespace Lockstep.Data
                 );
             RegisterData(
                 typeof(AbilityInterfacer),
-                "Abilitas",
+                "Abilities",
                 "AbilityCode",
                 "_abilityData"
                 );
