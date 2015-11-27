@@ -3,6 +3,8 @@ using UnityEngine;
 using System.Collections;
 using UnityEditor;
 using System;
+using System.Reflection;
+using System.Collections.Generic;
 namespace Lockstep.Data
 {
     public class EditorLSDatabase
@@ -40,6 +42,9 @@ namespace Lockstep.Data
                 "AbilityCode",
                 "_abilityData"
                 );
+            foreach (DataItemInfo info in RegisterDataAttribute.GetDataItemInfos ()) {
+                RegisterData (info);
+            }
         }
 
         public LSDatabase Database { get; private set; }
@@ -59,6 +64,9 @@ namespace Lockstep.Data
         public static void RegisterData(Type targetType, string displayName, string dataCodeName, string dataFieldName, params SortInfo[] sorts) 
         {
             DataItemInfos.Add (new DataItemInfo (targetType, displayName, dataCodeName, dataFieldName, sorts));
+        }
+        public static void RegisterData (DataItemInfo info) {
+            DataItemInfos.Add (info);
         }
         private DataHelper CreateDataHelper(DataItemInfo info) 
         {
@@ -182,7 +190,7 @@ namespace Lockstep.Data
                 string displayName,
                 string codeName,
                 string fieldName,
-                SortInfo[] sorts)
+                params SortInfo[] sorts)
             {
                 this.TargetType = targetType;
                 this.DisplayName = displayName;

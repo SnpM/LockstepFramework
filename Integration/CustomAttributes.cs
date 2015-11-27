@@ -20,3 +20,4 @@ public class VisualizeAttribute : PropertyAttribute {
 public class LocalVisualizeAttribute : PropertyAttribute {}
 public class HideInInspectorGUI : PropertyAttribute {}
 
+
