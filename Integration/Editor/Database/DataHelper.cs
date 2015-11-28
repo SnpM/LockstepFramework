@@ -10,35 +10,33 @@ using Rotorz.ReorderableList;
 namespace Lockstep.Data
 {
 
-	public sealed class DataHelper
-	{
-		public DataHelper (
+    public sealed class DataHelper
+    {
+        public DataHelper (
             Type targetType,
             EditorLSDatabase sourceEditor,
-			LSDatabase sourceDatabase,
+            LSDatabase sourceDatabase,
             string displayName,
             string dataCodeName,
-			string dataFieldName,
+            string dataFieldName,
             SortInfo[] sorts)
-		{
+        {
             Sorts = sorts;
             this.TargetType = targetType;
             SourceEditor = sourceEditor;
             this.DisplayName = displayName;
-			SourceDatabase = sourceDatabase;
+            SourceDatabase = sourceDatabase;
             DataCodeName = dataCodeName;
-            _dataFieldName = dataFieldName;
+            _dataFieldName = dataFieldName; 
 
             FieldInfo info = sourceDatabase.GetType().GetField(_dataFieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             _getData = () => (DataItem[])info.GetValue(sourceDatabase);
             _setData = (value) => info.SetValue(sourceDatabase, value);
-			if (Data == null)
-				Data = new DataItem[0];
-            DataItemAttribute dataAttribute = (DataItemAttribute)Attribute.GetCustomAttribute(typeof (object), typeof (DataItemAttribute));
+            if (Data == null)
+                Data = (DataItem[])Array.CreateInstance (TargetType,0);
+            DataItemAttribute dataAttribute = (DataItemAttribute)Attribute.GetCustomAttribute(targetType, typeof (DataItemAttribute));
             _dataAttribute = dataAttribute ?? new DataItemAttribute ();
-
-
-		}
+        }
         public string DisplayName {get; private set;}
         public string DataCodeName {
             get; private set;
@@ -57,31 +55,35 @@ namespace Lockstep.Data
         public Type TargetType {get; private set;}
         public EditorLSDatabase SourceEditor {get; private set;}
         public LSDatabase SourceDatabase {get; private set;}
-		readonly Func<DataItem[]> _getData;
-		readonly Action<DataItem[]> _setData;
+        readonly Func<DataItem[]> _getData;
+        readonly Action<DataItem[]> _setData;
 
         public DataItem[] Data { 
-			get {return _getData ();}
-			set {
-				_setData(value);
-			}
-		}
+            get {return _getData ();}
+            set {
+                _setData(value);
+            }
+        }
         private DataItemAttribute _dataAttribute;
         public DataItemAttribute DataAttribute {get {return _dataAttribute;}}
         public ReorderableListFlags ListFlags {
             get {return _dataAttribute.ListFlags;}
         }
 
-		public void Sort (Comparison<DataItem> comparison)
-		{
+        public void Sort (Comparison<DataItem> comparison)
+        {
             //EditorLSDatabase.FoldAll();
-			Array.Sort (Data, comparison);
-		}
+            Array.Sort (Data as DataItem[], comparison);
+        }
 
 
-
-        static List<DataItem> bufferData = new List<DataItem> ();
-		static HashSet<int> duplicateChecker = new HashSet<int> ();
+        ArrayList _bufferData;
+        ArrayList bufferData {
+            get {
+                return _bufferData != null ? _bufferData : (_bufferData = new ArrayList (Array.CreateInstance (TargetType,0)));
+            }
+        }
+        static HashSet<int> duplicateChecker = new HashSet<int> ();
 
         public void GenerateEnum () {
             this.CullDuplicates();
@@ -92,7 +94,7 @@ namespace Lockstep.Data
                 );
         }
         private void CullDuplicates () {
-            DataItem[] data = Data;
+            DataItem[] data = Data as DataItem[];
             bufferData.Clear ();
             duplicateChecker.Clear ();
             for (int i = 0; i < data.Length; i++) {
@@ -106,8 +108,10 @@ namespace Lockstep.Data
                     duplicateChecker.Add (hash);
                 }
             }
-            if (bufferData.Count != data.Length)
-                Data = bufferData.ToArray ();
+            if (bufferData.Count != data.Length) {
+                Debug.Log (bufferData.ToArray () as DataItem[]);
+                Data = bufferData.ToArray () as DataItem[];
+            }
         }
         private void Apply () {
             EditorUtility.SetDirty (this.SourceDatabase);
@@ -115,7 +119,7 @@ namespace Lockstep.Data
             SourceDatabase.cerealObject().ApplyModifiedProperties();
         }
         private void CheckDuplicates () {
-            DataItem[] data = Data;
+            DataItem[] data = Data as DataItem[];
             for (int i = 0; i < data.Length; i++) {
                 DataItem item = data[i];
                 int hash = item.Name.GetHashCode();
@@ -129,12 +133,12 @@ namespace Lockstep.Data
         }
 
         private bool firstManage = true;
-		public void Manage ()
-		{
+        public void Manage ()
+        {
             SourceDatabase.cerealObject().ApplyModifiedProperties();
             if (firstManage) {
-            if (DataAttribute.AutoGenerate)
-                GenerateFromTypes (DataAttribute.ScriptBaseType);
+                if (DataAttribute.AutoGenerate)
+                    GenerateFromTypes (DataAttribute.ScriptBaseType);
                 firstManage = false;
             }
             DataItem[] data = Data;
@@ -142,7 +146,7 @@ namespace Lockstep.Data
                 data[i].Manage();
             }
             Apply ();
-		}
+        }
 
         protected void OnManage () {
 
@@ -170,27 +174,27 @@ namespace Lockstep.Data
         }
 
         private void GenerateFromTypes (Type baseType) {
-
+            bufferData.Clear ();
             Type scriptBaseType = _dataAttribute.ScriptBaseType;
             List<Type> filteredTypes = LSEditorUtility.GetFilteredTypes(scriptBaseType);
-            DataItem[] data = Data;
+            DataItem[] data = Data as DataItem[];
             HashSet<Type> lackingTypes = new HashSet<Type> (filteredTypes);
-            List<DataItem> bufferedData = new List<DataItem> ();
             for (int i = 0; i < data.Length; i++) {
                 DataItem item = data[i];
                 ScriptDataItem scriptItem = item as ScriptDataItem;
                 if (lackingTypes.Remove(scriptItem.Script)) {
-                    bufferedData.Add(item);
+                    bufferData.Add(item);
                 }
             }
             foreach (Type type in lackingTypes) {
                 DataItem item = (DataItem)Activator.CreateInstance ( (TargetType));
                 item.Inject (type);
                 item.Name = (type.Name);
-                bufferedData.Add(item);
+                bufferData.Add(item);
             }
-            Data = bufferedData.ToArray ();
-
+            DataItem[] tempData = (DataItem[])Array.CreateInstance (TargetType,bufferData.Count);
+            bufferData.CopyTo (tempData);
+            Data = tempData;
         }
         
 
@@ -212,7 +216,7 @@ namespace Lockstep.Data
         public static bool operator != (DataHelper source, DataHelper other) {
             return !(source == other);
         }
-	}
+    }
     /*public interface IDataHelper <out TData> where TData : DataItem{
         void GenerateEnum ();
     }*/

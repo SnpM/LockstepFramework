@@ -348,7 +348,7 @@ namespace Lockstep
             DataHelper data
             )
         {
-            GenerateEnum (directory, enumName, data.Data, (item) => item.Name, (item) => (int)item.MappedCode);
+            GenerateEnum (directory, enumName, data.Data as DataItem[], (item) => item.Name, (item) => (int)item.MappedCode);
         }
         public static void GenerateEnum (
             string directory,

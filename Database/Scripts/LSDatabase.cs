@@ -10,8 +10,6 @@ namespace Lockstep.Data
     [Serializable]
     public class LSDatabase : ScriptableObject
     {
-        public List<int[]> asdf = new List<int[]>();
-
 
         #region Agents
         [SerializeField]
@@ -19,7 +17,6 @@ namespace Lockstep.Data
         _agentData;
         public AgentInterfacer[] AgentData { get { return _agentData; } }
         #endregion
-
 
         #region Projectiles
         [SerializeField]
@@ -44,6 +41,7 @@ namespace Lockstep.Data
         _abilityData ;
         public AbilityInterfacer[] AbilityData { get { return _abilityData; } }
        #endregion
+
     }
 
 }

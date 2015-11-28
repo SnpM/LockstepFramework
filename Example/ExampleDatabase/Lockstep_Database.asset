@@ -12,90 +12,90 @@ MonoBehaviour:
   m_Name: Lockstep_Database
   m_EditorClassIdentifier: 
   _agentData:
-  - _name: New Agent
+  - _name: TestAgent
     _description: 
     _icon: {fileID: 0}
-    _prefab: {fileID: 0}
+    _prefab: {fileID: 100310, guid: 7adf26d256267454bb6f9b55470051d7, type: 2}
   _projectileData: []
   _effectData: []
   _abilityData:
-  - _name: New Agent
+  - _name: Build
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: 
+      _classRef: Lockstep.Build, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0
-  - _name: New Agent
+  - _name: EnergyStore
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: 
+      _classRef: Lockstep.EnergyStore, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0
-  - _name: New Agent
+  - _name: Health
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: 
+      _classRef: Lockstep.Health, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0
-  - _name: New Agent
+  - _name: Move
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: 
+      _classRef: Lockstep.Move, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0
-  - _name: New Agent
+  - _name: Scan
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: 
+      _classRef: Lockstep.Scan, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0
-  - _name: New Agent
+  - _name: Shield
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: 
+      _classRef: Lockstep.Shield, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0
-  - _name: New Agent
+  - _name: Stop
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: 
+      _classRef: Lockstep.Stop, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0
-  - _name: New Agent
+  - _name: Turn
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: 
+      _classRef: Lockstep.Turn, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0
-  - _name: New Agent
+  - _name: Stats
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: 
+      _classRef: POC.Stats.Stats, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0
-  - _name: New Agent
+  - _name: SetHeight
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: 
+      _classRef: SetHeight, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0

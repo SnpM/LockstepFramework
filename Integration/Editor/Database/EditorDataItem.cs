@@ -38,6 +38,7 @@ public class EditorDataItem : PropertyDrawer {
                 ??(DataItemAttribute)Attribute.GetCustomAttribute(LSEditorUtility.GetPropertyType(property), typeof (DataItemAttribute), false)
                 ?? new DataItemAttribute ();
         ;
+           
         Rect pos = position;
         pos.height = propertyHeight;
         serializedProperties.Clear ();

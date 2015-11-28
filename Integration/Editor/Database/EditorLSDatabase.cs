@@ -9,7 +9,7 @@ namespace Lockstep.Data
 {
     public class EditorLSDatabase
     {
-        static EditorLSDatabase() {
+        protected virtual void InitializeData () {
             RegisterData(
                 typeof (AgentInterfacer),
                 "Agents",
@@ -42,20 +42,19 @@ namespace Lockstep.Data
                 "AbilityCode",
                 "_abilityData"
                 );
-            foreach (DataItemInfo info in RegisterDataAttribute.GetDataItemInfos ()) {
-                RegisterData (info);
-            }
         }
 
         public LSDatabase Database { get; private set; }
         private SerializedObject _serializedObject;
         public SerializedObject serializedObject {get {return _serializedObject ?? (_serializedObject = Database.cerealObject());}}
         public EditorLSDatabaseWindow MainWindow {get; private set;}
-        public EditorLSDatabase(EditorLSDatabaseWindow window, LSDatabase database)
+        public EditorLSDatabase () {}
+        public void Initialize (EditorLSDatabaseWindow window, LSDatabase database)
         {
             this.MainWindow = window;
             Database = database;
 
+            InitializeData ();
             for (int i = 0; i < DataItemInfos.Count; i++) {
                 DataItemInfo info = DataItemInfos[i];
                 CreateDataHelper (info);
@@ -184,26 +183,6 @@ namespace Lockstep.Data
             foldAllBuffer = true;
         }
 
-        public struct DataItemInfo {
-            public DataItemInfo (
-                Type targetType,
-                string displayName,
-                string codeName,
-                string fieldName,
-                params SortInfo[] sorts)
-            {
-                this.TargetType = targetType;
-                this.DisplayName = displayName;
-                this.CodeName = codeName;
-                this.FieldName = fieldName;
-                this.Sorts = sorts;
-            }
-            public Type TargetType;
-            public string DisplayName;
-            public string CodeName;
-            public string FieldName;
-            public SortInfo[] Sorts;
-        }
 
     }
 }

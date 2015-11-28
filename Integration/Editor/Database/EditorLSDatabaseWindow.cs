@@ -5,10 +5,17 @@ using UnityEditor;
 using Lockstep;
 using System;
 using System.IO;
-
+using TypeReferences;
 namespace Lockstep.Data {
+    [System.Serializable]
     public class EditorLSDatabaseWindow : EditorWindow {
-       
+        [SerializeField,ClassImplements (typeof (EditorLSDatabase))]
+        ClassTypeReference _databaseEditorType = typeof (EditorLSDatabase);
+        Type DatabaseEditorType {get {return _databaseEditorType;}}
+        [SerializeField,ClassImplements (typeof (LSDatabase))]
+        ClassTypeReference _databaseType = typeof (LSDatabase);
+        Type DatabaseType {get {return _databaseType;}}
+        
         private EditorLSDatabase _databaseEditor;
 
         private EditorLSDatabase databaseEditor {
@@ -78,6 +85,13 @@ namespace Lockstep.Data {
                 }
                 GUILayout.EndHorizontal ();
             }
+            SerializedObject obj = new SerializedObject(this);
+            SerializedProperty editorTypeProp = obj.FindProperty ("_databaseEditorType");
+
+            EditorGUILayout.PropertyField (editorTypeProp, new GUIContent ("Editor Type"));
+            SerializedProperty databaseTypeProp = obj.FindProperty("_databaseType");
+            EditorGUILayout.PropertyField (databaseTypeProp, new GUIContent ("Database Type"));
+
         }
 
         void DrawDatabase () {
@@ -102,13 +116,14 @@ namespace Lockstep.Data {
 
         void LoadDatabase (LSDatabase database) {
             _database = database;
-            _databaseEditor = new EditorLSDatabase (this,Database);
+            _databaseEditor = (EditorLSDatabase)Activator.CreateInstance (DatabaseEditorType);
+            _databaseEditor.Initialize (this,Database);
             LSFSettingsManager.GetSettings ().Database = database;
             LSFSettingsModifier.Save ();
         }
 
         bool CreateDatabase (string absolutePath) {
-            LSDatabase database = ScriptableObject.CreateInstance<LSDatabase> ();
+            LSDatabase database = (LSDatabase)ScriptableObject.CreateInstance (DatabaseType);
             LoadDatabase (database);
 
             string relativePath = absolutePath.GetRelativeUnityAssetPath ();

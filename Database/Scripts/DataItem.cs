@@ -6,14 +6,14 @@ using System;
 namespace Lockstep.Data
 {
     [System.Serializable]
-    public class DataItem : ScriptableObject
+    public class DataItem
     {
         public DataItem() {}
 
         public int MappedCode {get {return this.Name.GetHashCode ();}}
         [SerializeField]
         protected string
-            _name = "New Agent";
+            _name;
         
         public string Name {
             get { return _name; } 
