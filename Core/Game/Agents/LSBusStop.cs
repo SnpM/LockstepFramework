@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Lockstep {
-    public class LSMessageBus {
+    public class LSBusStop  {
     
         private Dictionary<string,MessageBus> Buses = new Dictionary<string,MessageBus> ();
     
@@ -40,22 +40,39 @@ namespace Lockstep {
         }
     
         public void CreateBus (string id) {
-            MessageBus bus = new MessageBus (id);
-            Buses.Add (id, bus);
+            this._CreateBus (id);
+        }
+        private MessageBus _CreateBus (string id) {
+            MessageBus bus;
+            if (!Buses.TryGetValue (id, out bus)) {
+                bus = new MessageBus (id);
+                Buses.Add (id, bus);
+            }
+            return bus;
         }
 
         public void ActivateBus (string id) {
-            Buses [id].Activate ();
+            MessageBus bus;
+            if (!Buses.TryGetValue (id, out bus)) {
+                return;
+            }
+            bus.Activate ();
         }
 
         public int BoardBus (string busID, Action call) {
             MessagePassenger passenger = new MessagePassenger (call);
-            MessageBus bus = Buses [busID];
+            MessageBus bus;
+            if (!Buses.TryGetValue (busID, out bus)) {
+                bus = _CreateBus (busID);
+            }
             return bus.Board (passenger);
         }
 
         public void UnboardBus (string busID, int passengerID) {
-            MessageBus bus = Buses [busID];
+            MessageBus bus;
+            if (!Buses.TryGetValue (busID, out bus)) {
+                return;
+            }
             bus.Unboard (passengerID);
         }
     }

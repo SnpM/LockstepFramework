@@ -42,9 +42,9 @@ namespace Lockstep {
             }
         }
 
-        private LSMessageBus _messageBus;
-        public LSMessageBus MessageBus {
-            get {return _messageBus ?? (_messageBus = new LSMessageBus());}
+        private LSBusStop _busStop;
+        public LSBusStop BusStop {
+            get {return _busStop ?? (_busStop = new LSBusStop());}
         }
 
         public event Action<LSAgent> onDeactivation;
