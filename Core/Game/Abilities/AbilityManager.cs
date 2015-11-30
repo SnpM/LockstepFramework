@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using Lockstep.Data;
 using System.Collections.Generic;
+using System;
 namespace Lockstep {
     public class AbilityManager {
-
 
 		static FastList<ActiveAbility> setupActives = new FastList<ActiveAbility>();
 		public Health Healther {get; private set;}
@@ -109,5 +109,6 @@ namespace Lockstep {
             }
             return null;
         }
+
     }
 }
