@@ -67,9 +67,9 @@ namespace Lockstep
 		[SerializeField]
 		private bool _attachEndEffectToTarget;
 		public bool AttachEndEffectToTarget {get {return _attachEndEffectToTarget;}}
-		[SerializeField]
-		private EffectCode _endEffect;
-		public EffectCode EndEffect {get {return _endEffect;}}
+		[SerializeField,DataCode ("Effects")]
+		private string _endEffect;
+		public string EndEffect {get {return _endEffect;}}
 		
 		public bool CanRotate = true;
 
@@ -77,9 +77,9 @@ namespace Lockstep
 		private TrajectoryType _trajectoryBehavior;
 		public TrajectoryType Trajectory {get {return _trajectoryBehavior;}}
 
-		[SerializeField]
-		private EffectCode _startEffect;
-		public EffectCode StartEffect {get {return _startEffect;}}
+        [SerializeField,DataCode ("Effects")]
+        private string _startEffect;
+        public string StartEffect {get {return _startEffect;}}
 		
 		[SerializeField]
 		private bool _channeled;
@@ -197,7 +197,7 @@ namespace Lockstep
 			}
 		}
 		
-		public ProjectileCode MyProjCode
+		public string MyProjCode
 		{
 			get;
 			private set;
@@ -560,7 +560,7 @@ namespace Lockstep
 			SetupCachedActions ();
 			this.SpawnVersion = 1u;
             this.MyData = dataItem;
-			this.MyProjCode = (ProjectileCode)dataItem.MappedCode;
+			this.MyProjCode = dataItem.Name;
 			this.cachedGameObject = base.gameObject;
 			this.cachedTransform = base.transform;
 			GameObject.DontDestroyOnLoad (this.cachedGameObject);

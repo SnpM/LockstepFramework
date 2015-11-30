@@ -10,7 +10,6 @@ namespace Lockstep.Data
     {
         public DataItem() {}
 
-        public int MappedCode {get {return this.Name.GetHashCode ();}}
         [SerializeField]
         protected string
             _name;

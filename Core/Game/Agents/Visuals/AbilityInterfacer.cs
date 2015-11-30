@@ -16,19 +16,19 @@ namespace Lockstep.Data {
 
     public sealed class AbilityInterfacer : ScriptDataItem {
 
-        private static Dictionary<AbilityCode,AbilityInterfacer> CodeInterfacerMap = new Dictionary<AbilityCode, AbilityInterfacer>();
+        private static Dictionary<string,AbilityInterfacer> CodeInterfacerMap = new Dictionary<string, AbilityInterfacer>();
         private static Dictionary<Type,AbilityInterfacer>TypeInterfacerMap = new Dictionary<Type, AbilityInterfacer>();
         public static void Setup ()
 	    {
             AbilityInterfacer[] interfacers = LSDatabaseManager.CurrentDatabase.AbilityData;
             for (int i = 0; i < interfacers.Length; i++) {
                 AbilityInterfacer interfacer = interfacers[i];
-                CodeInterfacerMap.Add((AbilityCode)interfacer.MappedCode, interfacer);
+                CodeInterfacerMap.Add(interfacer.Name, interfacer);
                 TypeInterfacerMap.Add(interfacer.Script.Type, interfacer);
             }
 		}
 
-		public static AbilityInterfacer FindInterfacer (AbilityCode code) {
+		public static AbilityInterfacer FindInterfacer (string code) {
 			return CodeInterfacerMap [code];
 		}
 
@@ -39,8 +39,8 @@ namespace Lockstep.Data {
             return null;
         }
 
-        public AbilityCode GetAbilityCode () {
-            return (AbilityCode)this.MappedCode;
+        public string GetAbilityCode () {
+            return this.Name;
         }
 
         public void SetName (string name)

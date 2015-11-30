@@ -19,5 +19,11 @@ public class VisualizeAttribute : PropertyAttribute {
 }
 public class LocalVisualizeAttribute : PropertyAttribute {}
 public class HideInInspectorGUI : PropertyAttribute {}
+public class DataCodeAttribute : PropertyAttribute {
+    public string TargetDataName {get; private set;}
+    public DataCodeAttribute (string targetDataName) {
+        this.TargetDataName = targetDataName;
+    }
 
+}
 

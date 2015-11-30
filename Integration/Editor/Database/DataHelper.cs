@@ -17,7 +17,6 @@ namespace Lockstep.Data
             EditorLSDatabase sourceEditor,
             LSDatabase sourceDatabase,
             string displayName,
-            string dataCodeName,
             string dataFieldName,
             SortInfo[] sorts,
             out bool valid)
@@ -27,7 +26,6 @@ namespace Lockstep.Data
             SourceEditor = sourceEditor;
             this.DisplayName = displayName;
             SourceDatabase = sourceDatabase;
-            DataCodeName = dataCodeName;
             _dataFieldName = dataFieldName; 
 
             FieldInfo info = sourceDatabase.GetType().GetField(_dataFieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -46,6 +44,7 @@ namespace Lockstep.Data
             _dataAttribute = dataAttribute ?? new DataItemAttribute ();
             valid = true;
         }
+       
         public string DisplayName {get; private set;}
         public string DataCodeName {
             get; private set;

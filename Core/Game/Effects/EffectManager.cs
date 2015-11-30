@@ -8,17 +8,17 @@ namespace Lockstep {
 	public static class EffectManager {
 
 		const int MaxEffects = ProjectileManager.MaxProjectiles * 2;
-		private static Dictionary<EffectCode,FastStack<LSEffect>> EffectPool;
-        private static Dictionary<EffectCode,EffectDataItem> CodeDataMap;
+		private static Dictionary<string,FastStack<LSEffect>> EffectPool;
+        private static Dictionary<string,EffectDataItem> CodeDataMap;
 		public static void Setup ()
 		{
             EffectDataItem[] effectData = LSDatabaseManager.CurrentDatabase.EffectData;
-			EffectPool = new Dictionary<EffectCode,FastStack<LSEffect>>(effectData.Length);
-            CodeDataMap = new Dictionary<EffectCode, EffectDataItem>(effectData.Length);
+			EffectPool = new Dictionary<string,FastStack<LSEffect>>(effectData.Length);
+            CodeDataMap = new Dictionary<string, EffectDataItem>(effectData.Length);
 			for (int i = 0; i < effectData.Length; i++)
 			{
                 EffectDataItem dataItem = effectData[i];
-                EffectCode code = (EffectCode)dataItem.MappedCode;
+                string code = (string)dataItem.Name;
 				EffectPool.Add(code,new FastStack<LSEffect> ());
                 CodeDataMap.Add(code,dataItem);
 			}
@@ -35,31 +35,31 @@ namespace Lockstep {
 			}
 		}
 
-		public static void LazyCreateEffect (EffectCode effectCode, Vector3 position)
+		public static void LazyCreateEffect (string effectCode, Vector3 position)
 		{
-			if (effectCode == EffectCode.None) return;
+			if (effectCode == "None") return;
 			LSEffect effect = CreateEffect (effectCode);
 			effect.CachedTransform.position = position;
 			effect.Initialize ();
 		}
 
-		public static void LazyCreateEffect (EffectCode effectCode, Vector3 position, Quaternion rotation)
+		public static void LazyCreateEffect (string effectCode, Vector3 position, Quaternion rotation)
 		{
-			if (effectCode == EffectCode.None) return;
+			if (effectCode == "None") return;
 			LSEffect effect = CreateEffect (effectCode);
 			effect.CachedTransform.position = position;
 			effect.Initialize ();
 		}
 
-		public static void LazyCreateEffect (EffectCode effectCode, Transform SpawnPoint)
+		public static void LazyCreateEffect (string effectCode, Transform SpawnPoint)
 		{
-			if (effectCode == EffectCode.None) return;
+			if (effectCode == "None") return;
 			LSEffect effect = CreateEffect (effectCode);
 			effect.CachedTransform.position = SpawnPoint.position;
 			effect.Initialize ();
 		}
 
-		public static LSEffect CreateEffect (EffectCode effectCode)
+		public static LSEffect CreateEffect (string effectCode)
 		{
 			LSEffect effect = GenEffect (effectCode, -1);
 			EffectActive[effect.ID] = true;
@@ -83,7 +83,7 @@ namespace Lockstep {
 			else return PeakCount++;
 		}
 
-		private static LSEffect GenEffect (EffectCode effectCode, int id = -1)
+		private static LSEffect GenEffect (string effectCode, int id = -1)
 		{
 			FastStack<LSEffect> pool = EffectPool[effectCode];
 			LSEffect effect = null;

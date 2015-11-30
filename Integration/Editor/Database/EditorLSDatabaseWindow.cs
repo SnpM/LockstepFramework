@@ -15,18 +15,20 @@ namespace Lockstep.Data {
         [SerializeField,ClassImplements (typeof (IDatabase))]
         ClassTypeReference _databaseType = typeof (LSDatabase);
         Type DatabaseType {get {return _databaseType;}}
+        public static EditorLSDatabaseWindow Window {get; private set;}
         
         private EditorLSDatabase _databaseEditor;
 
-        private EditorLSDatabase databaseEditor {
+        public EditorLSDatabase DatabaseEditor {
             get {
                 return _databaseEditor;
             }
         }
 
         private LSDatabase _database;
+        public bool IsLoaded {get; private set;}
 
-        private LSDatabase Database {
+        public LSDatabase Database {
             get { return _database;}
         }
 
@@ -39,6 +41,7 @@ namespace Lockstep.Data {
         }
 
         void OnEnable () {
+            Window = this;
             DatabaseDirectory = EditorPrefs.GetString ("*DataDir", Application.dataPath);
             LoadDatabaseFromPath (DatabaseDirectory + "/" + LSDatabaseManager.DatabaseFileName);
         }
@@ -52,7 +55,7 @@ namespace Lockstep.Data {
                 return;
             }
             DrawLoader ();
-            if (databaseEditor != null) {
+            if (DatabaseEditor != null) {
                 DrawDatabase ();
             } else {
                 EditorGUILayout.LabelField ("No database loaded");
@@ -99,7 +102,7 @@ namespace Lockstep.Data {
 
             scrollPos = EditorGUILayout.BeginScrollView (scrollPos);
 
-            databaseEditor.Draw ();
+            DatabaseEditor.Draw ();
 
             EditorGUILayout.EndScrollView ();
         }
@@ -123,10 +126,12 @@ namespace Lockstep.Data {
             if (!isValid) {
                 this._databaseEditor = null;
                 this._database = null;
+                IsLoaded = false;
                 return;
             }
             LSFSettingsManager.GetSettings ().Database = database;
             LSFSettingsModifier.Save ();
+            IsLoaded = true;
         }
 
         bool CreateDatabase (string absolutePath) {
@@ -143,8 +148,8 @@ namespace Lockstep.Data {
         }
 
         void Save () {
-            databaseEditor.Save ();
-            EditorUtility.SetDirty (databaseEditor.Database);
+            DatabaseEditor.Save ();
+            EditorUtility.SetDirty (DatabaseEditor.Database);
             AssetDatabase.SaveAssets ();
         }
 

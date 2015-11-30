@@ -20,7 +20,7 @@ namespace Lockstep {
 				return _agent;
 			}
 		}
-        public AbilityCode MyAbilityCode {get; private set;}
+        public string MyAbilityCode {get; private set;}
         public AbilityInterfacer Interfacer {get; private set;}
 
 		public int ID {get; private set;}
@@ -49,7 +49,7 @@ namespace Lockstep {
             if (Interfacer == null) {
                 throw new System.ArgumentException("This Ability of type " + this.GetType() + " has not been registered in database");
             }
-            this.MyAbilityCode = (AbilityCode)Interfacer.MappedCode;
+            this.MyAbilityCode = Interfacer.Name;
             _agent = agent;
 			ID = id;
 			TemplateSetup ();

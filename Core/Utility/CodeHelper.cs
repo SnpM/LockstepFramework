@@ -6,8 +6,6 @@ namespace Lockstep
 {
 	public static class CodeHelper
 	{
-		public static AgentCode GetAgentCode (string codeName) {
-			return (AgentCode) Enum.Parse (typeof (AgentCode), codeName);
-		}
+
 	}
 }

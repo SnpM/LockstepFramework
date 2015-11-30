@@ -13,7 +13,6 @@ namespace Lockstep.Data
             RegisterData(
                 typeof (AgentInterfacer),
                 "Agents",
-                "AgentCode",
                 "_agentData",
                 new SortInfo(
                 "Order Units First",
@@ -27,19 +26,16 @@ namespace Lockstep.Data
             RegisterData(
                 typeof(ProjectileDataItem),
                 "Projectiles",
-                "ProjectileCode",
                 "_projectileData"
                 );
             RegisterData(
                 typeof(EffectDataItem),
                 "Effects",
-                "EffectCode",
                 "_effectData"
                 );
             RegisterData(
                 typeof(AbilityInterfacer),
                 "Abilities",
-                "AbilityCode",
                 "_abilityData"
                 );
         }
@@ -68,31 +64,24 @@ namespace Lockstep.Data
             }
             valid = IsValid;
         }
-        public void RegisterData(Type targetType, string displayName, string dataCodeName, string dataFieldName, params SortInfo[] sorts) 
+        public void RegisterData(Type targetType, string dataName, string dataFieldName, params SortInfo[] sorts) 
         {
-            DataItemInfos.Add (new DataItemInfo (targetType, displayName, dataCodeName, dataFieldName, sorts));
+            DataItemInfos.Add (new DataItemInfo (targetType, dataName, dataFieldName, sorts));
         }
         public void RegisterData (DataItemInfo info) {
             DataItemInfos.Add (info);
         }
         private DataHelper CreateDataHelper(DataItemInfo info, out bool valid) 
         {
-            DataHelper helper = new DataHelper(info.TargetType, this, Database, info.DisplayName,
-                                               info.CodeName, info.FieldName, info.Sorts, out valid);
-            this.DataHelpers.Add (helper);
+            DataHelper helper = new DataHelper(info.TargetType, this, Database, info.DataName,info.FieldName, info.Sorts, out valid);
+            this.HelperOrder.Add (info.DataName);
+            this.DataHelpers.Add (info.DataName,helper);
             return helper;
         }
 
-        public void Apply()
-        {
-            for (int i = 0; i < DataHelpers.Count; i++) {
-                DataHelpers[i].GenerateEnum ();
-            }
-            AssetDatabase.Refresh();
-        }
-
         private readonly FastList<DataItemInfo> DataItemInfos = new FastList<DataItemInfo>();
-        private readonly FastList<DataHelper> DataHelpers = new FastList<DataHelper>();
+        public readonly FastList<string> HelperOrder = new FastList<string>();
+        public readonly Dictionary<string,DataHelper> DataHelpers = new Dictionary<string,DataHelper>();
 
         static bool isSearching;
         static string lastSearchString;
@@ -109,12 +98,12 @@ namespace Lockstep.Data
             EditorGUILayout.BeginHorizontal ();
             if (DataHelpers.Count == 0) return;
             for (int i = 0; i < DataHelpers.Count; i++) {
-                if (GUILayout.Button (DataHelpers[i].DisplayName)) {
+                if (GUILayout.Button (DataHelpers[HelperOrder[i]].DisplayName)) {
                     selectedHelperIndex = i;
                 }
             }
             EditorGUILayout.EndHorizontal ();
-            DrawDatabase (DataHelpers[selectedHelperIndex]);
+            DrawDatabase (DataHelpers[HelperOrder[selectedHelperIndex]]);
             EditorGUILayout.EndVertical ();
         }
 
@@ -176,9 +165,10 @@ namespace Lockstep.Data
             dataHelper.serializedObject.Update ();
             
             EditorGUILayout.Space();
-            if (GUILayout.Button ("Apply")) {
+
+            /*if (GUILayout.Button ("Apply")) {
                 dataHelper.SourceEditor.Apply ();
-            }
+            }*/
         }
     
 

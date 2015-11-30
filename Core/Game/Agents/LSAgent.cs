@@ -32,7 +32,7 @@ namespace Lockstep {
 		[SerializeField, FrameCount]
         private int _deathTime = LockstepManager.FrameRate * 2;
 
-        public AgentCode MyAgentCode { get; private set; }
+        public string MyAgentCode { get; private set; }
 
         [SerializeField, HideInInspector]
         private AgentType _agentType;
@@ -203,7 +203,7 @@ namespace Lockstep {
 
 			setupAbilitys.FastClear();
             
-            MyAgentCode = interfacer.GetAgentCode();
+            MyAgentCode = interfacer.Name;
             Interfacer = interfacer;
             SpawnVersion = 1;
             CheckCasting = true;
@@ -389,7 +389,7 @@ namespace Lockstep {
             return hash;
         }
 
-		public LSAgent BuildChild (AgentCode agentCode, Vector2d localPos, float localHeight) {
+		public LSAgent BuildChild (string agentCode, Vector2d localPos, float localHeight) {
 			LSAgent agent = this.Controller.CreateAgent (agentCode);
 			agent.Body.Parent = this.Body;
 			agent.Body.LocalPosition = localPos;

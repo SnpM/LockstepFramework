@@ -43,7 +43,7 @@ namespace Lockstep
             }
         }
 
-        public ProjectileCode ProjCode { get { return _projectileCode; } }
+        public string ProjCode { get { return _projectileCode; } }
 
         public long Range { get { return _range; } }
 
@@ -61,8 +61,8 @@ namespace Lockstep
 
         public float ProjectileHeightOffset { get { return _projectileOffset.Height; } }
 
-        [SerializeField]
-        private ProjectileCode
+        [SerializeField,DataCode ("Projectiles")]
+        private string
             _projectileCode;
         [FixedNumber, SerializeField]
         private long

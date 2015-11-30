@@ -7,8 +7,8 @@ using Lockstep.Data;
 namespace Lockstep {
     public static class ProjectileManager {
 		public const int MaxProjectiles = 1 << 13;
-        private static ProjectileCode[] AllProjCodes = (ProjectileCode[])System.Enum.GetValues (typeof(ProjectileCode));
-        private static readonly Dictionary<ProjectileCode,ProjectileDataItem> CodeDataMap = new Dictionary<ProjectileCode, ProjectileDataItem>();
+        private static string[] AllProjCodes;
+        private static readonly Dictionary<string,ProjectileDataItem> CodeDataMap = new Dictionary<string, ProjectileDataItem>();
 
 
 		public static void Setup ()
@@ -17,8 +17,8 @@ namespace Lockstep {
             for (int i = 0; i < projectileData.Length; i++)
             {
                 ProjectileDataItem item = projectileData[i];
-                CodeDataMap.Add((ProjectileCode)item.MappedCode, item);
-                ProjectilePool.Add((ProjectileCode)item.MappedCode, new FastStack<LSProjectile> ());
+                CodeDataMap.Add(item.Name, item);
+                ProjectilePool.Add(item.Name, new FastStack<LSProjectile> ());
             }
         }
         public static void Initialize ()
@@ -70,7 +70,7 @@ namespace Lockstep {
             return hash;
         }
 
-		private static LSProjectile NewProjectile (ProjectileCode projCode)
+        private static LSProjectile NewProjectile (string projCode)
 		{
             ProjectileDataItem projData = CodeDataMap[projCode];
 			curProj = ((GameObject)GameObject.Instantiate<GameObject> (projData.Prefab)).GetComponent<LSProjectile> ();
@@ -79,11 +79,9 @@ namespace Lockstep {
 		}
 
 
-		public static LSProjectile Create (ProjectileCode projCode, LSAgent source, LSAgent target, long damage)
+        public static LSProjectile Create (string projCode, LSAgent source, LSAgent target, long damage)
 		{
-            if (Enum.IsDefined(typeof (ProjectileCode), projCode) == false) {
-                throw new System.MissingMemberException("The specified ProjectileCode does not exist");
-            }
+
 			FastStack<LSProjectile> pool = ProjectilePool[projCode];
 			if (pool.Count > 0)
 			{
@@ -123,7 +121,7 @@ namespace Lockstep {
 		}
 
 		#region ID and allocation management
-        private static readonly Dictionary<ProjectileCode, FastStack<LSProjectile>> ProjectilePool = new Dictionary<ProjectileCode, FastStack<LSProjectile>>();
+        private static readonly Dictionary<string, FastStack<LSProjectile>> ProjectilePool = new Dictionary<string, FastStack<LSProjectile>>();
 		private static bool[] ProjectileActive = new bool[MaxProjectiles];
 		private static LSProjectile[] ProjectileBucket = new LSProjectile[MaxProjectiles];
 

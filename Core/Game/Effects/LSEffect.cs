@@ -22,7 +22,7 @@ namespace Lockstep
 			defaultDuration;
 		#endregion
 
-		public EffectCode MyEffectCode { get; private set; }
+		public string MyEffectCode { get; private set; }
 		public Transform CachedTransform {get; private set;}
 		public GameObject CachedGameObject {get; private set;}
 
@@ -39,7 +39,7 @@ namespace Lockstep
 		/// Called when this effect is first created.
 		/// </summary>
 		/// <param name="myEffectCode">My effect code.</param>
-		public void Setup (EffectCode myEffectCode)
+		public void Setup (string myEffectCode)
 		{
 			MyEffectCode = myEffectCode;
 			CachedTransform = base.transform;

@@ -4,8 +4,10 @@ using Lockstep.Data;
 using System.Collections.Generic;
 namespace Lockstep {
     public sealed class AgentController {
-        public static AgentCode[] AgentCodes;
-        public static Dictionary<AgentCode,FastStack<LSAgent>> CachedAgents;
+
+        public static string[] AgentCodes;
+        public static Dictionary<string,int> AgentCodeIndexMap = new Dictionary<string, int>();
+        public static Dictionary<string,FastStack<LSAgent>> CachedAgents;
 
         public static readonly bool[] GlobalAgentActive = new bool[MaxAgents * 4];
         public static readonly LSAgent[] GlobalAgents = new LSAgent[MaxAgents * 4];
@@ -14,27 +16,29 @@ namespace Lockstep {
         public static ushort PeakGlobalID {get; private set;}
 
         public const int MaxAgents = 512;
-        private static readonly Dictionary<AgentCode,AgentInterfacer> CodeInterfacerMap = new Dictionary<AgentCode, AgentInterfacer>();
+        private static readonly Dictionary<string,AgentInterfacer> CodeInterfacerMap = new Dictionary<string, AgentInterfacer>();
 
         public static void Setup ()
         {
 
             AgentInterfacer[] agentInters = LSDatabaseManager.CurrentDatabase.AgentData;
+            AgentCodes = new string[agentInters.Length];
 
-            AgentCodes = (AgentCode[])Enum.GetValues(typeof(AgentCode));
-            CachedAgents = new Dictionary<AgentCode,FastStack<LSAgent>>(agentInters.Length);
+            CachedAgents = new Dictionary<string,FastStack<LSAgent>>(agentInters.Length);
 
             for (int i = 0; i < agentInters.Length; i++) {
                 AgentInterfacer interfacer = agentInters[i];
-                AgentCode agentCode = interfacer.GetAgentCode ();
+                string agentCode = interfacer.Name;
+                AgentCodes[i] = agentCode;
+                AgentCodeIndexMap.Add (agentCode,i);
+
                 CodeInterfacerMap.Add (agentCode, interfacer);
                 CachedAgents.Add(agentCode, new FastStack<LSAgent>(2));
             }
         }
-        public static AgentCode GetAgentCodeFromString (string codeName) {
-            return (AgentCode) Enum.Parse (typeof (AgentCode), codeName);
-        }
-        public static AgentInterfacer GetAgentInterfacer (AgentCode agentCode) {
+
+
+        public static AgentInterfacer GetAgentInterfacer (string agentCode) {
             return AgentController.CodeInterfacerMap [agentCode];
         }
         public static void Initialize() {
@@ -200,12 +204,18 @@ namespace Lockstep {
             SelectionChanged = true;
         }
 
+        public static string GetAgentCode (int index) {
+            return AgentCodes[index];
+        }
+        public static int GetCodeIndex (string agentCode) {
+            return AgentCodeIndexMap[agentCode];
+        }
 
         private Selection previousSelection;
         public void Execute(Command com) {
             if (com.LeInput == InputCode.Spawn) {
                 for (int i = 0; i < com.Count; i++) {
-                    LSAgent agent = CreateAgent((AgentCode)com.Target, com.Position);
+                    LSAgent agent = CreateAgent(GetAgentCode((int)com.Target), com.Position);
                 }
                 return;
             }
@@ -234,22 +244,20 @@ namespace Lockstep {
             }
         }
 
-        public static void OrderSpawn (AgentController cont, AgentCode agentCode, int count, Vector2d position)
+        public static void OrderSpawn (AgentController cont, string agentCode, int count, Vector2d position)
         {
             Command com = new Command (InputCode.Spawn);
             com.ControllerID = cont.ControllerID;
             com.Position = position;
-            com.Target = (ushort)agentCode;
+            com.Target = (ushort)AgentController.GetCodeIndex (agentCode);
             com.Count = count;
             CommandManager.SendCommand(com);
         }
 
-        public LSAgent CreateAgent(AgentCode agentCode,
+        public LSAgent CreateAgent(string agentCode,
                                    Vector2d position = default(Vector2d)) {
             Vector2d vec = new Vector2d(0,1);
-            if (Enum.IsDefined(typeof (AgentCode), agentCode) == false) {
-                throw new System.MissingMemberException ("Specified AgentCode does not exist.");
-            }
+
             FastStack<LSAgent> cache = CachedAgents[agentCode];
             LSAgent curAgent = null;
             if (cache .IsNotNull () && cache.Count > 0) {

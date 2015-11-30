@@ -3,8 +3,8 @@ using System.Collections;
 using Lockstep.Data;
 namespace Lockstep.Example {
     public class ExampleGameManager : GameManager {
-        [SerializeField]
-        private AgentCode _spawnCode;
+        [SerializeField,DataCode ("Agents")]
+        private string _spawnCode;
         [SerializeField]
         private int _spawnAmount;
 
