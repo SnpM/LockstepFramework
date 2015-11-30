@@ -9,10 +9,10 @@ using TypeReferences;
 namespace Lockstep.Data {
     [System.Serializable]
     public class EditorLSDatabaseWindow : EditorWindow {
-        [SerializeField,ClassImplements (typeof (EditorLSDatabase))]
+        [SerializeField,ClassImplements (typeof (IEditorDatabase))]
         ClassTypeReference _databaseEditorType = typeof (EditorLSDatabase);
         Type DatabaseEditorType {get {return _databaseEditorType;}}
-        [SerializeField,ClassImplements (typeof (LSDatabase))]
+        [SerializeField,ClassImplements (typeof (IDatabase))]
         ClassTypeReference _databaseType = typeof (LSDatabase);
         Type DatabaseType {get {return _databaseType;}}
         
@@ -91,6 +91,7 @@ namespace Lockstep.Data {
             EditorGUILayout.PropertyField (editorTypeProp, new GUIContent ("Editor Type"));
             SerializedProperty databaseTypeProp = obj.FindProperty("_databaseType");
             EditorGUILayout.PropertyField (databaseTypeProp, new GUIContent ("Database Type"));
+            obj.ApplyModifiedProperties ();
 
         }
 
@@ -116,8 +117,14 @@ namespace Lockstep.Data {
 
         void LoadDatabase (LSDatabase database) {
             _database = database;
-            _databaseEditor = (EditorLSDatabase)Activator.CreateInstance (DatabaseEditorType);
-            _databaseEditor.Initialize (this,Database);
+            _databaseEditor = (EditorLSDatabase)Activator.CreateInstance ((Type)DatabaseEditorType);
+            bool isValid;
+            _databaseEditor.Initialize (this,Database, out isValid);
+            if (!isValid) {
+                this._databaseEditor = null;
+                this._database = null;
+                return;
+            }
             LSFSettingsManager.GetSettings ().Database = database;
             LSFSettingsModifier.Save ();
         }

@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Collections.Generic;
 namespace Lockstep.Data
 {
-    public class EditorLSDatabase
+    public class EditorLSDatabase : IEditorDatabase
     {
         protected virtual void InitializeData () {
             RegisterData(
@@ -43,34 +43,42 @@ namespace Lockstep.Data
                 "_abilityData"
                 );
         }
-
+        public bool IsValid {get; private set;}
         public LSDatabase Database { get; private set; }
         private SerializedObject _serializedObject;
         public SerializedObject serializedObject {get {return _serializedObject ?? (_serializedObject = Database.cerealObject());}}
         public EditorLSDatabaseWindow MainWindow {get; private set;}
         public EditorLSDatabase () {}
-        public void Initialize (EditorLSDatabaseWindow window, LSDatabase database)
+        public void Initialize (EditorLSDatabaseWindow window, LSDatabase database, out bool valid)
         {
             this.MainWindow = window;
             Database = database;
 
             InitializeData ();
+            IsValid = true;
             for (int i = 0; i < DataItemInfos.Count; i++) {
                 DataItemInfo info = DataItemInfos[i];
-                CreateDataHelper (info);
+                bool isValid;
+                CreateDataHelper (info, out isValid);
+                if (!isValid) {
+                    Debug.LogError ("Database does not match database type described by the database editor. Make sure Lockstep_Database.asset is the correct database type.");
+                    IsValid = false;
+                    break;
+                }
             }
+            valid = IsValid;
         }
-        public static void RegisterData(Type targetType, string displayName, string dataCodeName, string dataFieldName, params SortInfo[] sorts) 
+        public void RegisterData(Type targetType, string displayName, string dataCodeName, string dataFieldName, params SortInfo[] sorts) 
         {
             DataItemInfos.Add (new DataItemInfo (targetType, displayName, dataCodeName, dataFieldName, sorts));
         }
-        public static void RegisterData (DataItemInfo info) {
+        public void RegisterData (DataItemInfo info) {
             DataItemInfos.Add (info);
         }
-        private DataHelper CreateDataHelper(DataItemInfo info) 
+        private DataHelper CreateDataHelper(DataItemInfo info, out bool valid) 
         {
             DataHelper helper = new DataHelper(info.TargetType, this, Database, info.DisplayName,
-                                               info.CodeName, info.FieldName, info.Sorts);
+                                               info.CodeName, info.FieldName, info.Sorts, out valid);
             this.DataHelpers.Add (helper);
             return helper;
         }
@@ -83,7 +91,7 @@ namespace Lockstep.Data
             AssetDatabase.Refresh();
         }
 
-        private static readonly FastList<DataItemInfo> DataItemInfos = new FastList<DataItemInfo>();
+        private readonly FastList<DataItemInfo> DataItemInfos = new FastList<DataItemInfo>();
         private readonly FastList<DataHelper> DataHelpers = new FastList<DataHelper>();
 
         static bool isSearching;
@@ -168,6 +176,9 @@ namespace Lockstep.Data
             dataHelper.serializedObject.Update ();
             
             EditorGUILayout.Space();
+            if (GUILayout.Button ("Apply")) {
+                dataHelper.SourceEditor.Apply ();
+            }
         }
     
 

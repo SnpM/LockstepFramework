@@ -32,8 +32,8 @@ namespace Lockstep.Data {
         
         Turn = 2618525,
         
-        SetHeight = -2030630903,
-        
         Stats = 80204927,
+        
+        SetHeight = -2030630903,
     }
 }

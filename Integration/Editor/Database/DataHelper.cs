@@ -19,7 +19,8 @@ namespace Lockstep.Data
             string displayName,
             string dataCodeName,
             string dataFieldName,
-            SortInfo[] sorts)
+            SortInfo[] sorts,
+            out bool valid)
         {
             Sorts = sorts;
             this.TargetType = targetType;
@@ -30,12 +31,20 @@ namespace Lockstep.Data
             _dataFieldName = dataFieldName; 
 
             FieldInfo info = sourceDatabase.GetType().GetField(_dataFieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if (info == null) {
+                Debug.Log (string.Format ("Field with fieldName of {0} not found.", dataFieldName));
+                valid = false;
+                return;
+            }
+
             _getData = () => (DataItem[])info.GetValue(sourceDatabase);
             _setData = (value) => info.SetValue(sourceDatabase, value);
             if (Data == null)
                 Data = (DataItem[])Array.CreateInstance (TargetType,0);
             DataItemAttribute dataAttribute = (DataItemAttribute)Attribute.GetCustomAttribute(targetType, typeof (DataItemAttribute));
             _dataAttribute = dataAttribute ?? new DataItemAttribute ();
+            valid = true;
         }
         public string DisplayName {get; private set;}
         public string DataCodeName {
