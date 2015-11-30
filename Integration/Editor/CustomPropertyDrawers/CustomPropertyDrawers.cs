@@ -133,13 +133,14 @@ namespace Lockstep {
                 EditorLSDatabaseWindow.Window.DatabaseEditor.DataHelpers.TryGetValue (dca.TargetDataName, out helper);
                 DataItem[] data = helper.Data;
                 GUIContent[] dataContents = new GUIContent[data.Length];
-                if (property.isArray) {
+                if (property.isArray && property.type != "string") {
                     int arraySize = property.arraySize;
                     arraySize = EditorGUI.IntField (drawPos,"Size",arraySize);
                     property.arraySize = arraySize;
                     for (int n = 0; n < arraySize; n++) {
                         SerializedProperty element = property.GetArrayElementAtIndex (n);
 
+                        Debug.Log (element.type);
                         string curName = element.stringValue;
                         int index = -1;
                         for (int i = 0; i < data.Length; i++) {

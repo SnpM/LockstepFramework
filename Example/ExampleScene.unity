@@ -246,7 +246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 465e861767b9e445eafba76f21bd0dd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spawnCode: 795752819
+  _spawnCode: TestAgent
   _spawnAmount: 5
 --- !u!1001 &2144495884
 Prefab:
