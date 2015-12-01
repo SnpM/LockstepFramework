@@ -16,6 +16,12 @@ namespace Lockstep {
         public abstract NetworkHelper MainNetworkHelper {
             get;
         }
+
+        public virtual LSManager[] Managers {
+            get {
+                return new LSManager[0];
+            }
+        }
     
         void Start () {
             Instance = this;
@@ -27,7 +33,7 @@ namespace Lockstep {
 
         }
 
-        void FixedUpdate () {
+        protected virtual void FixedUpdate () {
             LockstepManager.Simulate ();
             if (ReplayManager.IsPlayingBack) {
                 if (hashChecked == false) {
@@ -51,7 +57,7 @@ namespace Lockstep {
     
         private float timeToNextSimulate;
 
-        void Update () {
+        protected virtual void Update () {
             timeToNextSimulate -= Time.smoothDeltaTime * Time.timeScale;
             if (timeToNextSimulate <= float.Epsilon) {
                 timeToNextSimulate = LockstepManager.BaseDeltaTime;

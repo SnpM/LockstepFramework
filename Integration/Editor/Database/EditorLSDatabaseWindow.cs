@@ -9,11 +9,20 @@ using TypeReferences;
 namespace Lockstep.Data {
     [System.Serializable]
     public class EditorLSDatabaseWindow : EditorWindow {
+        const string databaseEditorTypeKey = "!)^@#^2";
         [SerializeField,ClassImplements (typeof (IEditorDatabase))]
-        ClassTypeReference _databaseEditorType = typeof (EditorLSDatabase);
+        ClassTypeReference _databaseEditorType =
+            EditorPrefs.HasKey (databaseEditorTypeKey) ?
+                new ClassTypeReference(EditorPrefs.GetString (databaseEditorTypeKey)) :
+                new ClassTypeReference(typeof (EditorLSDatabase));
         Type DatabaseEditorType {get {return _databaseEditorType;}}
+
+        const string databaseTypeKey = "!)^@#^1";
         [SerializeField,ClassImplements (typeof (IDatabase))]
-        ClassTypeReference _databaseType = typeof (LSDatabase);
+        ClassTypeReference _databaseType =
+            EditorPrefs.HasKey (databaseTypeKey) ?
+                new ClassTypeReference (EditorPrefs.GetString (databaseTypeKey)) :
+                new ClassTypeReference(typeof (LSDatabase));
         Type DatabaseType {get {return _databaseType;}}
         public static EditorLSDatabaseWindow Window {get; private set;}
         
@@ -90,11 +99,11 @@ namespace Lockstep.Data {
 
                 SerializedObject obj = new SerializedObject(this);
                 SerializedProperty editorTypeProp = obj.FindProperty ("_databaseEditorType");
-                
                 EditorGUILayout.PropertyField (editorTypeProp, new GUIContent ("Editor Type"));
+                EditorPrefs.SetString (databaseEditorTypeKey, _databaseEditorType.Type.AssemblyQualifiedName);
                 SerializedProperty databaseTypeProp = obj.FindProperty("_databaseType");
                 EditorGUILayout.PropertyField (databaseTypeProp, new GUIContent ("Database Type"));
-                //EditorPrefs.SetString ("_databaseType",_databaseType.name);
+                EditorPrefs.SetString (databaseTypeKey,_databaseType.Type.AssemblyQualifiedName);
                 obj.ApplyModifiedProperties ();
 
             }

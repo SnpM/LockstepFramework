@@ -10,9 +10,8 @@ GameObject:
   - 4: {fileID: 465378}
   - 114: {fileID: 11487560}
   - 114: {fileID: 11485440}
-  - 114: {fileID: 11419530}
   - 114: {fileID: 11439568}
-  - 114: {fileID: 11495882}
+  - 114: {fileID: 11425566}
   m_Layer: 0
   m_Name: TestAgent
   m_TagString: Untagged
@@ -168,7 +167,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &11419530
+--- !u!114 &11425566
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -277,27 +276,6 @@ MonoBehaviour:
     x: 0
     y: 0
   Vertices: []
---- !u!114 &11495882
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100310}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80f515b6513df49c8becfa9469f29429, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Power:
-    _base: 0
-  Agility:
-    _base: 98304
-  Stamina:
-    _base: 0
-  Intelligence:
-    _base: 0
-  Leadership:
-    _base: 0
 --- !u!135 &13529482
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -408,6 +386,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: Agility._base
       value: 98304
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _agilitySpeedScaling
+      value: 65536
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

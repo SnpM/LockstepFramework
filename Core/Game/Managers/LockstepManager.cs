@@ -16,6 +16,7 @@ using UnityEngine;
 //using Lockstep.Integration;
 using Lockstep.Data;
 namespace Lockstep {
+    //TODO: Set up default functions to implement LSManager
     public static class LockstepManager {
 		public static readonly System.Diagnostics.Stopwatch SimulationTimer = new System.Diagnostics.Stopwatch();
 		public static long Ticks {get {return SimulationTimer.ElapsedTicks;}}
@@ -29,11 +30,15 @@ namespace Lockstep {
 		public static int InfluenceFrameCount {get; private set;}
         public static int FrameCount { get; private set; }
 		public static bool Started {get; private set;}
+        public static bool Loaded {get; private set;}
 
         public static GameManager MainGameManager {get; private set;}
 
+        private static LSManager[] Managers;
+
         public static void Setup () {
 
+            LSDatabaseManager.Setup ();
 
 			UnityInstance = GameObject.CreatePrimitive (PrimitiveType.Sphere).AddComponent<MonoBehaviour> ();
             UnityInstance.GetComponent<Renderer>().enabled = false;
@@ -56,10 +61,16 @@ namespace Lockstep {
 			Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
 
 			InputManager.Setup ();
+
+            foreach (LSManager manager in Managers) manager.Setup ();
         }
 
         public static void Initialize(GameManager gameManager) {
-
+            if (!Loaded) {
+                Setup ();
+                Loaded = true;
+            }
+            Managers = gameManager.Managers;
             MainGameManager = gameManager;
 
 
@@ -95,10 +106,13 @@ namespace Lockstep {
             InfluenceManager.Initialize();
             ProjectileManager.Initialize();
 
+            foreach (LSManager manager in Managers)manager.Initialize ();
+
             LoadSceneObjects();
 
 			Started = true;
             ClientManager.Initialize ();
+
         }
 
 		static bool Stalled;
@@ -132,6 +146,8 @@ namespace Lockstep {
 
 			TeamManager.Simulate ();
 
+            foreach (LSManager manager in Managers) manager.Simulate ();
+
 			LateSimulate ();
             FrameCount++;
 
@@ -161,6 +177,10 @@ namespace Lockstep {
 
 			TeamManager.Visualize ();
 
+            foreach (LSManager manager in Managers) {
+                manager.Visualize ();
+            }
+
 			//LateVisualize ();
         }
 
@@ -175,6 +195,10 @@ namespace Lockstep {
 			BehaviourHelper.GlobalDeactivate ();
             ProjectileManager.Deactivate();
 			ClientManager.Deactivate ();
+
+            foreach (LSManager manager in Managers) {
+                manager.Deactivate ();
+            }
 
 			TeamManager.Deactivate ();
             ClientManager.NetworkHelper.Disconnect ();

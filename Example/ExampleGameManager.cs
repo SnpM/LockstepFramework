@@ -9,6 +9,8 @@ namespace Lockstep.Example {
         private int _spawnAmount;
 
         private NetworkHelper _mainNetworkHelper = new ExampleNetworkHelper ();
+
+        protected FastList<LSAgent> spawnedAgents = new FastList<LSAgent>();
         public override NetworkHelper MainNetworkHelper {
             get {
                 return _mainNetworkHelper;
@@ -23,8 +25,9 @@ namespace Lockstep.Example {
             for (int i = 0; i < _spawnAmount; i++) {
                 AgentController ac = new AgentController();
                 PlayerManager.AddController (ac);
-                ac.CreateAgent (_spawnCode,Vector2d.zero);
+                spawnedAgents.Add (ac.CreateAgent (_spawnCode,Vector2d.zero));
             }
         }
+
     }
 }
