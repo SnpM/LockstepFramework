@@ -94,6 +94,7 @@ namespace Lockstep.Data {
                 EditorGUILayout.PropertyField (editorTypeProp, new GUIContent ("Editor Type"));
                 SerializedProperty databaseTypeProp = obj.FindProperty("_databaseType");
                 EditorGUILayout.PropertyField (databaseTypeProp, new GUIContent ("Database Type"));
+                //EditorPrefs.SetString ("_databaseType",_databaseType.name);
                 obj.ApplyModifiedProperties ();
 
             }
