@@ -68,7 +68,7 @@ public class EditorDataItem : PropertyDrawer {
                     serializedProperties.Add (property.FindPropertyRelative (extraProperties[i]));
                 }*/
             int beginningDepth = iterationProperty.depth;
-            while (iterationProperty.NextVisible(false))
+            while (iterationProperty.NextVisible(true))
             {
                 if (iterationProperty.depth != beginningDepth) break;
                 serializedProperties.Add(iterationProperty.Copy());

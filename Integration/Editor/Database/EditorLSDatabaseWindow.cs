@@ -54,7 +54,7 @@ namespace Lockstep.Data {
                 EditorGUILayout.LabelField ("Cannot modify database during runtime", EditorStyles.boldLabel);
                 return;
             }
-            DrawLoader ();
+            DrawSettings ();
             if (DatabaseEditor != null) {
                 DrawDatabase ();
             } else {
@@ -65,11 +65,11 @@ namespace Lockstep.Data {
         }
 
         public string DatabaseDirectory {get; private set;}
-        bool loadFoldout = false;
+        bool settingsFoldout = false;
 
-        void DrawLoader () {
-            loadFoldout = EditorGUILayout.Foldout (loadFoldout, "Database Directory");
-            if (loadFoldout) {
+        void DrawSettings () {
+            settingsFoldout = EditorGUILayout.Foldout (settingsFoldout, "Settings");
+            if (settingsFoldout) {
                 GUILayout.BeginHorizontal ();
 
                 const int maxDirLength = 28;
@@ -87,14 +87,16 @@ namespace Lockstep.Data {
                     }
                 }
                 GUILayout.EndHorizontal ();
-            }
-            SerializedObject obj = new SerializedObject(this);
-            SerializedProperty editorTypeProp = obj.FindProperty ("_databaseEditorType");
 
-            EditorGUILayout.PropertyField (editorTypeProp, new GUIContent ("Editor Type"));
-            SerializedProperty databaseTypeProp = obj.FindProperty("_databaseType");
-            EditorGUILayout.PropertyField (databaseTypeProp, new GUIContent ("Database Type"));
-            obj.ApplyModifiedProperties ();
+                SerializedObject obj = new SerializedObject(this);
+                SerializedProperty editorTypeProp = obj.FindProperty ("_databaseEditorType");
+                
+                EditorGUILayout.PropertyField (editorTypeProp, new GUIContent ("Editor Type"));
+                SerializedProperty databaseTypeProp = obj.FindProperty("_databaseType");
+                EditorGUILayout.PropertyField (databaseTypeProp, new GUIContent ("Database Type"));
+                obj.ApplyModifiedProperties ();
+
+            }
 
         }
 
