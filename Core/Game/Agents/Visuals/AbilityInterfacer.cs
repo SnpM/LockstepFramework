@@ -42,12 +42,7 @@ namespace Lockstep.Data {
         public string GetAbilityCode () {
             return this.Name;
         }
-
-        public void SetName (string name)
-        {
-            Name = name;
-        }
-
+       
 
 		[SerializeField]
         private InputCode _listenInput = InputCode.None;

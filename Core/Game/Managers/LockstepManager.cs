@@ -62,16 +62,20 @@ namespace Lockstep {
 
 			InputManager.Setup ();
 
-            foreach (LSManager manager in Managers) manager.Setup ();
+            foreach (LSManager manager in Managers) 
+            {
+                    manager.Setup ();
+            }
         }
 
         public static void Initialize(GameManager gameManager) {
+            MainGameManager = gameManager;
+            Managers = gameManager.Managers;
+
             if (!Loaded) {
                 Setup ();
                 Loaded = true;
             }
-            Managers = gameManager.Managers;
-            MainGameManager = gameManager;
 
 
 			SimulationTimer.Reset ();

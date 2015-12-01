@@ -23,7 +23,7 @@ namespace Lockstep {
             }
         }
     
-        void Start () {
+        protected void Start () {
             Instance = this;
             LockstepManager.Initialize (this);
             Startup ();
@@ -33,7 +33,7 @@ namespace Lockstep {
 
         }
 
-        protected virtual void FixedUpdate () {
+        protected void FixedUpdate () {
             LockstepManager.Simulate ();
             if (ReplayManager.IsPlayingBack) {
                 if (hashChecked == false) {
@@ -57,7 +57,7 @@ namespace Lockstep {
     
         private float timeToNextSimulate;
 
-        protected virtual void Update () {
+        protected void Update () {
             timeToNextSimulate -= Time.smoothDeltaTime * Time.timeScale;
             if (timeToNextSimulate <= float.Epsilon) {
                 timeToNextSimulate = LockstepManager.BaseDeltaTime;

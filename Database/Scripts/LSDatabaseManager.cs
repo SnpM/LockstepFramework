@@ -24,7 +24,6 @@ namespace Lockstep.Data {
         public static void Setup () {
             LSDatabase database = LSFSettingsManager.GetSettings ().Database;
             _currentDatabase = database;
-            LockstepManager.Setup ();
         }
 
         public static void Initialize () {
