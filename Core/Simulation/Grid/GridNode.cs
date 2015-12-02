@@ -16,7 +16,7 @@ namespace Lockstep
 		#region Constructor	
 		static GridNode ()
 		{
-			for (i = -1; i <= 1; i++) {
+			/*for (i = -1; i <= 1; i++) {
 				for (j = -1; j <= 1; j++) {
 					
 					if (i == 0 && j == 0)
@@ -24,7 +24,7 @@ namespace Lockstep
 					if ((i != 0 && j != 0))
 						continue;
 				}
-			}
+			}*/
 		}
 		
 		public GridNode (int _x, int _y)
