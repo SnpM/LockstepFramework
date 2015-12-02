@@ -42,7 +42,7 @@ namespace Lockstep.Data {
         }
 
         [MenuItem ("Lockstep/Database %#l")]
-        private static void Menu () {
+        public static void Menu () {
             EditorLSDatabaseWindow window = EditorWindow.GetWindow<EditorLSDatabaseWindow> ();
             window.titleContent = new GUIContent ("Lockstep Database");
             window.minSize = new Vector2 (400, 100);

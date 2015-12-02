@@ -126,7 +126,14 @@ namespace Lockstep {
                 EditorGUI.LabelField (drawPos,"No attribute found");
             }
             else if (EditorLSDatabaseWindow.Window == null || EditorLSDatabaseWindow.Window.IsLoaded == false) {
-                EditorGUI.LabelField (drawPos,"No database loaded.");
+                if (GUI.Button (drawPos,new GUIContent("No database loaded", "Click to open the database manager and load a database."))) {
+                    if (EditorLSDatabaseWindow.Window == null) {
+                        EditorLSDatabaseWindow.Menu ();
+                    }
+                    else {
+                        EditorLSDatabaseWindow.Window.Show ();
+                    }
+                }
             }
             else {
                 DataHelper helper;
