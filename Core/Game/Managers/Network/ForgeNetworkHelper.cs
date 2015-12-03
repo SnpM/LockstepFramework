@@ -7,6 +7,7 @@ using BeardedManStudios.Network;
 using System;
 
 namespace Lockstep {
+    //TODO: Finish ForgeNetworkHelper
     public class ForgeNetworkHelper : NetworkHelper {
         private const ushort Port = ushort.MaxValue / 2;
         private  NetWorker _gameNetworker;
