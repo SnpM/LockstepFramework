@@ -5,6 +5,17 @@ namespace Lockstep.Data {
         public DataItemInfo (
             Type targetType,
             string dataName,
+            string fieldName
+            )
+        {
+            this.TargetType = targetType;
+            this.DataName = dataName;
+            this.FieldName = fieldName;
+            this.Sorts = new SortInfo[0];
+        }
+        public DataItemInfo (
+            Type targetType,
+            string dataName,
             string fieldName,
             params SortInfo[] sorts)
         {

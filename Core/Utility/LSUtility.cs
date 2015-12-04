@@ -210,7 +210,6 @@ namespace Lockstep
             return source.IndexOf(other, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 	}
-    public enum AbilityCode {}
 }
 namespace Lockstep.Integration {
 

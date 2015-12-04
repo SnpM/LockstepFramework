@@ -8,21 +8,11 @@ using System.IO;
 using TypeReferences;
 namespace Lockstep.Data {
     [System.Serializable]
-    public class EditorLSDatabaseWindow : EditorWindow {
-        const string databaseEditorTypeKey = "!)^@#^2";
-        [SerializeField,ClassImplements (typeof (IEditorDatabase))]
-        ClassTypeReference _databaseEditorType =
-            EditorPrefs.HasKey (databaseEditorTypeKey) ?
-                new ClassTypeReference(EditorPrefs.GetString (databaseEditorTypeKey)) :
-                new ClassTypeReference(typeof (EditorLSDatabase));
-        Type DatabaseEditorType {get {return _databaseEditorType;}}
+    public sealed class EditorLSDatabaseWindow : EditorWindow {
 
         const string databaseTypeKey = "!)^@#^1";
         [SerializeField,ClassImplements (typeof (IDatabase))]
-        ClassTypeReference _databaseType =
-            EditorPrefs.HasKey (databaseTypeKey) ?
-                new ClassTypeReference (EditorPrefs.GetString (databaseTypeKey)) :
-                new ClassTypeReference(typeof (LSDatabase));
+        ClassTypeReference _databaseType;
         Type DatabaseType {get {return _databaseType;}}
         public static EditorLSDatabaseWindow Window {get; private set;}
         
@@ -53,8 +43,10 @@ namespace Lockstep.Data {
             Window = this;
             DatabaseDirectory = EditorPrefs.GetString ("*DataDir", Application.dataPath);
             LoadDatabaseFromPath (DatabaseDirectory + "/" + LSDatabaseManager.DatabaseFileName);
+            _databaseType = new ClassTypeReference (EditorPrefs.GetString (databaseTypeKey));
+            if (_databaseType.Type == null) _databaseType = typeof (LSDatabase);
         }
-
+        
         Vector2 scrollPos;
         Rect windowRect = new Rect (0, 0, 500, 500);
 
@@ -98,9 +90,7 @@ namespace Lockstep.Data {
                 GUILayout.EndHorizontal ();
 
                 SerializedObject obj = new SerializedObject(this);
-                SerializedProperty editorTypeProp = obj.FindProperty ("_databaseEditorType");
-                EditorGUILayout.PropertyField (editorTypeProp, new GUIContent ("Editor Type"));
-                EditorPrefs.SetString (databaseEditorTypeKey, _databaseEditorType.Type.AssemblyQualifiedName);
+
                 SerializedProperty databaseTypeProp = obj.FindProperty("_databaseType");
                 EditorGUILayout.PropertyField (databaseTypeProp, new GUIContent ("Database Type"));
                 EditorPrefs.SetString (databaseTypeKey,_databaseType.Type.AssemblyQualifiedName);
@@ -132,7 +122,7 @@ namespace Lockstep.Data {
 
         void LoadDatabase (LSDatabase database) {
             _database = database;
-            _databaseEditor = (EditorLSDatabase)Activator.CreateInstance ((Type)DatabaseEditorType);
+            _databaseEditor = (EditorLSDatabase)Activator.CreateInstance (typeof(EditorLSDatabase));
             bool isValid;
             _databaseEditor.Initialize (this,Database, out isValid);
             if (!isValid) {
