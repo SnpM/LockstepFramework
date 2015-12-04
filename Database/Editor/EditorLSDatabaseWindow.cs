@@ -1,15 +1,13 @@
-﻿#if true
-using UnityEngine;
-using System.Collections;
-using UnityEditor;
-using Lockstep;
+﻿using Lockstep;
 using System;
 using System.IO;
 using TypeReferences;
+using UnityEditor;
+using UnityEngine;
 namespace Lockstep.Data {
     [System.Serializable]
     public sealed class EditorLSDatabaseWindow : EditorWindow {
-
+        const string databasePathKey = "^(#!*@#^";
         const string databaseTypeKey = "!)^@#^1";
         [SerializeField,ClassImplements (typeof (IDatabase))]
         ClassTypeReference _databaseType;
@@ -17,20 +15,20 @@ namespace Lockstep.Data {
         public static EditorLSDatabaseWindow Window {get; private set;}
         
         private EditorLSDatabase _databaseEditor;
-
+        
         public EditorLSDatabase DatabaseEditor {
             get {
                 return _databaseEditor;
             }
         }
-
+        
         private LSDatabase _database;
         public bool IsLoaded {get; private set;}
-
+        
         public LSDatabase Database {
             get { return _database;}
         }
-
+        
         [MenuItem ("Lockstep/Database %#l")]
         public static void Menu () {
             EditorLSDatabaseWindow window = EditorWindow.GetWindow<EditorLSDatabaseWindow> ();
@@ -38,18 +36,18 @@ namespace Lockstep.Data {
             window.minSize = new Vector2 (400, 100);
             window.Show ();
         }
-
+        
         void OnEnable () {
             Window = this;
-            DatabaseDirectory = EditorPrefs.GetString ("*DataDir", Application.dataPath);
-            LoadDatabaseFromPath (DatabaseDirectory + "/" + LSDatabaseManager.DatabaseFileName);
+            DatabasePath = EditorPrefs.GetString (databasePathKey, Application.dataPath);
+            LoadDatabaseFromPath (DatabasePath);
             _databaseType = new ClassTypeReference (EditorPrefs.GetString (databaseTypeKey));
             if (_databaseType.Type == null) _databaseType = typeof (LSDatabase);
         }
         
         Vector2 scrollPos;
         Rect windowRect = new Rect (0, 0, 500, 500);
-
+        
         void OnGUI () {
             if (Application.isPlaying) {
                 EditorGUILayout.LabelField ("Cannot modify database during runtime", EditorStyles.boldLabel);
@@ -61,54 +59,70 @@ namespace Lockstep.Data {
             } else {
                 EditorGUILayout.LabelField ("No database loaded");
             }
-
-
+            
+            
         }
-
-        public string DatabaseDirectory {get; private set;}
+        
+        public string DatabasePath {get; private set;}
         bool settingsFoldout = false;
-
+        
         void DrawSettings () {
             settingsFoldout = EditorGUILayout.Foldout (settingsFoldout, "Settings");
             if (settingsFoldout) {
                 GUILayout.BeginHorizontal ();
-
+                
+                /*
                 const int maxDirLength = 28;
-                if (GUILayout.Button (DatabaseDirectory.Length > maxDirLength ? "..." + DatabaseDirectory.Substring (DatabaseDirectory.Length - maxDirLength) : DatabaseDirectory, GUILayout.ExpandWidth (true))) {
-                    DatabaseDirectory = EditorUtility.OpenFolderPanel ("Database Folder", DatabaseDirectory, DatabaseDirectory);
-                    EditorPrefs.SetString ("*DataDir", DatabaseDirectory);
-
-                    LSFSettingsModifier.Save ();
-                }
+                if (GUILayout.Button (DatabasePath.Length > maxDirLength ? "..." + DatabasePath.Substring (DatabasePath.Length - maxDirLength) : DatabasePath, GUILayout.ExpandWidth (true))) {
+                }*/
+                
+                
+                SerializedObject obj = new SerializedObject (this);
+                
+                SerializedProperty databaseTypeProp = obj.FindProperty ("_databaseType");
+                EditorGUILayout.PropertyField (databaseTypeProp, new GUIContent ("Database Type"));
+                EditorPrefs.SetString (databaseTypeKey, _databaseType.Type.AssemblyQualifiedName);
+                
                 if (GUILayout.Button ("Load", GUILayout.MaxWidth (50f))) {
-                    string databasePath = DatabaseDirectory + "/" + LSDatabaseManager.DatabaseFileName;
-                    if (LoadDatabaseFromPath (databasePath) == false) {
-                        CreateDatabase (databasePath);
-                        Debug.LogFormat ("Database was not found at directory of {0} so one was created", DatabaseDirectory);
+                    DatabasePath = EditorUtility.OpenFilePanel ("Database File", DatabasePath, "asset");
+                    if (!string.IsNullOrEmpty (DatabasePath)) {
+                        
+                        EditorPrefs.SetString (databasePathKey, DatabasePath);
+                        LSFSettingsModifier.Save ();
+                        if (LoadDatabaseFromPath (DatabasePath) == false) {
+                            Debug.LogFormat ("Database was not found at path of '{0}'.", DatabasePath);
+                        }
                     }
                 }
+                if (GUILayout.Button ("Create", GUILayout.MaxWidth (50f))) {
+                    DatabasePath = EditorUtility.SaveFilePanel ("Database File", DatabasePath, Application.dataPath + "/assets", "asset");
+                    if (!string.IsNullOrEmpty (DatabasePath)) {
+                        if (CreateDatabase (DatabasePath)) {
+                            Debug.Log ("Database creation succesful!");
+                        } else {
+                            Debug.Log ("Database creation unsuccesful");
+                        }
+                    }
+                }                
                 GUILayout.EndHorizontal ();
-
-                SerializedObject obj = new SerializedObject(this);
-
-                SerializedProperty databaseTypeProp = obj.FindProperty("_databaseType");
-                EditorGUILayout.PropertyField (databaseTypeProp, new GUIContent ("Database Type"));
-                EditorPrefs.SetString (databaseTypeKey,_databaseType.Type.AssemblyQualifiedName);
+                
+                
                 obj.ApplyModifiedProperties ();
-
+                
             }
-
+            
         }
 
+        
         void DrawDatabase () {
-
+            
             scrollPos = EditorGUILayout.BeginScrollView (scrollPos);
-
+            
             DatabaseEditor.Draw ();
-
+            
             EditorGUILayout.EndScrollView ();
         }
-
+        
         bool LoadDatabaseFromPath (string absolutePath) {
             string relativePath = absolutePath.GetRelativeUnityAssetPath ();
             LSDatabase database = AssetDatabase.LoadAssetAtPath<LSDatabase> (relativePath);
@@ -119,7 +133,7 @@ namespace Lockstep.Data {
             _databaseEditor = null;
             return false;
         }
-
+        
         void LoadDatabase (LSDatabase database) {
             _database = database;
             _databaseEditor = (EditorLSDatabase)Activator.CreateInstance (typeof(EditorLSDatabase));
@@ -135,26 +149,28 @@ namespace Lockstep.Data {
             LSFSettingsModifier.Save ();
             IsLoaded = true;
         }
-
+        
         bool CreateDatabase (string absolutePath) {
             LSDatabase database = (LSDatabase)ScriptableObject.CreateInstance (DatabaseType);
+            if (database == null) return false;
+
             LoadDatabase (database);
-
+            
             string relativePath = absolutePath.GetRelativeUnityAssetPath ();
-            AssetDatabase.CreateAsset (database, relativePath);
 
+            AssetDatabase.CreateAsset (database, relativePath);
+            
             AssetDatabase.SaveAssets ();
             AssetDatabase.Refresh ();
-
+            
             return true;
         }
-
+        
         void Save () {
             DatabaseEditor.Save ();
             EditorUtility.SetDirty (DatabaseEditor.Database);
             AssetDatabase.SaveAssets ();
         }
-
+        
     }
 }
-#endif

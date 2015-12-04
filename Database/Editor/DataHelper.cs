@@ -93,14 +93,7 @@ namespace Lockstep.Data
         }
         static HashSet<int> duplicateChecker = new HashSet<int> ();
 
-        public void GenerateEnum () {
-            this.CullDuplicates();
-            LSEditorUtility.GenerateEnum (
-                this.SourceEditor.MainWindow.DatabaseDirectory + "/",
-                DataCodeName,
-                this
-                );
-        }
+
         private void CullDuplicates () {
             DataItem[] data = Data as DataItem[];
             bufferData.Clear ();

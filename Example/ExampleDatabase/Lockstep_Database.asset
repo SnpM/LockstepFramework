@@ -91,19 +91,19 @@ MonoBehaviour:
     _listenInput: 15
     _informationGather: 0
     _markType: 0
-  - _name: SetHeight
-    _description: 
-    _icon: {fileID: 0}
-    _script:
-      _classRef: SetHeight, Assembly-CSharp
-    _listenInput: 15
-    _informationGather: 0
-    _markType: 0
   - _name: POCMove
     _description: 
     _icon: {fileID: 0}
     _script:
       _classRef: POCMove, Assembly-CSharp
+    _listenInput: 15
+    _informationGather: 0
+    _markType: 0
+  - _name: SetHeight
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: SetHeight, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0

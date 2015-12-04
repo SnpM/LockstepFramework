@@ -16,8 +16,16 @@ namespace Lockstep.Data {
                 for (int j = 0; j < attributes.Length; j++) {
                     RegisterDataAttribute registerDataAttribute = attributes[j] as RegisterDataAttribute;
                     if (registerDataAttribute != null) {
+                        if (!field.FieldType.IsArray) {
+                            Debug.LogError ("Serialized data field must be array");
+                            continue;
+                        }
+                        if (!field.FieldType.GetElementType().IsSubclassOf (typeof (DataItem))) {
+                            Debug.LogError ("Serialized data type must be derived from DataItem");
+                            continue;
+                        }
                         DataItemInfo dataInfo = new DataItemInfo (
-                            field.FieldType,
+                            field.FieldType.GetElementType (),
                             registerDataAttribute.DisplayName,
                             field.Name
                             );
