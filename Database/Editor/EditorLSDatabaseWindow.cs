@@ -42,7 +42,7 @@ namespace Lockstep.Data {
             DatabasePath = EditorPrefs.GetString (databasePathKey, Application.dataPath);
             LoadDatabaseFromPath (DatabasePath);
             _databaseType = new ClassTypeReference (EditorPrefs.GetString (databaseTypeKey));
-            if (_databaseType.Type == null) _databaseType = typeof (LSDatabase);
+            if (_databaseType.Type == null) _databaseType = typeof (DefaultLSDatabase);
         }
         
         Vector2 scrollPos;
