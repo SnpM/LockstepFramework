@@ -389,7 +389,7 @@ namespace Lockstep
                     isFocused = true;
                     isAttackMoving = false;
                     LSAgent tempTarget;
-                    AgentController.TryGetAgent(com.Target, out tempTarget);
+                    AgentController.TryGetAgentInstance(com.Target, out tempTarget);
                     Engage(tempTarget);
                 }
             }
