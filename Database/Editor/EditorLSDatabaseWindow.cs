@@ -82,8 +82,9 @@ namespace Lockstep.Data {
                 EditorGUILayout.PropertyField (databaseTypeProp, new GUIContent ("Database Type"));
                 EditorPrefs.SetString (databaseTypeKey, _databaseType.Type.AssemblyQualifiedName);
                 
+                
                 if (GUILayout.Button ("Load", GUILayout.MaxWidth (50f))) {
-                    DatabasePath = EditorUtility.OpenFilePanel ("Database File", DatabasePath, "asset");
+                    DatabasePath = EditorUtility.OpenFilePanel ("Database File", "NewDatabase", "asset");
                     if (!string.IsNullOrEmpty (DatabasePath)) {
                         
                         EditorPrefs.SetString (databasePathKey, DatabasePath);
@@ -94,7 +95,7 @@ namespace Lockstep.Data {
                     }
                 }
                 if (GUILayout.Button ("Create", GUILayout.MaxWidth (50f))) {
-                    DatabasePath = EditorUtility.SaveFilePanel ("Database File", DatabasePath, Application.dataPath + "/assets", "asset");
+                    DatabasePath = EditorUtility.SaveFilePanel ("Database File", Application.dataPath, "NewDatabase", "asset");
                     if (!string.IsNullOrEmpty (DatabasePath)) {
                         if (CreateDatabase (DatabasePath)) {
                             Debug.Log ("Database creation succesful!");
@@ -102,7 +103,7 @@ namespace Lockstep.Data {
                             Debug.Log ("Database creation unsuccesful");
                         }
                     }
-                }                
+                }             
                 GUILayout.EndHorizontal ();
                 
                 
