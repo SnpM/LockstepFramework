@@ -36,6 +36,7 @@ namespace Lockstep.Data {
                             registerDataAttribute.DisplayName,
                             field.Name
                             );
+
                             if (nameCollisionChecker.Add (dataInfo.DataName) == false) {
                                 throw new System.Exception("Data Name collision detected for '" + dataInfo.DataName + "'.");
                             }

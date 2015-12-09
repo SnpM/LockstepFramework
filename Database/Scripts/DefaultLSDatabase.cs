@@ -2,6 +2,7 @@
 using System.Collections;
 
 namespace Lockstep.Data {
+    [System.Serializable]
     public class DefaultLSDatabase : LSDatabase {
         #region Agents
         [SerializeField]

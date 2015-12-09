@@ -8,8 +8,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 163f07fc78fcd4072b13c76300ff5472, type: 3}
-  m_Name: Lockstep_Database
+  m_Script: {fileID: 11500000, guid: c1d6c482752cb49aa93b5f9421c22651, type: 3}
+  m_Name: Example_Database
   m_EditorClassIdentifier: 
   _agentData:
   - _name: TestAgent
@@ -80,22 +80,6 @@ MonoBehaviour:
     _icon: {fileID: 0}
     _script:
       _classRef: Lockstep.Turn, Assembly-CSharp
-    _listenInput: 15
-    _informationGather: 0
-    _markType: 0
-  - _name: Stats
-    _description: 
-    _icon: {fileID: 0}
-    _script:
-      _classRef: POC.Stats.Stats, Assembly-CSharp
-    _listenInput: 15
-    _informationGather: 0
-    _markType: 0
-  - _name: POCMove
-    _description: 
-    _icon: {fileID: 0}
-    _script:
-      _classRef: POCMove, Assembly-CSharp
     _listenInput: 15
     _informationGather: 0
     _markType: 0

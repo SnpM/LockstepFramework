@@ -7,9 +7,7 @@ using Lockstep.Data;
 
 namespace Lockstep.Data {
     [Serializable]
-    public class LSDatabase : ScriptableObject, IDatabase {
-
-       
+    public abstract class LSDatabase : ScriptableObject, IDatabase {
 
     }
 
