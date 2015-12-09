@@ -75,8 +75,7 @@ namespace Lockstep.Data {
                 const int maxDirLength = 28;
                 if (GUILayout.Button (DatabasePath.Length > maxDirLength ? "..." + DatabasePath.Substring (DatabasePath.Length - maxDirLength) : DatabasePath, GUILayout.ExpandWidth (true))) {
                 }*/
-                
-                
+
                 SerializedObject obj = new SerializedObject (this);
                 
                 SerializedProperty databaseTypeProp = obj.FindProperty ("_databaseType");

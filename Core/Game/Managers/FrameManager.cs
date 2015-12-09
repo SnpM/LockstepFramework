@@ -75,29 +75,8 @@ namespace Lockstep
                 for (int i = 0; i < frame.Commands.Count; i++)
                 {
                     Command com = frame.Commands [i];
-                    switch (com.LeInput)
-                    {
-                        case InputCode.Meta:
-                            MetaActionCode actionCode = (MetaActionCode)com.Target;
-                            int id = com.Count;
-                            switch (actionCode)
-                            {
-                                case MetaActionCode.NewPlayer:
-                                    AgentController controller = new AgentController();
-                                    if (id == ClientManager.ID)
-                                    {
-                                        PlayerManager.AddController(controller);
-                                    }
-                                    TeamManager.JoinTeam(controller);
+                    LockstepManager.Execute (com);
 
-                                    break;
-                            }
-                            break;
-                        default:
-                            AgentController cont = AgentController.InstanceManagers [com.ControllerID];
-                            cont.Execute(com);
-                            break;
-                    }
                 }
             }
             if (LockstepManager.InfluenceFrameCount == EndFrame)

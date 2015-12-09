@@ -21,7 +21,7 @@ namespace Lockstep {
         public static void Setup ()
         {
 
-            AgentInterfacer[] agentInters = LSDatabaseManager.CurrentDatabase.AgentData;
+            AgentInterfacer[] agentInters = (LSDatabaseManager.CurrentDatabase as DefaultLSDatabase).AgentData;
             AgentCodes = new string[agentInters.Length];
 
             CachedAgents = new Dictionary<string,FastStack<LSAgent>>(agentInters.Length);
@@ -234,7 +234,7 @@ namespace Lockstep {
                 previousSelection = com.Select;
             }
 
-            BehaviourHelper.GlobalExecute (com);
+            BehaviourHelperManager.Execute (com);
             for (int i = 0; i < com.Select.selectedAgentLocalIDs.Count; i++) {
                 ushort selectedAgentID = com.Select.selectedAgentLocalIDs[i];
                 if (LocalAgentActive[selectedAgentID])

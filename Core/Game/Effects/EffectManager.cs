@@ -12,7 +12,7 @@ namespace Lockstep {
         private static Dictionary<string,EffectDataItem> CodeDataMap;
 		public static void Setup ()
 		{
-            EffectDataItem[] effectData = LSDatabaseManager.CurrentDatabase.EffectData;
+            EffectDataItem[] effectData = (LSDatabaseManager.CurrentDatabase as DefaultLSDatabase).EffectData;
 			EffectPool = new Dictionary<string,FastStack<LSEffect>>(effectData.Length);
             CodeDataMap = new Dictionary<string, EffectDataItem>(effectData.Length);
 			for (int i = 0; i < effectData.Length; i++)

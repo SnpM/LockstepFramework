@@ -20,7 +20,7 @@ namespace Lockstep.Data {
         private static Dictionary<Type,AbilityInterfacer>TypeInterfacerMap = new Dictionary<Type, AbilityInterfacer>();
         public static void Setup ()
 	    {
-            AbilityInterfacer[] interfacers = LSDatabaseManager.CurrentDatabase.AbilityData;
+            AbilityInterfacer[] interfacers = (LSDatabaseManager.CurrentDatabase as DefaultLSDatabase).AbilityData;
             for (int i = 0; i < interfacers.Length; i++) {
                 AbilityInterfacer interfacer = interfacers[i];
                 CodeInterfacerMap.Add(interfacer.Name, interfacer);

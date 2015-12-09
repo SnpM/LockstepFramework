@@ -9,60 +9,42 @@ using System.Collections.Generic;
 namespace Lockstep.Data {
     public sealed class EditorLSDatabase : IEditorDatabase {
         private void InitializeData () {
-            FieldInfo[] fields = Database.GetType ().GetFields ((BindingFlags)~0);
-            for (int i = 0; i < fields.Length; i++) {
-                FieldInfo field = fields [i];
-                object[] attributes = field.GetCustomAttributes (typeof (RegisterDataAttribute),false);
-                for (int j = 0; j < attributes.Length; j++) {
-                    RegisterDataAttribute registerDataAttribute = attributes[j] as RegisterDataAttribute;
-                    if (registerDataAttribute != null) {
-                        if (!field.FieldType.IsArray) {
-                            Debug.LogError ("Serialized data field must be array");
-                            continue;
-                        }
-                        if (!field.FieldType.GetElementType().IsSubclassOf (typeof (DataItem))) {
-                            Debug.LogError ("Serialized data type must be derived from DataItem");
-                            continue;
-                        }
-                        DataItemInfo dataInfo = new DataItemInfo (
+            Type databaseType = Database.GetType ();
+            Type foundationType = typeof(LSDatabase);
+            if (!databaseType.IsSubclassOf (foundationType)) {
+                throw new System.Exception ("Database does not inherit from LSDatabase and cannot be edited.");
+            }
+            HashSet<string> nameCollisionChecker = new HashSet<string>();
+            while (databaseType != foundationType) {
+                FieldInfo[] fields = databaseType.GetFields ((BindingFlags)~0);
+                for (int i = 0; i < fields.Length; i++) {
+                    FieldInfo field = fields [i];
+                    object[] attributes = field.GetCustomAttributes (typeof(RegisterDataAttribute), false);
+                    for (int j = 0; j < attributes.Length; j++) {
+                        RegisterDataAttribute registerDataAttribute = attributes [j] as RegisterDataAttribute;
+                        if (registerDataAttribute != null) {
+                            if (!field.FieldType.IsArray) {
+                                Debug.LogError ("Serialized data field must be array");
+                                continue;
+                            }
+                            if (!field.FieldType.GetElementType ().IsSubclassOf (typeof(DataItem))) {
+                                Debug.LogError ("Serialized data type must be derived from DataItem");
+                                continue;
+                            }
+                            DataItemInfo dataInfo = new DataItemInfo (
                             field.FieldType.GetElementType (),
                             registerDataAttribute.DisplayName,
                             field.Name
                             );
-                        RegisterData (dataInfo);
+                            if (nameCollisionChecker.Add (dataInfo.DataName) == false) {
+                                throw new System.Exception("Data Name collision detected for '" + dataInfo.DataName + "'.");
+                            }
+                            RegisterData (dataInfo);
+                        }
                     }
                 }
+                databaseType = databaseType.BaseType;
             }
-            /*
-            RegisterData(
-                typeof (AgentInterfacer),
-                "Agents",
-                "_agentData",
-                new SortInfo(
-                "Order Units First",
-                (a) => (a as AgentInterfacer).SortDegreeFromAgentType(AgentType.Unit)
-                ),
-                new SortInfo(
-                "Order Buildings First",
-                (a) => (a as AgentInterfacer).SortDegreeFromAgentType(AgentType.Building)
-                )
-                );
-            RegisterData(
-                typeof(ProjectileDataItem),
-                "Projectiles",
-                "_projectileData"
-                );
-            RegisterData(
-                typeof(EffectDataItem),
-                "Effects",
-                "_effectData"
-                );
-            RegisterData(
-                typeof(AbilityInterfacer),
-                "Abilities",
-                "_abilityData"
-                );
-                */
         }
 
         public bool IsValid { get; private set; }

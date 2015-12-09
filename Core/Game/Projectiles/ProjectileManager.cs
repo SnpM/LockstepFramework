@@ -13,7 +13,7 @@ namespace Lockstep {
 
 		public static void Setup ()
         {
-            ProjectileDataItem[] projectileData = LSDatabaseManager.CurrentDatabase.ProjectileData;
+            ProjectileDataItem[] projectileData = (LSDatabaseManager.CurrentDatabase as DefaultLSDatabase).ProjectileData;
             for (int i = 0; i < projectileData.Length; i++)
             {
                 ProjectileDataItem item = projectileData[i];

@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using System.Collections;
 
 namespace Lockstep {
-    public abstract class GameManager : MonoBehaviour {
+    public abstract class GameManager : MonoBehaviour{
         public static GameManager Instance { get; private set; }
     
         string replayLoadScene;
@@ -17,10 +17,8 @@ namespace Lockstep {
             get;
         }
 
-        public virtual LSManager[] Managers {
-            get {
-                return new LSManager[0];
-            }
+        public virtual void GetBehaviourHelpers (FastList<BehaviourHelper> output) {
+
         }
     
         protected void Start () {

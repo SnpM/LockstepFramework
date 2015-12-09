@@ -217,6 +217,7 @@
         Coord = 1 << 3,
         Count = 1 << 4,
         Select = 1 << 5,
-        GroupID = 1 << 6
+        GroupID = 1 << 6,
+        TExt = 1 << 7
 	}
 }

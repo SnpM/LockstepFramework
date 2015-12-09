@@ -11,6 +11,12 @@ namespace Lockstep.Example {
         private NetworkHelper _mainNetworkHelper = new ExampleNetworkHelper ();
 
         protected FastList<LSAgent> spawnedAgents = new FastList<LSAgent>();
+
+        public override void GetBehaviourHelpers (FastList<BehaviourHelper> output) {
+            output.Add (new MovementGroupHandler());
+            output.Add (new ScanGroupHandler());
+        }
+
         public override NetworkHelper MainNetworkHelper {
             get {
                 return _mainNetworkHelper;
