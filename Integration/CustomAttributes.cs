@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Reflection;
 using System;
+using Lockstep.Data;
 
 public class FixedNumberAttribute : PropertyAttribute {
 	public bool Timescaled = false;

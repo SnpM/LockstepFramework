@@ -22,6 +22,9 @@ namespace Lockstep.Data {
         }
 
         public static void Setup () {
+            //LSFSettingsManagers.GetSettings().Database is the most recent database loaded/created.
+            //You can also set this manually by dragging the desired database onto the saved LSFSettings in...
+            //'Assets/Resources/LockstepFrameworkSettings'
             LSDatabase database = LSFSettingsManager.GetSettings ().Database;
             _currentDatabase = database;
         }
