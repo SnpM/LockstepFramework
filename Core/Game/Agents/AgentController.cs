@@ -51,6 +51,10 @@ namespace Lockstep {
         public static string GetAgentCode (ushort id) {
             return AgentCodes[id];
         }
+
+        public static bool IsValidAgentCode (string code) {
+            return CodeInterfacerMap.ContainsKey(code);
+        }
         
         public static void Initialize() {
             InstanceManagers.FastClear();
@@ -261,7 +265,9 @@ namespace Lockstep {
         public LSAgent CreateAgent(string agentCode,
                                    Vector2d position = default(Vector2d)) {
             Vector2d vec = new Vector2d(0,1);
-            
+            if (!IsValidAgentCode (agentCode)) {
+                throw new System.ArgumentException(string.Format("Agent code '{0}' not found.", agentCode));
+            }
             FastStack<LSAgent> cache = CachedAgents[agentCode];
             LSAgent curAgent = null;
             if (cache .IsNotNull () && cache.Count > 0) {

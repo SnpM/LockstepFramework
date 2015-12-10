@@ -29,7 +29,11 @@ namespace Lockstep.Data {
 		}
 
 		public static AbilityInterfacer FindInterfacer (string code) {
-			return CodeInterfacerMap [code];
+            AbilityInterfacer output;
+            if (!CodeInterfacerMap.TryGetValue(code, out output)) {
+                throw new System.Exception(string.Format("AbilityInterfacer for code '{0}' not found.",code));
+            }
+            return output;
 		}
 
         public static AbilityInterfacer FindInterfacer (Type type) {

@@ -15,6 +15,11 @@ namespace Lockstep.Example {
         public override void GetBehaviourHelpers (FastList<BehaviourHelper> output) {
             output.Add (new MovementGroupHandler());
             output.Add (new ScanGroupHandler());
+            EnvironmentSaver saver;
+            if ((saver = GameObject.FindObjectOfType<EnvironmentSaver> ()) != null) {
+                output.Add(saver.GetHelper());
+            }
+
         }
 
         public override NetworkHelper MainNetworkHelper {

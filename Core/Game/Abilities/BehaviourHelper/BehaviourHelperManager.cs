@@ -5,14 +5,8 @@ namespace Lockstep {
     public static class BehaviourHelperManager {
         private static BehaviourHelper[] Helpers { get; set; }
 
-        public static void Setup (BehaviourHelper[] helpers) {
+        public static void Initialize (BehaviourHelper[] helpers) {
             Helpers = helpers;
-            foreach (BehaviourHelper helper in helpers) {
-                helper.Setup ();
-            }
-        }
-
-        public static void Initialize () {
             foreach (BehaviourHelper helper in Helpers) {
                 helper.Initialize ();
             }

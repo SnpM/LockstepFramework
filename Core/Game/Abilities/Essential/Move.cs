@@ -266,7 +266,7 @@ namespace Lockstep {
         }
 		public void RegisterGroup (bool moveOnProcessed = true) {
             MoveOnGroupProcessed = moveOnProcessed;
-			MovementGroupHandler.LastCreatedGroup.Add(this);
+            MovementGroupHandler.LastCreatedGroup.Add(this);
 			
 			if (straightPath) {
 				repathCount /= 8;

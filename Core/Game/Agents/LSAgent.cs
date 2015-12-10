@@ -199,6 +199,10 @@ namespace Lockstep {
 
         public AgentInterfacer Interfacer {get; private set;}
 
+        void Awake () {
+            gameObject.SetActive(false);
+        }
+
         public void Setup(AgentInterfacer interfacer) {
 			
             LoadComponents ();

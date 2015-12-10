@@ -10,16 +10,9 @@ public abstract class BehaviourHelper
 	private static HashSet<Type> createdTypes = new HashSet<Type> ();
 	
 
-	public abstract InputCode ListenInput { get;}
-	
-	public void Setup ()
-	{
-		OnSetup ();
-	}
-	
-	protected virtual void OnSetup ()
-	{
-	}
+	public virtual InputCode ListenInput {
+        get {return InputCode.None;}
+    }
 	
 	public void Initialize ()
 	{

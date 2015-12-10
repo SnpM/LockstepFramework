@@ -44,7 +44,7 @@ namespace Lockstep {
 
         public static GameManager MainGameManager {get; private set;}
 
-        public static void Setup () {
+        internal static void Setup () {
 
             LSDatabaseManager.Setup ();
 
@@ -60,11 +60,6 @@ namespace Lockstep {
             ProjectileManager.Setup();
             EffectManager.Setup();
 
-
-            FastList<BehaviourHelper> helpers = new FastList<BehaviourHelper>();
-            MainGameManager.GetBehaviourHelpers (helpers);
-
-            BehaviourHelperManager.Setup(helpers.ToArray ());
 			PhysicsManager.Setup ();
 			ClientManager.Setup (MainGameManager.MainNetworkHelper);
             InterfaceManager.Setup();
@@ -76,11 +71,10 @@ namespace Lockstep {
 			InputManager.Setup ();
         }
 
-        public static void Initialize(GameManager gameManager) {
-
+        internal static void Initialize(GameManager gameManager) {
+            MainGameManager = gameManager;
 
             if (!Loaded) {
-                MainGameManager = gameManager;
                 Setup ();
                 Loaded = true;
             }
@@ -107,7 +101,6 @@ namespace Lockstep {
 			FrameManager.Initialize();
 
             CommandManager.Initialize();
-			BehaviourHelperManager.Initialize();
 
             AgentController.Initialize();
 			TeamManager.LateInitialize ();
@@ -123,10 +116,19 @@ namespace Lockstep {
 			Started = true;
             ClientManager.Initialize ();
 
+            InitializeHelpers ();
+
+
+        }
+
+        static void InitializeHelpers () {
+            FastList<BehaviourHelper> helpers = new FastList<BehaviourHelper>();
+            MainGameManager.GetBehaviourHelpers (helpers);
+            BehaviourHelperManager.Initialize(helpers.ToArray ());
         }
 
 		static bool Stalled;
-        public static void Simulate() {
+        internal static void Simulate() {
 			if (InfluenceCount == 0)
 			{
 				InfluenceSimulate ();
@@ -168,13 +170,13 @@ namespace Lockstep {
 			AgentController.LateSimulate ();
 			PhysicsManager.LateSimulate ();
 		}
-		public static void InfluenceSimulate () {
+        internal static void InfluenceSimulate () {
 			PlayerManager.Simulate();
 			CommandManager.Simulate();
 			ClientManager.Simulate ();
 		}
 
-        public static void Execute (Command com) {
+        internal static void Execute (Command com) {
             switch (com.LeInput)
             {
                 case InputCode.None:
@@ -203,7 +205,7 @@ namespace Lockstep {
             }
         }
 
-        public static void Visualize() {
+        internal static void Visualize() {
 			PlayerManager.Visualize();
 
 			BehaviourHelperManager.Visualize();
@@ -214,14 +216,13 @@ namespace Lockstep {
 
 			TeamManager.Visualize ();
 
-			//LateVisualize ();
         }
 
-		public static void LateVisualize () {
+        internal static void LateVisualize () {
 			InputManager.Visualize();
 		}
 
-        public static void Deactivate() {
+        internal static void Deactivate() {
             if (Started == false) return;
             Selector.Clear();
             AgentController.Deactivate();

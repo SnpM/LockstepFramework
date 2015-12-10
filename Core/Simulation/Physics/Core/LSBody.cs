@@ -201,7 +201,9 @@ namespace Lockstep
 		}
 		
 		public void Initialize (Vector2d StartPosition, Vector2d StartRotation)
-		{
+        {
+            CheckVariables ();
+
 			Parent = null;
 			
 			PositionChanged = true;
@@ -248,6 +250,13 @@ namespace Lockstep
 			lastVisualRot = visualRot;
 			_positionalTransform.rotation = visualRot;
 		}
+
+        void CheckVariables () {
+            if (_positionalTransform == null)
+                this._positionalTransform = base.transform;
+            if (_rotationalTransform == null)
+                this._rotationalTransform = base.transform;
+        }
 		
 		public void BuildPoints ()
 		{
