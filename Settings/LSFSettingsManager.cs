@@ -18,7 +18,7 @@ namespace Lockstep {
                     settings = ScriptableObject.CreateInstance <LSFSettings> ();
                     if (!System.IO.Directory.Exists(Application.dataPath + "/Resources"))
                         AssetDatabase.CreateFolder ("Assets","Resources");
-                    AssetDatabase.CreateAsset (settings,"Assets/Resources/" + SETTINGS_NAME);
+                    AssetDatabase.CreateAsset (settings,"Assets/Resources/" + SETTINGS_NAME + ".asset");
                     AssetDatabase.SaveAssets();
                     AssetDatabase.Refresh ();
                 }

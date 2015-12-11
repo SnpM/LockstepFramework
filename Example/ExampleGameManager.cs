@@ -13,7 +13,7 @@ namespace Lockstep.Example {
         protected FastList<LSAgent> spawnedAgents = new FastList<LSAgent>();
 
         public override void GetBehaviourHelpers (FastList<BehaviourHelper> output) {
-
+            base.GetBehaviourHelpers(output);
 
         }
 
