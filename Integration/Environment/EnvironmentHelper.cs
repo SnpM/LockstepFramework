@@ -31,6 +31,9 @@ namespace Lockstep
                 {
                     info.Body.Initialize(info.Position, info.Rotation);
                 }
+                foreach (EnvironmentTriggerInfo info in Saver.EnvironmentTriggers) {
+                    info.Trigger.Initialize();
+                }
             }
         }
     }

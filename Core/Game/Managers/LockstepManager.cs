@@ -92,6 +92,8 @@ namespace Lockstep {
             FrameCount = 0;
 			InfluenceFrameCount = 0;
 
+            TriggerManager.Initialize();
+
             GridManager.Generate();
             GridManager.Initialize();
 
@@ -157,6 +159,8 @@ namespace Lockstep {
             TestManager.Simulate ();
 
 			TeamManager.Simulate ();
+
+            TriggerManager.Simulate();
 
 			LateSimulate ();
             FrameCount++;
@@ -229,6 +233,7 @@ namespace Lockstep {
 			BehaviourHelperManager.Deactivate ();
             ProjectileManager.Deactivate();
 			ClientManager.Deactivate ();
+            LockstepManager.Deactivate();
 
 			TeamManager.Deactivate ();
             ClientManager.NetworkHelper.Disconnect ();
