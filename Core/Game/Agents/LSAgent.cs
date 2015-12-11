@@ -81,6 +81,9 @@ namespace Lockstep {
 		[SerializeField]
 		private LSBody _body;
 		public LSBody Body { get {return _body;} }
+        [SerializeField]
+        private LSTrigger[] _triggers;
+        public LSTrigger[] Triggers {get {return _triggers;}}
 		[SerializeField]
 		private LSAnimator _animator;
 		public LSAnimator Animator { get {return _animator;} }
@@ -264,6 +267,12 @@ namespace Lockstep {
                 Body.Initialize(position, Vector2d.up);
             }
 
+            if (Triggers.IsNotNull()) {
+                foreach (LSTrigger trigger in Triggers) {
+                    trigger.Initialize();
+                }
+            }
+
             if (Influencer .IsNotNull ()) {
                 Influencer.Initialize();
             }
@@ -417,6 +426,7 @@ namespace Lockstep {
             _body = GetComponent<LSBody> ();
             _animator = GetComponent<LSAnimator> ();
             _attachedAbilities = GetComponents<Ability> ();
+            _triggers = GetComponents<LSTrigger> ();
         }
 #if UNITY_EDITOR
 		public void RefreshComponents () {
