@@ -4,17 +4,12 @@ using TypeReferences;
 
 namespace Lockstep
 {
+    /// <summary>
+    /// Triggers check for input and send a message when Trigger () is called.
+    /// </summary>
     public abstract class LSTrigger : MonoBehaviour
     {
-        [SerializeField,ClassImplements(typeof(ITriggerMessage))]
-        private ClassTypeReference _triggerMessageType;
 
-        ClassTypeReference TriggerMessageType { get { return _triggerMessageType; } }
-
-        [SerializeField]
-        private string _channelID;
-
-        string ChannelID { get { return _channelID; } }
 
         internal int ID {
             get; set;
@@ -37,14 +32,15 @@ namespace Lockstep
         /// <summary>
         /// Called every frame for checking for stimuli.
         /// </summary>
-        protected abstract void OnCheckInput();
+        protected virtual void OnCheckInput() {
+
+        }
 
         /// <summary>
         /// Call to trigger.
         /// </summary>
         protected void Trigger()
         {
-
             OnTrigger();
         }
 
@@ -56,12 +52,12 @@ namespace Lockstep
 
         }
 
-        public void End () {
+        public void Deactivate () {
             TriggerManager.Dessimilate(this);
-            OnEnd ();
+            this.OnDeactivate ();
         }
 
-        protected virtual void OnEnd () {
+        protected virtual void OnDeactivate () {
 
         }
 

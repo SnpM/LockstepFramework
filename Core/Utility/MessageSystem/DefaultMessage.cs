@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Lockstep
 {
-    public interface ITriggerMessage
+    public struct DefaultMessage
     {
     }
 }

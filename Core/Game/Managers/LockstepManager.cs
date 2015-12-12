@@ -46,6 +46,8 @@ namespace Lockstep {
 
         internal static void Setup () {
 
+            DefaultMessageRaiser.EarlySetup();
+
             LSDatabaseManager.Setup ();
 
 			UnityInstance = GameObject.CreatePrimitive (PrimitiveType.Sphere).AddComponent<MonoBehaviour> ();
@@ -69,6 +71,8 @@ namespace Lockstep {
 			Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
 
 			InputManager.Setup ();
+
+            DefaultMessageRaiser.LateSetup();
         }
 
         internal static void Initialize(GameManager gameManager) {
@@ -79,6 +83,7 @@ namespace Lockstep {
                 Loaded = true;
             }
 
+            DefaultMessageRaiser.EarlyInitialize();
 
 			SimulationTimer.Reset ();
 			SimulationTimer.Start ();
@@ -120,7 +125,7 @@ namespace Lockstep {
 
             InitializeHelpers ();
 
-
+            DefaultMessageRaiser.LateInitialize();
         }
 
         static void InitializeHelpers () {
@@ -131,6 +136,7 @@ namespace Lockstep {
 
 		static bool Stalled;
         internal static void Simulate() {
+            DefaultMessageRaiser.EarlySimulate ();
 			if (InfluenceCount == 0)
 			{
 				InfluenceSimulate ();
@@ -173,6 +179,7 @@ namespace Lockstep {
             BehaviourHelperManager.LateSimulate ();
 			AgentController.LateSimulate ();
 			PhysicsManager.LateSimulate ();
+            DefaultMessageRaiser.LateSimulate ();
 		}
         internal static void InfluenceSimulate () {
 			PlayerManager.Simulate();
@@ -181,6 +188,7 @@ namespace Lockstep {
 		}
 
         internal static void Execute (Command com) {
+            
             switch (com.LeInput)
             {
                 case InputCode.None:
@@ -204,12 +212,15 @@ namespace Lockstep {
                 default:
                     AgentController cont = AgentController.InstanceManagers [com.ControllerID];
                     cont.Execute(com);
-
                     break;
             }
+
+            DefaultMessageRaiser.Execute (com);
+
         }
 
         internal static void Visualize() {
+            DefaultMessageRaiser.EarlyVisualize();
 			PlayerManager.Visualize();
 
 			BehaviourHelperManager.Visualize();
@@ -219,14 +230,17 @@ namespace Lockstep {
             EffectManager.Visualize();
 
 			TeamManager.Visualize ();
-
         }
 
         internal static void LateVisualize () {
 			InputManager.Visualize();
+            DefaultMessageRaiser.LateVisualize();
+
 		}
 
         internal static void Deactivate() {
+            DefaultMessageRaiser.EarlyDeactivate();
+
             if (Started == false) return;
             Selector.Clear();
             AgentController.Deactivate();
@@ -238,6 +252,8 @@ namespace Lockstep {
 			TeamManager.Deactivate ();
             ClientManager.NetworkHelper.Disconnect ();
 			Started = false;
+
+            DefaultMessageRaiser.LateDeactivate();
         }
 
 		public static void Quit () {

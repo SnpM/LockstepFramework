@@ -4,14 +4,20 @@ using System;
 using System.Collections.Generic;
 namespace Lockstep
 {
-    public class LSMessageManager
+    public class MessageManager
     {
-        public static LSMessageManager Instance {get; private set;}
-        static LSMessageManager () {
-            Instance = new LSMessageManager();
+        public static MessageManager Instance {get; private set;}
+        static MessageManager () {
+            Instance = new MessageManager();
+        }
+            
+        public void Reset () {
+            foreach (KeyValuePair<Type,BaseMessageStop> stop in this.Stops) {
+                stop.Value.Clear();
+            }
         }
 
-        private readonly Dictionary<Type,object> Stops = new Dictionary<Type, object>();
+        private readonly Dictionary<Type,BaseMessageStop> Stops = new Dictionary<Type, BaseMessageStop>();
         public int Subscribe <TMessage> (Action<TMessage> client, string channelID = "") {
             MessageChannel<TMessage> channel = GetMessageChannel<TMessage> ( channelID);
             int ticket = channel.Subscribe (client);
@@ -36,21 +42,37 @@ namespace Lockstep
         }
         private MessageStop<TMessage> GetMessageStop <TMessage> () {
             MessageStop<TMessage> stop;
-            object stopObj;
-            Type messageType = typeof (TMessage);
-            if (!Stops.TryGetValue (messageType, out stopObj)) {
-                stop = new MessageStop<TMessage>();
-                Stops.Add(messageType, (object)stop);
-            }
-            else {
-                stop = (MessageStop<TMessage>)stopObj;
-            }
+            BaseMessageStop baseStop = GetMessageStop (typeof (TMessage));
+            stop = baseStop as MessageStop<TMessage>;
             return stop;
         }
+        private BaseMessageStop GetMessageStop (Type messageType) {
+            BaseMessageStop baseStop;
+            if (!Stops.TryGetValue (messageType, out baseStop)) {
+                Type genericClass = typeof(MessageStop<>);
+                // MakeGenericType is badly named
+                Type constructedClass = genericClass.MakeGenericType(messageType);
+
+                object objStop = Activator.CreateInstance(constructedClass);
+                baseStop = (BaseMessageStop)objStop;
+
+                Stops.Add(messageType, baseStop);
+
+            }
+            else {
+            }
+            return baseStop;
+        }
         private MessageChannel<TMessage> GetMessageChannel <TMessage> (string channelID) {
-            MessageStop<TMessage> stop = GetMessageStop<TMessage> ();
-            MessageChannel<TMessage> channel = stop.GetChannel(channelID);
-            return channel;
+            return GetMessageChannel (typeof (TMessage), channelID) as MessageChannel<TMessage>;
+        }
+
+        public BaseMessageChannel GetMessageChannel (Type messageType, string channelID) {
+            if (channelID == null)
+                channelID = "";
+            BaseMessageStop baseStop = GetMessageStop (messageType);
+            return baseStop.GetChannel(channelID);
+
         }
     }
 }

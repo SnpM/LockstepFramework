@@ -584,6 +584,7 @@ namespace Lockstep
 					Children [i].Parent = null;
 				}
 			}
+            PhysicsManager.Dessimilate(this);
 		} 
 
 		public void Teleport (Vector2d destination) {

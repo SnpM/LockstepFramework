@@ -435,12 +435,17 @@ namespace Lockstep {
 
             xAbs = PenetrationX < 0 ? -PenetrationX : PenetrationX;
             yAbs = PenetrationY < 0 ? -PenetrationY : PenetrationY;
-            if (xAbs > yAbs) {
-                PenetrationX = 0;//FixedMath.Mul (PenetrationX, FixedMath.One * 1 / 4);
-            } else {
-                PenetrationY = 0;//FixedMath.Mul (PenetrationX, FixedMath.One * 1 / 4);
-            }
+            if (xAbs <= circle.Radius && yAbs <= circle.Radius) {
 
+            }
+            else {
+                if (xAbs > yAbs) {
+                    PenetrationX = 0;//FixedMath.Mul (PenetrationX, FixedMath.One * 1 / 4);
+                } else {
+
+                    PenetrationY = 0;//FixedMath.Mul (PenetrationX, FixedMath.One * 1 / 4);
+                }
+            }
             //Resolving
             circle.Position.x -= PenetrationX;//(PenetrationX * Multiplier) >> FixedMath.SHIFT_AMOUNT;
             circle.Position.y -= PenetrationY;//(PenetrationY * Multiplier) >> FixedMath.SHIFT_AMOUNT;

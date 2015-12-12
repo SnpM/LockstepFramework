@@ -362,7 +362,7 @@ namespace Lockstep {
 			
 			abilityManager.Deactivate();
 			
-			PhysicsManager.Dessimilate(Body);
+            Body.Deactivate();
 			if (Influencer .IsNotNull ()) {
 				Influencer.Deactivate();
 			}

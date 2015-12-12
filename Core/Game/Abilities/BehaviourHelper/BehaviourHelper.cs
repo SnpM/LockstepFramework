@@ -3,9 +3,13 @@ using System.Collections;
 using Lockstep;
 using System.Collections.Generic;
 using System;
-public abstract class BehaviourHelper
+public abstract class BehaviourHelper : MonoBehaviour, IBehaviourHelper
 {
-	
+
+    public BehaviourHelper () {
+
+    }
+
 	private static FastList<BehaviourHelper> behaviourHelpers = new FastList<BehaviourHelper> ();
 	private static HashSet<Type> createdTypes = new HashSet<Type> ();
 	

@@ -752,7 +752,7 @@ MonoBehaviour:
   _priority: 0
   RaycastVersion: 0
   Shape: 1
-  IsTrigger: 1
+  IsTrigger: 0
   Layer: 0
   HalfWidth: 0
   HalfHeight: 0
@@ -854,6 +854,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 465e861767b9e445eafba76f21bd0dd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _helpers: []
   _spawnCode: TestAgent
   _spawnAmount: 5
 --- !u!114 &1811928837
@@ -868,13 +869,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _environmentBodies:
-  - Body: {fileID: 1337110325}
-    Position:
-      x: -185466
-      y: -207749
-    Rotation:
-      x: 0
-      y: 65536
   - Body: {fileID: 132334610}
     Position:
       x: 527564
@@ -896,6 +890,14 @@ MonoBehaviour:
     Rotation:
       x: 0
       y: 65536
+  - Body: {fileID: 1337110325}
+    Position:
+      x: -185466
+      y: -207749
+    Rotation:
+      x: 0
+      y: 65536
+  _environmentTriggers: []
 --- !u!1001 &2144495884
 Prefab:
   m_ObjectHideFlags: 0

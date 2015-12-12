@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 namespace Lockstep
 {
-    public class MessageChannel<TMessage>
+    public class MessageChannel<TMessage> : BaseMessageChannel
     {
         private readonly FastList<Action<TMessage>> _lazyClients = new FastList<Action<TMessage>>();
         FastList<Action<TMessage>> LazyClients {get {return _lazyClients;}}
@@ -27,7 +27,8 @@ namespace Lockstep
             LazyClients.Remove(client);
         }
 
-        public void Invoke (TMessage message) {
+        protected override void OnInvoke (object obj) {
+            TMessage message = (TMessage)obj;
             for (int i = Clients.PeakCount - 1; i >= 0; i--) {
                 if (Clients.arrayAllocation[i]) {
                     Clients[i].Invoke (message);
@@ -39,8 +40,8 @@ namespace Lockstep
         }
 
         public void Clear () {
-            LazyClients.FastClear();
-            Clients.FastClear();
+            LazyClients.Clear();
+            Clients.Clear();
         }
     }
 }

@@ -5,6 +5,7 @@ namespace Lockstep
 {
     public class EnvironmentHelper : BehaviourHelper
     {
+
         public override InputCode ListenInput
         {
             get
@@ -13,27 +14,35 @@ namespace Lockstep
             }
         }
 
-        public EnvironmentSaver Saver { get; private set; }
 
-        public EnvironmentHelper(EnvironmentSaver saver)
-        {
-            this.Saver = saver;
+        #if UNITY_EDITOR
+        [SerializeField]
+        private GameObject _saverObject;
+        GameObject SaverObject {get {return _saverObject;}}
+        public void ScanAndSave () {
+            if (SaverObject == null) {
+                Debug.Log ("Please assign 'Saver Object'");
+                return;
+            }
+            _savers = SaverObject.GetComponents<EnvironmentSaver> (); //Gets savers from SaverObject
+            foreach (EnvironmentSaver saver in Savers) {
+                saver.Save();
+            }
         }
+
+        void Reset () {
+            this._saverObject = this.gameObject;
+        }
+        #endif
+
+        [SerializeField]
+        private EnvironmentSaver[] _savers;
+        public EnvironmentSaver[] Savers { get {return _savers;}}
 
         protected override void OnInitialize()
         {
-            if (Saver.EnvironmentBodies == null)
-            {
-                Debug.Log("No EnvironmentBodies found in Saver - Ignoring.");
-            } else
-            {
-                foreach (EnvironmentBodyInfo info in Saver.EnvironmentBodies)
-                {
-                    info.Body.Initialize(info.Position, info.Rotation);
-                }
-                foreach (EnvironmentTriggerInfo info in Saver.EnvironmentTriggers) {
-                    info.Trigger.Initialize();
-                }
+            foreach (EnvironmentSaver saver in Savers) {
+                saver.Apply ();
             }
         }
     }

@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Lockstep.Data;
+using TypeReferences;
+using System;
 namespace Lockstep.Example {
     public class ExampleGameManager : GameManager {
+
         [SerializeField,DataCode ("Agents")]
         private string _spawnCode;
         [SerializeField]
@@ -14,7 +17,8 @@ namespace Lockstep.Example {
 
         public override void GetBehaviourHelpers (FastList<BehaviourHelper> output) {
             base.GetBehaviourHelpers(output);
-
+            output.Add (new MovementGroupHandler());
+            output.Add (new ScanGroupHandler());
         }
 
         public override NetworkHelper MainNetworkHelper {

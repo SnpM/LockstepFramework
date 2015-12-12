@@ -2,11 +2,19 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-
+using TypeReferences;
+using System;
 namespace Lockstep {
     public abstract class GameManager : MonoBehaviour{
+
+        [SerializeField]
+        BehaviourHelper[] _helpers;
+        BehaviourHelper[] Helpers {get {return _helpers;}}
+
+
         public static GameManager Instance { get; private set; }
-    
+
+
         string replayLoadScene;
         static int hashFrame;
         static long prevHash;
@@ -17,12 +25,18 @@ namespace Lockstep {
             get;
         }
 
+        public void ScanForHelpers () {
+            //Currently deterministic but not guaranteed by Unity
+            _helpers = this.gameObject.GetComponents<BehaviourHelper> ();
+        }
+
         public virtual void GetBehaviourHelpers (FastList<BehaviourHelper> output) {
-            output.Add (new MovementGroupHandler());
-            output.Add (new ScanGroupHandler());
-            EnvironmentSaver saver;
-            if ((saver = GameObject.FindObjectOfType<EnvironmentSaver> ()) != null) {
-                output.Add(saver.GetHelper());
+            //if (Helpers == null)
+                ScanForHelpers ();
+            if (Helpers != null) {
+                for (int i = 0; i < Helpers.Length; i++) {
+                    output.Add(Helpers[i]);
+                }
             }
         }
     

@@ -166,7 +166,7 @@ namespace Lockstep
 		static int id;
         static LSBody other;
 
-		public static int Assimilate (LSBody body) {
+		internal static int Assimilate (LSBody body) {
 			if (CachedIDs.Count > 0) {
 				id = CachedIDs.Pop ();
 			} else {
@@ -204,7 +204,7 @@ namespace Lockstep
 			pair.Initialize (body1, body2);
 		}
 
-		public static void Dessimilate (LSBody body) {
+		internal static void Dessimilate (LSBody body) {
 			if (!SimObjectExists [body.ID]) {
 				Debug.LogWarning ("Object with ID" + body.ID.ToString () + "cannot be dessimilated because it it not assimilated");
 				return;

@@ -10,8 +10,12 @@ public class Marker : MonoBehaviour {
 	private static Color FriendlyColor = Color.green;
 	private static Color AggresiveColor = Color.red;
 	private static Vector3 InactivePosition = new Vector3(0,10000,0);
+    bool hasRenderer {get; set;}
 	void Awake () {
-		material = renderer.material;
+        hasRenderer = renderer != null;
+        if (hasRenderer) {
+        material = renderer.material;
+        }
 	}
 
 	public void PlayOneShot (Vector3 pos, Vector3 norm, MarkerType markerType) {
@@ -19,6 +23,7 @@ public class Marker : MonoBehaviour {
 		renderer.gameObject.SetActiveIfNot (true);
 
 		transform.position = pos;
+            if (!hasRenderer) return;
 		switch (markerType)
 		{
 		case MarkerType.Neutral:

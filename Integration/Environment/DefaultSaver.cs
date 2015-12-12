@@ -4,7 +4,7 @@ using Lockstep;
 
 namespace Lockstep
 {
-    public class EnvironmentSaver : MonoBehaviour
+    public class DefaultSaver : EnvironmentSaver
     {
         [SerializeField]
         private EnvironmentBodyInfo[] _environmentBodies;
@@ -13,13 +13,19 @@ namespace Lockstep
         private EnvironmentTriggerInfo[] _environmentTriggers;
         public EnvironmentTriggerInfo[] EnvironmentTriggers {get {return _environmentTriggers;}}
 
-        public EnvironmentHelper GetHelper () {
-            return new EnvironmentHelper(this);
-        }
 
-        public void ScanAndSave () {
+        protected override void OnSave () {
             SaveBodies ();
             SaveTriggers ();
+        }
+
+        protected override void OnApply () {
+            foreach (EnvironmentBodyInfo info in EnvironmentBodies) {
+                info.Body.InitializeSerialized();
+            }
+            foreach (EnvironmentTriggerInfo info in EnvironmentTriggers) {
+                info.Trigger.Initialize();
+            }
         }
 
         void SaveBodies () {
@@ -52,5 +58,6 @@ namespace Lockstep
             if (mb.IsNull()) return false;
             return mb.GetComponent<LSAgent>().IsNotNull();
         }
+
     }
 }
