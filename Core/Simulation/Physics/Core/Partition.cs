@@ -14,7 +14,7 @@ namespace Lockstep
 	public static class Partition
 	{
 		#region Settings
-		public const int Count = 128;
+		public const int Count = 256;
 		public const int ShiftSize = FixedMath.SHIFT_AMOUNT + 2;
 		public const long OffsetX = -(1 << ShiftSize) * Count / 2;
 		public const long testX = -FixedMath.One * 32;
@@ -62,7 +62,6 @@ namespace Lockstep
 				for (long o = Body.PastGridXMin; o <= Body.PastGridXMax; o++) {
 					for (long p = Body.PastGridYMin; p <= Body.PastGridYMax; p++) {
 						PartitionNode node = Nodes [o * Count + p];
-
 						node.Remove (Body.ID);
 					}
 				}
@@ -107,8 +106,7 @@ namespace Lockstep
 		{
 
 			_Version++;
-			int activatedPeakCount = ActivatedNodes.PeakCount;
-			for (int i = 0; i < activatedPeakCount; i++) {
+            for (int i = ActivatedNodes.PeakCount - 1; i >= 0; i--) {
 				if (ActivatedNodes.arrayAllocation[i])
 				{
 					PartitionNode node = ActivatedNodes[i];
