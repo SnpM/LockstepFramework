@@ -160,7 +160,7 @@ namespace Lockstep
 			NetworkHelper.SendMessageToServer (messageType, data);
 		}
 
-		private static bool isConnected { get { return NetworkHelper.IsConnected;} }
+		private static bool isConnected { get { return NetworkHelper != null && NetworkHelper.IsConnected;} }
 
 		private static void Connect (string ip)
 		{
