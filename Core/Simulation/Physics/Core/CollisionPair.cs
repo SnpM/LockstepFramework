@@ -24,9 +24,12 @@ namespace Lockstep
         public static long PenetrationX;
         public static long PenetrationY;
         public static CollisionPair CurrentCollisionPair;
+        bool IsValid {get; set;}
 
         public void Initialize(LSBody b1, LSBody b2)
         {
+            IsValid = PhysicsManager.RequireCollisionPair(b1,b2);
+
             PartitionVersion = 0;
             Body1 = b1;
             Body2 = b2;
@@ -39,6 +42,7 @@ namespace Lockstep
 
             CacheSqrDistance = b1.Radius + b2.Radius;
             CacheSqrDistance *= CacheSqrDistance;
+            if (!IsValid) return;
 
             LeCollisionType = CollisionType.None;
             if (Body1.Shape == ColliderType.None || Body2.Shape == ColliderType.None)
