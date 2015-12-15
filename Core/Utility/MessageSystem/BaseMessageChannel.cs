@@ -32,6 +32,7 @@ namespace Lockstep
             for (int i = LazyClients.Count - 1; i >= 0; i--) {
                 LazyClients[i].Invoke(message);
             }
+            this.OnInvoke(message);
         }
         protected virtual void OnInvoke (object message) {
 

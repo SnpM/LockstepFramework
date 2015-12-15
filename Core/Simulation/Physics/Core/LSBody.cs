@@ -31,6 +31,8 @@ namespace Lockstep
 		bool SetVisualPosition;
 		bool SetVisualRotation;
 		
+        public bool Setted {get; private set;}
+
 		public Vector2d _velocity;
 		
 		public Vector2d Velocity {
@@ -178,6 +180,7 @@ namespace Lockstep
 				} else {
 					Radius = FixedMath.Sqrt ((HalfHeight * HalfHeight + HalfWidth * HalfWidth) >> FixedMath.SHIFT_AMOUNT);
 				}
+
 			} else if (Shape == ColliderType.Polygon) {
 				long BiggestSqrRadius = Vertices [0].SqrMagnitude ();
 				for (int i = 1; i < Vertices.Length; i++) {
@@ -202,6 +205,10 @@ namespace Lockstep
 		
 		public void Initialize (Vector2d StartPosition, Vector2d StartRotation)
         {
+            if (!Setted) {
+                this.Setup(null);
+                Setted = true;
+            }
             CheckVariables ();
 
 			Parent = null;

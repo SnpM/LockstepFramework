@@ -7,8 +7,10 @@
 using UnityEngine;
 using System.Collections;
 
-namespace Lockstep {
-    public class CollisionPair {
+namespace Lockstep
+{
+    public class CollisionPair
+    {
         public LSBody Body1;
         public LSBody Body2;
         private long CacheSqrDistance;
@@ -23,7 +25,8 @@ namespace Lockstep {
         public static long PenetrationY;
         public static CollisionPair CurrentCollisionPair;
 
-        public void Initialize (LSBody b1, LSBody b2) {
+        public void Initialize(LSBody b1, LSBody b2)
+        {
             PartitionVersion = 0;
             Body1 = b1;
             Body2 = b2;
@@ -38,71 +41,92 @@ namespace Lockstep {
             CacheSqrDistance *= CacheSqrDistance;
 
             LeCollisionType = CollisionType.None;
-            if (Body1.Shape == ColliderType.None || Body2.Shape == ColliderType.None) {
-            } else if (Body1.Shape == ColliderType.Circle) {
-                if (Body2.Shape == ColliderType.Circle) {
+            if (Body1.Shape == ColliderType.None || Body2.Shape == ColliderType.None)
+            {
+            } else if (Body1.Shape == ColliderType.Circle)
+            {
+                if (Body2.Shape == ColliderType.Circle)
+                {
                     LeCollisionType = CollisionType.Circle_Circle;
-                } else if (Body2.Shape == ColliderType.AABox) {
+                } else if (Body2.Shape == ColliderType.AABox)
+                {
                     LeCollisionType = CollisionType.Circle_AABox;
 
-                } else if (Body2.Shape == ColliderType.Polygon) {
+                } else if (Body2.Shape == ColliderType.Polygon)
+                {
                     LeCollisionType = CollisionType.Circle_Polygon;
                 }
-            } else if (Body1.Shape == ColliderType.AABox) {
-                if (Body2.Shape == ColliderType.Circle) {
+            } else if (Body1.Shape == ColliderType.AABox)
+            {
+                if (Body2.Shape == ColliderType.Circle)
+                {
                     LeCollisionType = CollisionType.Circle_AABox;
-                } else if (Body2.Shape == ColliderType.AABox) {
+                } else if (Body2.Shape == ColliderType.AABox)
+                {
                     LeCollisionType = CollisionType.AABox_AABox;
-                } else if (Body2.Shape == ColliderType.Polygon) {
+                } else if (Body2.Shape == ColliderType.Polygon)
+                {
                     LeCollisionType = CollisionType.AABox_Polygon;
                 }
-            } else if (Body1.Shape == ColliderType.Polygon) {
-                if (Body2.Shape == ColliderType.Circle) {
+            } else if (Body1.Shape == ColliderType.Polygon)
+            {
+                if (Body2.Shape == ColliderType.Circle)
+                {
                     LeCollisionType = CollisionType.Circle_Polygon;
-                } else if (Body2.Shape == ColliderType.AABox) {
+                } else if (Body2.Shape == ColliderType.AABox)
+                {
                     LeCollisionType = CollisionType.AABox_Polygon;
-                } else if (Body2.Shape == ColliderType.Polygon) {
+                } else if (Body2.Shape == ColliderType.Polygon)
+                {
                     LeCollisionType = CollisionType.Polygon_Polygon;
                 }
             }
 
             DoPhysics = ((Body1.IsTrigger || Body2.IsTrigger) == false);
-            if (DoPhysics) {
+            if (DoPhysics)
+            {
 
             }
             Active = true;
         }
 
-        public void Deactivate () {
+        public void Deactivate()
+        {
             Active = false;
         }
 
         static long dist, depth;
 
-        private void DistributeCollision () {
+        private void DistributeCollision()
+        {
 
 
-            if (Body1.OnContact .IsNotNull ()) {
-                Body1.OnContact (Body2);
+            if (Body1.OnContact.IsNotNull())
+            {
+                Body1.OnContact(Body2);
             }
-            if (Body2.OnContact .IsNotNull ()) {
-                Body2.OnContact (Body1);
+            if (Body2.OnContact.IsNotNull())
+            {
+                Body2.OnContact(Body1);
             }
 
-            if (DoPhysics && Body1.HasParent == false && Body2.HasParent == false) {
-                switch (LeCollisionType) {
+            if (DoPhysics && Body1.HasParent == false && Body2.HasParent == false)
+            {
+                switch (LeCollisionType)
+                {
                     case CollisionType.Circle_Circle:
                         DistX = Body1.Position.x - Body2.Position.x;
                         DistY = Body1.Position.y - Body2.Position.y;
-                        dist = FixedMath.Sqrt ((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT);
+                        dist = FixedMath.Sqrt((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT);
                         
-                        if (dist == 0) {
+                        if (dist == 0)
+                        {
                             const int randomMax = 1000;
-                            Body1.Position.x += LSUtility.GetRandom (randomMax);
-                            Body1.Position.y += LSUtility.GetRandom (randomMax);
+                            Body1.Position.x += LSUtility.GetRandom(randomMax);
+                            Body1.Position.y += LSUtility.GetRandom(randomMax);
                             Body1.PositionChanged = true;
-                            Body2.Position.x += LSUtility.GetRandom (randomMax);
-                            Body2.Position.y += LSUtility.GetRandom (randomMax);
+                            Body2.Position.x += LSUtility.GetRandom(randomMax);
+                            Body2.Position.y += LSUtility.GetRandom(randomMax);
                             Body2.PositionChanged = true;
                             return;
                         }
@@ -110,7 +134,8 @@ namespace Lockstep {
 
                         depth = (Body1.Radius + Body2.Radius - dist);
 
-                        if (depth <= 0) {
+                        if (depth <= 0)
+                        {
                             return;
                         }
                         DistX = (DistX * depth / dist) / 2L;
@@ -118,26 +143,31 @@ namespace Lockstep {
 
                         const bool applyVelocity = true;
                     //Resolving collision
-                        if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority)) {
+                        if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority))
+                        {
                             Body2.Position.x -= DistX;
                             Body2.Position.y -= DistY;
                             Body2.PositionChanged = true;
-                            if (applyVelocity) {
+                            if (applyVelocity)
+                            {
                                 Body2._velocity.x -= DistX;
                                 Body2._velocity.y -= DistY;
                                 Body2.VelocityChanged = true;
                             }
-                        } else if (Body2.Immovable || Body2.Priority > Body1.Priority) {
+                        } else if (Body2.Immovable || Body2.Priority > Body1.Priority)
+                        {
 
                             Body1.Position.x += DistX;
                             Body1.Position.y += DistY;
                             Body1.PositionChanged = true;
-                            if (applyVelocity) {
+                            if (applyVelocity)
+                            {
                                 Body1._velocity.x += DistX;
                                 Body1._velocity.y += DistY;
                                 Body1.VelocityChanged = true;
                             }
-                        } else {
+                        } else
+                        {
                             DistX /= 2;
                             DistY /= 2;
 
@@ -148,7 +178,8 @@ namespace Lockstep {
                         
                             Body1.PositionChanged = true;
                             Body2.PositionChanged = true;
-                            if (applyVelocity) {
+                            if (applyVelocity)
+                            {
 
                                 DistX /= 8;
                                 DistY /= 8;
@@ -163,10 +194,12 @@ namespace Lockstep {
                         }
                         break;
                     case CollisionType.Circle_AABox:
-                        if (Body1.Shape == ColliderType.AABox) {
-                            DistributeCircle_Box (Body1, Body2);
-                        } else {
-                            DistributeCircle_Box (Body2, Body1);
+                        if (Body1.Shape == ColliderType.AABox)
+                        {
+                            DistributeCircle_Box(Body1, Body2);
+                        } else
+                        {
+                            DistributeCircle_Box(Body2, Body1);
                         }
                         break;
                             
@@ -178,72 +211,91 @@ namespace Lockstep {
 
         }
 
-        public void CheckAndDistributeCollision () {
+        public void CheckAndDistributeCollision()
+        {
 
-            if (!Active || Body1.HasParent || Body2.HasParent) {
+            if (!Active || Body1.HasParent || Body2.HasParent)
+            {
                 return;
             }
             CurrentCollisionPair = this;
 
-            if (CheckCollision ()) {
-                if (IsColliding == false) {
-                    if (Body1.OnContactEnter .IsNotNull ()) {
-                        Body1.OnContactEnter (Body2);
+            if (CheckCollision())
+            {
+                if (IsColliding == false)
+                {
+                    if (Body1.OnContactEnter.IsNotNull())
+                    {
+                        Body1.OnContactEnter(Body2);
                     }
-                    if (Body2.OnContactEnter .IsNotNull ()) {
-                        Body2.OnContactEnter (Body1);
+                    if (Body2.OnContactEnter.IsNotNull())
+                    {
+                        Body2.OnContactEnter(Body1);
                     }
                     IsColliding = true;
-                } else {
+                } else
+                {
 
                 }
-                DistributeCollision ();
-            } else {
-                if (IsColliding) {
-                    if (Body1.OnContactExit .IsNotNull ()) {
-                        Body1.OnContactExit (Body2);
+                DistributeCollision();
+            } else
+            {
+                if (IsColliding)
+                {
+                    if (Body1.OnContactExit.IsNotNull())
+                    {
+                        Body1.OnContactExit(Body2);
                     }
-                    if (Body2.OnContactExit .IsNotNull ()) {
-                        Body2.OnContactExit (Body1);
+                    if (Body2.OnContactExit.IsNotNull())
+                    {
+                        Body2.OnContactExit(Body1);
                     }
                     IsColliding = false;
-                } else {
+                } else
+                {
 
                 }
             }
 
         }
 
-        public bool CheckCollision () {
-            if ((Body1.PositionChanged || Body2.PositionChanged || Body1.PositionChangedBuffer || Body2.PositionChangedBuffer) == false) {
+        public bool CheckCollision()
+        {
+            if ((Body1.PositionChanged || Body2.PositionChanged || Body1.PositionChangedBuffer || Body2.PositionChangedBuffer) == false)
+            {
                 return IsColliding;
             }
 
-            switch (LeCollisionType) {
+            switch (LeCollisionType)
+            {
                 case CollisionType.None:
                     break;
 
             //Check
                 case CollisionType.Circle_Circle:
-                    return CheckCircle ();
+                    return CheckCircle();
                     break;
             
             //Check
                 case CollisionType.Circle_AABox:
-                    if (CheckBox ()) {
-                        if (CheckCircle ()) {
+                    if (CheckBox())
+                    {
 
-                            if (Body1.Shape == ColliderType.AABox) {
-                                if (CheckCircle_Box (Body1, Body2)) {
-                                    return true;
-                                }
+                        if (Body1.Shape == ColliderType.AABox)
+                        {
+                            if (CheckCircle_Box(Body1, Body2))
+                            {
+                                return true;
+                            }
 
-                            } else {
-                                if (CheckCircle_Box (Body2, Body1)) {
-                                    return true;
-                                }
+                        } else
+                        {
+                            if (CheckCircle_Box(Body2, Body1))
+                            {
+                                return true;
                             }
                         }
+ 
                     }
 
                     break;
@@ -251,12 +303,16 @@ namespace Lockstep {
                 case CollisionType.Circle_Polygon:
                 //Not supported
                     return false;
-                    if (CheckCircle ()) {
-                        if (Body1.Shape == ColliderType.Circle) {
-                            if (CheckCircle_Poly (Body1, Body2)) {
+                    if (CheckCircle())
+                    {
+                        if (Body1.Shape == ColliderType.Circle)
+                        {
+                            if (CheckCircle_Poly(Body1, Body2))
+                            {
                                 return true;
                             }
-                        } else if (CheckCircle_Poly (Body2, Body1)) {
+                        } else if (CheckCircle_Poly(Body2, Body1))
+                        {
                             return true;
                         }
                     }
@@ -266,14 +322,19 @@ namespace Lockstep {
                 case CollisionType.AABox_AABox:
                 //Not supported
                     return false;
-                    if (DoPhysics) {
-                        if (CheckCircle ()) {
-                            if (CheckBox ()) {
+                    if (DoPhysics)
+                    {
+                        if (CheckCircle())
+                        {
+                            if (CheckBox())
+                            {
                                 return true;
                             }
                         }
-                    } else {
-                        if (CheckBox ()) {
+                    } else
+                    {
+                        if (CheckBox())
+                        {
                             return true;
                         }
                     }
@@ -282,13 +343,18 @@ namespace Lockstep {
                 case CollisionType.AABox_Polygon:
                 //Not supported
                     return false;
-                    if (CheckCircle ()) {
-                        if (Body1.Shape == ColliderType.AABox) {
-                            if (CheckBox_Poly (Body1, Body2)) {
+                    if (CheckCircle())
+                    {
+                        if (Body1.Shape == ColliderType.AABox)
+                        {
+                            if (CheckBox_Poly(Body1, Body2))
+                            {
                                 return true;
                             }
-                        } else {
-                            if (CheckBox_Poly (Body2, Body1)) {
+                        } else
+                        {
+                            if (CheckBox_Poly(Body2, Body1))
+                            {
 
                                 return true;
                             }
@@ -299,8 +365,10 @@ namespace Lockstep {
                 case CollisionType.Polygon_Polygon:
                 //Not supported
                     return false;
-                    if (CheckCircle ()) {
-                        if (CheckPoly_Poly (Body1, Body2)) {
+                    if (CheckCircle())
+                    {
+                        if (CheckPoly_Poly(Body1, Body2))
+                        {
                             return true;
                         }
                     }
@@ -310,11 +378,13 @@ namespace Lockstep {
             return false;
         }
 
-        public bool CheckCircle () {
+        public bool CheckCircle()
+        {
 
             DistX = Body1.Position.x - Body2.Position.x;
             DistY = Body1.Position.y - Body2.Position.y;
-            if ((DistX * DistX + DistY * DistY) <= CacheSqrDistance) {
+            if ((DistX * DistX + DistY * DistY) <= CacheSqrDistance)
+            {
                 return true;
             }
 
@@ -329,11 +399,16 @@ namespace Lockstep {
             return false;
         }
 
-        public bool CheckBox () {
-            if (Body1.XMin <= Body2.XMax) {
-                if (Body1.XMax >= Body2.XMin) {
-                    if (Body1.YMin <= Body2.YMax) {
-                        if (Body1.YMax >= Body2.YMin) {
+        public bool CheckBox()
+        {
+            if (Body1.XMin <= Body2.XMax)
+            {
+                if (Body1.XMax >= Body2.XMin)
+                {
+                    if (Body1.YMin <= Body2.YMax)
+                    {
+                        if (Body1.YMax >= Body2.YMin)
+                        {
                             return true;
                         }
                     }
@@ -353,55 +428,71 @@ namespace Lockstep {
             return false;
         }
 
-        public static bool CheckBox_Poly (LSBody box, LSBody poly) {
+        public static bool CheckBox_Poly(LSBody box, LSBody poly)
+        {
             bool Right = poly.Position.x > box.Position.x;
             bool Top = poly.Position.y > box.Position.y;
             bool xPassed = false;
             bool yPassed = false;
             int vertCount = poly.RealPoints.Length;
-            for (int i = 0; i < vertCount; i++) {
-                if (!xPassed) {
-                    if (Right) {
-                        if (poly.RealPoints [i].x <= box.XMax) {
+            for (int i = 0; i < vertCount; i++)
+            {
+                if (!xPassed)
+                {
+                    if (Right)
+                    {
+                        if (poly.RealPoints [i].x <= box.XMax)
+                        {
                             xPassed = true;
                         }
-                    } else {
-                        if (poly.RealPoints [i].x >= box.XMin) {
+                    } else
+                    {
+                        if (poly.RealPoints [i].x >= box.XMin)
+                        {
                             xPassed = true;
                         }
                     }
                 }
-                if (!yPassed) {
-                    if (Top) {
-                        if (poly.RealPoints [i].y <= box.YMax) {
+                if (!yPassed)
+                {
+                    if (Top)
+                    {
+                        if (poly.RealPoints [i].y <= box.YMax)
+                        {
                             yPassed = true;
                         }
-                    } else {
-                        if (poly.RealPoints [i].y >= box.YMin) {
+                    } else
+                    {
+                        if (poly.RealPoints [i].y >= box.YMin)
+                        {
                             yPassed = true;
                         }
                     }
                 }
-                if (xPassed && yPassed) {
+                if (xPassed && yPassed)
+                {
                     return true;
                 }
             }
             return false;
         }
 
-        public static bool CheckCircle_Poly (LSBody circle, LSBody poly) {
+        public static bool CheckCircle_Poly(LSBody circle, LSBody poly)
+        {
             int EdgeCount = poly.EdgeNorms.Length;
-            for (int i = 0; i < EdgeCount; i++) {
+            for (int i = 0; i < EdgeCount; i++)
+            {
                 Vector2d axis = poly.EdgeNorms [i];
-                long CircleProjection = circle.Position.Dot (axis.x, axis.y);
+                long CircleProjection = circle.Position.Dot(axis.x, axis.y);
                 long CircleMin = CircleProjection - circle.Radius;
                 long CircleMax = CircleProjection + circle.Radius;
 
                 long PolyMin;
                 long PolyMax;
-                ProjectPolygon (axis.x, axis.y, poly, out PolyMin, out PolyMax);
+                ProjectPolygon(axis.x, axis.y, poly, out PolyMin, out PolyMax);
 
-                if (!CheckOverlap (CircleMin, CircleMax, PolyMin, PolyMax)) {
+                if (!CheckOverlap(CircleMin, CircleMax, PolyMin, PolyMax))
+                {
                     return false;
                 }
             }
@@ -417,31 +508,39 @@ namespace Lockstep {
         static bool Collided;
         static long xAbs, yAbs;
 
-        public void DistributeCircle_Box (LSBody box, LSBody circle) {
+        public void DistributeCircle_Box(LSBody box, LSBody circle)
+        {
             xMore = circle.Position.x > box.Position.x;
             yMore = circle.Position.y > box.Position.y;
 
-            if (xMore) {
+            if (xMore)
+            {
                 PenetrationX = (circle.XMin - box.XMax);
-            } else {
+            } else
+            {
                 PenetrationX = (circle.XMax - box.XMin);
             }
-            if (yMore) {
+            if (yMore)
+            {
                 PenetrationY = (circle.YMin - box.YMax);
-            } else {
+            } else
+            {
                 PenetrationY = (circle.YMax - box.YMin);
             }
 
 
             xAbs = PenetrationX < 0 ? -PenetrationX : PenetrationX;
             yAbs = PenetrationY < 0 ? -PenetrationY : PenetrationY;
-            if (xAbs <= circle.Radius && yAbs <= circle.Radius) {
+            if (xAbs <= circle.Radius && yAbs <= circle.Radius)
+            {
 
-            }
-            else {
-                if (xAbs > yAbs) {
+            } else
+            {
+                if (xAbs > yAbs)
+                {
                     PenetrationX = 0;//FixedMath.Mul (PenetrationX, FixedMath.One * 1 / 4);
-                } else {
+                } else
+                {
 
                     PenetrationY = 0;//FixedMath.Mul (PenetrationX, FixedMath.One * 1 / 4);
                 }
@@ -453,49 +552,65 @@ namespace Lockstep {
             circle._velocity.y -= PenetrationY;
             circle.VelocityChanged = true;
             circle.PositionChanged = true;
-            circle.BuildBounds ();
+            circle.BuildBounds();
         }
 
-        public static bool CheckCircle_Box (LSBody box, LSBody circle) {
+        public static bool CheckCircle_Box(LSBody box, LSBody circle)
+        {
             Collided = false;
 
             xMore = circle.Position.x > box.Position.x;
             yMore = circle.Position.y > box.Position.y;
-            if (!Collided) {
+            if (!Collided)
+            {
                 Collided = false;
-                if (xMore) {
-                    if (circle.Position.x <= box.XMax) {
+                if (xMore)
+                {
+                    if (circle.Position.x <= box.XMax)
+                    {
                         Collided = true;
                     }
-                } else {
-                    if (circle.Position.x >= box.XMin) {
-                        Collided = true;
-                    }
-                }
-
-                if (yMore) {
-                    if (circle.Position.y <= box.YMax) {
-                        Collided = true;
-                    }
-                } else {
-                    if (circle.Position.y >= box.YMin) {
+                } else
+                {
+                    if (circle.Position.x >= box.XMin)
+                    {
                         Collided = true;
                     }
                 }
 
-                if (!Collided) {
-                    if (xMore) {
+                if (yMore)
+                {
+                    if (circle.Position.y <= box.YMax)
+                    {
+                        Collided = true;
+                    }
+                } else
+                {
+                    if (circle.Position.y >= box.YMin)
+                    {
+                        Collided = true;
+                    }
+                }
+
+                if (!Collided)
+                {
+                    if (xMore)
+                    {
                         xDist = (circle.Position.x) - (box.XMax);
-                    } else {
+                    } else
+                    {
                         xDist = (circle.Position.x) - (box.XMin);
                     }
-                    if (yMore) {
+                    if (yMore)
+                    {
                         yDist = (circle.Position.y) - (box.YMax);
-                    } else {
+                    } else
+                    {
                         yDist = (circle.Position.y) - (box.YMin);
                     }
 
-                    if ((xDist * xDist + yDist * yDist) <= circle.Radius * circle.Radius) {
+                    if ((xDist * xDist + yDist * yDist) <= circle.Radius * circle.Radius)
+                    {
                         Collided = true;
                     }
                 }   
@@ -504,63 +619,80 @@ namespace Lockstep {
             return Collided;
         }
 
-        public static bool CheckPoly_Poly (LSBody poly1, LSBody poly2) {
+        public static bool CheckPoly_Poly(LSBody poly1, LSBody poly2)
+        {
             int Poly1EdgeCount = poly1.EdgeNorms.Length;
             int EdgeCount = Poly1EdgeCount + poly2.EdgeNorms.Length;
-            for (int i = 0; i < EdgeCount; i++) {
+            for (int i = 0; i < EdgeCount; i++)
+            {
                 Vector2d edge;
-                if (i < Poly1EdgeCount) {
+                if (i < Poly1EdgeCount)
+                {
                     edge = poly1.EdgeNorms [i];
-                } else {
+                } else
+                {
                     edge = poly1.EdgeNorms [i - Poly1EdgeCount];
                 }
                 long Poly1Min;
                 long Poly1Max;
-                ProjectPolygon (edge.x, edge.y, poly1, out Poly1Min, out Poly1Max);
+                ProjectPolygon(edge.x, edge.y, poly1, out Poly1Min, out Poly1Max);
                 long Poly2Min;
                 long Poly2Max;
-                ProjectPolygon (edge.x, edge.y, poly2, out Poly2Min, out Poly2Max);
-                if (!CheckOverlap (Poly1Min, Poly1Max, Poly2Min, Poly2Max)) {
+                ProjectPolygon(edge.x, edge.y, poly2, out Poly2Min, out Poly2Max);
+                if (!CheckOverlap(Poly1Min, Poly1Max, Poly2Min, Poly2Max))
+                {
                     return false;
                 }
             }
             return true;
         }
 
-        public static void ProjectPolygon (long AxisX, long AxisY, LSBody Poly, out long Min, out long Max) {
-            Min = Poly.RealPoints [0].Dot (AxisX, AxisY);
+        public static void ProjectPolygon(long AxisX, long AxisY, LSBody Poly, out long Min, out long Max)
+        {
+            Min = Poly.RealPoints [0].Dot(AxisX, AxisY);
             Max = Min;
 
             int PointCount = Poly.RealPoints.Length;
             long Projection;
-            for (int i = 1; i < PointCount; i++) {
-                Projection = Poly.RealPoints [i].Dot (AxisX, AxisY);
-                if (Projection < Min) {
+            for (int i = 1; i < PointCount; i++)
+            {
+                Projection = Poly.RealPoints [i].Dot(AxisX, AxisY);
+                if (Projection < Min)
+                {
                     Min = Projection;
-                } else if (Projection > Max) {
+                } else if (Projection > Max)
+                {
                     Max = Projection;
                 }
             }
         }
 
-        public static long IntervalDistance (long Min1, long Max1, long Min2, long Max2) {
-            if (Min1 < Min2) {
+        public static long IntervalDistance(long Min1, long Max1, long Min2, long Max2)
+        {
+            if (Min1 < Min2)
+            {
                 return Min2 - Max1;
-            } else {
+            } else
+            {
                 return Min1 - Max2;
             }
         }
 
-        public static bool CheckOverlap (long Min1, long Max1, long Min2, long Max2) {
-            if (Max1 >= Min2) {
-                if (Min1 <= Max2) {
+        public static bool CheckOverlap(long Min1, long Max1, long Min2, long Max2)
+        {
+            if (Max1 >= Min2)
+            {
+                if (Min1 <= Max2)
+                {
                     return true;
                 }
             }
 
             return false;
         }
-        private enum CollisionType : byte {
+
+        private enum CollisionType : byte
+        {
             None,
             Circle_Circle,
             Circle_AABox,
