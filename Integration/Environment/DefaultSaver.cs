@@ -21,7 +21,7 @@ namespace Lockstep
 
         protected override void OnApply () {
             foreach (EnvironmentBodyInfo info in EnvironmentBodies) {
-                info.Body.InitializeSerialized();
+                info.Body.Initialize(info.Position,info.Rotation);
             }
             foreach (EnvironmentTriggerInfo info in EnvironmentTriggers) {
                 info.Trigger.Initialize();
