@@ -13,6 +13,8 @@ namespace Lockstep
             SerializedProperty saverObjectProperty = serializedObject.FindProperty("_saverObject");
             EditorGUILayout.PropertyField(saverObjectProperty);
 
+            serializedObject.ApplyModifiedProperties();
+
             EnvironmentHelper saver = this.target as EnvironmentHelper;
             EditorGUI.BeginChangeCheck();
             if (GUILayout.Button("Scan and Save")) {
