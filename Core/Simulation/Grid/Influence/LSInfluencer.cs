@@ -57,8 +57,8 @@ namespace Lockstep
 		static AllegianceType TargetAllegiance;
 		static PlatformType TargetPlatform;
 		public LSAgent Scan (int deltaCount,
-		                  AllegianceType targetAllegiance = AllegianceType.Any,
-		                  PlatformType targetPlatform = PlatformType.Any)
+            AllegianceType targetAllegiance = AllAllegiance,
+            PlatformType targetPlatform = AllPlatforms)
 		{
 			InfluenceManager.Source = Agent;
 			InfluenceManager.TargetAllegiance = targetAllegiance;
@@ -68,13 +68,13 @@ namespace Lockstep
 			                              Agent.Body.Position.x,
 			                              Agent.Body.Position.y);
 		}
-                          
+        const PlatformType AllPlatforms = (PlatformType)~0;
+        const AllegianceType AllAllegiance = (AllegianceType)~0;
 	}
 
 	public enum PlatformType
 	{
-		Any,
-		Air,
-		Ground
+		Air             = 1 << 1,
+		Ground          = 1 << 2
 	}
 }
