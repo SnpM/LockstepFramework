@@ -611,6 +611,34 @@ namespace Lockstep
 			abil = null;
 			return false;
 		}
+
+        public void GetCoveredSnappedPositions (long snapSpacing, FastList<Vector2d> output) {
+            //Used for getting snapped positions this body covered
+            for (long x = this.XMin; x <= this.XMax; x+= snapSpacing) {
+                for (long y = this.YMin; y <= this.YMax; y += snapSpacing) {
+                    Vector2d checkPos = new Vector2d(x,y);
+                    if (IsPositionCovered (checkPos)) {
+                        output.Add (checkPos);
+                    }
+                }
+            }
+        }
+        public bool IsPositionCovered (Vector2d position) {
+            //Checks if this body covers a position
+
+            //Different techniques for different shapes
+            switch (this.Shape) {
+                case ColliderType.Circle:
+                    return (this.Position - position).FastMagnitude() <= this.FastRadius;
+                    break;
+                case ColliderType.AABox:
+                    return position.x >= this.XMin && position.x <= this.XMax
+                        && position.y >= this.YMin && position.y <= this.YMax;
+                    break;
+            }
+            return false;
+        }
+
 	}
 	
 	public enum ColliderType : byte
