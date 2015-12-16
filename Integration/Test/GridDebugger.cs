@@ -13,6 +13,7 @@ namespace Lockstep
 
         void OnDrawGizmos ()
         {
+            if (Application.isPlaying == false) return;
             if (Show) {
                 nodeScale = new Vector3(NodeSize,NodeSize,NodeSize);
                 //Switch for which grid to show
@@ -30,6 +31,7 @@ namespace Lockstep
             for (int i = 0; i < GridManager.NodeCount; i++)
             {
                 for (int j = 0; j < GridManager.NodeCount; j++) {
+                    
                     //Gets every pathfinding node and shows the draws a cube for the node
                     GridNode node = GridManager.GetNode(i,j);
                     //Color depends on whether or not the node is walkable
