@@ -124,8 +124,8 @@ namespace Lockstep
 		public ColliderType Shape;
 		public bool IsTrigger;
 		public  int Layer;
-		public long HalfWidth;
-		public long HalfHeight;
+        public long HalfWidth = FixedMath.Half;
+        public long HalfHeight = FixedMath.Half;
 		public long Radius;
 		public bool Immovable;
 	
