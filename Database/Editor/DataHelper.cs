@@ -179,7 +179,14 @@ namespace Lockstep.Data
             Type scriptBaseType = _dataAttribute.ScriptBaseType;
             List<Type> filteredTypes = LSEditorUtility.GetFilteredTypes(scriptBaseType);
             DataItem[] data = Data as DataItem[];
-            HashSet<Type> lackingTypes = new HashSet<Type> (filteredTypes);
+            HashSet<Type> lackingTypes = new HashSet<Type> ();
+            Type abilityType = typeof (Ability);
+            Type activeAbilityType = typeof (ActiveAbility);
+            for (int i = 0; i < filteredTypes.Count; i++) {
+                if (filteredTypes[i].BaseType != abilityType && filteredTypes[i].BaseType != activeAbilityType)
+                    continue;
+                lackingTypes.Add(filteredTypes[i]);
+            }
             for (int i = 0; i < data.Length; i++) {
                 DataItem item = data[i];
                 ScriptDataItem scriptItem = item as ScriptDataItem;

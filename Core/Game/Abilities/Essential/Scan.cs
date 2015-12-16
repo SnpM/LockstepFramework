@@ -103,7 +103,7 @@ namespace Lockstep
         private int attackFrameCount;
         private Move cachedMove;
         private Turn cachedTurn;
-        private LSBody cachedBody;
+        private LSBody cachedBody {get {return Agent.Body;}}
         private int rangeDeltaCount;
         private int baseDeltaCount;
         private int basePriority;
@@ -119,7 +119,6 @@ namespace Lockstep
 
         protected override void OnSetup()
         {
-            cachedBody = Agent.Body;
             cachedTurn = Agent.Turner;
             cachedMove = Agent.Mover;
             if (Sight < Range)
