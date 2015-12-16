@@ -197,7 +197,7 @@ namespace Lockstep {
         private readonly FastBucket<AllegianceType> DiplomacyFlags = new FastBucket<AllegianceType>();
         private readonly FastStack<ushort> OpenLocalIDs = new FastStack<ushort>();
         
-        public AgentController() {
+        internal AgentController() {
             OpenLocalIDs.FastClear();
             PeakLocalID = 0;
             ControllerID = (byte)InstanceManagers.Count;

@@ -27,9 +27,6 @@ namespace Lockstep.Example {
             }
         }
 
-        protected override void Startup () {
-
-        }
 
         protected override void OnStartGame () {
             for (int i = 0; i < _spawnAmount; i++) {

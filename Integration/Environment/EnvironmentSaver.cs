@@ -3,8 +3,7 @@ using System.Collections;
 
 namespace Lockstep
 {
-    [System.Serializable]
-    public class EnvironmentSaver : MonoBehaviour
+    public abstract class EnvironmentSaver : MonoBehaviour
     {
         public void Save() {
             OnSave ();

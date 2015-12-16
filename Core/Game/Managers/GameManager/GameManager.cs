@@ -43,10 +43,10 @@ namespace Lockstep {
         protected void Start () {
             Instance = this;
             LockstepManager.Initialize (this);
-            Startup ();
+            GameStart ();
         }
     
-        protected virtual void Startup () {
+        protected virtual void GameStart () {
 
         }
 
