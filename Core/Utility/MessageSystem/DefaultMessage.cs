@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Lockstep
 {
-    public struct DefaultMessage
+    public class DefaultMessage : IMessage
     {
     }
 }
