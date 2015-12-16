@@ -5,6 +5,7 @@ namespace Lockstep
 {
     public class GridDebugger : MonoBehaviour
     {
+        public bool Show;
         public GridType LeGridType;
         public float LeHeight;
         [Range (.1f,.9f)]
@@ -12,12 +13,14 @@ namespace Lockstep
 
         void OnDrawGizmos ()
         {
-            nodeScale = new Vector3(NodeSize,NodeSize,NodeSize);
-            switch (this.LeGridType)
-            {
-                case GridType.Pathfinding:
-                    DrawPathfinding();
-                    break;
+            if (Show) {
+                nodeScale = new Vector3(NodeSize,NodeSize,NodeSize);
+                switch (this.LeGridType)
+                {
+                    case GridType.Pathfinding:
+                        DrawPathfinding();
+                        break;
+                }
             }
         }
         private Vector3 nodeScale;
