@@ -10,21 +10,21 @@ namespace Lockstep
         private EnvironmentBodyInfo[] _environmentBodies;
         public EnvironmentBodyInfo[] EnvironmentBodies {get {return _environmentBodies;}}
         [SerializeField]
-        private EnvironmentTriggerInfo[] _environmentTriggers;
-        public EnvironmentTriggerInfo[] EnvironmentTriggers {get {return _environmentTriggers;}}
+        private EnvironmentObject[] _environmentObjects;
+        public EnvironmentObject[] EnvironmentObjects {get {return _environmentObjects;}}
 
 
         protected override void OnSave () {
             SaveBodies ();
-            SaveTriggers ();
+            SaveObjects ();
         }
 
         protected override void OnApply () {
             foreach (EnvironmentBodyInfo info in EnvironmentBodies) {
                 info.Body.Initialize(info.Position,info.Rotation);
             }
-            foreach (EnvironmentTriggerInfo info in EnvironmentTriggers) {
-                info.Trigger.Initialize();
+            foreach (EnvironmentObject obj in EnvironmentObjects) {
+                obj.Initialize();
             }
         }
 
@@ -43,15 +43,15 @@ namespace Lockstep
 
             _environmentBodies = bodiesBuffer.ToArray();
         }
-        void SaveTriggers () {
-            LSTrigger[] allTriggers = GameObject.FindObjectsOfType<LSTrigger> ();
-            FastList<EnvironmentTriggerInfo> triggerBuffer = new FastList<EnvironmentTriggerInfo>();
-            foreach (LSTrigger trigger in allTriggers) {
-                if (IsAgent(trigger)) continue;
-                EnvironmentTriggerInfo triggerInfo = new EnvironmentTriggerInfo(trigger);
-                triggerBuffer.Add(triggerInfo);
+        void SaveObjects () {
+            EnvironmentObject[] allObjects = GameObject.FindObjectsOfType<EnvironmentObject> ();
+            FastList<EnvironmentObject> objectBuffer = new FastList<EnvironmentObject>();
+
+            foreach (EnvironmentObject obj in allObjects) {
+                if (IsAgent(obj)) continue;
+                objectBuffer.Add(obj);
             }
-            _environmentTriggers = triggerBuffer.ToArray();
+            _environmentObjects = objectBuffer.ToArray();
         }
         static bool IsAgent (object obj) {
             MonoBehaviour mb = obj as MonoBehaviour;

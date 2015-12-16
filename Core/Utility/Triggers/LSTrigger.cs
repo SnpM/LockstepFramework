@@ -7,21 +7,19 @@ namespace Lockstep
     /// <summary>
     /// Triggers check for input and send a message when Trigger () is called.
     /// </summary>
-    public abstract class LSTrigger : MonoBehaviour
+    public abstract class LSTrigger : EnvironmentObject
     {
 
 
         internal int ID {
+            //Assigned and used by Triggermanager
             get; set;
         }
 
 
-        public void Initialize () {
-            TriggerManager.Assimilate(this);
-            OnInitialize ();
-        }
-        protected virtual void OnInitialize () {
 
+        protected override void OnInitialize () {
+            TriggerManager.Assimilate(this);
         }
 
         public void CheckInput()
