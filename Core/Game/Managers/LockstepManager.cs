@@ -162,8 +162,6 @@ namespace Lockstep {
             CoroutineManager.Simulate();
             InfluenceManager.Simulate();
             ProjectileManager.Simulate();
-            TestManager.Simulate ();
-
 			TeamManager.Simulate ();
 
             TriggerManager.Simulate();

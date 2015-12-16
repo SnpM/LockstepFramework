@@ -3,12 +3,12 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 namespace Lockstep {
-    public static class TestManager {  
-        static TestManager () {
+    public class TestHelper : BehaviourHelper{  
+        protected override void OnInitialize () {
             ClientManager.NetworkHelper.OnTestData += HandleOnTestData;
         }
-        static Dictionary<int,List<int>> frameHashes = new Dictionary<int, List<int>>();
-        static void HandleOnTestData (byte[] obj) {
+        Dictionary<int,List<int>> frameHashes = new Dictionary<int, List<int>>();
+        void HandleOnTestData (byte[] obj) {
             int frame = BitConverter.ToInt32 (obj, 0);
             int pos = 4;
             List<int> hashes = new List<int>();
@@ -26,8 +26,8 @@ namespace Lockstep {
 
 
         }
-        private static int lastFrameSent;
-        public static void Simulate () {
+        private int lastFrameSent;
+        protected override void OnSimulate () {
             List<int> hashes;
             if (frameHashes.TryGetValue (LockstepManager.FrameCount - 10, out hashes)) {
                 int mainHash = hashes[0];

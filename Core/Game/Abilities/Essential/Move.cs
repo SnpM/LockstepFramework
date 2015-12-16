@@ -28,7 +28,7 @@ namespace Lockstep {
         public bool IsFormationMoving { get; set; }
 
         public bool IsMoving { get; private set; }
-		private const bool canPathfind = false;
+		private const bool canPathfind = true;
         private bool hasPath;
         private bool straightPath;
         private bool viableDestination;
