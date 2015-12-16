@@ -62,8 +62,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 143428}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: .479999989}
-  m_LocalScale: {x: .5, y: .5, z: .600000024}
+  m_LocalPosition: {x: 0, y: 0, z: 0.48}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.6}
   m_Children: []
   m_Father: {fileID: 450234}
   m_RootOrder: 0
@@ -111,8 +111,10 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_AutoUVMaxDistance: .5
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
@@ -135,8 +137,10 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
-  m_AutoUVMaxDistance: .5
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
@@ -185,6 +189,7 @@ MonoBehaviour:
   Speed: 262144
   Acceleration: 65536
   Flying: 0
+  DrawPath: 1
 --- !u!114 &11439568
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -219,6 +224,7 @@ MonoBehaviour:
   _selectionPriority: 0
   _attachedAbilities: []
   _body: {fileID: 0}
+  _triggers: []
   _animator: {fileID: 0}
   _cachedTransform: {fileID: 0}
   _cachedGameObject: {fileID: 0}
@@ -286,7 +292,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: .5
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &100100000
 Prefab:
@@ -390,6 +396,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: _agilitySpeedScaling
       value: 65536
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: DrawPath
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
