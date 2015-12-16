@@ -8,7 +8,6 @@ namespace Lockstep
     {
         private const int SearchRate =  (int)(LockstepManager.FrameRate / 2);
         public const long MissModifier = FixedMath.One / 2;
-        public PlatformType TargetPlatform;
 
         public virtual bool CanMove { get; private set; }
 
@@ -16,10 +15,7 @@ namespace Lockstep
 
         public LSAgent Target { get; private set; }
 
-        protected virtual AllegianceType TargetAllegiance
-        {
-            get { return AllegianceType.Enemy; }
-        }
+
 
         public bool HasTarget
         {
@@ -43,54 +39,63 @@ namespace Lockstep
             }
         }
 
-        public string ProjCode { get { return _projectileCode; } }
+        public virtual string ProjCode { get { return _projectileCode; } }
 
-        public long Range { get { return _range; } }
+        public virtual long Range { get { return _range; } } //Range
 
-        public long Sight { get { return _sight; } }
+        public virtual long Sight { get { return _sight; } } //Approximate radius that's scanned for targets
 
-        public long Damage { get { return _damage; } }
+        public virtual long Damage { get { return _damage; } } //Damage of attack
 
-        public int AttackRate { get { return _attackRate; } }
+        public virtual int AttackRate { get { return _attackRate; } } //Frames between each attack
 
-        public bool TrackAttackAngle { get { return _trackAttackAngle; } }
+        public virtual bool TrackAttackAngle { get { return _trackAttackAngle; } } //Whether or not to require the unit to face the target for attacking
 
-        public long AttackAngle { get { return _attackAngle; } }
+        public long AttackAngle { get { return _attackAngle; } } //The angle in front of the unit that the target must be located in
 
-        public Vector2d ProjectileOffset { get { return _projectileOffset.ToOrientedVector2d(); } }
+        protected virtual AllegianceType TargetAllegiance //Allegiance to the target
+        {
+            get { return this._targetAllegiance; }
+        }
 
-        public float ProjectileHeightOffset { get { return _projectileOffset.Height; } }
+        protected virtual PlatformType TargetPlatform //PlatformType of the target
+        {
+            get {return this._targetPlatform;}
+        }
 
+        public Vector2d ProjectileOffset { get { return _projectileOffset.ToOrientedVector2d(); } } //Offset of projectile
+
+        public float ProjectileHeightOffset { get { return _projectileOffset.Height; } } //Offset of projectile on the Y axis
+
+        #region Serialized Values (Further description in properties)
         [SerializeField,DataCode ("Projectiles")]
-        private string
-            _projectileCode;
+        protected string _projectileCode;
         [FixedNumber, SerializeField]
-        private long
-            _range = FixedMath.One * 6;
+        protected long _range = FixedMath.One * 6;
         [FixedNumber, SerializeField]
-        private long
-            _sight = FixedMath.One * 10;
+        protected long _sight = FixedMath.One * 10;
         [FixedNumber, SerializeField]
-        private long
-            _damage = FixedMath.One;
+        protected long _damage = FixedMath.One;
         [FrameCount, SerializeField]
-        private int
-            _attackRate = 1 * LockstepManager.FrameRate;
+        protected int _attackRate = 1 * LockstepManager.FrameRate;
+        [SerializeField, EnumMask]
+        protected AllegianceType _targetAllegiance = AllegianceType.Enemy;
+        [SerializeField, EnumMask]
+        protected PlatformType _targetPlatform = PlatformType.Ground;
         [SerializeField]
-        private  bool
-            _trackAttackAngle = true;
+        protected  bool _trackAttackAngle = true;
         [FixedNumberAngle, SerializeField]
-        private  long
-            _attackAngle = FixedMath.TenDegrees;
+        protected  long _attackAngle = FixedMath.TenDegrees;
         [SerializeField]
-        private  Vector2dHeight
-            _projectileOffset;
+        protected  Vector2dHeight _projectileOffset;
         [SerializeField, FixedNumber]
-        private long
-            _energyCost;
+        protected long _energyCost;
+
+        #endregion
 
         public long EnergyCost { get { return _energyCost; } }
 
+        //Stuff for the logic
         private bool inRange;
         private long fastRange;
         private long fastRangeToTarget;
@@ -98,7 +103,7 @@ namespace Lockstep
         private int attackFrameCount;
         private Move cachedMove;
         private Turn cachedTurn;
-        private LSBody cachedBody;
+        private LSBody cachedBody {get {return Agent.Body;}}
         private int rangeDeltaCount;
         private int baseDeltaCount;
         private int basePriority;
@@ -107,7 +112,6 @@ namespace Lockstep
         private int deltaCount;
         private int searchCount;
         private int attackCount;
-        //cachedBody.Priority;
         private bool _hasTarget;
         private bool isAttackMoving;
         private bool isFocused;
@@ -115,7 +119,6 @@ namespace Lockstep
 
         protected override void OnSetup()
         {
-            cachedBody = Agent.Body;
             cachedTurn = Agent.Turner;
             cachedMove = Agent.Mover;
             if (Sight < Range)
@@ -445,7 +448,7 @@ namespace Lockstep
                 Debug.LogWarning ("Visual editting can only be used when transform is at origin.");
                 return;
             }
-            _projectileOffset = new Vector2dHeight(CachedTransform.InverseTransformPoint (_projectileOrigin));
+            _projectileOffset = new Vector2dHeight(base.transform.InverseTransformPoint (_projectileOrigin));
         }
 #endif
     }

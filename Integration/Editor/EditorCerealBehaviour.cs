@@ -74,6 +74,8 @@ namespace Lockstep
         private static IEnumerable<LSScenePropertyDrawer> GetPropertyDrawers(SerializedProperty p)
         {
             Type propertyObjectType = LSEditorUtility.GetPropertyType(p);
+            if (propertyObjectType == null)
+                yield break;
             LSScenePropertyDrawer drawer = LSScenePropertyDrawer.GetDrawer(propertyObjectType);
             yield return drawer;
             IEnumerable<PropertyAttribute> propertyAttributes = LSEditorUtility.GetPropertyAttributes<PropertyAttribute>(p);

@@ -517,7 +517,9 @@ namespace Lockstep
             
             Type targetType = currentType;
             return targetType;*/
-            return GetPropertyTarget (property).GetType();
+            object propertyTarget = GetPropertyTarget (property);
+            if (propertyTarget == null) return null;
+            return propertyTarget.GetType();
         }
         public static IEnumerable<TAttribute> GetPropertyAttributes<TAttribute> (SerializedProperty prop) {
 

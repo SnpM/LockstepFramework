@@ -59,9 +59,15 @@ namespace Lockstep
         private bool collisionTicked;
         private int stuckTick;
 
+        //Has this unit arrived at destination? Default set to false.
         public bool Arrived { get; private set; }
 
-        public Action OnArrive;
+        //Called when unit arrives at destination
+        public event Action OnArrive;
+
+        //Called whenever movement is stopped... i.e. to attack
+        public event Action OnStopMove;
+
 
         private LSBody cachedBody;
         private Turn cachedTurn;
@@ -357,7 +363,6 @@ namespace Lockstep
             StopMove();
         }
 
-        public event Action OnStopMove;
 
         public void StopMove()
         {
