@@ -47,7 +47,7 @@ namespace Lockstep {
         }
     
         protected virtual void GameStart () {
-
+            //When the game starts (first simulation frame)
         }
 
         protected void FixedUpdate () {
