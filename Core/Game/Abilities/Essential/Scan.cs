@@ -61,33 +61,27 @@ namespace Lockstep
 
         public float ProjectileHeightOffset { get { return _projectileOffset.Height; } }
 
+        #region Serialized Values
         [SerializeField,DataCode ("Projectiles")]
-        private string
-            _projectileCode;
+        protected string _projectileCode;
         [FixedNumber, SerializeField]
-        private long
-            _range = FixedMath.One * 6;
+        protected long _range = FixedMath.One * 6;
         [FixedNumber, SerializeField]
-        private long
-            _sight = FixedMath.One * 10;
+        protected long _sight = FixedMath.One * 10;
         [FixedNumber, SerializeField]
-        private long
-            _damage = FixedMath.One;
+        protected long _damage = FixedMath.One;
         [FrameCount, SerializeField]
-        private int
-            _attackRate = 1 * LockstepManager.FrameRate;
+        protected int _attackRate = 1 * LockstepManager.FrameRate;
         [SerializeField]
-        private  bool
-            _trackAttackAngle = true;
+        protected  bool _trackAttackAngle = true;
         [FixedNumberAngle, SerializeField]
-        private  long
-            _attackAngle = FixedMath.TenDegrees;
+        protected  long _attackAngle = FixedMath.TenDegrees;
         [SerializeField]
-        private  Vector2dHeight
-            _projectileOffset;
+        protected  Vector2dHeight _projectileOffset;
         [SerializeField, FixedNumber]
-        private long
-            _energyCost;
+        protected long _energyCost;
+
+        #endregion
 
         public long EnergyCost { get { return _energyCost; } }
 
