@@ -128,7 +128,7 @@ namespace Lockstep
             timescaledAcceleration = Acceleration * 32 / LockstepManager.FrameRate;
             if (timescaledAcceleration > FixedMath.One)
                 timescaledAcceleration = FixedMath.One;
-            closingDistance = cachedBody.Radius / 4;
+            closingDistance = cachedBody.Radius / 2;
             stuckTolerance = ((Agent.Body.Radius * Speed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
             stuckTolerance *= stuckTolerance;
         }

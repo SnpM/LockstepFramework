@@ -37,6 +37,14 @@ namespace Lockstep
 			}
 		}
 		
+
+        public static int GenerateDeltaCount(int size)
+        {
+            long fixSize = FixedMath.Create(size);
+            int ret = FixedMath.Mul(FixedMath.Mul(fixSize, fixSize), FixedMath.Pi).CeilToInt();
+            return ret;
+        }
+
 		public static void Initialize ()
 		{
 			for (int k = 0; k < NodeCount * NodeCount; k++) {
