@@ -45,13 +45,13 @@ namespace Lockstep {
 				}
 			}
 
-
-			Agent.StatsBarer.SetFill (StatType.Health, (float)(HealthAmount / (double)MaxHealth));
+            if (Agent.StatsBarer != null)
+			Agent.StatsBarer.SetFill (StatBarType.Health, (float)(HealthAmount / (double)MaxHealth));
 		}
 
         public void Die () {
             AgentController.DestroyAgent(Agent);
-            if (Agent.Animator .IsNotNull ()) {
+            if (Agent.Animator.IsNotNull ()) {
                 Agent.SetState(AnimState.Dying);
                 Agent.Animator.Visualize();
             }

@@ -80,11 +80,13 @@ namespace Lockstep {
 		
 		public override string ToString ()
 		{
+			if (Count <= 0)
+				return base.ToString ();
 			string output = string.Empty;
 			for (int i = 0; i < Count - 1; i++)
 				output += innerArray [i] + ", ";
 			
-			return output + innerArray [Count - 1];
+			return base.ToString () + ": " + output + innerArray [Count - 1];
 		}
 
 

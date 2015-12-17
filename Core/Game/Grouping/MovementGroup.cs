@@ -13,10 +13,7 @@ namespace Lockstep
             }
         }
 
-        protected override void OnSetup()
-        {
-            
-        }
+
 
         public static MovementGroup LastCreatedGroup {get; private set;}
         static readonly FastBucket<MovementGroup> activeGroups = new FastBucket<MovementGroup>();
@@ -77,6 +74,10 @@ namespace Lockstep
             int indexID = group.indexID;
             activeGroups.RemoveAt(indexID);
             pooledGroups.Add(group);
+        }
+        protected override void OnDeactivate()
+        {
+            LastCreatedGroup = null;
         }
     }
 

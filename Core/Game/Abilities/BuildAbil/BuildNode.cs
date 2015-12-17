@@ -15,9 +15,9 @@ public class BuildNode : CerealBehaviour, IMousable {
 	[SerializeField]
 	private Vector2dHeight _localPos;
 
-	[SerializeField]
-	private AgentCode[] _spawnableAgents;
-	public AgentCode[] SpawnableAgents {get {return _spawnableAgents;}}
+	[SerializeField,DataCode ("Agents")]
+	private string[] _spawnableAgents;
+	public string[] SpawnableAgents {get {return _spawnableAgents;}}
 
     [SerializeField]
     private BuildNodeType _nodeType;

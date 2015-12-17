@@ -20,7 +20,7 @@ namespace Lockstep {
 				return _agent;
 			}
 		}
-        public AbilityCode MyAbilityCode {get; private set;}
+        public string MyAbilityCode {get; private set;}
         public AbilityInterfacer Interfacer {get; private set;}
 
 		public int ID {get; private set;}
@@ -45,11 +45,16 @@ namespace Lockstep {
 
 
         public void Setup(LSAgent agent, int id) {
-            Interfacer = AbilityInterfacer.FindInterfacer(this.GetType());
-            if (Interfacer == null) {
-                throw new System.ArgumentException("This Ability of type " + this.GetType() + " has not been registered in database");
+            System.Type mainType = this.GetType();
+
+            while (mainType.BaseType != typeof (Ability) && mainType.BaseType != typeof (ActiveAbility)) {
+                mainType = mainType.BaseType;
             }
-            this.MyAbilityCode = (AbilityCode)Interfacer.MappedCode;
+            Interfacer = AbilityInterfacer.FindInterfacer(mainType);
+            if (Interfacer == null) {
+                throw new System.ArgumentException("The Ability of type " + mainType + " has not been registered in database");
+            }
+            this.MyAbilityCode = Interfacer.Name;
             _agent = agent;
 			ID = id;
 			TemplateSetup ();

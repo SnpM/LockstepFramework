@@ -50,13 +50,13 @@ namespace Lockstep
 			if (GameStarted == false) {
 			}
 			else {
+                
 				bufferBytes.FastClear ();
 				bufferBytes.AddRange (BitConverter.GetBytes (InfluenceFrameCount));
 				bufferBytes.AddRange (receivedBytes);
 				receivedBytes.FastClear ();
 				ClientManager.NetworkHelper.SendMessageToAll (MessageType.Frame, bufferBytes.ToArray ());
-
-				InfluenceFrameCount++;
+                InfluenceFrameCount++;
 
 			}
 		}

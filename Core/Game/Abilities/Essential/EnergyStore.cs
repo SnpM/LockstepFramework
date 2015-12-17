@@ -52,7 +52,7 @@ namespace Lockstep
 		{
 			if (setStatBuffer > 0) setStatBuffer--;
 			if (setStatBuffer == 0) {
-				Agent.StatsBarer.SetFill (Lockstep.UI.StatType.Energy, (float)(EnergyAmount / (double)MaxEnergy));
+				Agent.StatsBarer.SetFill (Lockstep.UI.StatBarType.Energy, (float)(EnergyAmount / (double)MaxEnergy));
 			}
 
 		}

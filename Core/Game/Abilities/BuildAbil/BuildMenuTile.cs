@@ -28,7 +28,7 @@ namespace Lockstep
 		}
 
 
-		public void Open (AgentCode agentCode) {
+		public void Open (string agentCode) {
 			AgentInterfacer agentInfo = AgentController.GetAgentInterfacer (agentCode);
 			Imager.sprite = agentInfo.Icon;
 			Texter.text = agentCode.ToString ();

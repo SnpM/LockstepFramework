@@ -27,6 +27,7 @@ namespace Lockstep
 			PeakCount = 0;
 		}
 
+
 		public int Add (T item)
 		{
 			int index = OpenSlots.Count > 0 ? OpenSlots.Pop () : PeakCount++;
@@ -65,7 +66,7 @@ namespace Lockstep
 		}
 
         public bool ContainsAt (int index, T item) {
-            return index >= 0 && index < PeakCount && innerArray[index].Equals( item);
+            return index >= 0 && index < PeakCount && this.arrayAllocation[index] && innerArray[index].Equals( item);
         }
 
 		public T this [int index] {

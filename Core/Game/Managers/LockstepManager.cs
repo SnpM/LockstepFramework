@@ -11,11 +11,22 @@
 #pragma warning disable 0414 // private field assigned but not used.
 #endif
 
+/*
+ * Call Pattern
+ * ------------
+ * Setup: Called once per run for setting up any values
+ * Initialize: Called once per instance. On managers, called in new game. On agents, called when unpooled.
+ * Simulate: Called once every simulation frame. 
+ * Visualize: Called once every rendering/player interfacing frame
+ * Deactivate: Called upon deactivation. On managers, called when game is ended. On agents, called when pooled.
+ */
+
 using Lockstep.UI;
 using UnityEngine;
 //using Lockstep.Integration;
 using Lockstep.Data;
 namespace Lockstep {
+    //TODO: Set up default functions to implement LSManager
     public static class LockstepManager {
 		public static readonly System.Diagnostics.Stopwatch SimulationTimer = new System.Diagnostics.Stopwatch();
 		public static long Ticks {get {return SimulationTimer.ElapsedTicks;}}
@@ -29,11 +40,15 @@ namespace Lockstep {
 		public static int InfluenceFrameCount {get; private set;}
         public static int FrameCount { get; private set; }
 		public static bool Started {get; private set;}
+        public static bool Loaded {get; private set;}
 
         public static GameManager MainGameManager {get; private set;}
 
-        public static void Setup () {
+        internal static void Setup () {
 
+            DefaultMessageRaiser.EarlySetup();
+
+            LSDatabaseManager.Setup ();
 
 			UnityInstance = GameObject.CreatePrimitive (PrimitiveType.Sphere).AddComponent<MonoBehaviour> ();
             UnityInstance.GetComponent<Renderer>().enabled = false;
@@ -46,7 +61,7 @@ namespace Lockstep {
 
             ProjectileManager.Setup();
             EffectManager.Setup();
-            BehaviourHelper.GlobalSetup();
+
 			PhysicsManager.Setup ();
 			ClientManager.Setup (MainGameManager.MainNetworkHelper);
             InterfaceManager.Setup();
@@ -56,12 +71,19 @@ namespace Lockstep {
 			Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
 
 			InputManager.Setup ();
+
+            DefaultMessageRaiser.LateSetup();
         }
 
-        public static void Initialize(GameManager gameManager) {
-
+        internal static void Initialize(GameManager gameManager) {
             MainGameManager = gameManager;
 
+            if (!Loaded) {
+                Setup ();
+                Loaded = true;
+            }
+
+            DefaultMessageRaiser.EarlyInitialize();
 
 			SimulationTimer.Reset ();
 			SimulationTimer.Start ();
@@ -75,6 +97,8 @@ namespace Lockstep {
             FrameCount = 0;
 			InfluenceFrameCount = 0;
 
+            TriggerManager.Initialize();
+
             GridManager.Generate();
             GridManager.Initialize();
 
@@ -84,7 +108,6 @@ namespace Lockstep {
 			FrameManager.Initialize();
 
             CommandManager.Initialize();
-			BehaviourHelper.GlobalInitialize();
 
             AgentController.Initialize();
 			TeamManager.LateInitialize ();
@@ -99,10 +122,21 @@ namespace Lockstep {
 
 			Started = true;
             ClientManager.Initialize ();
+
+            InitializeHelpers ();
+
+            DefaultMessageRaiser.LateInitialize();
+        }
+
+        static void InitializeHelpers () {
+            FastList<BehaviourHelper> helpers = new FastList<BehaviourHelper>();
+            MainGameManager.GetBehaviourHelpers (helpers);
+            BehaviourHelperManager.Initialize(helpers.ToArray ());
         }
 
 		static bool Stalled;
-        public static void Simulate() {
+        internal static void Simulate() {
+            DefaultMessageRaiser.EarlySimulate ();
 			if (InfluenceCount == 0)
 			{
 				InfluenceSimulate ();
@@ -112,6 +146,8 @@ namespace Lockstep {
                		return;
            		}
 				Stalled = false;
+                MainGameManager.GameStart();
+
 				FrameManager.Simulate();
 				InfluenceFrameCount++;
 			}
@@ -122,15 +158,15 @@ namespace Lockstep {
 				return;
 			}
 			if (FrameCount == 0) StartGame ();
-			BehaviourHelper.GlobalSimulate();
+			BehaviourHelperManager.Simulate();
 			AgentController.Simulate();
             PhysicsManager.Simulate();
             CoroutineManager.Simulate();
             InfluenceManager.Simulate();
             ProjectileManager.Simulate();
-            TestManager.Simulate ();
-
 			TeamManager.Simulate ();
+
+            TriggerManager.Simulate();
 
 			LateSimulate ();
             FrameCount++;
@@ -140,45 +176,84 @@ namespace Lockstep {
 			GameManager.StartGame ();
 		}
 		private static void LateSimulate () {
-            BehaviourHelper.GlobalLateSimulate ();
+            BehaviourHelperManager.LateSimulate ();
 			AgentController.LateSimulate ();
 			PhysicsManager.LateSimulate ();
+            DefaultMessageRaiser.LateSimulate ();
 		}
-		public static void InfluenceSimulate () {
+        internal static void InfluenceSimulate () {
 			PlayerManager.Simulate();
 			CommandManager.Simulate();
 			ClientManager.Simulate ();
 		}
 
-        public static void Visualize() {
+        internal static void Execute (Command com) {
+            
+            switch (com.LeInput)
+            {
+                case InputCode.None:
+                    break;
+                case InputCode.Meta:
+                    MetaActionCode actionCode = (MetaActionCode)com.Target;
+                    int id = com.Count;
+                    switch (actionCode)
+                    {
+                        case MetaActionCode.NewPlayer:
+                            AgentController controller = new AgentController();
+                            if (id == ClientManager.ID)
+                            {
+                                PlayerManager.AddController(controller);
+                            }
+                            TeamManager.JoinTeam(controller);
+                            
+                            break;
+                    }
+                    break;
+                default:
+                    AgentController cont = AgentController.InstanceManagers [com.ControllerID];
+                    cont.Execute(com);
+                    break;
+            }
+
+            DefaultMessageRaiser.Execute (com);
+
+        }
+
+        internal static void Visualize() {
+            DefaultMessageRaiser.EarlyVisualize();
 			PlayerManager.Visualize();
 
-			BehaviourHelper.GlobalVisualize();
+			BehaviourHelperManager.Visualize();
 			PhysicsManager.Visualize();
 			AgentController.Visualize();
             ProjectileManager.Visualize();
             EffectManager.Visualize();
 
 			TeamManager.Visualize ();
-
-			//LateVisualize ();
         }
 
-		public static void LateVisualize () {
+        internal static void LateVisualize () {
 			InputManager.Visualize();
+            DefaultMessageRaiser.LateVisualize();
+
 		}
 
-        public static void Deactivate() {
+        internal static void Deactivate() {
+            DefaultMessageRaiser.EarlyDeactivate();
+
             if (Started == false) return;
             Selector.Clear();
             AgentController.Deactivate();
-			BehaviourHelper.GlobalDeactivate ();
+			BehaviourHelperManager.Deactivate ();
             ProjectileManager.Deactivate();
 			ClientManager.Deactivate ();
+            LockstepManager.Deactivate();
 
 			TeamManager.Deactivate ();
             ClientManager.NetworkHelper.Disconnect ();
 			Started = false;
+
+            DefaultMessageRaiser.LateDeactivate();
         }
 
 		public static void Quit () {

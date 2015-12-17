@@ -19,9 +19,7 @@ namespace Lockstep.Data
             base._description = description;
         }
         public AgentInterfacer(){}
-        public AgentCode GetAgentCode () {
-            return (AgentCode)base.MappedCode;
-        }
+
         public LSAgent GetAgent () {
             if (this.Prefab != null)
             {

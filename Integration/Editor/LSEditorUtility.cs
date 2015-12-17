@@ -342,20 +342,20 @@ namespace Lockstep
 
         }
 
-        public static void GenerateEnum<TData> (
+        public static void GenerateEnum (
             string directory,
             string enumName,
-            DataHelper<TData> data
-            ) where TData : DataItem,new()
+            DataHelper data
+            )
         {
-            GenerateEnum<TData> (directory, enumName, data.Data, (item) => item.Name, (item) => (int)item.MappedCode);
+            GenerateEnum (directory, enumName, data.Data as DataItem[], (item) => item.Name, (item) => (int)item.Name.GetHashCode ());
         }
-        public static void GenerateEnum<TData> (
+        public static void GenerateEnum (
             string directory,
             string enumName,
-            TData[] data,
-            Func<TData,string> getEnumElementName,
-            Func<TData,int> getEnumElementValue)
+            DataItem[] data,
+            Func<DataItem,string> getEnumElementName,
+            Func<DataItem,int> getEnumElementValue)
         {
             string generationFolder = directory;
             string namespaceName = "Lockstep.Data";
@@ -406,7 +406,7 @@ namespace Lockstep
             enumValues.Add(0);
             enumNames.Add("None");
             for (int i = 0; i < data.Length; i++) {
-                TData item = data [i];
+                DataItem item = data [i];
                 string memberName = getEnumElementName (item);
                 if (string.IsNullOrEmpty (memberName))
                 {
@@ -517,7 +517,9 @@ namespace Lockstep
             
             Type targetType = currentType;
             return targetType;*/
-            return GetPropertyTarget (property).GetType();
+            object propertyTarget = GetPropertyTarget (property);
+            if (propertyTarget == null) return null;
+            return propertyTarget.GetType();
         }
         public static IEnumerable<TAttribute> GetPropertyAttributes<TAttribute> (SerializedProperty prop) {
 

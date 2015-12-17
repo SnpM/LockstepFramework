@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1d6c482752cb49aa93b5f9421c22651, type: 3}
+  m_Name: Example_Database
+  m_EditorClassIdentifier: 
+  _agentData:
+  - _name: TestAgent
+    _description: 
+    _icon: {fileID: 0}
+    _prefab: {fileID: 100310, guid: 7adf26d256267454bb6f9b55470051d7, type: 2}
+  _projectileData: []
+  _effectData: []
+  _abilityData:
+  - _name: Build
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: Lockstep.Build, Assembly-CSharp
+    _listenInput: 15
+    _informationGather: 0
+    _markType: 0
+  - _name: EnergyStore
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: Lockstep.EnergyStore, Assembly-CSharp
+    _listenInput: 15
+    _informationGather: 0
+    _markType: 0
+  - _name: Health
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: Lockstep.Health, Assembly-CSharp
+    _listenInput: 15
+    _informationGather: 0
+    _markType: 0
+  - _name: Move
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: Lockstep.Move, Assembly-CSharp
+    _listenInput: 6
+    _informationGather: 1
+    _markType: 0
+  - _name: Scan
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: Lockstep.Scan, Assembly-CSharp
+    _listenInput: 15
+    _informationGather: 0
+    _markType: 0
+  - _name: Shield
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: Lockstep.Shield, Assembly-CSharp
+    _listenInput: 15
+    _informationGather: 0
+    _markType: 0
+  - _name: Stop
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: Lockstep.Stop, Assembly-CSharp
+    _listenInput: 15
+    _informationGather: 0
+    _markType: 0
+  - _name: Turn
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: Lockstep.Turn, Assembly-CSharp
+    _listenInput: 15
+    _informationGather: 0
+    _markType: 0
+  - _name: SetHeight
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: SetHeight, Assembly-CSharp
+    _listenInput: 15
+    _informationGather: 0
+    _markType: 0

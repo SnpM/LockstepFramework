@@ -16,7 +16,6 @@
         private int _count;
         private Selection _select;
         private byte _groupID;
-        private float[] _transform;
 
         public bool HasPosition { get; private set; }
         public bool HasTarget { get; private set; }
@@ -24,6 +23,7 @@
         public bool HasCoord { get; private set; }
         public bool HasCount { get; private set; }
         public bool HasSelect { get;  set; }
+
         public bool HasGroupID { get; private set; }
 
         public bool Used;
@@ -217,6 +217,7 @@
         Coord = 1 << 3,
         Count = 1 << 4,
         Select = 1 << 5,
-        GroupID = 1 << 6
+        GroupID = 1 << 6,
+        TExt = 1 << 7
 	}
 }

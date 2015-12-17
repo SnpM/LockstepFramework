@@ -31,6 +31,8 @@ namespace Lockstep
 		bool SetVisualPosition;
 		bool SetVisualRotation;
 		
+        public bool Setted {get; private set;}
+
 		public Vector2d _velocity;
 		
 		public Vector2d Velocity {
@@ -122,8 +124,8 @@ namespace Lockstep
 		public ColliderType Shape;
 		public bool IsTrigger;
 		public  int Layer;
-		public long HalfWidth;
-		public long HalfHeight;
+        public long HalfWidth = FixedMath.Half;
+        public long HalfHeight = FixedMath.Half;
 		public long Radius;
 		public bool Immovable;
 	
@@ -178,6 +180,7 @@ namespace Lockstep
 				} else {
 					Radius = FixedMath.Sqrt ((HalfHeight * HalfHeight + HalfWidth * HalfWidth) >> FixedMath.SHIFT_AMOUNT);
 				}
+
 			} else if (Shape == ColliderType.Polygon) {
 				long BiggestSqrRadius = Vertices [0].SqrMagnitude ();
 				for (int i = 1; i < Vertices.Length; i++) {
@@ -201,7 +204,13 @@ namespace Lockstep
 		}
 		
 		public void Initialize (Vector2d StartPosition, Vector2d StartRotation)
-		{
+        {
+            if (!Setted) {
+                this.Setup(null);
+                Setted = true;
+            }
+            CheckVariables ();
+
 			Parent = null;
 			
 			PositionChanged = true;
@@ -248,6 +257,13 @@ namespace Lockstep
 			lastVisualRot = visualRot;
 			_positionalTransform.rotation = visualRot;
 		}
+
+        void CheckVariables () {
+            if (_positionalTransform == null)
+                this._positionalTransform = base.transform;
+            if (_rotationalTransform == null)
+                this._rotationalTransform = base.transform;
+        }
 		
 		public void BuildPoints ()
 		{
@@ -575,6 +591,7 @@ namespace Lockstep
 					Children [i].Parent = null;
 				}
 			}
+            PhysicsManager.Dessimilate(this);
 		} 
 
 		public void Teleport (Vector2d destination) {
@@ -594,6 +611,34 @@ namespace Lockstep
 			abil = null;
 			return false;
 		}
+
+        public void GetCoveredSnappedPositions (long snapSpacing, FastList<Vector2d> output) {
+            //Used for getting snapped positions this body covered
+            for (long x = this.XMin; x <= this.XMax; x+= snapSpacing) {
+                for (long y = this.YMin; y <= this.YMax; y += snapSpacing) {
+                    Vector2d checkPos = new Vector2d(x,y);
+                    if (IsPositionCovered (checkPos)) {
+                        output.Add (checkPos);
+                    }
+                }
+            }
+        }
+        public bool IsPositionCovered (Vector2d position) {
+            //Checks if this body covers a position
+
+            //Different techniques for different shapes
+            switch (this.Shape) {
+                case ColliderType.Circle:
+                    return (this.Position - position).FastMagnitude() <= this.FastRadius;
+                    break;
+                case ColliderType.AABox:
+                    return position.x >= this.XMin && position.x <= this.XMax
+                        && position.y >= this.YMin && position.y <= this.YMax;
+                    break;
+            }
+            return false;
+        }
+
 	}
 	
 	public enum ColliderType : byte

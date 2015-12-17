@@ -32,7 +32,7 @@ namespace Lockstep {
 		[SerializeField, FrameCount]
         private int _deathTime = LockstepManager.FrameRate * 2;
 
-        public AgentCode MyAgentCode { get; private set; }
+        public string MyAgentCode { get; private set; }
 
         [SerializeField, HideInInspector]
         private AgentType _agentType;
@@ -40,6 +40,11 @@ namespace Lockstep {
             get {
                 return _agentType;
             }
+        }
+
+        private LSBusStop _busStop;
+        public LSBusStop BusStop {
+            get {return _busStop ?? (_busStop = new LSBusStop());}
         }
 
         public event Action<LSAgent> onDeactivation;
@@ -76,6 +81,9 @@ namespace Lockstep {
 		[SerializeField]
 		private LSBody _body;
 		public LSBody Body { get {return _body;} }
+        [SerializeField]
+        private LSTrigger[] _triggers;
+        public LSTrigger[] Triggers {get {return _triggers;}}
 		[SerializeField]
 		private LSAnimator _animator;
 		public LSAnimator Animator { get {return _animator;} }
@@ -194,6 +202,10 @@ namespace Lockstep {
 
         public AgentInterfacer Interfacer {get; private set;}
 
+        void Awake () {
+            gameObject.SetActive(false);
+        }
+
         public void Setup(AgentInterfacer interfacer) {
 			
             LoadComponents ();
@@ -203,7 +215,7 @@ namespace Lockstep {
 
 			setupAbilitys.FastClear();
             
-            MyAgentCode = interfacer.GetAgentCode();
+            MyAgentCode = interfacer.Name;
             Interfacer = interfacer;
             SpawnVersion = 1;
             CheckCasting = true;
@@ -253,6 +265,12 @@ namespace Lockstep {
 			CachedGameObject.SetActive (true);
             if (Body .IsNotNull ()) {
                 Body.Initialize(position, Vector2d.up);
+            }
+
+            if (Triggers.IsNotNull()) {
+                foreach (LSTrigger trigger in Triggers) {
+                    trigger.Initialize();
+                }
             }
 
             if (Influencer .IsNotNull ()) {
@@ -344,7 +362,7 @@ namespace Lockstep {
 			
 			abilityManager.Deactivate();
 			
-			PhysicsManager.Dessimilate(Body);
+            Body.Deactivate();
 			if (Influencer .IsNotNull ()) {
 				Influencer.Deactivate();
 			}
@@ -389,7 +407,7 @@ namespace Lockstep {
             return hash;
         }
 
-		public LSAgent BuildChild (AgentCode agentCode, Vector2d localPos, float localHeight) {
+		public LSAgent BuildChild (string agentCode, Vector2d localPos, float localHeight) {
 			LSAgent agent = this.Controller.CreateAgent (agentCode);
 			agent.Body.Parent = this.Body;
 			agent.Body.LocalPosition = localPos;
@@ -408,6 +426,7 @@ namespace Lockstep {
             _body = GetComponent<LSBody> ();
             _animator = GetComponent<LSAnimator> ();
             _attachedAbilities = GetComponents<Ability> ();
+            _triggers = GetComponents<LSTrigger> ();
         }
 #if UNITY_EDITOR
 		public void RefreshComponents () {

@@ -44,8 +44,8 @@ namespace Lockstep
 
         public static void Setup()
         {
-            QuickPos = AbilityInterfacer.FindInterfacer(Lockstep.Data.AbilityCode.Move);
-            QuickTarget = AbilityInterfacer.FindInterfacer(Lockstep.Data.AbilityCode.Scan);
+            QuickPos = AbilityInterfacer.FindInterfacer ("Move");
+            QuickTarget = AbilityInterfacer.FindInterfacer("Scan");
         }
 
         public static void Initialize()

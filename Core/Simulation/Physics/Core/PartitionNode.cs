@@ -37,12 +37,7 @@ public class PartitionNode {
 					for (int k = j + 1; k < nodePeakCount; k++) {
 						if (ContainedObjects.arrayAllocation[k]) {
 							id2 = this [k];
-							if (id1 < id2) {
-								pair = PhysicsManager.CollisionPairs [id1 * PhysicsManager.MaxSimObjects + id2];
-							} else {
-								pair = PhysicsManager.CollisionPairs [id2 * PhysicsManager.MaxSimObjects + id1];
-							}
-							
+                            pair = PhysicsManager.GetCollisionPair(id1,id2);
 							if (System.Object.ReferenceEquals (null, pair) == false && (pair.PartitionVersion != Partition._Version)) {
 								pair.CheckAndDistributeCollision ();
 								pair.PartitionVersion = Partition._Version;
