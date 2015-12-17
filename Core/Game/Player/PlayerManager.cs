@@ -69,8 +69,25 @@ namespace Lockstep {
 			if (MainController == null) MainController = agentController;
 		}
 
+        public static void RemoveController (AgentController agentController) { 
+            AgentControllers.RemoveAt(agentController.PlayerIndex);
+            if (MainController == agentController) {
+                if (AgentControllers.Count == 0)
+                    MainController = null;
+                else
+                {
+                    for (int i = 0; i < AgentControllers.PeakCount; i++) {
+                        if (AgentControllers.arrayAllocation[i]) {
+                            MainController = AgentControllers[i];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
 		public static bool ContainsController (AgentController controller) {
-			return controller.PlayerIndex < AgentControllers.PeakCount && AgentControllers[controller.PlayerIndex] == controller;
+            return controller.PlayerIndex < AgentControllers.PeakCount && AgentControllers.ContainsAt(controller.PlayerIndex,controller);
 		}
 		
 		public static AllegianceType GetAllegiance (AgentController otherController)

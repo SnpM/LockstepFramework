@@ -13,12 +13,12 @@ namespace Lockstep {
         public abstract int PlayerCount { get; }
 
         public Action<MessageType,byte[]> OnDataReceived;
-        public Action<byte[]> OnFrameData;
-        public Action<byte[]> OnInputData;
-        public Action<byte[]> OnInitData;
-        public Action<byte[]> OnMatchmakingData;
-        public Action<byte[]> OnRegisterData;
-        public Action<byte[]> OnTestData;
+        public Action<byte[]> OnFrameData; //Frame data
+        public Action<byte[]> OnInputData; //(For server) Client input
+        public Action<byte[]> OnInitData; //Initialization data - Not Used (NU)
+        public Action<byte[]> OnMatchmakingData; //Matchmaking data NU
+        public Action<byte[]> OnRegisterData; //For registering clients NU
+        public Action<byte[]> OnTestData; //For test purposes
         
         public NetworkHelper () {
 
@@ -34,9 +34,12 @@ namespace Lockstep {
 
         public abstract void SendMessageToAll (MessageType messageType, byte[] data);
 
+        //For receiving data
         protected void Receive (MessageType messageType, byte[] data) {
             if (OnDataReceived != null)
                 OnDataReceived (messageType,data);
+
+            //Huge switch statement for distributing data based on MessageType
             switch (messageType) {
                 case MessageType.Input:
                     if (OnInputData != null) {
