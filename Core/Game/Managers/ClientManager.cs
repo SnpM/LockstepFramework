@@ -89,6 +89,7 @@ namespace Lockstep
 
 				} else {
 					if (isConnected) {
+                        
 						while (bufferedSendData.Count > 0) {
 							Distribute (bufferedSendData.Pop ());
 						}

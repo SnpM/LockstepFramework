@@ -51,7 +51,7 @@ namespace Lockstep {
 
         public void Die () {
             AgentController.DestroyAgent(Agent);
-            if (Agent.Animator .IsNotNull ()) {
+            if (Agent.Animator.IsNotNull ()) {
                 Agent.SetState(AnimState.Dying);
                 Agent.Animator.Visualize();
             }
