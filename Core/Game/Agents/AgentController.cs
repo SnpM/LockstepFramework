@@ -168,7 +168,7 @@ namespace Lockstep
         {
             for (int i = 0; i < InstanceManagers.Count; i++)
             {
-                InstanceManagers [i].DiplomacyFlags.AddAt(AllegianceType.Neutral, newCont.ControllerID);
+                InstanceManagers [i].SetAllegiance(newCont, AllegianceType.Neutral);
             }
         }
 
@@ -230,25 +230,26 @@ namespace Lockstep
 
         public Team MyTeam { get; private set; }
 
-        private readonly FastBucket<AllegianceType> DiplomacyFlags = new FastBucket<AllegianceType>();
+        private readonly FastList<AllegianceType> DiplomacyFlags = new FastList<AllegianceType>();
         private readonly FastStack<ushort> OpenLocalIDs = new FastStack<ushort>();
 
         internal AgentController()
         {
+            
             OpenLocalIDs.FastClear();
             PeakLocalID = 0;
             ControllerID = (byte)InstanceManagers.Count;
             
             for (int i = 0; i < InstanceManagers.Count; i++)
             {
-                DiplomacyFlags.AddAt(AllegianceType.Neutral, InstanceManagers [i].ControllerID);
+                this.SetAllegiance(InstanceManagers[i], AllegianceType.Neutral);
             }
-            
-            InstanceManagers.Add(this);
             UpdateDiplomacy(this);
+
+            InstanceManagers.Add(this);
             DiplomacyFlags [ControllerID] = AllegianceType.Friendly;
         }
-
+            
         public void AddToSelection(LSAgent agent)
         {
             SelectedAgents.Add(agent);
@@ -370,6 +371,9 @@ namespace Lockstep
 
         public void SetAllegiance(AgentController otherController, AllegianceType allegianceType)
         {
+            while (DiplomacyFlags.Count >= otherController.ControllerID) {
+                DiplomacyFlags.Add(AllegianceType.Neutral);
+            }
             DiplomacyFlags [otherController.ControllerID] = allegianceType;
         }
 

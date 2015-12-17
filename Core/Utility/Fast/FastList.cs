@@ -15,7 +15,7 @@ namespace Lockstep
 	{
 		private const int DefaultCapacity = 8;
 		public T[] innerArray;
-		public int Count {get; private set;}
+        public int Count {get; private set;} //Also the index of the next element to be added
 		public int Capacity = DefaultCapacity;
 		 
 		public FastList (FastList<T> CopyList)

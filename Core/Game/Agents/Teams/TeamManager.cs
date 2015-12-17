@@ -20,7 +20,7 @@
 
 		public static void UpdateDiplomacy (Team newTeam) {
 			for (int i = 0; i < Teams.Count; i++) {
-				Teams[i].Diplomacy.AddAt (AllegianceType.Neutral,newTeam.ID);
+                Teams[i].SetAllegiance (newTeam,AllegianceType.Neutral);
 			}
 		}
 		public static void Initialize () {
