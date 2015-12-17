@@ -70,6 +70,7 @@ namespace Lockstep {
 		}
 
         public static void RemoveController (AgentController agentController) { 
+            Selector.Clear();
             AgentControllers.RemoveAt(agentController.PlayerIndex);
             if (MainController == agentController) {
                 if (AgentControllers.Count == 0)
