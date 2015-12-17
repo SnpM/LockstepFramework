@@ -450,6 +450,9 @@ namespace Lockstep
             }
             _projectileOffset = new Vector2dHeight(base.transform.InverseTransformPoint (_projectileOrigin));
         }
+        void OnDrawGizmos () {
+            Gizmos.DrawWireSphere (Application.isPlaying ? Agent.Body.visualPosition : this.transform.position,this.Range.ToFloat()); 
+        }
 #endif
     }
 }

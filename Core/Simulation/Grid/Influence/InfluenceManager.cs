@@ -27,74 +27,50 @@ namespace Lockstep
 
         #region Scanning
 
-        static long tempDistance;
-        static LSAgent secondClosest;
-        static ScanNode tempNode;
-        static FastBucket<LSAgent> tempBucket;
-        static BitArray arrayAllocation;
+        const int FoundScanBuffer = 5;
 
         public static LSAgent Scan(int gridX, int gridY, int deltaCount,
-            LSAgent sourceAgent, AllegianceType targetAllegiance)
+                                   LSAgent sourceAgent, AllegianceType targetAllegiance)
         {
             long sourceX = sourceAgent.Body.Position.x;
             long sourceY = sourceAgent.Body.Position.y;
-            bool agentFound = false;
-            long closestDistance = 0;
             LSAgent closestAgent = null;
-            for (int i = 0; i < deltaCount; i++)
+            long closestDistance = 0;
+            int foundBuffer = FoundScanBuffer;
+            foreach (LSAgent agent in ScanAll (gridX, gridY, deltaCount, sourceAgent, targetAllegiance))
             {
-                tempNode = GridManager.GetScanNode(
-                    gridX + DeltaCache.CacheX [i],
-                    gridY + DeltaCache.CacheY [i]);
-				
-                if (tempNode.IsNotNull())
+                if (FoundScanBuffer == 0)
+                    break;
+                if (closestAgent != null)
                 {
-                    foreach (FastBucket<LSInfluencer> tempBucket in tempNode.BucketsWithAllegiance(sourceAgent, targetAllegiance))
+                    long tempDistance = agent.Body.Position.FastDistance(sourceX, sourceY);
+                    if (tempDistance < closestDistance)
                     {
-                        arrayAllocation = tempBucket.arrayAllocation;
-                        for (int j = 0; j < tempBucket.PeakCount; j++)
-                        {
-                            if (arrayAllocation.Get(j))
-                            {
-                                LSAgent tempAgent = tempBucket [j].Agent;
-                                if (true)//conditional(tempAgent))
-                                {
-                                    if (agentFound)
-                                    {
-                                        if ((tempDistance = tempAgent.Body.Position.FastDistance(sourceX, sourceY)) < closestDistance)
-                                        {
-                                            secondClosest = closestAgent;
-                                            closestAgent = tempAgent;
-                                            closestDistance = tempDistance;
-                                        }
-                                    } else
-                                    {
-                                        closestAgent = tempAgent;
-                                        agentFound = true;
-                                        closestDistance = tempAgent.Body.Position.FastDistance(sourceX, sourceY);
-                                    }
-                                }
-                            }
-                        }
-                        if (agentFound)
-                        {
-                            return closestAgent;
-                        }
+                        closestAgent = agent;
+                        closestDistance = tempDistance;
+                        foundBuffer = FoundScanBuffer;
                     }
+                    else {
+                        foundBuffer--;
+                    }
+                } else
+                {
+                    closestAgent = agent;
+                    closestDistance = agent.Body.Position.FastDistance(sourceX, sourceY);
                 }
             }
-            return null;
+            return closestAgent;
         }
 
         public static IEnumerable<LSAgent> ScanAll(int gridX, int gridY, int deltaCount,
-            LSAgent sourceAgent,
-            AllegianceType targetAllegiance)
+                                                   LSAgent sourceAgent,
+                                                   AllegianceType targetAllegiance)
         {
             long sourceX = sourceAgent.Body.Position.x;
             long sourceY = sourceAgent.Body.Position.y;
             for (int i = 0; i < deltaCount; i++)
             {
-                tempNode = GridManager.GetScanNode(
+                ScanNode tempNode = GridManager.GetScanNode(
                     gridX + DeltaCache.CacheX [i],
                     gridY + DeltaCache.CacheY [i]);
 
@@ -102,7 +78,7 @@ namespace Lockstep
                 {
                     foreach (FastBucket<LSInfluencer> tempBucket in tempNode.BucketsWithAllegiance(sourceAgent, targetAllegiance))
                     {
-                        arrayAllocation = tempBucket.arrayAllocation;
+                        BitArray arrayAllocation = tempBucket.arrayAllocation;
                         for (int j = 0; j < tempBucket.PeakCount; j++)
                         {
                             if (arrayAllocation.Get(j))

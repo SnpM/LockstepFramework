@@ -45,7 +45,7 @@ namespace Lockstep {
 				}
 			}
 
-
+            if (Agent.StatsBarer != null)
 			Agent.StatsBarer.SetFill (StatBarType.Health, (float)(HealthAmount / (double)MaxHealth));
 		}
 

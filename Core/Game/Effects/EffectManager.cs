@@ -34,10 +34,12 @@ namespace Lockstep {
 				}
 			}
 		}
-
+        public static bool IsValid (string effectCode) {
+            return !string.IsNullOrEmpty (effectCode) && effectCode != "None";
+        }
 		public static void LazyCreateEffect (string effectCode, Vector3 position)
 		{
-			if (effectCode == "None") return;
+            if (!IsValid (effectCode)) return;
 			LSEffect effect = CreateEffect (effectCode);
 			effect.CachedTransform.position = position;
 			effect.Initialize ();
@@ -45,7 +47,7 @@ namespace Lockstep {
 
 		public static void LazyCreateEffect (string effectCode, Vector3 position, Quaternion rotation)
 		{
-			if (effectCode == "None") return;
+            if (!IsValid (effectCode)) return;
 			LSEffect effect = CreateEffect (effectCode);
 			effect.CachedTransform.position = position;
 			effect.Initialize ();
@@ -53,7 +55,7 @@ namespace Lockstep {
 
 		public static void LazyCreateEffect (string effectCode, Transform SpawnPoint)
 		{
-			if (effectCode == "None") return;
+            if (!IsValid (effectCode)) return;
 			LSEffect effect = CreateEffect (effectCode);
 			effect.CachedTransform.position = SpawnPoint.position;
 			effect.Initialize ();
@@ -61,6 +63,8 @@ namespace Lockstep {
 
 		public static LSEffect CreateEffect (string effectCode)
 		{
+            if (!IsValid (effectCode)) return null;
+
 			LSEffect effect = GenEffect (effectCode, -1);
 			EffectActive[effect.ID] = true;
 			Effects[effect.ID] = effect;

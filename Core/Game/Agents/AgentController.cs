@@ -401,9 +401,9 @@ namespace Lockstep
     [System.Flags]
     public enum AllegianceType : int
     {
-        Neutral         = 1 << 1,
-        Friendly        = 1 << 2,
-        Enemy           = 1 << 3
+        Neutral         = 1 << 0,
+        Friendly        = 1 << 1,
+        Enemy           = 1 << 2
     }
   
 }
