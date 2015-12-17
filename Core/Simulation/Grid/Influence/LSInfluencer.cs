@@ -15,12 +15,15 @@ namespace Lockstep
 		public int bucketIndex = -1;
 		#endregion
 
+        #region ScanNode Helper
+        public int NodeTicket;
+        #endregion
+
 		public GridNode LocatedNode { get; private set;}
 
 		public LSBody Body { get; private set; }
 
 		public LSAgent Agent { get; private set; }
-		private int nodeIndex;
 
 		public void Setup (LSAgent agent)
 		{
@@ -31,7 +34,7 @@ namespace Lockstep
 		public void Initialize ()
 		{
 			LocatedNode = GridManager.GetNode (Body.Position.x, Body.Position.y);
-			nodeIndex = LocatedNode.Add (Agent);
+			LocatedNode.Add (this);
 		}
 
 		public void Simulate ()
@@ -41,8 +44,8 @@ namespace Lockstep
 				tempNode = GridManager.GetNode (Body.Position.x, Body.Position.y);
 
 				if (System.Object.ReferenceEquals (tempNode, LocatedNode) == false) {
-					LocatedNode.RemoveAt (this.nodeIndex);
-					nodeIndex = tempNode.Add (Agent);
+                    LocatedNode.Remove (this);
+					 tempNode.Add (this);
 					LocatedNode = tempNode;
 				}
 			}
@@ -50,7 +53,7 @@ namespace Lockstep
 
 		public void Deactivate ()
 		{
-			LocatedNode.RemoveAt (this.nodeIndex);
+			LocatedNode.Remove (this);
 			LocatedNode = null;
 		}
         
@@ -64,9 +67,7 @@ namespace Lockstep
 			InfluenceManager.TargetAllegiance = targetAllegiance;
 			InfluenceManager.TargetPlatform = targetPlatform;
 			return InfluenceManager.Scan (LocatedNode.ScanX, LocatedNode.ScanY, deltaCount,
-			                              InfluenceManager.ScanConditionalSourceWithHealthAction,
-			                              Agent.Body.Position.x,
-			                              Agent.Body.Position.y);
+			                              this.Agent,targetAllegiance);
 		}
         const PlatformType AllPlatforms = (PlatformType)~0;
         const AllegianceType AllAllegiance = (AllegianceType)~0;

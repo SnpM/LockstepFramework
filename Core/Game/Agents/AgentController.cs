@@ -378,6 +378,14 @@ namespace Lockstep
             return HasTeam && otherController.HasTeam ? MyTeam.GetAllegiance(otherController) : DiplomacyFlags [otherController.ControllerID];
         }
 
+        public AllegianceType GetAllegiance (byte controllerID) {
+            if (HasTeam) {
+                //TODO: Team allegiance
+            }
+
+            return DiplomacyFlags [controllerID];
+        }
+
         public void JoinTeam(Team team)
         {
             MyTeam = team;

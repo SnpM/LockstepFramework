@@ -27,6 +27,7 @@ namespace Lockstep
 			PeakCount = 0;
 		}
 
+
 		public int Add (T item)
 		{
 			int index = OpenSlots.Count > 0 ? OpenSlots.Pop () : PeakCount++;

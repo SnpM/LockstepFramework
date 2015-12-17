@@ -70,11 +70,34 @@ namespace Lockstep
 		public int fCost;
 		public GridNode parent;
 		public bool Unwalkable;
+
+        public bool Unpassable (int size) {
+            if (this.Unwalkable)
+                return true;
+            if (size == 1) {
+                return false;
+            }
+            if (size == 2) {
+                bool unpassable = false;
+                for (int i = 0; i < 8; i++) {
+                    GridNode node = NeighborNodes[i];
+                    if (node != null)
+                    if (node.Unwalkable) return true;
+                }
+                return false;
+            }
+            size -= 1;
+            for (int i = -size; i <= size; i++) {
+                for (int j = -size; j <= size; j++) {
+                    if (i != 0 && j != 0) continue;
+                }
+            }
+            return false;
+        }
 		public int Weight;
 		public GridNode[] NeighborNodes = new GridNode[8];
 		public Vector2d WorldPos;
-		public bool Obstructed;
-		public static readonly bool[] IsNeighborDiagnal = new bool[] {
+        public static readonly bool[] IsNeighborDiagnal = new bool[] {
 			true,
 			false,
 			true,
@@ -97,10 +120,7 @@ namespace Lockstep
 							
 							if (i == 0 && j == 0)
 								continue;
-							
-							if (checkNode.Unwalkable) {
-								Obstructed = true;
-							}
+
 							
 							//if ((i != 0 && j != 0)) continue;
 							NeighborNodes [GetNeighborIndex (i, j)] = checkNode;
@@ -197,15 +217,15 @@ namespace Lockstep
 		public int ScanY {get {return LinkedScanNode.Y;}}
 		public ScanNode LinkedScanNode;
 		const int weightPerUnit = 100;
-		public int Add (LSAgent influencer)
+		public void Add (LSInfluencer influencer)
 		{
 			//Weight += weightPerUnit;
-			return LinkedScanNode.LocatedAgents.Add(influencer);
+			LinkedScanNode.Add(influencer);
 		}
-		public void RemoveAt (int index)
+        public void Remove (LSInfluencer influencer)
 		{
 			//Weight -= weightPerUnit;
-			LinkedScanNode.LocatedAgents.RemoveAt (index);
+            LinkedScanNode.Remove (influencer);
 		}
 		#endregion
 

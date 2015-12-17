@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Lockstep.Data;
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 using Lockstep.Integration;
@@ -271,9 +272,9 @@ namespace Lockstep
 		//
 		// Static Methods
 		//
-		private static void ApplyArea (Vector2d center, long radius, Func<LSAgent, bool> conditional, Action<LSAgent> apply)
+		private void ApplyArea (Vector2d center, long radius, Action<LSAgent> apply)
 		{
-			LSProjectile.Scan (center, radius, conditional);
+            LSProjectile.Scan (center, radius, this.Source, Source.GetAllegiance(this.Target));
 			long num = radius * radius;
 			for (int i = 0; i < LSProjectile.outputAgents.Count; i++)
 			{
@@ -285,9 +286,9 @@ namespace Lockstep
 			}
 		}
 		
-		private static void ApplyCone (Vector2d center, Vector2d rotation, long radius, long angle, Func<LSAgent, bool> conditional, Action<LSAgent> apply, PlatformType targetPlatform)
+		private void ApplyCone (Vector2d center, Vector2d rotation, long radius, long angle, Action<LSAgent> apply, PlatformType targetPlatform)
 		{
-			LSProjectile.Scan (center, radius, conditional);
+            LSProjectile.Scan (center, radius, this.Source,this.Source.GetAllegiance(this.Target));
 			long num = radius * radius;
 			long num2 = angle * angle >> 16;
 			for (int i = 0; i < LSProjectile.outputAgents.Count; i++)
@@ -321,14 +322,18 @@ namespace Lockstep
 			return target.Position.FastDistance (Position.x, Position.y) <= target.FastRadius;
 		}
 		
-		private static void Scan (Vector2d center, long radius, Func<LSAgent, bool> conditional)
+
+		private static IEnumerable<LSAgent> Scan (Vector2d center, long radius, LSAgent sourceAgent, AllegianceType targetAllegiance)
 		{
 			int gridX;
 			int gridY;
 			GridManager.GetScanCoordinates (center.x, center.y, out gridX, out gridY);
-			InfluenceManager.ScanAll (gridX, gridY, InfluenceManager.GenerateDeltaCount (radius), LSProjectile.outputAgents, conditional);
+            foreach (LSAgent agent in InfluenceManager.ScanAll (gridX, gridY, InfluenceManager.GenerateDeltaCount (radius), sourceAgent, targetAllegiance)) {
+                yield return agent;
+            }
 		}
 		
+
 		//
 		// Methods
 		//
@@ -506,10 +511,10 @@ namespace Lockstep
 				this.DealDamage (Target);
 				break;
 			case DamageType.Area:
-				LSProjectile.ApplyArea (this.TargetPosition, this.Radius,  (this.AllButFriendlyAction), this.DealDamageAction);
+				ApplyArea (this.TargetPosition, this.Radius, this.DealDamageAction);
 				break;
 			case DamageType.Cone:
-				LSProjectile.ApplyCone (this.Position, this.Source.Body.Rotation, this.Radius, this.Angle, this.AllButFriendlyAction, DealDamageAction, this.TargetPlatform);
+				ApplyCone (this.Position, this.Source.Body.Rotation, this.Radius, this.Angle, DealDamageAction, this.TargetPlatform);
 				break;
 			}
 		}

@@ -27,10 +27,6 @@ namespace Lockstep
 
         #region Scanning
 
-        static bool agentFound;
-        static LSAgent tempAgent;
-        static LSAgent closestAgent;
-        static long closestDistance;
         static long tempDistance;
         static LSAgent secondClosest;
         static ScanNode tempNode;
@@ -38,74 +34,84 @@ namespace Lockstep
         static BitArray arrayAllocation;
 
         public static LSAgent Scan(int gridX, int gridY, int deltaCount,
-                              Func<LSAgent,bool> conditional, long sourceX, long sourceY)
+            LSAgent sourceAgent, AllegianceType targetAllegiance)
         {
-            agentFound = false;
+            long sourceX = sourceAgent.Body.Position.x;
+            long sourceY = sourceAgent.Body.Position.y;
+            bool agentFound = false;
+            long closestDistance = 0;
+            LSAgent closestAgent = null;
             for (int i = 0; i < deltaCount; i++)
             {
                 tempNode = GridManager.GetScanNode(
                     gridX + DeltaCache.CacheX [i],
                     gridY + DeltaCache.CacheY [i]);
 				
-                if (tempNode.IsNotNull() && tempNode.LocatedAgents.IsNotNull())
+                if (tempNode.IsNotNull())
                 {
-                    tempBucket = tempNode.LocatedAgents;
-                    arrayAllocation = tempBucket.arrayAllocation;
-                    for (int j = 0; j < tempBucket.PeakCount; j++)
+                    foreach (FastBucket<LSInfluencer> tempBucket in tempNode.BucketsWithAllegiance(sourceAgent, targetAllegiance))
                     {
-                        if (arrayAllocation.Get(j))
+                        arrayAllocation = tempBucket.arrayAllocation;
+                        for (int j = 0; j < tempBucket.PeakCount; j++)
                         {
-                            tempAgent = tempBucket [j];
-                            if (conditional(tempAgent))
+                            if (arrayAllocation.Get(j))
                             {
-                                if (agentFound)
+                                LSAgent tempAgent = tempBucket [j].Agent;
+                                if (true)//conditional(tempAgent))
                                 {
-                                    if ((tempDistance = tempAgent.Body.Position.FastDistance(sourceX, sourceY)) < closestDistance)
+                                    if (agentFound)
                                     {
-                                        secondClosest = closestAgent;
+                                        if ((tempDistance = tempAgent.Body.Position.FastDistance(sourceX, sourceY)) < closestDistance)
+                                        {
+                                            secondClosest = closestAgent;
+                                            closestAgent = tempAgent;
+                                            closestDistance = tempDistance;
+                                        }
+                                    } else
+                                    {
                                         closestAgent = tempAgent;
-                                        closestDistance = tempDistance;
+                                        agentFound = true;
+                                        closestDistance = tempAgent.Body.Position.FastDistance(sourceX, sourceY);
                                     }
-                                } else
-                                {
-                                    closestAgent = tempAgent;
-                                    agentFound = true;
-                                    closestDistance = tempAgent.Body.Position.FastDistance(sourceX, sourceY);
                                 }
                             }
                         }
-                    }
-                    if (agentFound)
-                    {
-                        return closestAgent;
+                        if (agentFound)
+                        {
+                            return closestAgent;
+                        }
                     }
                 }
             }
             return null;
         }
 
-        public static void ScanAll(int gridX, int gridY, int deltaCount, FastList<LSAgent> outputAgents,
-                              Func<LSAgent,bool> conditional)
+        public static IEnumerable<LSAgent> ScanAll(int gridX, int gridY, int deltaCount,
+            LSAgent sourceAgent,
+            AllegianceType targetAllegiance)
         {
-            outputAgents.FastClear();
+            long sourceX = sourceAgent.Body.Position.x;
+            long sourceY = sourceAgent.Body.Position.y;
             for (int i = 0; i < deltaCount; i++)
             {
                 tempNode = GridManager.GetScanNode(
                     gridX + DeltaCache.CacheX [i],
                     gridY + DeltaCache.CacheY [i]);
-				
-                if (tempNode.IsNotNull() && tempNode.LocatedAgents.IsNotNull())
+
+                if (tempNode.IsNotNull())
                 {
-                    tempBucket = tempNode.LocatedAgents;
-                    arrayAllocation = tempBucket.arrayAllocation;
-                    for (int j = 0; j < tempBucket.PeakCount; j++)
+                    foreach (FastBucket<LSInfluencer> tempBucket in tempNode.BucketsWithAllegiance(sourceAgent, targetAllegiance))
                     {
-                        if (arrayAllocation.Get(j))
+                        arrayAllocation = tempBucket.arrayAllocation;
+                        for (int j = 0; j < tempBucket.PeakCount; j++)
                         {
-                            tempAgent = tempBucket [j];
-                            if (conditional(tempAgent))
+                            if (arrayAllocation.Get(j))
                             {
-                                outputAgents.Add(tempAgent);
+                                LSAgent tempAgent = tempBucket [j].Agent;
+                                if (true)//conditional(tempAgent))
+                                {
+                                    yield return tempAgent;
+                                }
                             }
                         }
                     }
@@ -136,10 +142,10 @@ namespace Lockstep
                 return false;
 			
 
-                if ((Source.GetAllegiance(agent) & TargetAllegiance) == 0)
-                {
-                    return false;
-                }
+            if ((Source.GetAllegiance(agent) & TargetAllegiance) == 0)
+            {
+                return false;
+            }
 
             if ((agent.Platform & TargetPlatform) == 0)
                 return false;
