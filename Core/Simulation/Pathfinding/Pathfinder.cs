@@ -45,11 +45,11 @@ namespace Lockstep
 		#endregion
 
 
-		public static bool FindPath (Vector2d Start, Vector2d End, FastList<Vector2d> outputVectorPath)
+		public static bool FindPath (Vector2d Start, Vector2d End, FastList<Vector2d> outputVectorPath, int unitSize = 1)
 		{
 			if (!GetPathNodes(Start.x,Start.y,End.x,End.y,out node1, out node2))
 			    return false;
-			if (FindPath (node1, node2, OutputPath)) {
+			if (FindPath (node1, node2, OutputPath, unitSize)) {
 				outputVectorPath.FastClear ();
 				length = OutputPath.Count - 1;
 				for (i = 0; i < length; i++) {
@@ -60,11 +60,11 @@ namespace Lockstep
 			}
 			return false;
 		}
-		public static bool FindPath (Vector2d End, GridNode startNode, GridNode endNode, FastList<Vector2d> outputVectorPath)
+		public static bool FindPath (Vector2d End, GridNode startNode, GridNode endNode, FastList<Vector2d> outputVectorPath, int unitSize = 1)
 		{
 
 			if (startNode.Unwalkable || endNode.Unwalkable) return false;
-			if (FindPath (startNode, endNode, OutputPath)) {
+			if (FindPath (startNode, endNode, OutputPath, unitSize)) {
 				outputVectorPath.FastClear ();
 				length = OutputPath.Count - 1;
 				for (i = 0; i < length; i++) {
@@ -86,7 +86,7 @@ namespace Lockstep
 		/// <param name="startNode">Start node.</param>
 		/// <param name="endNode">End node.</param>
 		/// <param name="outputPath">Return path.</param>
-		public static bool FindPath (GridNode startNode, GridNode endNode, FastList<GridNode> outputPath)
+		public static bool FindPath (GridNode startNode, GridNode endNode, FastList<GridNode> outputPath, int unitSize = 1)
 		{
 			#region Broadphase and Preperation
 			if (endNode.Unwalkable) {
@@ -162,7 +162,7 @@ namespace Lockstep
 				for (i = 0; i < 8; i++) {
 					neighbor = currentNode.NeighborNodes [i];
 
-					if (neighbor == null || neighbor.Unwalkable || GridClosedSet.Contains (neighbor)) {
+                    if (neighbor == null || neighbor.Unpassable(unitSize) || GridClosedSet.Contains (neighbor)) {
 						continue;
 					}
 

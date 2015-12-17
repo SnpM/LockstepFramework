@@ -177,7 +177,8 @@ namespace Lockstep
                                 {
                                     if (forcePathfind || Pathfinder.NeedsPath(currentNode, destinationNode))
                                     {
-                                        if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath))
+                                        if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath, 
+                                            Agent.Body.Radius.CeilToInt()))
                                         {
                                             hasPath = true;
                                             pathIndex = 0;
@@ -199,7 +200,8 @@ namespace Lockstep
                                 {
                                     if (forcePathfind || Pathfinder.NeedsPath(currentNode, destinationNode))
                                     {
-                                        if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath))
+                                        if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath,
+                                            Agent.Body.Radius.CeilToInt()))
                                         {
                                             hasPath = true;
                                             pathIndex = 0;
