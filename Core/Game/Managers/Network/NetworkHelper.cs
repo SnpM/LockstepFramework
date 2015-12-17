@@ -36,7 +36,7 @@ namespace Lockstep {
 
         protected void Receive (MessageType messageType, byte[] data) {
             if (OnDataReceived != null)
-            OnDataReceived (messageType,data);
+                OnDataReceived (messageType,data);
             switch (messageType) {
                 case MessageType.Input:
                     if (OnInputData != null) {
