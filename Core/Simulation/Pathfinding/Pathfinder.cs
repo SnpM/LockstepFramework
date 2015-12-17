@@ -191,7 +191,7 @@ namespace Lockstep
 			return false;
 		}
 
-		public static bool NeedsPath (GridNode startNode, GridNode endNode)
+		public static bool NeedsPath (GridNode startNode, GridNode endNode, int unitSize)
 		{
 			//return true;
 			//Tests if there is a direct path. If there is, no need to run AStar.
@@ -238,7 +238,7 @@ namespace Lockstep
 				retY = (steep ? x : y);
 					
 				currentNode = GridManager.Grid[retX * GridManager.NodeCount + retY];
-				if (currentNode.Unwalkable) {
+                if (currentNode.Unpassable(unitSize)) {
 					break;
 				} else if (x == x1) {
 					return false;

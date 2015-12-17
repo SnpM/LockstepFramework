@@ -77,7 +77,7 @@ namespace Lockstep
             if (size == 1) {
                 return false;
             }
-            if (size == 2) {
+            if (size <= 3) {
                 bool unpassable = false;
                 for (int i = 0; i < 8; i++) {
                     GridNode node = NeighborNodes[i];
@@ -86,10 +86,12 @@ namespace Lockstep
                 }
                 return false;
             }
-            size -= 1;
-            for (int i = -size; i <= size; i++) {
-                for (int j = -size; j <= size; j++) {
-                    if (i != 0 && j != 0) continue;
+            int halfSize = (size) / 2;
+            for (int i = -halfSize; i <= halfSize; i++) {
+                for (int j = -halfSize; j <= halfSize; j++) {
+                    if (i == 0 && j == 0) continue; //Don't check same node
+                    GridNode node = GridManager.GetNode (i + this.gridX,j + this.gridY);
+                    if (node.Unwalkable) return true;
                 }
             }
             return false;

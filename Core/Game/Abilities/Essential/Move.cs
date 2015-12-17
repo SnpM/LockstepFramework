@@ -13,6 +13,11 @@ namespace Lockstep
         private const int CollisionStopCount = LockstepManager.FrameRate * 2;
         private const long CollisionStopTreshold = FixedMath.One / 2;
 
+        public int GridSize {get {return cachedBody.Radius <= FixedMath.One ?
+                (cachedBody.Radius * 2).CeilToInt() :
+                (cachedBody.Radius * 2).CeilToInt ()+ 1;}}
+                
+
         public Vector2d Position { get { return cachedBody.Position; } }
 
         public long CollisionSize { get { return cachedBody.Radius; } }
@@ -123,9 +128,7 @@ namespace Lockstep
             timescaledAcceleration = Acceleration * 32 / LockstepManager.FrameRate;
             if (timescaledAcceleration > FixedMath.One)
                 timescaledAcceleration = FixedMath.One;
-            closingDistance = cachedBody.Radius;
-            if (closingDistance < FixedMath.One / 4)
-                closingDistance = closingDistance;
+            closingDistance = cachedBody.Radius / 4;
             stuckTolerance = ((Agent.Body.Radius * Speed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
             stuckTolerance *= stuckTolerance;
         }
@@ -157,6 +160,7 @@ namespace Lockstep
             Arrived = true;
         }
 
+
         protected override void OnSimulate()
         {
             if (!CanMove)
@@ -175,10 +179,10 @@ namespace Lockstep
                             {
                                 if (straightPath)
                                 {
-                                    if (forcePathfind || Pathfinder.NeedsPath(currentNode, destinationNode))
+                                    if (forcePathfind || Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize))
                                     {
                                         if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath, 
-                                            Agent.Body.Radius.CeilToInt()))
+                                            GridSize))
                                         {
                                             hasPath = true;
                                             pathIndex = 0;
@@ -198,10 +202,10 @@ namespace Lockstep
                                     }
                                 } else
                                 {
-                                    if (forcePathfind || Pathfinder.NeedsPath(currentNode, destinationNode))
+                                    if (forcePathfind || Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize))
                                     {
                                         if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath,
-                                            Agent.Body.Radius.CeilToInt()))
+                                            GridSize))
                                         {
                                             hasPath = true;
                                             pathIndex = 0;
@@ -291,9 +295,10 @@ namespace Lockstep
                 desiredVelocity *= timescaledSpeed;
                 
                 cachedBody._velocity += (desiredVelocity - cachedBody._velocity) * timescaledAcceleration;
-                if (distance <= closingDistance)
+                if (distance <= closingDistance / 2)
                 {
                     pathIndex++;
+
                 }
                 cachedBody.VelocityChanged = true;
                 if (collidedWithTrackedAgent)
