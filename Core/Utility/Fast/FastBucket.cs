@@ -45,7 +45,6 @@ namespace Lockstep
             innerArray [index] = item;
             
             Count++;
-            PeakCount++;
 		}
 
 		public bool Remove (T item)
@@ -64,7 +63,6 @@ namespace Lockstep
 			arrayAllocation.Set (index, false);
             this.innerArray[index] = default(T);
 			Count--;
-            PeakCount--;
         }
 
         public bool ContainsAt (int index, T item) {

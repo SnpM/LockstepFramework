@@ -168,8 +168,6 @@ namespace Lockstep
         {
             for (int i = 0; i < InstanceManagers.Count; i++)
             {
-                if(newCont.ControllerID == 8)
-                Debug.logger.Log("adding diplomacy for", newCont.ControllerID);
                 InstanceManagers [i].DiplomacyFlags.AddAt(AllegianceType.Neutral, newCont.ControllerID);
             }
         }
