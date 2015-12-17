@@ -55,7 +55,7 @@ namespace Lockstep
 				bufferBytes.AddRange (receivedBytes);
 				receivedBytes.FastClear ();
 				ClientManager.NetworkHelper.SendMessageToAll (MessageType.Frame, bufferBytes.ToArray ());
-
+                Debug.Log ("asdf");
 				InfluenceFrameCount++;
 
 			}

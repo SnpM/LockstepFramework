@@ -34,7 +34,7 @@ namespace Lockstep
             MakeGame();
         }
         private static void MakeGame () {
-            Application.LoadLevel("Domination");
+            //Application.LoadLevel("Domination");
         }
 
 
@@ -92,7 +92,7 @@ namespace Lockstep
 						while (bufferedSendData.Count > 0) {
 							Distribute (bufferedSendData.Pop ());
 						}
-						if (NetworkHelper.IsServer) {
+                        if (NetworkHelper.IsServer) {
 							LSServer.Simulate ();
 						}
 					}

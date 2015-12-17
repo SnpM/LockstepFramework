@@ -146,6 +146,8 @@ namespace Lockstep {
                		return;
            		}
 				Stalled = false;
+                MainGameManager.GameStart();
+
 				FrameManager.Simulate();
 				InfluenceFrameCount++;
 			}

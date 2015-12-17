@@ -43,10 +43,17 @@ namespace Lockstep {
         protected void Start () {
             Instance = this;
             LockstepManager.Initialize (this);
-            GameStart ();
+            this.Startup();
+        }
+
+        protected virtual void Startup () {
+
         }
     
-        protected virtual void GameStart () {
+        public void GameStart () {
+            this.OnGameStart();
+        }
+        protected virtual void OnGameStart () {
             //When the game starts (first simulation frame)
         }
 
