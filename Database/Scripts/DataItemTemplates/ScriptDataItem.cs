@@ -16,6 +16,7 @@ namespace Lockstep.Data
         {
             Type type = (Type)data[0];
             _script = type;
+            this._name = type.Name;
         }
     }
 

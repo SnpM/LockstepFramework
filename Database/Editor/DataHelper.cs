@@ -197,7 +197,6 @@ namespace Lockstep.Data
             foreach (Type type in lackingTypes) {
                 DataItem item = (DataItem)Activator.CreateInstance ( (TargetType));
                 item.Inject (type);
-                item.Name = (type.Name);
                 bufferData.Add(item);
             }
             DataItem[] tempData = (DataItem[])Array.CreateInstance (TargetType,bufferData.Count);
