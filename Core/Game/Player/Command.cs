@@ -17,6 +17,7 @@
         private Selection _select;
         private byte _groupID;
         private string _text;
+        private VectorRotation _rotation;
 
         public bool HasPosition { get; private set; }
         public bool HasTarget { get; private set; }
@@ -26,6 +27,7 @@
         public bool HasSelect { get; set; }
         public bool HasGroupID { get; private set; }
         public bool HasText {get; private set;}
+        public bool HasRotation {get; private set;}
 
         public bool Used;
         public byte ControllerID;
@@ -104,6 +106,14 @@
             }
         }
 
+        public VectorRotation Rotation {
+            get {return _rotation;}
+            set {
+                _rotation = value;
+                HasRotation = true;
+            }
+        }
+
 
         /// <summary>
         /// Reconstructs this command from a serialized command and returns the size of the command.
@@ -123,6 +133,7 @@
             HasSelect = GetMaskBool(ValuesMask, DataType.Select);
             HasGroupID = GetMaskBool(ValuesMask, DataType.GroupID);
             HasText = GetMaskBool (ValuesMask, DataType.Text);
+            HasRotation = GetMaskBool (ValuesMask, DataType.Rotation);
 
             if (HasPosition) {
                 _position.x = reader.ReadShort() << CompressionShift;
@@ -159,6 +170,10 @@
                 _text = reader.ReadString ();
             }
 
+            if (HasRotation) {
+                _rotation = new VectorRotation (reader.ReadLong(), reader.ReadLong());
+            }
+
             return reader.count - StartIndex;
         }
 
@@ -183,7 +198,8 @@
                     | (HasCount ? DataType.Count : 0) 
                     | (HasSelect ? DataType.Select : 0) 
                     | (HasGroupID ? DataType.GroupID : 0)
-                    | (HasText ?  DataType.Text : 0);
+                    | (HasText ?  DataType.Text : 0)
+                    | (HasRotation ? DataType.Rotation : 0);
 
                 ValuesMask = (uint) valueMaskDataType;
 
@@ -227,6 +243,11 @@
                 if (HasText) {
                     writer.Write(_text);
                 }
+
+                if (HasRotation) {
+                    writer.Write(_rotation.Cos);
+                    writer.Write(_rotation.Sin);
+                }
                 return serializeList.ToArray();
             }
         }
@@ -240,6 +261,7 @@
         Count = 1 << 4,
         Select = 1 << 5,
         GroupID = 1 << 6,
-        Text = 1 << 7
+        Text = 1 << 7,
+        Rotation = 1 << 8,
 	}
 }

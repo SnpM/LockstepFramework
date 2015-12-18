@@ -88,5 +88,6 @@ namespace Lockstep
             count += byteLength;
             return ret;
         }
+
     }
 }
