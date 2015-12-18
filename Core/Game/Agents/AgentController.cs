@@ -371,7 +371,7 @@ namespace Lockstep
 
         public void SetAllegiance(AgentController otherController, AllegianceType allegianceType)
         {
-            while (DiplomacyFlags.Count >= otherController.ControllerID) {
+            while (DiplomacyFlags.Count <= otherController.ControllerID) {
                 DiplomacyFlags.Add(AllegianceType.Neutral);
             }
             DiplomacyFlags [otherController.ControllerID] = allegianceType;
