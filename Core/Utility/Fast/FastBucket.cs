@@ -76,7 +76,9 @@ namespace Lockstep
                 if (capacity < min)
                     capacity = min;
                 Array.Resize(ref innerArray, capacity);
-                arrayAllocation.Length = capacity;
+                arrayAllocation.Length =
+                arrayAllocation.Length >= capacity ?
+                arrayAllocation.Length : capacity;
             }
         }
 
