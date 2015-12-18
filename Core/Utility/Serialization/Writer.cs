@@ -65,5 +65,11 @@ namespace Lockstep
             canvas.AddRange(stringBytes);
         }
 
+        public void WriteByteArray (byte[] byteArray) {
+            ushort byteLength = (ushort)byteArray.Length;
+            canvas.AddRange(BitConverter.GetBytes(byteLength));
+            canvas.AddRange(byteArray);
+        }
+
 	}
 }

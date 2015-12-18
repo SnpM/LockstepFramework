@@ -18,6 +18,7 @@
         private byte _groupID;
         private string _text;
         private VectorRotation _rotation;
+        private byte[] _raw;
 
         public bool HasPosition { get; private set; }
         public bool HasTarget { get; private set; }
@@ -28,6 +29,7 @@
         public bool HasGroupID { get; private set; }
         public bool HasText {get; private set;}
         public bool HasRotation {get; private set;}
+        public bool HasRaw {get; private set;}
 
         public bool Used;
         public byte ControllerID;
@@ -113,7 +115,13 @@
                 HasRotation = true;
             }
         }
-
+        public byte[] Raw {
+            get {return _raw;}
+            set {
+                _raw = value;
+                HasRaw = true;
+            }
+        }
 
         /// <summary>
         /// Reconstructs this command from a serialized command and returns the size of the command.
@@ -134,6 +142,7 @@
             HasGroupID = GetMaskBool(ValuesMask, DataType.GroupID);
             HasText = GetMaskBool (ValuesMask, DataType.Text);
             HasRotation = GetMaskBool (ValuesMask, DataType.Rotation);
+            HasRaw = GetMaskBool (ValuesMask, DataType.Raw);
 
             if (HasPosition) {
                 _position.x = reader.ReadShort() << CompressionShift;
@@ -159,7 +168,7 @@
 
             if (HasSelect) {
                 Select = new Selection();
-                reader.count += Select.Reconstruct(reader.source, reader.count);
+                reader.MovePosition (Select.Reconstruct(reader.Source, reader.Position));
             }
 
             if (HasGroupID) {
@@ -174,7 +183,11 @@
                 _rotation = new VectorRotation (reader.ReadLong(), reader.ReadLong());
             }
 
-            return reader.count - StartIndex;
+            if (HasRaw) {
+                _raw = reader.ReadByteArray();
+            }
+
+            return reader.Position - StartIndex;
         }
 
         private static bool GetMaskBool(uint mask, DataType dataType) {
@@ -263,5 +276,6 @@
         GroupID = 1 << 6,
         Text = 1 << 7,
         Rotation = 1 << 8,
+        Raw = 1 << 9,
 	}
 }
