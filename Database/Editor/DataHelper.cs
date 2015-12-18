@@ -1,4 +1,4 @@
-﻿ #if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using UnityEngine;
 using System.Collections;
 using System;
@@ -28,7 +28,7 @@ namespace Lockstep.Data
             SourceDatabase = sourceDatabase;
             _dataFieldName = dataFieldName; 
 
-            FieldInfo info = sourceDatabase.GetType().GetField(_dataFieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo info = sourceDatabase.GetType ().GetField (_dataFieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
             if (info == null) {
                 Debug.Log (string.Format ("Field with fieldName of {0} not found.", dataFieldName));
