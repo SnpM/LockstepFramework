@@ -54,6 +54,7 @@ namespace Lockstep {
             UnityInstance.GetComponent<Renderer>().enabled = false;
 			GameObject.DontDestroyOnLoad (UnityInstance.gameObject);
 
+            GridManager.Setup();
 			AbilityInterfacer.Setup ();
          
             AgentController.Setup();
@@ -99,7 +100,6 @@ namespace Lockstep {
 
             TriggerManager.Initialize();
 
-            GridManager.Generate();
             GridManager.Initialize();
 
 			TeamManager.Initialize ();
@@ -117,8 +117,6 @@ namespace Lockstep {
             SelectionManager.Initialize();
             InfluenceManager.Initialize();
             ProjectileManager.Initialize();
-
-            LoadSceneObjects();
 
 			Started = true;
             ClientManager.Initialize ();
@@ -259,13 +257,6 @@ namespace Lockstep {
 		public static void Quit () {
 			ClientManager.Quit ();
 		}
-
-        private static void LoadSceneObjects() {
-            LSSceneObject[] sceneObjects = GameObject.FindObjectsOfType<LSSceneObject>();
-            for (int i = 0; i < sceneObjects.Length; i++) {
-                sceneObjects[i].Initialize();
-            }
-        }
 
         public static int GetStateHash () {
             int hash = LSUtility.PeekRandom (int.MaxValue);

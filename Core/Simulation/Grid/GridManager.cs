@@ -21,7 +21,7 @@ namespace Lockstep
 		public const long OffsetX = FixedMath.One * -64;
 		public const long OffsetY = FixedMath.One * -64;
 
-		public static void Generate ()
+		private static void Generate ()
 		{
 			ScanGrid = new ScanNode[ScanNodeCount * ScanNodeCount];
 			for (int i = 0; i < NodeCount / ScanResolution; i++) {
@@ -45,10 +45,17 @@ namespace Lockstep
             return ret;
         }
 
+        public static void Setup () {
+            Generate ();
+            for (int i = NodeCount * NodeCount - 1; i >= 0; i--) {
+                Grid[i].Setup();
+            }
+        }
+
 		public static void Initialize ()
 		{
-			for (int k = 0; k < NodeCount * NodeCount; k++) {
-				Grid [k].Initialize ();
+            for (int i = NodeCount * NodeCount - 1; i >= 0; i--) {
+				Grid [i].Initialize ();
 			}
 		}
 

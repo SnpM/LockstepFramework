@@ -36,11 +36,13 @@ namespace Lockstep
             WorldPos.x = gridX * FixedMath.One + GridManager.OffsetX;
             WorldPos.y = gridY * FixedMath.One + GridManager.OffsetY;
         }
-
-        public void Initialize()
-        {
+        public void Setup () {
             GenerateNeighbors();
             LinkedScanNode = GridManager.GetScanNode(gridX / GridManager.ScanResolution, gridY / GridManager.ScanResolution);
+        }
+        public void Initialize()
+        {
+
         }
 
         #endregion
@@ -79,7 +81,39 @@ namespace Lockstep
         public int hCost;
         public int fCost;
         public GridNode parent;
-        public bool Unwalkable;
+        private byte _obstacleCount;
+        public byte ObstacleCount {
+            get {
+
+                return _obstacleCount;
+            }
+        }
+        public void UpdateUnwalkable () {
+            _unwalkable = this._obstacleCount > 0;
+        }
+        private bool _unwalkable;
+        public bool Unwalkable {
+            get {
+                return _unwalkable;
+            }
+        }
+
+        public void AddObstacle () {
+            #if DEBUG
+            if (this._obstacleCount == byte.MaxValue) {
+                Debug.LogErrorFormat("Too many obstacles on this node ({0})!", new Coordinate (this.gridX,this.gridY));
+            }
+            #endif
+            this._obstacleCount++;
+            this.UpdateUnwalkable();
+        }
+        public void RemoveObstacle () {
+            if (this._obstacleCount == 0) {
+                Debug.LogErrorFormat("No obstacle to remove on this node ({0})!", new Coordinate(this.gridX,this.gridY));
+            }
+            this._obstacleCount--;
+            this.UpdateUnwalkable();
+        }
 
         public bool Unpassable(int size)
         {
