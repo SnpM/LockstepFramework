@@ -1,9 +1,63 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using System;
+using System.Reflection;
+using System.Collections.Generic;
 namespace Lockstep
 {
     public static class LSVariableManager
     {
+        static readonly FastList<string> bufferPropertyNames = new FastList<string>();
+        private static Dictionary<Type,string[]> CachedLockstepPropertyNames = new Dictionary<Type, string[]>();
+        private static readonly FastBucket<LSVariableContainer> Containers = new FastBucket<LSVariableContainer>();
+
+        /// <summary>
+        /// Registers an object and returns a ticket to access variable info about the object.
+        /// Note: Ticket may vary on multiple clients and sessions.
+        /// </summary>
+        /// <param name="lockstepObject">Lockstep object.</param>
+        public static int Register (object lockstepObject) {
+            Type type = lockstepObject.GetType();
+            string[] propertyNames;
+            LSVariableContainer container;
+            if (!CachedLockstepPropertyNames.TryGetValue(type, out propertyNames)) {
+                bufferPropertyNames.FastClear();
+                container = new LSVariableContainer(GetVariables (type.GetProperties((BindingFlags)~0)));
+                foreach (LSVariable info in container.Variables) {
+                    bufferPropertyNames.Add(info.Info.Name);
+                }
+                CachedLockstepPropertyNames.Add (type, bufferPropertyNames.ToArray());
+            }
+            else {
+                container = new LSVariableContainer(GetVariables (type, propertyNames));
+            }
+            return Containers.Add(container);
+        }
+        private static IEnumerable <LSVariable> GetVariables (Type type, string[] propertyNames) {
+            foreach (string name in propertyNames) {
+                yield return new LSVariable(type.GetProperty(name));
+            }
+        }
+        private static IEnumerable<LSVariable> GetVariables (PropertyInfo[] allProperties) {
+            foreach (PropertyInfo info in allProperties) {
+                object[] attributes = info.GetCustomAttributes(typeof (LockstepAttribute), true);
+                if (attributes != null && attributes.Length > 0) {
+                    yield return new LSVariable(info);
+                }
+            }
+        }
+
+        public static LSVariableContainer GetContainer (int ticket) {
+            return Containers[ticket];
+        }
+
+        public static int GetHash (int ticket) {
+            return GetContainer(ticket).Hash();
+        }
+
+        public static IEnumerable<LSVariable> GetObjectDesyncs (int ticket,int[] compareHashes) {
+            foreach (LSVariable variable in GetContainer (ticket).GetDesyncs (compareHashes))
+                yield return variable;
+        }
     }
 }

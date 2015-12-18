@@ -6,7 +6,7 @@ using System;
 namespace Lockstep
 {
     //Note: Ideally used for value types (i.e. Struct)
-    internal sealed class LSVariable
+    public sealed class LSVariable
     {
         //Must be PropertyInfo for PropertyInfo .Get[Get/Set]Method ()
         public LSVariable(PropertyInfo info)
@@ -42,11 +42,6 @@ namespace Lockstep
 
         public int Hash () {
             return Value.GetHashCode();
-        }
-
-        public bool ValueEquals (LSVariable other) {
-            //Compares the hash of the 2 variable Values
-            return this.Hash () == other.Hash ();
         }
 
         /// <summary>
