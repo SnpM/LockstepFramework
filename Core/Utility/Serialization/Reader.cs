@@ -12,7 +12,7 @@ namespace Lockstep
 
         public void Initialize(byte[] Source, int StartIndex)
         {
-            Source = Source;
+            this.Source = Source;
             Position = StartIndex;
         }
 
