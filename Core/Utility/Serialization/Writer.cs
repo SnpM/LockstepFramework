@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
-
+using System.Text;
 namespace Lockstep
 {
 	public class Writer
@@ -57,6 +57,13 @@ namespace Lockstep
 		{
 			canvas.AddRange (BitConverter.GetBytes (value));
 		}
+
+        public void Write (string value) {
+            byte[] stringBytes = System.Text.Encoding.Unicode.GetBytes (value);
+            ushort byteLength = (ushort)stringBytes.Length;
+            canvas.AddRange(BitConverter.GetBytes(byteLength));
+            canvas.AddRange(stringBytes);
+        }
 
 	}
 }
