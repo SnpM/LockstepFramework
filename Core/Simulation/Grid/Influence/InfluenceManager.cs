@@ -32,8 +32,8 @@ namespace Lockstep
         public static LSAgent Scan(int gridX, int gridY, int deltaCount,
                                    LSAgent sourceAgent, AllegianceType targetAllegiance)
         {
-            long sourceX = sourceAgent.Body.Position.x;
-            long sourceY = sourceAgent.Body.Position.y;
+            long sourceX = sourceAgent.Body._position.x;
+            long sourceY = sourceAgent.Body._position.y;
             LSAgent closestAgent = null;
             long closestDistance = 0;
             int foundBuffer = FoundScanBuffer;
@@ -43,7 +43,7 @@ namespace Lockstep
                     break;
                 if (closestAgent != null)
                 {
-                    long tempDistance = agent.Body.Position.FastDistance(sourceX, sourceY);
+                    long tempDistance = agent.Body._position.FastDistance(sourceX, sourceY);
                     if (tempDistance < closestDistance)
                     {
                         closestAgent = agent;
@@ -56,7 +56,7 @@ namespace Lockstep
                 } else
                 {
                     closestAgent = agent;
-                    closestDistance = agent.Body.Position.FastDistance(sourceX, sourceY);
+                    closestDistance = agent.Body._position.FastDistance(sourceX, sourceY);
                 }
             }
             return closestAgent;
@@ -66,8 +66,8 @@ namespace Lockstep
                                                    LSAgent sourceAgent,
                                                    AllegianceType targetAllegiance)
         {
-            long sourceX = sourceAgent.Body.Position.x;
-            long sourceY = sourceAgent.Body.Position.y;
+            long sourceX = sourceAgent.Body._position.x;
+            long sourceY = sourceAgent.Body._position.y;
             for (int i = 0; i < deltaCount; i++)
             {
                 ScanNode tempNode = GridManager.GetScanNode(

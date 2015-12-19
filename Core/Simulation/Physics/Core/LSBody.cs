@@ -11,7 +11,8 @@ namespace Lockstep
 	public class LSBody : MonoBehaviour
 	{
 		public Vector3 visualPosition;
-		public Vector2d Position;
+        public Vector2d _position;
+
 		
 		public LSAgent Agent { get; private set; }
 		
@@ -195,7 +196,7 @@ namespace Lockstep
 		
 		public void InitializeSerialized ()
 		{
-			Initialize (Position, Rotation);
+            Initialize (this._position, Rotation);
 		}
 		
 		public void Initialize (Vector2d startPosition)
@@ -222,7 +223,7 @@ namespace Lockstep
 			Priority = _priority;
 			Velocity = Vector2d.zero;
 			VelocityFastMagnitude = 0;
-			Position = StartPosition;
+			_position = StartPosition;
 			Rotation = StartRotation;
 
 
@@ -249,7 +250,7 @@ namespace Lockstep
 			ID = PhysicsManager.Assimilate (this);
 			Partition.PartitionObject (this);
 			
-			visualPosition = Position.ToVector3 (0f);
+			visualPosition = _position.ToVector3 (0f);
 			lastVisualPos = visualPosition;
 			_positionalTransform.position = visualPosition;
             UnityEngine.Profiler.maxNumberOfSamplesPerFrame = 7000000;
@@ -288,28 +289,28 @@ namespace Lockstep
 				}
 			}
 			for (int i = 0; i < Vertices.Length; i++) {
-				RealPoints [i].x = RotatedPoints [i].x + Position.x;
-				RealPoints [i].y = RotatedPoints [i].y + Position.y;
+				RealPoints [i].x = RotatedPoints [i].x + _position.x;
+				RealPoints [i].y = RotatedPoints [i].y + _position.y;
 			}
 		}
 		
 		public void BuildBounds ()
 		{
 			if (Shape == ColliderType.Circle) {
-				XMin = -Radius + Position.x;
-				XMax = Radius + Position.x;
-				YMin = -Radius + Position.y;
-				YMax = Radius + Position.y;
+				XMin = -Radius + _position.x;
+				XMax = Radius + _position.x;
+				YMin = -Radius + _position.y;
+				YMax = Radius + _position.y;
 			} else if (Shape == ColliderType.AABox) {
-				XMin = -HalfWidth + Position.x;
-				XMax = HalfWidth + Position.x;
-				YMin = -HalfHeight + Position.y;
-				YMax = HalfHeight + Position.y;
+				XMin = -HalfWidth + _position.x;
+				XMax = HalfWidth + _position.x;
+				YMin = -HalfHeight + _position.y;
+				YMax = HalfHeight + _position.y;
 			} else if (Shape == ColliderType.Polygon) {
-				XMin = Position.x;
-				XMax = Position.x;
-				YMin = Position.y;
-				YMax = Position.y;
+				XMin = _position.x;
+				XMax = _position.x;
+				YMin = _position.y;
+				YMax = _position.y;
 				for (int i = 0; i < Vertices.Length; i++) {
 					Vector2d vec = RealPoints [i];
 					if (vec.x < XMin) {
@@ -338,8 +339,8 @@ namespace Lockstep
 			}
 			
 			if (VelocityFastMagnitude != 0) {
-				Position.x += Velocity.x;
-				Position.y += Velocity.y;
+				_position.x += Velocity.x;
+				_position.y += Velocity.y;
 				PositionChanged = true;
 			}
 			
@@ -456,8 +457,8 @@ namespace Lockstep
 				}
 				else {
 					lastVisualPos = visualPosition;
-					visualPosition.x = Position.x.ToFloat ();
-					visualPosition.z = Position.y.ToFloat ();
+					visualPosition.x = _position.x.ToFloat ();
+					visualPosition.z = _position.y.ToFloat ();
 					SetPositionBuffer = true;
 					visualPositionReached = false;
 				}
@@ -515,7 +516,7 @@ namespace Lockstep
 		public void UpdateLocalPosition ()
 		{
 			if (HasParent) {
-				LocalPosition = Position - _parent.Position;
+				LocalPosition = _position - _parent._position;
 				LocalPosition.Rotate (_parent.Rotation.x, _parent.Rotation.y);
 			}
 		}
@@ -523,9 +524,9 @@ namespace Lockstep
 		public void UpdatePosition ()
 		{
 			if (HasParent) {
-				Position = LocalPosition;
-				Position.RotateInverse (_parent.Rotation.x, _parent.Rotation.y);
-				Position += _parent.Position;
+				_position = LocalPosition;
+				_position.RotateInverse (_parent.Rotation.x, _parent.Rotation.y);
+				_position += _parent._position;
 				PositionChanged = true;
 			}
 		}
@@ -564,7 +565,7 @@ namespace Lockstep
 		
 		public Vector2d TransformDirection (Vector2d worldPos)
 		{
-			worldPos -= Position;
+			worldPos -= _position;
 			worldPos.RotateInverse (Rotation.x, Rotation.y);
 			return worldPos;
 		}
@@ -572,7 +573,7 @@ namespace Lockstep
 		public Vector2d InverseTransformDirection (Vector2d localPos)
 		{
 			localPos.Rotate (Rotation.x, Rotation.y);
-			localPos += Position;
+			localPos += _position;
 			return localPos;
 		}
 		
@@ -595,7 +596,7 @@ namespace Lockstep
 		} 
 
 		public void Teleport (Vector2d destination) {
-			this.Position = destination;
+			this._position = destination;
 			this.visualPosition = destination.ToVector3 (visualPosition.y);
 			this.lastVisualPos = visualPosition;
 			this._positionalTransform.position = visualPosition;
@@ -629,7 +630,7 @@ namespace Lockstep
             //Different techniques for different shapes
             switch (this.Shape) {
                 case ColliderType.Circle:
-                    return (this.Position - position).FastMagnitude() <= this.FastRadius;
+                    return (this._position - position).FastMagnitude() <= this.FastRadius;
                     break;
                 case ColliderType.AABox:
                     return position.x >= this.XMin && position.x <= this.XMax

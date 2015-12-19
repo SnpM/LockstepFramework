@@ -402,7 +402,7 @@ namespace Lockstep {
             long hash = 3;
             hash ^= this.GlobalID;
             hash ^= this.LocalID;
-            hash ^= this.Body.Position.GetStateHash ();
+            hash ^= this.Body._position.GetStateHash ();
             hash ^= this.Body.Rotation.GetStateHash ();
             hash ^= this.Body.Velocity.GetStateHash ();
             return hash;

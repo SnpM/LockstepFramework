@@ -119,18 +119,18 @@ namespace Lockstep
                 switch (LeCollisionType)
                 {
                     case CollisionType.Circle_Circle:
-                        DistX = Body1.Position.x - Body2.Position.x;
-                        DistY = Body1.Position.y - Body2.Position.y;
+                        DistX = Body1._position.x - Body2._position.x;
+                        DistY = Body1._position.y - Body2._position.y;
                         dist = FixedMath.Sqrt((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT);
                         
                         if (dist == 0)
                         {
-                            const int randomMax = 1000;
-                            Body1.Position.x += LSUtility.GetRandom(randomMax);
-                            Body1.Position.y += LSUtility.GetRandom(randomMax);
+                            const int randomMax = (int)((long)int.MaxValue % (FixedMath.One / 64));
+                            Body1._position.x += LSUtility.GetRandom(randomMax);
+                            Body1._position.y += LSUtility.GetRandom(randomMax);
                             Body1.PositionChanged = true;
-                            Body2.Position.x += LSUtility.GetRandom(randomMax);
-                            Body2.Position.y += LSUtility.GetRandom(randomMax);
+                            Body2._position.x += LSUtility.GetRandom(randomMax);
+                            Body2._position.y += LSUtility.GetRandom(randomMax);
                             Body2.PositionChanged = true;
                             return;
                         }
@@ -149,8 +149,8 @@ namespace Lockstep
                     //Resolving collision
                         if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority))
                         {
-                            Body2.Position.x -= DistX;
-                            Body2.Position.y -= DistY;
+                            Body2._position.x -= DistX;
+                            Body2._position.y -= DistY;
                             Body2.PositionChanged = true;
                             if (applyVelocity)
                             {
@@ -161,8 +161,8 @@ namespace Lockstep
                         } else if (Body2.Immovable || Body2.Priority > Body1.Priority)
                         {
 
-                            Body1.Position.x += DistX;
-                            Body1.Position.y += DistY;
+                            Body1._position.x += DistX;
+                            Body1._position.y += DistY;
                             Body1.PositionChanged = true;
                             if (applyVelocity)
                             {
@@ -175,10 +175,10 @@ namespace Lockstep
                             DistX /= 2;
                             DistY /= 2;
 
-                            Body1.Position.x += DistX;
-                            Body1.Position.y += DistY;
-                            Body2.Position.x -= DistX;
-                            Body2.Position.y -= DistY;
+                            Body1._position.x += DistX;
+                            Body1._position.y += DistY;
+                            Body2._position.x -= DistX;
+                            Body2._position.y -= DistY;
                         
                             Body1.PositionChanged = true;
                             Body2.PositionChanged = true;
@@ -385,8 +385,8 @@ namespace Lockstep
         public bool CheckCircle()
         {
 
-            DistX = Body1.Position.x - Body2.Position.x;
-            DistY = Body1.Position.y - Body2.Position.y;
+            DistX = Body1._position.x - Body2._position.x;
+            DistY = Body1._position.y - Body2._position.y;
             if ((DistX * DistX + DistY * DistY) <= CacheSqrDistance)
             {
                 return true;
@@ -434,8 +434,8 @@ namespace Lockstep
 
         public static bool CheckBox_Poly(LSBody box, LSBody poly)
         {
-            bool Right = poly.Position.x > box.Position.x;
-            bool Top = poly.Position.y > box.Position.y;
+            bool Right = poly._position.x > box._position.x;
+            bool Top = poly._position.y > box._position.y;
             bool xPassed = false;
             bool yPassed = false;
             int vertCount = poly.RealPoints.Length;
@@ -487,7 +487,7 @@ namespace Lockstep
             for (int i = 0; i < EdgeCount; i++)
             {
                 Vector2d axis = poly.EdgeNorms [i];
-                long CircleProjection = circle.Position.Dot(axis.x, axis.y);
+                long CircleProjection = circle._position.Dot(axis.x, axis.y);
                 long CircleMin = CircleProjection - circle.Radius;
                 long CircleMax = CircleProjection + circle.Radius;
 
@@ -514,8 +514,8 @@ namespace Lockstep
 
         public void DistributeCircle_Box(LSBody box, LSBody circle)
         {
-            xMore = circle.Position.x > box.Position.x;
-            yMore = circle.Position.y > box.Position.y;
+            xMore = circle._position.x > box._position.x;
+            yMore = circle._position.y > box._position.y;
 
             if (xMore)
             {
@@ -550,8 +550,8 @@ namespace Lockstep
                 }
             }
             //Resolving
-            circle.Position.x -= PenetrationX;//(PenetrationX * Multiplier) >> FixedMath.SHIFT_AMOUNT;
-            circle.Position.y -= PenetrationY;//(PenetrationY * Multiplier) >> FixedMath.SHIFT_AMOUNT;
+            circle._position.x -= PenetrationX;//(PenetrationX * Multiplier) >> FixedMath.SHIFT_AMOUNT;
+            circle._position.y -= PenetrationY;//(PenetrationY * Multiplier) >> FixedMath.SHIFT_AMOUNT;
             circle._velocity.x -= PenetrationX;
             circle._velocity.y -= PenetrationY;
             circle.VelocityChanged = true;
@@ -563,20 +563,20 @@ namespace Lockstep
         {
             Collided = false;
 
-            xMore = circle.Position.x > box.Position.x;
-            yMore = circle.Position.y > box.Position.y;
+            xMore = circle._position.x > box._position.x;
+            yMore = circle._position.y > box._position.y;
             if (!Collided)
             {
                 Collided = false;
                 if (xMore)
                 {
-                    if (circle.Position.x <= box.XMax)
+                    if (circle._position.x <= box.XMax)
                     {
                         Collided = true;
                     }
                 } else
                 {
-                    if (circle.Position.x >= box.XMin)
+                    if (circle._position.x >= box.XMin)
                     {
                         Collided = true;
                     }
@@ -584,13 +584,13 @@ namespace Lockstep
 
                 if (yMore)
                 {
-                    if (circle.Position.y <= box.YMax)
+                    if (circle._position.y <= box.YMax)
                     {
                         Collided = true;
                     }
                 } else
                 {
-                    if (circle.Position.y >= box.YMin)
+                    if (circle._position.y >= box.YMin)
                     {
                         Collided = true;
                     }
@@ -600,17 +600,17 @@ namespace Lockstep
                 {
                     if (xMore)
                     {
-                        xDist = (circle.Position.x) - (box.XMax);
+                        xDist = (circle._position.x) - (box.XMax);
                     } else
                     {
-                        xDist = (circle.Position.x) - (box.XMin);
+                        xDist = (circle._position.x) - (box.XMin);
                     }
                     if (yMore)
                     {
-                        yDist = (circle.Position.y) - (box.YMax);
+                        yDist = (circle._position.y) - (box.YMax);
                     } else
                     {
-                        yDist = (circle.Position.y) - (box.YMin);
+                        yDist = (circle._position.y) - (box.YMin);
                     }
 
                     if ((xDist * xDist + yDist * yDist) <= circle.Radius * circle.Radius)
