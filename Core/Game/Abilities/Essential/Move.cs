@@ -287,7 +287,6 @@ namespace Lockstep
                 {
                     if (distance < FixedMath.Mul(closingDistance, CollisionStopMultiplier))
                     {
-                        Debug.Log("1");
                         Arrive();
                         return;
                     }
@@ -298,7 +297,6 @@ namespace Lockstep
                 if (movingToWaypoint) {
                     if (distance < FixedMath.Mul(closingDistance, CollisionStopMultiplier))
                     {
-                        Debug.Log("2");
                         this.pathIndex++;
                     }
                 }

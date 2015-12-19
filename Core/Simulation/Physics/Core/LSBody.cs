@@ -4,6 +4,7 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
+
 using UnityEngine;
 
 namespace Lockstep
@@ -656,7 +657,13 @@ namespace Lockstep
             }
             return false;
         }
-
+        void OnDrawGizmos () {
+            switch (this.Shape) {
+                case ColliderType.Circle:
+                    Gizmos.DrawWireSphere(this._position.ToVector3(transform.position.y + .5f),this.Radius.ToFloat());
+                    break;
+            }
+        }
 	}
 	
 	public enum ColliderType : byte
