@@ -267,8 +267,6 @@ namespace Lockstep
                 }
 
                 movementDirection = targetPos - cachedBody._position;
-                Debug.Log(targetPos + ", " + cachedBody._position + ", "
-                    + this.distance.ToFormattedDouble() + this.CollisionStopMultiplier.ToFormattedDouble());
 
                 movementDirection.Normalize(out distance);
                 if (targetPos.x != lastTargetPos.x || targetPos.y != lastTargetPos.y)
@@ -289,6 +287,7 @@ namespace Lockstep
                 {
                     if (distance < FixedMath.Mul(closingDistance, CollisionStopMultiplier))
                     {
+                        Debug.Log("1");
                         Arrive();
                         return;
                     }
@@ -299,6 +298,7 @@ namespace Lockstep
                 if (movingToWaypoint) {
                     if (distance < FixedMath.Mul(closingDistance, CollisionStopMultiplier))
                     {
+                        Debug.Log("2");
                         this.pathIndex++;
                     }
                 }

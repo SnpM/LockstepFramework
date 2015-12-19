@@ -614,12 +614,23 @@ namespace Lockstep
 			return false;
 		}
 
+        long GetCeiledSnap (long f, long snap) {
+            return (f + snap - 1) / snap * snap;
+        }
+        long GetFlooredSnap (long f, long snap) {
+            return (f / snap) * snap;
+        }
         public void GetCoveredSnappedPositions (long snapSpacing, FastList<Vector2d> output) {
-            long xmax = (this.XMax + snapSpacing - 1) / snapSpacing * snapSpacing;
-            long ymax = (this.YMax + snapSpacing - 1) / snapSpacing * snapSpacing;
+            long referenceX = 0,
+            referenceY = 0;
+            long xmin = GetFlooredSnap (this.XMin - FixedMath.Half, snapSpacing);
+            long ymin = GetFlooredSnap (this.YMin - FixedMath.Half, snapSpacing);
+
+            long xmax = GetCeiledSnap (this.XMax + FixedMath.Half - xmin, snapSpacing) + xmin;
+            long ymax = GetCeiledSnap (this.YMax + FixedMath.Half - ymin, snapSpacing) + ymin;
             //Used for getting snapped positions this body covered
-            for (long x = this.XMin; x <= xmax; x+= snapSpacing) {
-                for (long y = this.YMin; y <= ymax; y += snapSpacing) {
+            for (long x = xmin; x < xmax; x+= snapSpacing) {
+                for (long y = ymin; y < ymax; y += snapSpacing) {
                     Vector2d checkPos = new Vector2d(x,y);
                     if (IsPositionCovered (checkPos)) {
                         output.Add (checkPos);
@@ -635,11 +646,12 @@ namespace Lockstep
                 case ColliderType.Circle:
                     long maxDistance = this.Radius + FixedMath.Half;
                     maxDistance *= maxDistance;
-                    return (this._position - position).FastMagnitude() <= maxDistance;
-                    break;
+                    if ((this._position - position).FastMagnitude() > maxDistance)
+                        return false;
+                    goto case ColliderType.AABox;
                 case ColliderType.AABox:
-                    return position.x >= this.XMin && position.x <= this.XMax
-                        && position.y >= this.YMin && position.y <= this.YMax;
+                    return position.x + FixedMath.Half >= this.XMin && position.x - FixedMath.Half <= this.XMax
+                        && position.y + FixedMath.Half >= this.YMin && position.y - FixedMath.Half <= this.YMax;
                     break;
             }
             return false;
