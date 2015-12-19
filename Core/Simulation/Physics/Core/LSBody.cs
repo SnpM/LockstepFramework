@@ -17,6 +17,7 @@ namespace Lockstep
 		public LSAgent Agent { get; private set; }
 		
 		public long FastRadius { get; private set; }
+
 		
 		public bool PositionChanged { get; set; }
 		
@@ -614,9 +615,11 @@ namespace Lockstep
 		}
 
         public void GetCoveredSnappedPositions (long snapSpacing, FastList<Vector2d> output) {
+            long xmax = (this.XMax + snapSpacing - 1) / snapSpacing * snapSpacing;
+            long ymax = (this.YMax + snapSpacing - 1) / snapSpacing * snapSpacing;
             //Used for getting snapped positions this body covered
-            for (long x = this.XMin; x <= this.XMax; x+= snapSpacing) {
-                for (long y = this.YMin; y <= this.YMax; y += snapSpacing) {
+            for (long x = this.XMin; x <= xmax; x+= snapSpacing) {
+                for (long y = this.YMin; y <= ymax; y += snapSpacing) {
                     Vector2d checkPos = new Vector2d(x,y);
                     if (IsPositionCovered (checkPos)) {
                         output.Add (checkPos);
@@ -630,7 +633,9 @@ namespace Lockstep
             //Different techniques for different shapes
             switch (this.Shape) {
                 case ColliderType.Circle:
-                    return (this._position - position).FastMagnitude() <= this.FastRadius;
+                    long maxDistance = this.Radius + FixedMath.Half;
+                    maxDistance *= maxDistance;
+                    return (this._position - position).FastMagnitude() <= maxDistance;
                     break;
                 case ColliderType.AABox:
                     return position.x >= this.XMin && position.x <= this.XMax
