@@ -18,7 +18,7 @@ namespace Lockstep
                 (cachedBody.Radius * 2).CeilToInt ()+ 1;}}
                 
 
-        public Vector2d Position { get { return cachedBody.Position; } }
+        public Vector2d Position { get { return cachedBody._position; } }
 
         public long CollisionSize { get { return cachedBody.Radius; } }
 
@@ -128,7 +128,7 @@ namespace Lockstep
             timescaledAcceleration = Acceleration * 32 / LockstepManager.FrameRate;
             if (timescaledAcceleration > FixedMath.One)
                 timescaledAcceleration = FixedMath.One;
-            closingDistance = cachedBody.Radius / 2;
+            closingDistance = cachedBody.Radius;
             stuckTolerance = ((Agent.Body.Radius * Speed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
             stuckTolerance *= stuckTolerance;
         }
@@ -175,7 +175,7 @@ namespace Lockstep
                     {
                         if (viableDestination)
                         {
-                            if (Pathfinder.GetPathNode(cachedBody.Position.x, cachedBody.Position.y, out currentNode))
+                            if (Pathfinder.GetPathNode(cachedBody._position.x, cachedBody._position.y, out currentNode))
                             {
                                 if (straightPath)
                                 {
@@ -240,7 +240,7 @@ namespace Lockstep
                     {
                         if (hasPath)
                         {
-                            repathCount--;
+                            //repathCount--;
                         } else
                         {
                             repathCount--;
@@ -266,15 +266,16 @@ namespace Lockstep
                     targetPos = Destination;
                 }
 
-                movementDirection = targetPos - cachedBody.Position;
+                movementDirection = targetPos - cachedBody._position;
+
                 movementDirection.Normalize(out distance);
                 if (targetPos.x != lastTargetPos.x || targetPos.y != lastTargetPos.y)
                 {
                     lastTargetPos = targetPos;
                     targetDirection = movementDirection;
                 }
-
-                if (distance > closingDistance)
+                bool movingToWaypoint = (this.hasPath && this.pathIndex < myPath.Count - 1);
+                if (distance > closingDistance || movingToWaypoint)
                 {
                     desiredVelocity = (movementDirection);
                     if (movementDirection.Cross(lastMovementDirection.x, lastMovementDirection.y) != 0)
@@ -292,14 +293,17 @@ namespace Lockstep
                     desiredVelocity = (movementDirection * (distance) / (closingDistance));
                 }
 
-                desiredVelocity *= timescaledSpeed;
-                
-                cachedBody._velocity += (desiredVelocity - cachedBody._velocity) * timescaledAcceleration;
-                if (distance <= closingDistance / 2)
-                {
-                    pathIndex++;
 
+                if (movingToWaypoint) {
+                    if (distance < FixedMath.Mul(closingDistance, FixedMath.One))
+                    {
+                        this.pathIndex++;
+                    }
                 }
+                desiredVelocity *= timescaledSpeed;
+
+                cachedBody._velocity += (desiredVelocity - cachedBody._velocity) * timescaledAcceleration;
+
                 cachedBody.VelocityChanged = true;
                 if (collidedWithTrackedAgent)
                 {
@@ -310,13 +314,13 @@ namespace Lockstep
                         Arrive();
                     } else
                     {
-                        if (lastPosition.FastDistance(cachedBody.Position.x, cachedBody.Position.y)
+                        if (lastPosition.FastDistance(cachedBody._position.x, cachedBody._position.y)
                         < collisionStopTreshold)
                         {
                             collidedCount++;
                         } else
                         {
-                            lastPosition = cachedBody.Position;
+                            lastPosition = cachedBody._position;
                             collidedCount = 0;
                         }
                     }
@@ -420,7 +424,7 @@ namespace Lockstep
                 //TODO: guard return
             } else
             {
-                cachedTurn.TurnDirection(destination - cachedBody.Position);
+                cachedTurn.TurnDirection(destination - cachedBody._position);
                 Agent.SetState(AnimState.Moving);
                 hasPath = false;
                 straightPath = false;

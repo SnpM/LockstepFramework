@@ -33,7 +33,7 @@ namespace Lockstep
 
 		public void Initialize ()
 		{
-			LocatedNode = GridManager.GetNode (Body.Position.x, Body.Position.y);
+			LocatedNode = GridManager.GetNode (Body._position.x, Body._position.y);
 			LocatedNode.Add (this);
 		}
 
@@ -41,7 +41,7 @@ namespace Lockstep
 		{
 
 			if (Body.PositionChangedBuffer) {
-				tempNode = GridManager.GetNode (Body.Position.x, Body.Position.y);
+				tempNode = GridManager.GetNode (Body._position.x, Body._position.y);
 
 				if (System.Object.ReferenceEquals (tempNode, LocatedNode) == false) {
                     LocatedNode.Remove (this);

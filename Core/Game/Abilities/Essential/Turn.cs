@@ -178,7 +178,7 @@ namespace Lockstep
 						if (checkCollisionCount == 0) {
 							const long collisionTurnTreshold = FixedMath.One;
 							if (this.cachedBody.VelocityFastMagnitude < other.VelocityFastMagnitude || other.VelocityFastMagnitude == 0) {
-								contactDif += cachedBody.Position - other.Position;
+                                contactDif += cachedBody._position - other._position;
 								if (cachedBody.Rotation.Dot (contactDif.x, contactDif.y) >= 0) {
 									contactCount++;
 									contactChecked = true;

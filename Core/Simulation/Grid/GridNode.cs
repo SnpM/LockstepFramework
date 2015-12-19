@@ -47,6 +47,10 @@ namespace Lockstep
 
         #endregion
 
+        #region 
+        static int _i;
+
+        #endregion
 
         #region Collection Helpers
 
@@ -115,35 +119,74 @@ namespace Lockstep
             this.UpdateUnwalkable();
         }
 
+        static int CachedSize;
+        static int CachedLargeDeltaCount;
+        static Func<bool> CachedUnpassableFunction;
+
+        public static void PrepareUnpassableCheck (int size) {
+            CachedSize = size;
+            CachedLargeDeltaCount = GridManager.GenerateDeltaCount((CachedSize + 1) / 2);
+            /*
+            if (CachedSize == 1)
+                CachedUnpassableFunction = () => false;
+            else if (CachedSize <= 3) {
+                CachedUnpassableFunction = () => CheckNode.UnpassableMedium ();
+            }
+            else {
+                CachedUnpassableFunction = () => CheckNode.UnpassableLarge ();
+            }*/
+        }
+
+        internal static GridNode CheckNode;
+        public static bool CheckUnpassable () {
+            if (CheckNode._unwalkable) return true;
+            return CachedUnpassableFunction ();
+        }
+
+        public bool Unpassable () {
+            if (this._unwalkable)
+                return true;
+            if (CachedSize == 1)
+            {
+                return false;
+            }
+            if (CachedSize <= 3)
+            {
+                return UnpassableMedium ();
+            }
+            else {
+                return UnpassableLarge ();
+            }
+        }
+
         public bool Unpassable(int size)
         {
-            if (this.Unwalkable)
-                return true;
-            if (size == 1)
+            PrepareUnpassableCheck (size);
+            return this.Unpassable();
+        }
+
+        public bool UnpassableNormal () {
+            return false;
+        }
+
+        Func<bool> _UnpassableMedium;
+        public bool UnpassableMedium () {
+            for (_i = 0; _i < 8; i++)
             {
-                return false;
+                GridNode node = NeighborNodes [_i];
+                if (node != null)
+                if (node._unwalkable)
+                    return true;
             }
-            if (size <= 3)
+            return false;
+        }
+        public bool UnpassableLarge () {
+            for (_i = 1; _i < CachedLargeDeltaCount; _i++)
             {
-                bool unpassable = false;
-                for (int i = 0; i < 8; i++)
-                {
-                    GridNode node = NeighborNodes [i];
-                    if (node != null)
-                    if (node.Unwalkable)
-                        return true;
-                }
-                return false;
-            }
-            int deltaCount = GridManager.GenerateDeltaCount((size + 1) / 2);
-            //TODO: Optimize delta count generation with data-driven cache
-            //Possibility: Split into 3 functions with single place for conditionals?
-            for (int i = 1; i < deltaCount; i++)
-            {
-                GridNode node = GridManager.GetNode(DeltaCache.CacheX [i] + this.gridX, DeltaCache.CacheY [i] + this.gridY);
+                GridNode node = GridManager.GetNode(DeltaCache.CacheX [_i] + this.gridX, DeltaCache.CacheY [_i] + this.gridY);
                 if (node.Unwalkable)
                     return true;
-                
+
             }
             return false;
         }

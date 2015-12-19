@@ -32,7 +32,7 @@ namespace Lockstep {
 		public static long Ticks {get {return SimulationTimer.ElapsedTicks;}}
 		public static MonoBehaviour UnityInstance {get; private set;}
         public const int FrameRate = 32;
-        public const int InfluenceResolution = 4;
+        public const int InfluenceResolution = 2;
 		public const float BaseDeltaTime = (float)(1d  / FrameRate);
 
 		private static int InfluenceCount;

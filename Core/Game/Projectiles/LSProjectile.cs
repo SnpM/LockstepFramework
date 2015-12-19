@@ -279,7 +279,7 @@ namespace Lockstep
 			for (int i = 0; i < LSProjectile.outputAgents.Count; i++)
 			{
 				LSAgent lSAgent = LSProjectile.outputAgents [i];
-				if (lSAgent.Body.Position.FastDistance (center.x, center.y) < num)
+                if (lSAgent.Body._position.FastDistance (center.x, center.y) < num)
 				{
 					apply (lSAgent);
 				}
@@ -294,7 +294,7 @@ namespace Lockstep
 			for (int i = 0; i < LSProjectile.outputAgents.Count; i++)
 			{
 				LSAgent lSAgent = LSProjectile.outputAgents [i];
-				LSProjectile.agentPos = lSAgent.Body.Position;
+                LSProjectile.agentPos = lSAgent.Body._position;
 				LSProjectile.difference = LSProjectile.agentPos - center;
 				long num3 = LSProjectile.difference.FastMagnitude ();
 				if (num3 <= num && LSProjectile.difference.Dot (rotation.x, rotation.y) > 0L)
@@ -319,7 +319,7 @@ namespace Lockstep
 		}
 		private bool CheckCollision (LSBody target)
 		{
-			return target.Position.FastDistance (Position.x, Position.y) <= target.FastRadius;
+            return target._position.FastDistance (Position.x, Position.y) <= target.FastRadius;
 		}
 		
 
@@ -433,14 +433,14 @@ namespace Lockstep
 			if (Source.Scanner .IsNotNull ()) {
 				this.Position = Source.Scanner.ProjectileOffset;
 				this.Position.RotateInverse (source.Body.Rotation.x,source.Body.Rotation.y);
-				this.Position += this.Source.Body.Position;
+				this.Position += this.Source.Body._position;
 				this.CurrentHeight = this.Source.CachedTransform.position.y + source.Scanner.ProjectileHeightOffset;
 			}
 			else {
-				this.Position = this.Source.Body.Position;
+				this.Position = this.Source.Body._position;
 			}
 
-			this.TargetPosition = this.Target.Body.Position;
+			this.TargetPosition = this.Target.Body._position;
 			this.TargetHeight = this.Target.CachedTransform.position.y;
 			DamageType damageBehavior = this.DamageBehavior;
 			if (damageBehavior == DamageType.Cone)
@@ -595,15 +595,15 @@ namespace Lockstep
 			case TargetingType.Seeking:
 				if (this.CheckCollision ())
 				{
-					this.TargetPosition = this.Target.Body.Position;
+					this.TargetPosition = this.Target.Body._position;
 					this.Hit ();
 				}
 				else
 				{
-					LSProjectile.tempDirection = this.Target.Body.Position - this.Position;
+					LSProjectile.tempDirection = this.Target.Body._position - this.Position;
 					if (LSProjectile.tempDirection.Dot (this.lastDirection.x, this.lastDirection.y) < 0L)
 					{
-						this.TargetPosition = this.Target.Body.Position;
+						this.TargetPosition = this.Target.Body._position;
 						this.Hit ();
 					}
 					else
