@@ -31,6 +31,7 @@ namespace Lockstep
                 scaler -= 2;
                 scaler /= 32;
                 Time.timeScale = Mathf.Lerp(Time.timeScale, 1f + (scaler), .5f);
+                Debug.Log(scaler);
             } else
             {
                 //Time.timeScale = 1f;
