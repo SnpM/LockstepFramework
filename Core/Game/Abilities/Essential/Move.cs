@@ -295,7 +295,7 @@ namespace Lockstep
 
 
                 if (movingToWaypoint) {
-                    if (distance < FixedMath.Mul(closingDistance, CollisionStopMultiplier))
+                    if (distance < FixedMath.Mul(closingDistance, FixedMath.One))
                     {
                         this.pathIndex++;
                     }
