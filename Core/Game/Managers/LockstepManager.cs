@@ -83,6 +83,8 @@ namespace Lockstep {
                 Setup ();
                 Loaded = true;
             }
+            InitializeHelpers ();
+
 
             DefaultMessageRaiser.EarlyInitialize();
 
@@ -121,9 +123,9 @@ namespace Lockstep {
 			Started = true;
             ClientManager.Initialize ();
 
-            InitializeHelpers ();
 
             DefaultMessageRaiser.LateInitialize();
+            BehaviourHelperManager.LateInitialize();
         }
 
         static void InitializeHelpers () {

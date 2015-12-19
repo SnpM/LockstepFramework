@@ -13,8 +13,8 @@ namespace Lockstep
 {
 	public static class GridHeap
 	{
-	
-		public static GridNode[] items = new GridNode[GridManager.NodeCount * GridManager.NodeCount];
+		public static GridNode[] items = new GridNode[GridManager.DefaultCapacity];
+        static int capacity = GridManager.DefaultCapacity;
 		public static uint Count;
 		public static uint _Version = 1;
 	
@@ -25,7 +25,14 @@ namespace Lockstep
 			SortUp (item);
 			item.HeapVersion = _Version;
 		}
-
+        static void EnsureCapacity (int min) {
+            if (capacity < min) {
+                capacity *= 2;
+                if (capacity < min)
+                    capacity = min;
+                Array.Resize<GridNode> (ref items,capacity);
+            }
+        }
 		static GridNode curNode;
 	
 		public static GridNode RemoveFirst ()

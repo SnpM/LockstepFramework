@@ -5,10 +5,16 @@ namespace Lockstep
 {
     public class EnvironmentObject : MonoBehaviour
     {
-        public void Initialize () {
+        internal void Initialize () {
             this.OnInitialize();
         }
         protected virtual void OnInitialize () {
+
+        }
+        internal void LateInitialize () {
+            this.OnLateInitialize();
+        }
+        protected virtual void OnLateInitialize () {
 
         }
     }

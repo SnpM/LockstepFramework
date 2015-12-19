@@ -143,7 +143,6 @@ namespace Lockstep
 
 				for (i = 0; i < 8; i++) {
 					neighbor = currentNode.NeighborNodes [i];
-                    GridNode.CheckNode = neighbor;
                     if (neighbor.IsNull() || currentNode.Unpassable() || GridClosedSet.Contains (neighbor)) {
 						continue;
 					}
@@ -255,9 +254,8 @@ namespace Lockstep
 				retX = (steep ? y : x);
 				retY = (steep ? x : y);
 					
-				currentNode = GridManager.Grid[retX * GridManager.NodeCount + retY];
-                GridNode.CheckNode = currentNode;
-                if (currentNode.Unpassable()) {
+                currentNode = GridManager.Grid[GridManager.GetGridIndex(retX,retY)];
+                if (currentNode != null && currentNode.Unpassable()) {
 					break;
 				} else if (x == x1) {
 					return false;

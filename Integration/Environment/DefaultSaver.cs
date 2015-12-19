@@ -6,10 +6,10 @@ namespace Lockstep
 {
     public class DefaultSaver : EnvironmentSaver
     {
-        [SerializeField]
+        [SerializeField, HideInInspector]
         private EnvironmentBodyInfo[] _environmentBodies;
         public EnvironmentBodyInfo[] EnvironmentBodies {get {return _environmentBodies;}}
-        [SerializeField]
+        [SerializeField, HideInInspector]
         private EnvironmentObject[] _environmentObjects;
         public EnvironmentObject[] EnvironmentObjects {get {return _environmentObjects;}}
 
@@ -20,11 +20,18 @@ namespace Lockstep
         }
 
         protected override void OnApply () {
+            foreach (EnvironmentObject obj in EnvironmentObjects) {
+                obj.Initialize();
+            }
+        }
+
+        protected override void OnLateApply()
+        {
             foreach (EnvironmentBodyInfo info in EnvironmentBodies) {
                 info.Body.Initialize(info.Position,info.Rotation);
             }
             foreach (EnvironmentObject obj in EnvironmentObjects) {
-                obj.Initialize();
+                obj.LateInitialize();
             }
         }
 

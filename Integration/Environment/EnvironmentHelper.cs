@@ -45,5 +45,11 @@ namespace Lockstep
                 saver.Apply ();
             }
         }
+        protected override void OnLateInitialize()
+        {
+            foreach (EnvironmentSaver saver in Savers) {
+                saver.LateApply();
+            }
+        }
     }
 }
