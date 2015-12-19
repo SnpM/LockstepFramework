@@ -50,6 +50,7 @@ namespace Lockstep {
         public event Action<LSAgent> onDeactivation;
         public event Action<bool, bool> onInteraction;
 		public event Action<LSAgent> onBuildChild;
+        public event Action<LSAgent> onInitialized;
         public ushort GlobalID { get; private set; }
         public ushort LocalID { get; private set; }
         public uint BoxVersion { get; set; }
@@ -289,6 +290,10 @@ namespace Lockstep {
 				IsSelected = false;
 				IsHighlighted = false;
 			}
+            if(onInitialized != null)
+            {
+                onInitialized(this);
+            }
         }
 
         public void Simulate() {
