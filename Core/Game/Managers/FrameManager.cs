@@ -80,6 +80,7 @@ namespace Lockstep
 
                 }
             }
+            frames[LockstepManager.InfluenceFrameCount] = null;
             if (LockstepManager.InfluenceFrameCount == EndFrame)
             {
                 FreeSimulate = true;

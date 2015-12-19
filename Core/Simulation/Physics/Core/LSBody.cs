@@ -252,7 +252,7 @@ namespace Lockstep
 			visualPosition = Position.ToVector3 (0f);
 			lastVisualPos = visualPosition;
 			_positionalTransform.position = visualPosition;
-
+            UnityEngine.Profiler.maxNumberOfSamplesPerFrame = 7000000;
 			visualRot = Quaternion.LookRotation (Rotation.ToVector3 (0f));
 			lastVisualRot = visualRot;
 			_positionalTransform.rotation = visualRot;

@@ -128,7 +128,7 @@ namespace Lockstep
             timescaledAcceleration = Acceleration * 32 / LockstepManager.FrameRate;
             if (timescaledAcceleration > FixedMath.One)
                 timescaledAcceleration = FixedMath.One;
-            closingDistance = cachedBody.Radius / 2;
+            closingDistance = cachedBody.Radius;
             stuckTolerance = ((Agent.Body.Radius * Speed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
             stuckTolerance *= stuckTolerance;
         }
@@ -240,7 +240,7 @@ namespace Lockstep
                     {
                         if (hasPath)
                         {
-                            repathCount--;
+                            //repathCount--;
                         } else
                         {
                             repathCount--;
@@ -295,7 +295,7 @@ namespace Lockstep
                 desiredVelocity *= timescaledSpeed;
                 
                 cachedBody._velocity += (desiredVelocity - cachedBody._velocity) * timescaledAcceleration;
-                if (distance <= closingDistance / 2)
+                if (distance <= closingDistance / 8)
                 {
                     pathIndex++;
 
