@@ -252,7 +252,7 @@ namespace Lockstep {
 		    ushort localID,
 			ushort globalID,
 			Vector2d position = default (Vector2d),
-            Vector2d rotation = new Vector2d(0,1)) {
+            Vector2d rotation = default (Vector2d)) {
 
 			LocalID = localID;
 			GlobalID = globalID;

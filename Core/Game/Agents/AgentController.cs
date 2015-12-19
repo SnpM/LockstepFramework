@@ -270,7 +270,7 @@ namespace Lockstep
             {
                 for (int i = 0; i < com.Count; i++)
                 {
-                    LSAgent agent = CreateAgent(GetAgentCode(com.Target), com.Position);
+                    LSAgent agent = CreateAgent(GetAgentCode(com.Target), com.Position,null);
                 }
                 return;
             }
@@ -314,14 +314,20 @@ namespace Lockstep
 
         public LSAgent CreateAgent(
             string agentCode,
-            Vector2d position = default(Vector2d),
-            Vector2d rotation = new Vector2d(0,1))
+            Vector2d? position = null, //nullable position
+            Vector2d? rotation = null  //Nullable rotation for default parametrz
+        )
         {
+            Vector2d pos = position != null ? position.Value : new Vector2d(0,0);
+            Vector2d rot = rotation != null ? rotation.Value : new Vector2d(0,1);
+
+
             if (!IsValidAgentCode(agentCode))
             {
                 throw new System.ArgumentException(string.Format("Agent code '{0}' not found.", agentCode));
             }
 
+           
             FastStack<LSAgent> cache = CachedAgents [agentCode];
             LSAgent curAgent = null;
             if (cache.IsNotNull() && cache.Count > 0)
@@ -333,7 +339,7 @@ namespace Lockstep
                 curAgent = GameObject.Instantiate(AgentController.CodeInterfacerMap [agentCode].Prefab).GetComponent<LSAgent>();
                 curAgent.Setup(interfacer);
             }
-            InitializeAgent(curAgent, position, rotation);
+            InitializeAgent(curAgent, pos, rot);
             return curAgent;
         }
         /*
