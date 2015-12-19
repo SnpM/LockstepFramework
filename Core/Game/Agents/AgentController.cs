@@ -312,14 +312,16 @@ namespace Lockstep
             return com;
         }
 
-        public LSAgent CreateAgent(string agentCode,
-                                   Vector2d position = default(Vector2d))
+        public LSAgent CreateAgent(
+            string agentCode,
+            Vector2d position = default(Vector2d),
+            Vector2d rotation = new Vector2d(0,1))
         {
-            Vector2d vec = new Vector2d(0, 1);
             if (!IsValidAgentCode(agentCode))
             {
                 throw new System.ArgumentException(string.Format("Agent code '{0}' not found.", agentCode));
             }
+
             FastStack<LSAgent> cache = CachedAgents [agentCode];
             LSAgent curAgent = null;
             if (cache.IsNotNull() && cache.Count > 0)
@@ -331,7 +333,7 @@ namespace Lockstep
                 curAgent = GameObject.Instantiate(AgentController.CodeInterfacerMap [agentCode].Prefab).GetComponent<LSAgent>();
                 curAgent.Setup(interfacer);
             }
-            InitializeAgent(curAgent, position);
+            InitializeAgent(curAgent, position, rotation);
             return curAgent;
         }
         /*
@@ -346,7 +348,8 @@ namespace Lockstep
         }*/
         
         private void InitializeAgent(LSAgent agent,
-                                      Vector2d position)
+                                      Vector2d position,
+        Vector2d rotation)
         {
             ushort localID = GenerateLocalID();
             LocalAgents [localID] = agent;
@@ -355,7 +358,7 @@ namespace Lockstep
             ushort globalID = GenerateGlobalID();
             GlobalAgentActive [globalID] = true;
             GlobalAgents [globalID] = agent;
-            agent.Initialize(this, localID, globalID, position);
+            agent.Initialize(this, localID, globalID, position, rotation);
         }
 
         private ushort GenerateLocalID()

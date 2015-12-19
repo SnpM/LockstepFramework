@@ -251,7 +251,8 @@ namespace Lockstep {
 			AgentController controller,
 		    ushort localID,
 			ushort globalID,
-			Vector2d position = default (Vector2d)) {
+			Vector2d position = default (Vector2d),
+            Vector2d rotation = new Vector2d(0,1)) {
 
 			LocalID = localID;
 			GlobalID = globalID;
@@ -264,7 +265,7 @@ namespace Lockstep {
 
 			CachedGameObject.SetActive (true);
             if (Body .IsNotNull ()) {
-                Body.Initialize(position, Vector2d.up);
+                Body.Initialize(position, rotation);
             }
 
             if (Triggers.IsNotNull()) {
