@@ -132,7 +132,6 @@ namespace Lockstep
                     Grid[i].FastInitialize();
                 }
             }
-            Debug.Log("Grid initialized");
 		}
 
 		public static GridNode GetNode (int xGrid, int yGrid)
