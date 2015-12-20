@@ -80,7 +80,7 @@ namespace Lockstep.Data {
                 
                 SerializedProperty databaseTypeProp = obj.FindProperty ("_databaseType");
                 EditorGUILayout.PropertyField (databaseTypeProp, new GUIContent ("Database Type"));
-                EditorPrefs.SetString (databaseTypeKey, _databaseType.Type.AssemblyQualifiedName);
+                EditorPrefs.SetString (databaseTypeKey, _databaseType.Type != null ? _databaseType.Type.AssemblyQualifiedName : typeof (DefaultLSDatabase).AssemblyQualifiedName);
                 
                 
                 if (GUILayout.Button ("Load", GUILayout.MaxWidth (50f))) {

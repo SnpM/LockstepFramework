@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using Lockstep.Data;
 namespace Lockstep
 {
 	public class ScanGroupHandler : BehaviourHelper
 	{
 		public override InputCode ListenInput {
 			get {
-				return InputCode.C1;
+                return AbilityInterfacer.FindInterfacer(typeof (Scan)).ListenInput;
 			}
 		}
 

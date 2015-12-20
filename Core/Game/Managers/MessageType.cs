@@ -2,7 +2,7 @@
 using System.Collections;
 
 namespace Lockstep {
-	public enum MessageType : uint
+	public enum MessageType : byte
 	{
 		Input = 100,
 		Frame = 101,

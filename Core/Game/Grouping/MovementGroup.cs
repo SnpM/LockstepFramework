@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-
+using Lockstep.Data;
 namespace Lockstep
 {
     public class MovementGroupHandler : BehaviourHelper
@@ -9,7 +9,7 @@ namespace Lockstep
         {
             get
             {
-                return InputCode.C3;
+                return AbilityInterfacer.FindInterfacer(typeof (Move)).ListenInput;
             }
         }
 

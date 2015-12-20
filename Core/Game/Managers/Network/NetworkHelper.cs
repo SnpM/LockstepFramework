@@ -32,6 +32,11 @@ namespace Lockstep {
 
         public abstract void SendMessageToServer (MessageType messageType, byte[] data);
 
+        /// <summary>
+        /// Used by a locally hosted server. 
+        /// </summary>
+        /// <param name="messageType">Message type.</param>
+        /// <param name="data">Data.</param>
         public abstract void SendMessageToAll (MessageType messageType, byte[] data);
 
         //For receiving data
