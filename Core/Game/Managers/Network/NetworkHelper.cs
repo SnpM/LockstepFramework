@@ -39,7 +39,11 @@ namespace Lockstep {
         /// <param name="data">Data.</param>
         public abstract void SendMessageToAll (MessageType messageType, byte[] data);
 
-        //For receiving data
+        /// <summary>
+        /// Call from derived class.
+        /// </summary>
+        /// <param name="messageType">Message type.</param>
+        /// <param name="data">Data.</param>
         protected void Receive (MessageType messageType, byte[] data) {
             if (OnDataReceived != null)
                 OnDataReceived (messageType,data);
