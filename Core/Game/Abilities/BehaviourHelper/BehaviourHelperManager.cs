@@ -12,6 +12,12 @@ namespace Lockstep {
             }
         }
 
+        public static void LateInitialize () {
+            foreach (BehaviourHelper helper in Helpers) {
+                helper.LateInitialize();
+            }
+        }
+
         public static void Simulate () {
             foreach (BehaviourHelper helper in Helpers) {
                 helper.Simulate ();

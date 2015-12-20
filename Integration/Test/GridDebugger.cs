@@ -28,18 +28,16 @@ namespace Lockstep
         private Vector3 nodeScale;
         void DrawPathfinding()
         {
-            for (int i = 0; i < GridManager.NodeCount; i++)
+            for (int i = 0; i < GridManager.GridSize; i++)
             {
-                for (int j = 0; j < GridManager.NodeCount; j++) {
-                    
                     //Gets every pathfinding node and shows the draws a cube for the node
-                    GridNode node = GridManager.GetNode(i,j);
+                GridNode node = GridManager.Grid[i];
                     //Color depends on whether or not the node is walkable
                     //Red = Unwalkable, Green = Walkable
                     if (node.Unwalkable) Gizmos.color = Color.red;
                     else Gizmos.color = Color.gray;
                     Gizmos.DrawCube(node.WorldPos.ToVector3(LeHeight),nodeScale);
-                }
+
             }
         }
 

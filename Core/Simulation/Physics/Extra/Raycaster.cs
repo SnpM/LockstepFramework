@@ -136,12 +136,12 @@ namespace Lockstep
 							body.RaycastVersion = _Version;
 							switch (body.Shape) {
 							case ColliderType.Circle:
-								Projection = Vector2d.Dot (AxisX, AxisY, body.Position.x, body.Position.y);
+								Projection = Vector2d.Dot (AxisX, AxisY, body._position.x, body._position.y);
 								TestMin = Projection - body.Radius;
 								TestMax = Projection + body.Radius;
 								if (TestMin < AxisMax) {
 									if (TestMax > AxisMin) {
-										Projection = Vector2d.Dot (-AxisY, AxisX, body.Position.x, body.Position.y);
+										Projection = Vector2d.Dot (-AxisY, AxisX, body._position.x, body._position.y);
 										TestMin = Projection - body.Radius;
 										TestMax = Projection + body.Radius;
 										if (PerpProj < TestMax && PerpProj > TestMin) {

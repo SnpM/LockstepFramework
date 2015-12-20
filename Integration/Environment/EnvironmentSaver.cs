@@ -17,5 +17,11 @@ namespace Lockstep
         protected virtual void OnApply () {
 
         }
+        public void LateApply () {
+            this.OnLateApply();
+        }
+        protected virtual void OnLateApply () {
+
+        }
     }
 }

@@ -45,7 +45,7 @@ namespace Lockstep.Integration
             {
                 LSBody body = Bodies [i];
                 Transform posTransform = body._positionalTransform != null ? body._positionalTransform : body.transform;
-                body.Position = new Vector2d(posTransform.position);
+                body._position = new Vector2d(posTransform.position);
                 Transform rotTransform = body._rotationalTransform != null ? body._rotationalTransform : body.transform;
                 body.Rotation = new Vector2d(Mathf.Sin(rotTransform.rotation.x), Mathf.Cos(rotTransform.rotation.y));
             }

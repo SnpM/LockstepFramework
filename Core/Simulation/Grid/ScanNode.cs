@@ -4,12 +4,14 @@ using System.Collections.Generic;
 namespace Lockstep{
 	public class ScanNode {
 
-		public ScanNode (int x, int y)
+		public ScanNode ()
 		{
-			X = x;
-			Y = y;
 		}
 
+        public void Setup (int x, int y) {
+            this.X = x;
+            this.Y = y;
+        }
         //One bucket for each AC of units that lands on this ScanNode
         private Dictionary<byte,FastBucket<LSInfluencer>> LocatedAgents = new Dictionary<byte,FastBucket<LSInfluencer>> ();
 		public int X;

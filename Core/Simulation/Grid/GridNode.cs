@@ -28,23 +28,44 @@ namespace Lockstep
 			}*/
         }
 
-        public GridNode(int _x, int _y)
+        public GridNode()
+        {
+
+        }
+
+        public void Setup(int _x, int _y)
         {
             gridX = _x;
             gridY = _y;
-            gridIndex = gridX * GridManager.NodeCount + gridY;
+            gridIndex = GridManager.GetGridIndex(gridX, gridY);
             WorldPos.x = gridX * FixedMath.One + GridManager.OffsetX;
             WorldPos.y = gridY * FixedMath.One + GridManager.OffsetY;
+
         }
 
         public void Initialize()
         {
+
+            this.FastInitialize();
+
             GenerateNeighbors();
             LinkedScanNode = GridManager.GetScanNode(gridX / GridManager.ScanResolution, gridY / GridManager.ScanResolution);
         }
 
+        public void FastInitialize()
+        {
+            this.ClosedSetVersion = 0;
+            this.HeapIndex = 0;
+            this.HeapVersion = 0;
+        }
+
         #endregion
 
+        #region
+
+        static int _i;
+
+        #endregion
 
         #region Collection Helpers
 
@@ -56,8 +77,6 @@ namespace Lockstep
 
 
         #region Pathfinding
-
-        const int taxPerUnit = 25;
 
         public int gridX;
         public int gridY;
@@ -79,37 +98,121 @@ namespace Lockstep
         public int hCost;
         public int fCost;
         public GridNode parent;
-        public bool Unwalkable;
+        private byte _obstacleCount;
+
+        public byte ObstacleCount
+        {
+            get
+            {
+
+                return _obstacleCount;
+            }
+        }
+
+        public void UpdateUnwalkable()
+        {
+            _unwalkable = this._obstacleCount > 0;
+        }
+
+        private bool _unwalkable;
+
+        public bool Unwalkable
+        {
+            get
+            {
+                return _unwalkable;
+            }
+        }
+
+        public void AddObstacle()
+        {
+            #if DEBUG
+            if (this._obstacleCount == byte.MaxValue)
+            {
+                Debug.LogErrorFormat("Too many obstacles on this node ({0})!", new Coordinate(this.gridX, this.gridY));
+            }
+            #endif
+            this._obstacleCount++;
+            this.UpdateUnwalkable();
+        }
+
+        public void RemoveObstacle()
+        {
+            if (this._obstacleCount == 0)
+            {
+                Debug.LogErrorFormat("No obstacle to remove on this node ({0})!", new Coordinate(this.gridX, this.gridY));
+            }
+            this._obstacleCount--;
+            this.UpdateUnwalkable();
+        }
+
+        static int CachedSize;
+        static int CachedLargeDeltaCount;
+        static Func<bool> CachedUnpassableFunction;
+
+        public static void PrepareUnpassableCheck(int size)
+        {
+            CachedSize = size;
+            CachedLargeDeltaCount = GridManager.GenerateDeltaCount((CachedSize + 1) / 2);
+
+            /*if (CachedSize == 1)
+                CachedUnpassableFunction = () => false;
+            else if (CachedSize <= 3) {
+                CachedUnpassableFunction = () => CheckNode.UnpassableMedium ();
+            }
+            else {
+                CachedUnpassableFunction = () => CheckNode.UnpassableLarge ();
+            }*/
+        }
+
+        public bool Unpassable()
+        {
+            if (this._unwalkable)
+                return true;
+            if (CachedSize == 1)
+            {
+                return false;
+            }
+            if (CachedSize <= 3)
+            {
+                return UnpassableMedium();
+            } else
+            {
+                return UnpassableLarge();
+            }
+        }
 
         public bool Unpassable(int size)
         {
-            if (this.Unwalkable)
-                return true;
-            if (size == 1)
+            PrepareUnpassableCheck(size);
+            return this.Unpassable();
+        }
+
+        public bool UnpassableNormal()
+        {
+            return false;
+        }
+
+        public bool UnpassableMedium()
+        {
+            for (_i = 0; _i < 8; i++)
             {
-                return false;
+                GridNode node = NeighborNodes [_i];
+                if (node != null)
+                if (node._unwalkable)
+                    return true;
             }
-            if (size <= 3)
+            return false;
+        }
+
+        public bool UnpassableLarge()
+        {
+            for (_i = 1; _i < CachedLargeDeltaCount; _i++)
             {
-                bool unpassable = false;
-                for (int i = 0; i < 8; i++)
-                {
-                    GridNode node = NeighborNodes [i];
-                    if (node != null)
-                    if (node.Unwalkable)
-                        return true;
-                }
-                return false;
-            }
-            int deltaCount = GridManager.GenerateDeltaCount((size + 1) / 2);
-            //TODO: Optimize delta count generation with data-driven cache
-            //Possibility: Split into 3 functions with single place for conditionals?
-            for (int i = 1; i < deltaCount; i++)
-            {
-                GridNode node = GridManager.GetNode(DeltaCache.CacheX [i] + this.gridX, DeltaCache.CacheY [i] + this.gridY);
+                GridNode node = GridManager.GetNode(DeltaCache.CacheX [_i] + this.gridX, DeltaCache.CacheY [_i] + this.gridY);
                 if (node.Unwalkable)
                     return true;
-                
+
             }
             return false;
         }
@@ -134,23 +237,18 @@ namespace Lockstep
             for (i = -1; i <= 1; i++)
             {
                 checkX = gridX + i;
-                if (checkX >= 0 && checkX < GridManager.NodeCount)
-                {
-                    for (j = -1; j <= 1; j++)
-                    {
-						
-                        checkY = gridY + j;
-                        if (checkY >= 0 && checkY < GridManager.NodeCount)
-                        {
-                            GridNode checkNode = GridManager.Grid [GridManager.GetGridIndex(checkX, checkY)];
-							
-                            if (i == 0 && j == 0)
-                                continue;
 
-							
-                            //if ((i != 0 && j != 0)) continue;
-                            NeighborNodes [GetNeighborIndex(i, j)] = checkNode;
-                        }
+                for (j = -1; j <= 1; j++)
+                {
+                    if (i == 0 && j == 0)
+                        continue;
+                    //if ((i != 0 && j != 0)) continue; //Disables diagnal connections 
+                    checkY = gridY + j;
+                    if (GridManager.ValidateCoordinates(checkX, checkY))
+                    {
+                        
+                        GridNode checkNode = GridManager.Grid [GridManager.GetGridIndex(checkX, checkY)];
+                        NeighborNodes [GetNeighborIndex(i, j)] = checkNode;
                     }
                 }
             }

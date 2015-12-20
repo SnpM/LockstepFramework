@@ -16,15 +16,20 @@
         private int _count;
         private Selection _select;
         private byte _groupID;
+        private string _text;
+        private VectorRotation _rotation;
+        private byte[] _raw;
 
         public bool HasPosition { get; private set; }
         public bool HasTarget { get; private set; }
         public bool HasFlag { get; private set; }
         public bool HasCoord { get; private set; }
         public bool HasCount { get; private set; }
-        public bool HasSelect { get;  set; }
-
+        public bool HasSelect { get; set; }
         public bool HasGroupID { get; private set; }
+        public bool HasText {get; private set;}
+        public bool HasRotation {get; private set;}
+        public bool HasRaw {get; private set;}
 
         public bool Used;
         public byte ControllerID;
@@ -95,6 +100,28 @@
             }
         }
 
+        public string Text {
+            get {return _text;}
+            set {
+                this._text = value;
+                this.HasText = true;
+            }
+        }
+
+        public VectorRotation Rotation {
+            get {return _rotation;}
+            set {
+                _rotation = value;
+                HasRotation = true;
+            }
+        }
+        public byte[] Raw {
+            get {return _raw;}
+            set {
+                _raw = value;
+                HasRaw = true;
+            }
+        }
 
         /// <summary>
         /// Reconstructs this command from a serialized command and returns the size of the command.
@@ -113,6 +140,9 @@
             HasCount = GetMaskBool(ValuesMask, DataType.Count);
             HasSelect = GetMaskBool(ValuesMask, DataType.Select);
             HasGroupID = GetMaskBool(ValuesMask, DataType.GroupID);
+            HasText = GetMaskBool (ValuesMask, DataType.Text);
+            HasRotation = GetMaskBool (ValuesMask, DataType.Rotation);
+            HasRaw = GetMaskBool (ValuesMask, DataType.Raw);
 
             if (HasPosition) {
                 _position.x = reader.ReadShort() << CompressionShift;
@@ -138,14 +168,26 @@
 
             if (HasSelect) {
                 Select = new Selection();
-                reader.count += Select.Reconstruct(reader.source, reader.count);
+                reader.MovePosition (Select.Reconstruct(reader.Source, reader.Position));
             }
 
             if (HasGroupID) {
                 _groupID = reader.ReadByte();
             }
 
-            return reader.count - StartIndex;
+            if (HasText) {
+                _text = reader.ReadString ();
+            }
+
+            if (HasRotation) {
+                _rotation = new VectorRotation (reader.ReadLong(), reader.ReadLong());
+            }
+
+            if (HasRaw) {
+                _raw = reader.ReadByteArray();
+            }
+
+            return reader.Position - StartIndex;
         }
 
         private static bool GetMaskBool(uint mask, DataType dataType) {
@@ -161,13 +203,18 @@
                 writer.Write((byte)LeInput);
 
                 //Header 
-                ValuesMask = (HasPosition ? (uint)DataType.Position : (uint)0) 
-                           | (HasTarget ? (uint)DataType.Target : (uint)0) 
-                           | (HasFlag ? (uint)DataType.Flag : (uint)0) 
-                           | (HasCoord ? (uint)DataType.Coord : (uint)0) 
-                           | (HasCount ? (uint)DataType.Count : (uint)0) 
-                           | (HasSelect ? (uint)DataType.Select : (uint)0) 
-                           | (HasGroupID ? (uint)DataType.GroupID : (uint)0) ;
+                DataType valueMaskDataType = 
+                    (HasPosition ? DataType.Position : 0)
+                    | (HasTarget ? DataType.Target : 0) 
+                    | (HasFlag ? DataType.Flag : 0) 
+                    | (HasCoord ? DataType.Coord : 0) 
+                    | (HasCount ? DataType.Count : 0) 
+                    | (HasSelect ? DataType.Select : 0) 
+                    | (HasGroupID ? DataType.GroupID : 0)
+                    | (HasText ?  DataType.Text : 0)
+                    | (HasRotation ? DataType.Rotation : 0);
+
+                ValuesMask = (uint) valueMaskDataType;
 
                 writer.Write(ValuesMask);
 
@@ -205,6 +252,15 @@
                 if (HasGroupID) {
 					writer.Write (_groupID);
                 }
+
+                if (HasText) {
+                    writer.Write(_text);
+                }
+
+                if (HasRotation) {
+                    writer.Write(_rotation.Cos);
+                    writer.Write(_rotation.Sin);
+                }
                 return serializeList.ToArray();
             }
         }
@@ -218,6 +274,8 @@
         Count = 1 << 4,
         Select = 1 << 5,
         GroupID = 1 << 6,
-        TExt = 1 << 7
+        Text = 1 << 7,
+        Rotation = 1 << 8,
+        Raw = 1 << 9,
 	}
 }

@@ -17,7 +17,7 @@ public abstract class BehaviourHelper : MonoBehaviour, IBehaviourHelper
 	public virtual InputCode ListenInput {
         get {return InputCode.None;}
     }
-	
+
 	public void Initialize ()
 	{
 		OnInitialize ();
@@ -26,7 +26,12 @@ public abstract class BehaviourHelper : MonoBehaviour, IBehaviourHelper
 	protected virtual void OnInitialize ()
 	{
 	}
-	
+    public void LateInitialize () {
+        this.OnLateInitialize();
+    }
+    protected virtual void OnLateInitialize () {
+
+    }
     public void Simulate ()
 	{
 		OnSimulate ();

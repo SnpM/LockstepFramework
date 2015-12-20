@@ -168,7 +168,7 @@ namespace Lockstep
         {
             for (int i = 0; i < InstanceManagers.Count; i++)
             {
-                InstanceManagers [i].DiplomacyFlags.AddAt(AllegianceType.Neutral, newCont.ControllerID);
+                InstanceManagers [i].SetAllegiance(newCont, AllegianceType.Neutral);
             }
         }
 
@@ -182,7 +182,7 @@ namespace Lockstep
                 if (GlobalAgentActive [i])
                 {
                     LSAgent agent = GlobalAgents [i];
-                    int n1 = agent.Body.Position.GetStateHash() + agent.Body.Rotation.GetStateHash();
+                    int n1 = agent.Body._position.GetStateHash() + agent.Body.Rotation.GetStateHash();
                     switch (operationToggle)
                     {
                         case 0:
@@ -202,7 +202,7 @@ namespace Lockstep
                     }
                     if (agent.Body.IsNotNull())
                     {
-                        hash ^= agent.Body.Position.GetStateHash();
+                        hash ^= agent.Body._position.GetStateHash();
                         hash ^= agent.Body.Rotation.GetStateHash();
                     }
                 }
@@ -230,25 +230,26 @@ namespace Lockstep
 
         public Team MyTeam { get; private set; }
 
-        private readonly FastBucket<AllegianceType> DiplomacyFlags = new FastBucket<AllegianceType>();
+        private readonly FastList<AllegianceType> DiplomacyFlags = new FastList<AllegianceType>();
         private readonly FastStack<ushort> OpenLocalIDs = new FastStack<ushort>();
 
         internal AgentController()
         {
+            
             OpenLocalIDs.FastClear();
             PeakLocalID = 0;
             ControllerID = (byte)InstanceManagers.Count;
             
             for (int i = 0; i < InstanceManagers.Count; i++)
             {
-                DiplomacyFlags.AddAt(AllegianceType.Neutral, InstanceManagers [i].ControllerID);
+                this.SetAllegiance(InstanceManagers[i], AllegianceType.Neutral);
             }
-            
-            InstanceManagers.Add(this);
             UpdateDiplomacy(this);
+
+            InstanceManagers.Add(this);
             DiplomacyFlags [ControllerID] = AllegianceType.Friendly;
         }
-
+            
         public void AddToSelection(LSAgent agent)
         {
             SelectedAgents.Add(agent);
@@ -269,7 +270,7 @@ namespace Lockstep
             {
                 for (int i = 0; i < com.Count; i++)
                 {
-                    LSAgent agent = CreateAgent(GetAgentCode(com.Target), com.Position);
+                    LSAgent agent = CreateAgent(GetAgentCode(com.Target), com.Position,null);
                 }
                 return;
             }
@@ -311,14 +312,22 @@ namespace Lockstep
             return com;
         }
 
-        public LSAgent CreateAgent(string agentCode,
-                                   Vector2d position = default(Vector2d))
+        public LSAgent CreateAgent(
+            string agentCode,
+            Vector2d? position = null, //nullable position
+            Vector2d? rotation = null  //Nullable rotation for default parametrz
+        )
         {
-            Vector2d vec = new Vector2d(0, 1);
+            Vector2d pos = position != null ? position.Value : new Vector2d(0,0);
+            Vector2d rot = rotation != null ? rotation.Value : new Vector2d(0,1);
+
+
             if (!IsValidAgentCode(agentCode))
             {
                 throw new System.ArgumentException(string.Format("Agent code '{0}' not found.", agentCode));
             }
+
+           
             FastStack<LSAgent> cache = CachedAgents [agentCode];
             LSAgent curAgent = null;
             if (cache.IsNotNull() && cache.Count > 0)
@@ -330,7 +339,7 @@ namespace Lockstep
                 curAgent = GameObject.Instantiate(AgentController.CodeInterfacerMap [agentCode].Prefab).GetComponent<LSAgent>();
                 curAgent.Setup(interfacer);
             }
-            InitializeAgent(curAgent, position);
+            InitializeAgent(curAgent, pos, rot);
             return curAgent;
         }
         /*
@@ -345,7 +354,8 @@ namespace Lockstep
         }*/
         
         private void InitializeAgent(LSAgent agent,
-                                      Vector2d position)
+                                      Vector2d position,
+        Vector2d rotation)
         {
             ushort localID = GenerateLocalID();
             LocalAgents [localID] = agent;
@@ -354,7 +364,7 @@ namespace Lockstep
             ushort globalID = GenerateGlobalID();
             GlobalAgentActive [globalID] = true;
             GlobalAgents [globalID] = agent;
-            agent.Initialize(this, localID, globalID, position);
+            agent.Initialize(this, localID, globalID, position, rotation);
         }
 
         private ushort GenerateLocalID()
@@ -370,6 +380,9 @@ namespace Lockstep
 
         public void SetAllegiance(AgentController otherController, AllegianceType allegianceType)
         {
+            while (DiplomacyFlags.Count <= otherController.ControllerID) {
+                DiplomacyFlags.Add(AllegianceType.Neutral);
+            }
             DiplomacyFlags [otherController.ControllerID] = allegianceType;
         }
 

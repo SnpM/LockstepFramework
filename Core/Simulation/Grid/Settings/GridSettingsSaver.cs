@@ -3,9 +3,9 @@ using System.Collections;
 
 namespace Lockstep
 {
-    public sealed class GridSettings : MonoBehaviour
+    public sealed class GridSettingsSaver : EnvironmentSaver
     {
-        [SerializeField]
+        [SerializeField, HideInInspector]
         private Vector2d _mapCenter;
         public Vector2d Offset {
             get 
@@ -22,15 +22,22 @@ namespace Lockstep
         private int _mapHeight = 100;
         public int MapHeight {get {return _mapHeight;}}
 
+        protected override void OnSave()
+        {
+            this._mapCenter = new Vector2d(transform.position);
+        }
+        protected override void OnApply()
+        {
+            GridManager.Settings = new GridSettings(this.MapWidth,this.MapHeight,this.Offset.x,this.Offset.y);
+        }
 
         #if UNITY_EDITOR
         public bool Show;
-        public float ShowHeight;
 
         void OnDrawGizmos () {
-            if (!Show) return;
+            if (!Show || Application.isPlaying) return;
             Gizmos.color = Color.green;
-            Vector3 offset = Offset.ToVector3(ShowHeight);
+            Vector3 offset = Offset.ToVector3(this.transform.position.y);
             Vector3 scale = Vector3.one * .5f;
             for (int x = 0; x < MapWidth; x++) {
                 for (int y = 0; y < MapHeight; y++) {

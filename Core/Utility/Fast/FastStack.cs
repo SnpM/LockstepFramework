@@ -48,13 +48,18 @@ namespace Lockstep {
 		
 		private void EnsureCapacity ()
 		{
-			if (Count == Capacity) {
-				Capacity *= 2;
-				T[] newItems = new T[Capacity];
-				Array.Copy (innerArray, 0, newItems, 0, Count);
-				innerArray = newItems;	
-			}
+            EnsureCapacity (Count);
 		}
+        public void EnsureCapacity (int min) {
+            if (Capacity < min) {
+                Capacity *= 2;
+                if (Capacity < min)
+                    Capacity = min;
+                T[] newItems = new T[Capacity];
+                Array.Copy (innerArray, 0, newItems, 0, Count);
+                innerArray = newItems;  
+            }
+        }
 		
 		public T this [int index] {
 			get {

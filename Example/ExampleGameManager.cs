@@ -17,8 +17,11 @@ namespace Lockstep.Example {
 
         public override void GetBehaviourHelpers (FastList<BehaviourHelper> output) {
             base.GetBehaviourHelpers(output);
-            output.Add (new MovementGroupHandler());
-            output.Add (new ScanGroupHandler());
+            var go = new GameObject("BehaviourHandlers");
+            go.AddComponent<MovementGroupHandler>();
+            go.AddComponent<ScanGroupHandler>();
+            output.Add (go.GetComponent<MovementGroupHandler>());
+            output.Add (go.GetComponent<ScanGroupHandler>());
         }
 
         public override NetworkHelper MainNetworkHelper {

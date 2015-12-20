@@ -149,9 +149,9 @@ namespace Lockstep
 
         }
 
-        public static bool SetVisuals;
-        public static float LerpTime;
-        public static float LerpDamping;
+        public static bool SetVisuals {get; private set;}
+        public static float LerpTime {get ;private set;}
+        public static float LerpDamping {get; private set;}
         private static float LerpDampScaler;
         static long LastSimulateTicks;
         static long LastDeltaTicks;
@@ -159,7 +159,7 @@ namespace Lockstep
         public static void Visualize()
         {
             float smoothDeltaTime = Mathf.Max(Time.unscaledDeltaTime, 1f / 256);
-            LerpDampScaler = Mathf.Lerp(LerpDampScaler, (4f / 64) / smoothDeltaTime, Time.deltaTime);
+            LerpDampScaler = .3f / smoothDeltaTime;
             LerpDamping = Time.unscaledDeltaTime * LerpDampScaler;
             LerpDamping *= Time.timeScale;
             long curTicks = LockstepManager.Ticks;

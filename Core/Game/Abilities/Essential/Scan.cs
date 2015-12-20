@@ -184,7 +184,7 @@ namespace Lockstep
                 BehaveWithNoTarget();
                 return;
             }
-            Vector2d targetDirection = Target.Body.Position - cachedBody.Position;
+            Vector2d targetDirection = Target.Body._position - cachedBody._position;
             long fastMag = targetDirection.FastMagnitude();
 
             if (fastMag <= fastRangeToTarget)
@@ -229,13 +229,13 @@ namespace Lockstep
                 {
                     if (cachedMove.IsMoving == false)
                     {
-                        cachedMove.StartMove(Target.Body.Position);
+                        cachedMove.StartMove(Target.Body._position);
                         cachedBody.Priority = basePriority;
                     } else
                     {
                         if (Target.Body.PositionChanged || inRange)
                         {
-                            cachedMove.Destination = Target.Body.Position;
+                            cachedMove.Destination = Target.Body._position;
                         }
                     }
                 }

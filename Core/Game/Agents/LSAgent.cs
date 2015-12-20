@@ -50,6 +50,7 @@ namespace Lockstep {
         public event Action<LSAgent> onDeactivation;
         public event Action<bool, bool> onInteraction;
 		public event Action<LSAgent> onBuildChild;
+        public event Action<LSAgent> onInitialized;
         public ushort GlobalID { get; private set; }
         public ushort LocalID { get; private set; }
         public uint BoxVersion { get; set; }
@@ -251,7 +252,8 @@ namespace Lockstep {
 			AgentController controller,
 		    ushort localID,
 			ushort globalID,
-			Vector2d position = default (Vector2d)) {
+			Vector2d position = default (Vector2d),
+            Vector2d rotation = default (Vector2d)) {
 
 			LocalID = localID;
 			GlobalID = globalID;
@@ -264,7 +266,7 @@ namespace Lockstep {
 
 			CachedGameObject.SetActive (true);
             if (Body .IsNotNull ()) {
-                Body.Initialize(position, Vector2d.up);
+                Body.Initialize(position, rotation);
             }
 
             if (Triggers.IsNotNull()) {
@@ -289,6 +291,10 @@ namespace Lockstep {
 				IsSelected = false;
 				IsHighlighted = false;
 			}
+            if(onInitialized != null)
+            {
+                onInitialized(this);
+            }
         }
 
         public void Simulate() {
@@ -401,7 +407,7 @@ namespace Lockstep {
             long hash = 3;
             hash ^= this.GlobalID;
             hash ^= this.LocalID;
-            hash ^= this.Body.Position.GetStateHash ();
+            hash ^= this.Body._position.GetStateHash ();
             hash ^= this.Body.Rotation.GetStateHash ();
             hash ^= this.Body.Velocity.GetStateHash ();
             return hash;

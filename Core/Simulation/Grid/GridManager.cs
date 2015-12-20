@@ -12,27 +12,90 @@ namespace Lockstep
 {
 	public static class GridManager
 	{
-		public const int NodeCount = 128;
-		public const int ScanNodeCount = NodeCount / ScanResolution;
+        public const int DefaultCapacity = 64 * 64;
+
+        public static int Width {get; private set;}
+        public static int Height {get; private set;}
+        public static int ScanHeight {get; private set;}
+        public static int ScanWidth {get; private set;}
+        public static int GridSize {get; private set;}
+        public static int ScanGridSize {get; private set;}
 		public static GridNode[] Grid;
 		private static ScanNode[] ScanGrid;
 		public const int ScanResolution = 4;
 		public const int SqrScanResolution = ScanResolution * ScanResolution;
-		public const long OffsetX = FixedMath.One * -64;
-		public const long OffsetY = FixedMath.One * -64;
+        public static long OffsetX {get; private set;}
+        public static long OffsetY {get; private set;}
 
-		public static void Generate ()
+        private static bool _settingsChanged = true;
+
+        public static readonly GridSettings DefaultSettings = new GridSettings();
+
+        private static GridSettings _settings;
+        /// <summary>
+        /// GridSettings for the GridManager's simulation. Make sure you set this property ONLY if you wish to change the settings.
+        /// Changes will apply to the next session.
+        /// </summary>
+        /// <value>The settings.</value>
+        public static GridSettings Settings {
+            get {
+                return _settings;
+            }
+            set {
+                _settings = value;
+                _settingsChanged = true;
+            }
+        }
+
+        private static FastStack<GridNode> CachedGridNodes = new FastStack<GridNode> (GridManager.DefaultCapacity);
+        private static FastStack<ScanNode> CachedScanNodes = new FastStack<ScanNode> (GridManager.DefaultCapacity);
+		private static void Generate ()
 		{
-			ScanGrid = new ScanNode[ScanNodeCount * ScanNodeCount];
-			for (int i = 0; i < NodeCount / ScanResolution; i++) {
-				for (int j = 0; j < NodeCount / ScanResolution; j++) {
-					ScanGrid [GetScanIndex (i, j)] = new ScanNode (i, j);
+            Width = Settings.Width;
+            Height = Settings.Height;
+            ScanHeight = Height / ScanResolution;
+            ScanWidth = Width / ScanResolution;
+            GridSize = Width * Height;
+            OffsetX = Settings.XOffset;
+            OffsetY = Settings.YOffset;
+
+            ScanGridSize = ScanHeight * ScanWidth;
+
+
+        #region Pooling; no need to create all those nodes again
+
+            if (Grid != null) {
+                int min = Grid.Length;
+                CachedGridNodes.EnsureCapacity (min);
+                for (int i = min - 1; i >= 0; i--) {
+                    CachedGridNodes.Add (Grid[i]);
+                }
+            }
+
+
+            if (ScanGrid != null) {
+                int min = ScanGrid.Length;
+                CachedScanNodes.EnsureCapacity(min);
+                for (int i = min - 1; i >= 0; i--) {
+                    CachedScanNodes.Add(ScanGrid[i]);
+                }
+            }
+        #endregion
+
+
+			ScanGrid = new ScanNode[ScanGridSize];
+            for (int i = ScanWidth - 1; i >= 0; i--) {
+                for (int j = ScanHeight - 1; j >= 0; j--) {
+                    ScanNode node = CachedScanNodes.Count > 0 ? CachedScanNodes.Pop() : new ScanNode ();
+                    ScanGrid [GetScanIndex (i, j)] = node;
 				}
 			}
-			Grid = new GridNode[NodeCount * NodeCount];
-			for (int i = 0; i < NodeCount; i++) {
-				for (int j = 0; j < NodeCount; j++) {
-					Grid [i * NodeCount + j] = new GridNode (i, j);
+			Grid = new GridNode[GridSize];
+            for (int i = Width - 1; i >= 0; i--) {
+				for (int j = Height - 1; j >= 0; j--) {
+                    GridNode node = CachedGridNodes.Count > 0 ? CachedGridNodes.Pop() : new GridNode ();
+                    node.Setup(i,j);
+                    Grid [GetGridIndex (i,j)] = node;
 				}
 			}
 		}
@@ -45,11 +108,31 @@ namespace Lockstep
             return ret;
         }
 
+
+        public static void Setup () {
+            //Nothing here to see
+        }
+
 		public static void Initialize ()
 		{
-			for (int k = 0; k < NodeCount * NodeCount; k++) {
-				Grid [k].Initialize ();
-			}
+            if (_settingsChanged) {
+                if (_settings == null)
+                    _settings = DefaultSettings;
+
+
+                Generate ();
+
+                for (int i = GridSize - 1; i >= 0; i--) {
+    				Grid [i].Initialize ();
+    			}
+            }
+            else {
+                //If we're using the same settings, no need to generate a new grid or neighbors
+                for (int i = GridSize - 1; i >= 0; i--) {
+                    Grid[i].FastInitialize();
+                }
+            }
+            Debug.Log("Grid initialized");
 		}
 
 		public static GridNode GetNode (int xGrid, int yGrid)
@@ -66,9 +149,17 @@ namespace Lockstep
 		{
 			indexX = (int)((xPos + FixedMath.Half - 1 - OffsetX) >> FixedMath.SHIFT_AMOUNT);
 			indexY = (int)((yPos + FixedMath.Half - 1 - OffsetY) >> FixedMath.SHIFT_AMOUNT);
+            if (!ValidateCoordinates (indexX, indexY)) return null;
+
 			return (GetNode (indexX, indexY));
 		}
 
+        public static bool ValidateCoordinates (int xGrid, int yGrid) {
+            return xGrid >= 0 && xGrid < Width && yGrid >= 0 && yGrid < Height;
+        }
+        public static bool ValidateIndex (int index) {
+            return index >= 0 && index < GridSize;
+        }
 		public static void GetCoordinates (long xPos, long yPos, out int xGrid, out int yGrid)
 		{
 			xGrid = (int)((xPos + FixedMath.Half - 1 - OffsetX) >> FixedMath.SHIFT_AMOUNT);
@@ -87,52 +178,23 @@ namespace Lockstep
 		public static ScanNode GetScanNode (int xGrid, int yGrid)
 		{
 			//if (xGrid < 0 || xGrid >= NodeCount || yGrid < 0 || yGrid >= NodeCount) return null;
-
+            if (!ValidateScanCoordinates (xGrid, yGrid)) return null;
 			return ScanGrid [GetScanIndex (xGrid, yGrid)];
 		}
 
 		public static int GetGridIndex (int xGrid, int yGrid)
 		{
-			if (xGrid < 0)
-				xGrid = 0;
-			if (xGrid >= NodeCount)
-				xGrid = NodeCount - 1;
-			if (yGrid < 0)
-				yGrid = 0;
-			if (yGrid >= NodeCount)
-				yGrid = NodeCount - 1;
-			return xGrid * NodeCount + yGrid;
+            
+			return xGrid * Height + yGrid;
 		}
-
+        public static bool ValidateScanCoordinates (int scanX, int scanY) {
+            return scanX >= 0 && scanX < ScanWidth && scanY >= 0 && scanY < ScanHeight;
+        }
 		public static int GetScanIndex (int xGrid, int yGrid)
 		{
-			if (xGrid < 0)
-				xGrid = 0;
-			if (xGrid >= ScanNodeCount)
-				xGrid = ScanNodeCount - 1;
-			if (yGrid < 0)
-				yGrid = 0;
-			if (yGrid >= ScanNodeCount)
-				yGrid = ScanNodeCount - 1;
-			return xGrid * ScanNodeCount + yGrid;
+			return xGrid * ScanHeight + yGrid;
 		}
-
-		public static void ApplyWeight (int xpos, int ypos, int weight)
-		{
-			Grid [xpos * NodeCount + ypos].Weight = weight;
-		}
-
-		static int i, j;
-
-		public static void ApplyWeight (int xmin, int xmax, int ymin, int ymax, int weight)
-		{
-			for (i = xmin; i <= xmax; i++) {
-				for (j = ymin; j <= ymax; j++) {
-					Grid [i * NodeCount + j].Weight = weight;
-				}
-			}
-		}
-
+            
 		public static int ToGridX (this long xPos)
 		{
 			return (xPos - OffsetX).RoundToInt ();

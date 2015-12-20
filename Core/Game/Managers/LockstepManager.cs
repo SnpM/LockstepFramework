@@ -32,7 +32,7 @@ namespace Lockstep {
 		public static long Ticks {get {return SimulationTimer.ElapsedTicks;}}
 		public static MonoBehaviour UnityInstance {get; private set;}
         public const int FrameRate = 32;
-        public const int InfluenceResolution = 4;
+        public const int InfluenceResolution = 2;
 		public const float BaseDeltaTime = (float)(1d  / FrameRate);
 
 		private static int InfluenceCount;
@@ -54,6 +54,7 @@ namespace Lockstep {
             UnityInstance.GetComponent<Renderer>().enabled = false;
 			GameObject.DontDestroyOnLoad (UnityInstance.gameObject);
 
+            GridManager.Setup();
 			AbilityInterfacer.Setup ();
          
             AgentController.Setup();
@@ -82,6 +83,8 @@ namespace Lockstep {
                 Setup ();
                 Loaded = true;
             }
+            InitializeHelpers ();
+
 
             DefaultMessageRaiser.EarlyInitialize();
 
@@ -99,7 +102,6 @@ namespace Lockstep {
 
             TriggerManager.Initialize();
 
-            GridManager.Generate();
             GridManager.Initialize();
 
 			TeamManager.Initialize ();
@@ -118,14 +120,12 @@ namespace Lockstep {
             InfluenceManager.Initialize();
             ProjectileManager.Initialize();
 
-            LoadSceneObjects();
-
 			Started = true;
             ClientManager.Initialize ();
 
-            InitializeHelpers ();
 
             DefaultMessageRaiser.LateInitialize();
+            BehaviourHelperManager.LateInitialize();
         }
 
         static void InitializeHelpers () {
@@ -259,13 +259,6 @@ namespace Lockstep {
 		public static void Quit () {
 			ClientManager.Quit ();
 		}
-
-        private static void LoadSceneObjects() {
-            LSSceneObject[] sceneObjects = GameObject.FindObjectsOfType<LSSceneObject>();
-            for (int i = 0; i < sceneObjects.Length; i++) {
-                sceneObjects[i].Initialize();
-            }
-        }
 
         public static int GetStateHash () {
             int hash = LSUtility.PeekRandom (int.MaxValue);

@@ -19,6 +19,7 @@ namespace Lockstep
 			ID = id;
 
 		}
+        public readonly FastList<AllegianceType> Diplomacy = new FastList<AllegianceType>();
 
 
 		public void Initialize ()
@@ -28,9 +29,11 @@ namespace Lockstep
 			for (int i = 0; i < TeamManager.Teams.Count; i++) {
 				Team team = TeamManager.Teams[i];
 				if (team != this)
-					Diplomacy.AddAt (AllegianceType.Neutral, team.ID);
+                    this.SetAllegiance(team,AllegianceType.Neutral);
 			}
 			TeamManager.UpdateDiplomacy (this);
+
+            TeamManager.Teams.Add(this);
 			this.SetAllegiance (this, AllegianceType.Friendly);
 
 			MainController = new AgentController();
@@ -53,8 +56,9 @@ namespace Lockstep
 			controller.JoinTeam (this);
 		}
 
-		public readonly FastBucket<AllegianceType> Diplomacy = new FastBucket<AllegianceType>();
 		public void SetAllegiance (Team other, AllegianceType allegiance) {
+            while (other.ID >= Diplomacy.Count)
+                Diplomacy.Add(AllegianceType.Neutral);
 			Diplomacy[other.ID] = allegiance;
 		}
 		public AllegianceType GetAllegiance (AgentController controller) {
