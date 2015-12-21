@@ -151,12 +151,11 @@ namespace Lockstep
                         newMovementCostToNeighbor = currentNode.gCost + 100;
                     }
                     else {
-                        if (GridManager.UseDiagonalConnections) {
-                            newMovementCostToNeighbor = currentNode.gCost + 141;
+                        if (i == 4) {
+                            if (!GridManager.UseDiagonalConnections)
+                                break;
                         }
-                        else {
-                            break;
-                        }
+                        newMovementCostToNeighbor = currentNode.gCost + 141;
                     }
 
 					if (!GridHeap.Contains (neighbor)) {

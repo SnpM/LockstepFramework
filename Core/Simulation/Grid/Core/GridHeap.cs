@@ -47,6 +47,7 @@ namespace Lockstep
 	
 		public static void UpdateItem (GridNode item)
 		{
+            //SortUp (item);
 			SortDown (item);
 		}
 	
@@ -84,14 +85,7 @@ namespace Lockstep
 					}
 				
 					swapNode = items[swapIndex];
-					if (item.fCost == swapNode.fCost)
-					{
-						if (item.hCost > swapNode.hCost)
-							Swap (item, swapNode);
-						else
-							return;
-					}
-					else if(item.fCost > swapNode.fCost) {
+					if(item.fCost > swapNode.fCost) {
 						Swap (item, swapNode);
 					} else {
 						return;
@@ -111,14 +105,7 @@ namespace Lockstep
 		
 			while (true) {
 				curNode = items [parentIndex];
-				if (item.fCost == curNode.fCost)
-				{
-					if (item.hCost < curNode.hCost)
-						Swap (item,curNode);
-					else
-						return;
-				}
-				else if(item.fCost < curNode.fCost) {
+                if(item.fCost < curNode.fCost) {
 					Swap (item, curNode);
 				} else {
 					break;
