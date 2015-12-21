@@ -6,105 +6,76 @@ namespace Lockstep
 	public class LSInfluencer
 	{
 		#region Static Helpers
-		static InfluencerBucket tempBucket;
-		static GridNode tempNode;
 		static LSAgent tempAgent;
-		static int i, j;
+		static GridNode tempNode;
 		#endregion
 
 		#region Collection Helper
-		public int bucketIndex;
+		[NonSerialized]
+		public int bucketIndex = -1;
 		#endregion
 
-		public GridNode LocatedNode;
-		public LSBody Body;
-		public LSAgent Agent;
+        #region ScanNode Helper
+        public int NodeTicket;
+        #endregion
 
-		public void Initialize (LSAgent agent)
+		public GridNode LocatedNode { get; private set;}
+
+		public LSBody Body { get; private set; }
+
+		public LSAgent Agent { get; private set; }
+
+		public void Setup (LSAgent agent)
 		{
 			Agent = agent;
 			Body = agent.Body;
-			LocatedNode = GridManager.GetNode (Body.Position.x, Body.Position.y);
+		}
+
+		public void Initialize ()
+		{
+			LocatedNode = GridManager.GetNode (Body._position.x, Body._position.y);
 			LocatedNode.Add (this);
 		}
 
 		public void Simulate ()
 		{
-			tempNode = GridManager.GetNode (Body.Position.x, Body.Position.y);
 
 			if (Body.PositionChangedBuffer) {
+				tempNode = GridManager.GetNode (Body._position.x, Body._position.y);
+
 				if (System.Object.ReferenceEquals (tempNode, LocatedNode) == false) {
-					LocatedNode.LocatedAgents.Remove (this);
+                    LocatedNode.Remove (this);
+					 tempNode.Add (this);
 					LocatedNode = tempNode;
-					LocatedNode.Add (this);
 				}
 			}
 		}
-
-		#region Scanning
-		public LSAgent Scan (int deltaCount,
-		                     bool CheckAllegiance = false,
-		                     AllegianceType allegianceType = AllegianceType.Neutral)
-		{
-			for (i = 0; i < deltaCount; i++) {
-				tempNode = GridManager.GetNode (
-					LocatedNode.gridX + DeltaCache.CacheX[i],
-					LocatedNode.gridY + DeltaCache.CacheY[i]);
-
-				if (tempNode != null && tempNode.LocatedAgents != null) {
-					tempBucket = tempNode.LocatedAgents;
-					for (j = 0; j < tempBucket.PeakCount; j++) {
-						if (LSUtility.GetBitTrue (tempBucket.arrayAllocation, j)) {
-							tempAgent = tempBucket.innerArray [j].Agent;
-							if (System.Object.ReferenceEquals (tempAgent, Agent) == false) {
-								if (CheckAllegiance)
-								{
-									if (Agent.MyAgentController.DiplomacyFlags
-									    [tempAgent.MyAgentController.ControllerID] != allegianceType) continue;
-								}
-								return tempAgent;
-							}
-						}
-					}
-				}
-			}
-			return null;
-		}
-		public void ScanAll (int deltaCount, FastList<LSAgent> outputAgents,
-		                      bool CheckAllegiance = false,
-		                      AllegianceType allegianceType = AllegianceType.Neutral)
-		{
-			for (i = 0; i < deltaCount; i++) {
-				tempNode = GridManager.GetNode (
-					LocatedNode.gridX + DeltaCache.CacheX[i],
-					LocatedNode.gridY + DeltaCache.CacheY[i]);
-				
-				if (tempNode != null && tempNode.LocatedAgents != null) {
-					tempBucket = tempNode.LocatedAgents;
-					for (j = 0; j < tempBucket.PeakCount; j++) {
-						if (LSUtility.GetBitTrue (tempBucket.arrayAllocation, j)) {
-							tempAgent = tempBucket.innerArray [j].Agent;
-							if (System.Object.ReferenceEquals (tempAgent, Agent) == false) {
-								if (CheckAllegiance)
-								{
-									if (Agent.MyAgentController.DiplomacyFlags
-									    [tempAgent.MyAgentController.ControllerID] != allegianceType) continue;
-								}
-								outputAgents.Add (tempAgent);
-							}
-						}
-					}
-				}
-			}
-		}
-
-
-		#endregion
 
 		public void Deactivate ()
 		{
 			LocatedNode.Remove (this);
 			LocatedNode = null;
 		}
+        
+		static AllegianceType TargetAllegiance;
+		static PlatformType TargetPlatform;
+		public LSAgent Scan (int deltaCount,
+            AllegianceType targetAllegiance = AllAllegiance,
+            PlatformType targetPlatform = AllPlatforms)
+		{
+			InfluenceManager.Source = Agent;
+			InfluenceManager.TargetAllegiance = targetAllegiance;
+			InfluenceManager.TargetPlatform = targetPlatform;
+			return InfluenceManager.Scan (LocatedNode.ScanX, LocatedNode.ScanY, deltaCount,
+			                              this.Agent,targetAllegiance);
+		}
+        const PlatformType AllPlatforms = (PlatformType)~0;
+        const AllegianceType AllAllegiance = (AllegianceType)~0;
+	}
+
+	public enum PlatformType
+	{
+		Air             = 1 << 1,
+		Ground          = 1 << 2
 	}
 }

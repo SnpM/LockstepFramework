@@ -4,297 +4,166 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
-using UnityEngine;
-using System.Collections;
 
-#if UNITY_EDITOR
-using Lockstep.Integration;
-#endif
+using UnityEngine;
 
 namespace Lockstep
 {
 	public class LSBody : MonoBehaviour
 	{
-		#region User-defined Variables
+		public Vector3 visualPosition;
+        public Vector2d _position;
 
-		[SerializeField]
-		public bool
-			IsTrigger = false;
-		[SerializeField]
-		public bool
-			Immovable = false;
-		[SerializeField]
-		public ColliderType
-			Shape;
-		[SerializeField]
-		public long
-			Radius = FixedMath.Half;
-		[SerializeField]
-		public long
-			HalfWidth = FixedMath.Half;
-		[SerializeField]
-		public long
-			HalfHeight = FixedMath.Half;
-		[SerializeField]
-		public Vector2d[]
-			Vertices;
-		public int Priority;
-		#endregion
-
-		#region Meta Variables
 		
-		public int ID;
-		public Transform cachedTransform;
-		public GameObject cachedGameObject;
-		[System.NonSerialized]
-		public bool
-			FirstInitialize = true;
+		public LSAgent Agent { get; private set; }
+		
+		public long FastRadius { get; private set; }
 
-		public delegate void CollisionFunction (LSBody other);
+		
+		public bool PositionChanged { get; set; }
+		
+		public bool PositionChangedBuffer { get; private set; } //D
+		public bool SetPositionBuffer; //ND
+		public Vector2d Rotation = Vector2d.up;
+		
+		public bool RotationChanged { get; set; }
+		
+		private bool RotationChangedBuffer { get; set; } //D
+		private bool SetRotationBuffer; //ND
 
-		public CollisionFunction OnContactEnter;
-		public CollisionFunction OnContact;
-		public CollisionFunction OnContactExit;
-		public Move Mover;
-		#endregion
+		bool SetVisualPosition;
+		bool SetVisualRotation;
+		
+        public bool Setted {get; private set;}
 
-		#region State Information
-		public Vector2d Position;
-		public Vector2d Rotation;
-		public Vector2d Velocity;
-		public Vector2d LocalPosition;
-		public Vector2d LocalRotation;
-
-		public long VelocityMagnitude;
-		public bool VelocityChanged;
-		public bool PositionChanged;
-		public bool RotationChanged;
-		public bool PositionChangedBuffer;
-		public bool RotationChangedBuffer;
-		public bool SetPositionBuffer;
-		public bool SetRotationBuffer;
-
-		public int[] LocatedPartitions = new int[4];
-		public bool[] LocatedPartitionExists = new bool[4];
-
-		public bool HasParent;
-		public Vector2d LastPosition;
-		public Vector2d Offset;
-
-		public LSBody Parent {
-			get {
-				return HasParent ? _parent : null;
-			}
+		public Vector2d _velocity;
+		
+		public Vector2d Velocity {
+			get { return _velocity; }
 			set {
-				if (value == null) {
-					HasParent = false;
-				} else {
-					if (_parent != value) {
+				_velocity = value;
+				VelocityChanged = true;
+			}
+		}
+		
+		public long VelocityFastMagnitude { get; private set; }
+		
+		public bool VelocityChanged { get; set; }
+		
+		public LSBody Parent {
+			get { return HasParent ? _parent : null; }
+			set {
+				if (value != _parent) {
+					if (HasParent) {
+						_parent.RemoveChild (this);
+					}
+					if (value == null) {
+						HasParent = false;
+					} else {
+						if (value.HasParent) {
+							throw new System.Exception ("Cannot parent object to object with parent");
+						}
+						if (this.Children .IsNotNull () && this.Children.Count > 0) {
+							throw new System.Exception ("Cannot child object with children");
+						}
 						HasParent = true;
 						_parent = value;
-						LocalPosition = (Position - _parent.Position);
-						LocalPosition.RotateInverse (_parent.Rotation.x, _parent.Rotation.y);
+						_parent.AddChild (this);
+						this._positionalTransform.parent = _parent._positionalTransform;
+						this._rotationalTransform.parent = _parent._rotationalTransform;
+						UpdateLocalPosition ();
+						UpdateLocalRotation ();
 						LocalRotation = Rotation;
-						LocalRotation.RotateInverse (_parent.Rotation.x, _parent.Rotation.y);
+						LocalRotation.Rotate (_parent.Rotation.x, _parent.Rotation.y); 
+						
 					}
 				}
 			}
 		}
-
-		private LSBody _parent;
-		#endregion
-
-		public void Initialize ()
+		
+		public bool HasParent { get; private set; }
+		
+		private void AddChild (LSBody child)
 		{
-			Initialize (Vector2d.zero, Vector2d.up);
+			if (Children == null)
+				Children = new FastBucket<LSBody> ();
+			Children.Add (child);
 		}
-
-		public void Initialize (Vector2d StartPosition)
+		
+		private void RemoveChild (LSBody child)
 		{
-			Initialize (StartPosition, Vector2d.up);
+			Children.Remove (child);
 		}
-
-		public void Initialize (Vector2d StartPosition, Vector2d StartRotation)
-		{
-			if (FirstInitialize) {
-				FirstInitialize = false;
-				cachedGameObject = base.gameObject;
-				cachedTransform = base.transform;
-			}
-
-			HasParent = false;
-
-			PositionChanged = true;
-			RotationChanged = true;
-			VelocityChanged = true;
-			Position = StartPosition;
-			Rotation = StartRotation;
-
-			if (Shape != ColliderType.None) {
-				GeneratePoints ();
-				GenerateBounds ();
-				BuildPoints ();
-				BuildBounds ();
-			}
-			for (int i = 0; i < 4; i++) {
-				LocatedPartitionExists [i] = false;
-			}
-			PhysicsManager.Assimilate (this);
-		}
-
-		public void EarlySimulate ()
-		{
-			if (HasParent) {
-
-			} else {
-				if (VelocityChanged) {
-					VelocityMagnitude = Velocity.Magnitude ();
-					VelocityChanged = false;
-
-				}
-
-				if (VelocityMagnitude != 0) {
-					Position.x += Velocity.x;
-					Position.y += Velocity.y;
-					PositionChanged = true;
-				}
-			}
-			if (PositionChanged) {
-				Partition.PartitionObject (this);
-				Offset = Position - LastPosition;
-				LastPosition = Position;
-				PositionChangedBuffer = true;
-			} else {
-				PositionChangedBuffer = false;
-			}
-			if (RotationChanged) {
-				RotationChangedBuffer = true;
-			} else {
-				RotationChangedBuffer = false;
-			}
-		}
-
-		public void Simulate ()
-		{
-			if (HasParent)
-			{
-				if (_parent.RotationChangedBuffer)
-				{
-					Position = LocalPosition;
-					Position.Rotate (_parent.Rotation.x,_parent.Rotation.y);
-					Position += _parent.Position;
-
-					Rotation = LocalRotation;
-					Rotation.Rotate (_parent.Rotation.x,_parent.Rotation.y);
-					RotationChanged = true;
-					PositionChanged = true;
-				}
-				else if (_parent.PositionChangedBuffer) {
-					Position += _parent.Offset;
-					PositionChanged = true;
-				}
-			}
-			if (PositionChanged || RotationChanged) {
-				if (PositionChanged) {
-					FuturePosition.x = Position.x + Velocity.x * PhysicsManager.ColSpreadMul;
-					FuturePosition.y = Position.y + Velocity.y * PhysicsManager.ColSpreadMul;
-					SetPositionBuffer = true;
-				} else {
-
-				}
-
-				if (RotationChanged) {
-					SetRotationBuffer = true;
-				} else {
-				}
-
-				BuildPoints ();
-				BuildBounds ();
-
-				PositionChanged = false;
-				RotationChanged = false;
-			} else {
-
-			}
-		}
-
-		public void Visualize ()
-		{
-			if (SetPositionBuffer) {
-				this.cachedTransform.position = Position.ToVector3 (transform.position.y);
-				SetPositionBuffer = false;
-			}
-
-			if (SetRotationBuffer) {
-				this.cachedTransform.rotation = Quaternion.LookRotation (Rotation.ToVector3 (0f));
-				SetRotationBuffer = false;
-			}
-
-		}
-
-		public void SetPosition (long x, long y)
-		{
-			Position.x = x;
-			Position.y = y;
-			PositionChanged = true;
-			if (HasParent)
-			{
-				LocalPosition = Position - _parent.Position;
-				LocalPosition.RotateInverse(_parent.Rotation.x,_parent.Rotation.y);
-			}
-		}
-
-		public void SetLocalPosition (long x, long y)
-		{
-			if (HasParent)
-			{
-				LocalPosition = Position - _parent.Position;
-				LocalPosition.RotateInverse(_parent.Rotation.x,_parent.Rotation.y);
-				PositionChanged = true;
-			}
-		}
-
-		public void SetRotation (long x, long y)
-		{
-			Rotation.x = x;
-			Rotation.y = y;
-			RotationChanged = true;
-		}
-
-		public void SetVelocity (long x, long y)
-		{
-			Velocity.x = x;
-			Velocity.y = y;
-			VelocityChanged = true;
-		}
-
-		#region Collider
-
-		public uint RaycastVersion;
-		public Vector2d[]
-			RotatedPoints;
-		public Vector2d[]
-			RealPoints;
-		public Vector2d[]
-			EdgeNorms;
-		public Vector2d FuturePosition;
+		
+		private FastBucket<LSBody> Children;
+		public Vector2d[] RealPoints;
+		public Vector2d[] EdgeNorms;
 		public long XMin;
 		public long XMax;
 		public long YMin;
 		public long YMax;
-		public long FutureXMin;
-		public long FutureXMax;
-		public long FutureYMin;
-		public long FutureYMax;
 		public long PastGridXMin;
 		public long PastGridXMax;
 		public long PastGridYMin;
 		public long PastGridYMax;
-
+		
+		public delegate void CollisionFunction (LSBody other);
+		
+		public CollisionFunction OnContactEnter;
+		public CollisionFunction OnContact;
+		public CollisionFunction OnContactExit;
+		
+		public int ID { get; private set; }
+		
+		[SerializeField]
+		private int
+			_priority;
+		
+		public int Priority { get; set; }
+		
+		public uint RaycastVersion;
+		
+		#region Serialized
+		public ColliderType Shape;
+		public bool IsTrigger;
+		public  int Layer;
+        public long HalfWidth = FixedMath.Half;
+        public long HalfHeight = FixedMath.Half;
+		public long Radius;
+		public bool Immovable;
+	
+		public Transform _positionalTransform;
+		public Transform _rotationalTransform;
+		#endregion
+		
+		private LSBody _parent;
+		private Vector2d[] RotatedPoints;
+		public Vector2d LocalPosition;
+		public Vector2d LocalRotation;
+		public Vector2d[] Vertices;
+		
+		public void Setup (LSAgent agent)
+		{
+			FastRadius = Radius * Radius;
+			if (_positionalTransform == null)
+				_positionalTransform = base.transform;
+			if (_rotationalTransform == null)
+				_rotationalTransform = base.transform;
+			if (Shape == ColliderType.Polygon) {
+				Immovable = true;
+			}
+			if (Shape != ColliderType.None) {
+				GeneratePoints ();
+				GenerateBounds ();
+			}
+			Agent = agent;
+		}
+		
 		public void GeneratePoints ()
 		{
-			if (Shape != ColliderType.Polygon)
+			if (Shape != ColliderType.Polygon) {
 				return;
+			}
 			RotatedPoints = new Vector2d[Vertices.Length];
 			for (int i = 0; i < Vertices.Length; i++) {
 				RotatedPoints [i] = Vertices [i];
@@ -303,43 +172,18 @@ namespace Lockstep
 			RealPoints = new Vector2d[Vertices.Length];
 			EdgeNorms = new Vector2d[Vertices.Length];
 		}
-
-		public void BuildPoints ()
-		{
-			if (Shape != ColliderType.Polygon)
-				return;
-			int VertLength = Vertices.Length;
-
-			if (RotationChanged) {
-				for (int i = 0; i < VertLength; i++) {
-					RotatedPoints [i] = Vertices [i];
-					RotatedPoints [i].Rotate (Rotation.x, Rotation.y);
-
-					EdgeNorms [i] = RotatedPoints [i];
-					if (i == 0) {
-						EdgeNorms [i].Subtract (ref RotatedPoints [VertLength - 1]);
-					} else {
-						EdgeNorms [i].Subtract (ref RotatedPoints [i - 1]);
-					}
-					EdgeNorms [i].Normalize ();
-					EdgeNorms [i].RotateRight ();
-				}
-			}
-			for (int i = 0; i < Vertices.Length; i++) {
-				RealPoints [i].x = RotatedPoints [i].x + Position.x;
-				RealPoints [i].y = RotatedPoints [i].y + Position.y;
-			}
-		}
-
+		
 		public void GenerateBounds ()
 		{
 			if (Shape == ColliderType.Circle) {
 				Radius = Radius;
 			} else if (Shape == ColliderType.AABox) {
-				if (HalfHeight == HalfWidth)
+				if (HalfHeight == HalfWidth) {
 					Radius = FixedMath.Sqrt ((HalfHeight * HalfHeight * 2) >> FixedMath.SHIFT_AMOUNT);
-				else
+				} else {
 					Radius = FixedMath.Sqrt ((HalfHeight * HalfHeight + HalfWidth * HalfWidth) >> FixedMath.SHIFT_AMOUNT);
+				}
+
 			} else if (Shape == ColliderType.Polygon) {
 				long BiggestSqrRadius = Vertices [0].SqrMagnitude ();
 				for (int i = 1; i < Vertices.Length; i++) {
@@ -352,96 +196,476 @@ namespace Lockstep
 			}
 		}
 		
+		public void InitializeSerialized ()
+		{
+            Initialize (this._position, Rotation);
+		}
+		
+		public void Initialize (Vector2d startPosition)
+		{
+			Initialize (startPosition, Rotation);
+		}
+		
+		public void Initialize (Vector2d StartPosition, Vector2d StartRotation)
+        {
+            if (!Setted) {
+                this.Setup(null);
+                Setted = true;
+            }
+            CheckVariables ();
+
+			Parent = null;
+			
+			PositionChanged = true;
+			RotationChanged = true;
+			VelocityChanged = true;
+			PositionChangedBuffer = false;
+			RotationChangedBuffer = false;
+			
+			Priority = _priority;
+			Velocity = Vector2d.zero;
+			VelocityFastMagnitude = 0;
+			_position = StartPosition;
+			Rotation = StartRotation;
+
+
+			_parent = null;
+			LocalPosition = Vector2d.zero;
+			LocalRotation = Vector2d.up;
+			
+			XMin = 0;
+			XMax = 0;
+			YMin = 0;
+			YMax = 0;
+			
+			
+			PastGridXMin = long.MaxValue;
+			PastGridXMax = long.MaxValue;
+			PastGridYMin = long.MaxValue;
+			PastGridYMax = long.MaxValue;
+			
+			if (Shape != ColliderType.None) {
+				BuildPoints ();
+				BuildBounds ();
+			}
+			
+			ID = PhysicsManager.Assimilate (this);
+			Partition.PartitionObject (this);
+			
+			visualPosition = _position.ToVector3 (0f);
+			lastVisualPos = visualPosition;
+			_positionalTransform.position = visualPosition;
+            UnityEngine.Profiler.maxNumberOfSamplesPerFrame = 7000000;
+			visualRot = Quaternion.LookRotation (Rotation.ToVector3 (0f));
+			lastVisualRot = visualRot;
+			_positionalTransform.rotation = visualRot;
+		}
+
+        void CheckVariables () {
+            if (_positionalTransform == null)
+                this._positionalTransform = base.transform;
+            if (_rotationalTransform == null)
+                this._rotationalTransform = base.transform;
+        }
+		
+		public void BuildPoints ()
+		{
+			if (Shape != ColliderType.Polygon) {
+				return;
+			}
+			int VertLength = Vertices.Length;
+			
+			if (RotationChanged) {
+				for (int i = 0; i < VertLength; i++) {
+					RotatedPoints [i] = Vertices [i];
+					RotatedPoints [i].Rotate (Rotation.x, Rotation.y);
+					
+					EdgeNorms [i] = RotatedPoints [i];
+					if (i == 0) {
+						EdgeNorms [i].Subtract (ref RotatedPoints [VertLength - 1]);
+					} else {
+						EdgeNorms [i].Subtract (ref RotatedPoints [i - 1]);
+					}
+					EdgeNorms [i].Normalize ();
+					EdgeNorms [i].RotateRight ();
+				}
+			}
+			for (int i = 0; i < Vertices.Length; i++) {
+				RealPoints [i].x = RotatedPoints [i].x + _position.x;
+				RealPoints [i].y = RotatedPoints [i].y + _position.y;
+			}
+		}
+		
 		public void BuildBounds ()
 		{
 			if (Shape == ColliderType.Circle) {
-				XMin = -Radius + Position.x;
-				XMax = Radius + Position.x;
-				YMin = -Radius + Position.y;
-				YMax = Radius + Position.y;
+				XMin = -Radius + _position.x;
+				XMax = Radius + _position.x;
+				YMin = -Radius + _position.y;
+				YMax = Radius + _position.y;
 			} else if (Shape == ColliderType.AABox) {
-				XMin = -HalfWidth + Position.x;
-				XMax = HalfWidth + Position.x;
-				YMin = -HalfHeight + Position.y;
-				YMax = HalfHeight + Position.y;
+				XMin = -HalfWidth + _position.x;
+				XMax = HalfWidth + _position.x;
+				YMin = -HalfHeight + _position.y;
+				YMax = HalfHeight + _position.y;
 			} else if (Shape == ColliderType.Polygon) {
-				XMin = Position.x;
-				XMax = Position.x;
-				YMin = Position.y;
-				YMax = Position.y; 
+				XMin = _position.x;
+				XMax = _position.x;
+				YMin = _position.y;
+				YMax = _position.y;
 				for (int i = 0; i < Vertices.Length; i++) {
-
 					Vector2d vec = RealPoints [i];
 					if (vec.x < XMin) {
 						XMin = vec.x;
 					} else if (vec.x > XMax) {
 						XMax = vec.x;
 					}
-
+					
 					if (vec.y < YMin) {
 						YMin = vec.y;
 					} else if (vec.y > YMax) {
 						YMax = vec.y;
 					}
 				}
+			}
+		}
+		
+		public void EarlySimulate ()
+		{
+			if (HasParent)
+				return;
+
+			if (VelocityChanged) {
+				VelocityFastMagnitude = Velocity.FastMagnitude ();
+				VelocityChanged = false;
+			}
+			
+			if (VelocityFastMagnitude != 0) {
+				_position.x += Velocity.x;
+				_position.y += Velocity.y;
+				PositionChanged = true;
+			}
+			
+			if (PositionChanged) {
+				Partition.UpdateObject (this);
+			}
+			if (RotationChanged) {
+			} else {
+			}
+		}
+		
+		public void Simulate ()
+		{
+			if (HasParent)
+				return;
+			
+			if (PositionChanged || RotationChanged) {
+				if (PositionChanged) {
+
+				} else {
+				}
+				
+				if (RotationChanged) {
+				} else {
+				}
+				
+			} else {
+				
+			}
+			
+		}
+		
+		public void LateSimulate ()
+		{
+			if (HasParent) {
+				ChildSimulate ();
+			}
+			if (PhysicsManager.SetVisuals) {
+				SetVisuals ();
+			}
+			BuildChangedValues ();
+
+		}
+		
+		private void ChildSimulate ()
+		{
+			
+			if (_parent.RotationChangedBuffer) {
+				UpdateRotation ();
+				UpdatePosition ();
+			} else {
+				if (_parent.PositionChangedBuffer || this.PositionChanged) {
+					UpdatePosition ();
+				}
+				if (this.RotationChanged) {
+					UpdateRotation ();
+				}
+			}
+			
+		}
+		
+		public void BuildChangedValues ()
+		{
+			if (PositionChanged || RotationChanged) {
+				BuildPoints ();
+				BuildBounds ();
+			}
+			if (PositionChanged) {
+				PositionChangedBuffer = true;
+				PositionChanged = false;
+				this.SetVisualPosition = true;
+			} else {
+				PositionChangedBuffer = false;
+				this.SetVisualPosition = false;
+			}
+			
+			if (RotationChanged) {
+				
+				if (HasParent)
+					LocalRotation.Normalize ();
+				else
+					Rotation.Normalize ();
+				RotationChangedBuffer = true;
+				RotationChanged = false;
+				this.SetVisualRotation = true;
+			} else {
+				RotationChangedBuffer = false;
+				this.SetVisualRotation = false;
 
 			}
-			FutureXMin = XMin + Velocity.x * PhysicsManager.ColSpreadMul;
-			FutureXMax = XMax + Velocity.x * PhysicsManager.ColSpreadMul;
-			FutureYMin = YMin + Velocity.y * PhysicsManager.ColSpreadMul;
-			FutureYMax = YMax + Velocity.y * PhysicsManager.ColSpreadMul;
 		}
-#if UNITY_EDITOR
-		void OnDrawGizmos ()
-		{
-			if (!Application.isPlaying) return;
-			Gizmos.color = Color.white;
-			Vector3[] PolyLine;
-			LSBody body = this;
-			Vector3 TargetPosition = ((MonoBehaviour)body).transform.position;
-			//TargetPosition.y += .55f;
-			switch (body.Shape) {
-			case ColliderType.Circle:
-				LSEditorUtility.GizmoCircle (TargetPosition, FixedMath.ToFloat (body.Radius));
-				break;
-			case ColliderType.AABox:
-				PolyLine = new Vector3[] {
-					TargetPosition,
-					TargetPosition,
-					TargetPosition,
-					TargetPosition
-				};
-				float halfWidth = FixedMath.ToFloat (body.HalfWidth);
-				float halfHeight = FixedMath.ToFloat (body.HalfHeight);
-				PolyLine [0].x += halfWidth;
-				PolyLine [0].z += halfHeight;
-				PolyLine [1].x += halfWidth;
-				PolyLine [1].z -= halfHeight;
-				PolyLine [2].x -= halfWidth;
-				PolyLine [2].z -= halfHeight;
-				PolyLine [3].x -= halfWidth;
-				PolyLine [3].z += halfHeight;
-				LSEditorUtility.GizmoPolyLine (PolyLine);
-				break;
-			case ColliderType.Polygon:
-				int VertLength = body.Vertices.Length;
-				PolyLine = new Vector3[VertLength];
-				for (int i = 0; i < VertLength; i++)
-				{
-					PolyLine[i] = body.RealPoints[i].ToVector3 (TargetPosition.y);
+		private bool visualPositionReached;
+		private bool visualRotationReached;
+		private void SetVisuals () {
+
+			const bool test = false;
+			if (HasParent) {
+
+			}
+			else {
+				if (SetVisualPosition == false) {
+					if (visualPositionReached == false)
+					visualPositionReached = !(SetVisualPosition = _positionalTransform.position != visualPosition);
 				}
-				LSEditorUtility.GizmoPolyLine (PolyLine);
-				break;
+				if (SetVisualRotation == false) {
+					if (visualRotationReached == false)
+					visualRotationReached = !(SetVisualRotation = _rotationalTransform.rotation != this.visualRot);
+				}
+			}
+			if (test || this.SetVisualPosition)
+			{
+				if (HasParent) {
+					this._positionalTransform.localPosition = this.LocalPosition.rotatedLeft.ToVector3 (visualPosition.y - _parent.visualPosition.y);
+				}
+				else {
+					lastVisualPos = visualPosition;
+					visualPosition.x = _position.x.ToFloat ();
+					visualPosition.z = _position.y.ToFloat ();
+					SetPositionBuffer = true;
+					visualPositionReached = false;
+				}
+			}
+			else if (HasParent == false){
+				if (SetPositionBuffer) {
+					//_positionalTransform.position = visualPosition;
+					SetPositionBuffer = false;
+				}
+			}
+
+			if (test || this.SetVisualRotation)
+			{
+				if (HasParent) {
+					this._rotationalTransform.localRotation = Quaternion.LookRotation (this.LocalRotation.rotatedLeft.ToVector3 (0f));
+				}
+				else {
+					lastVisualRot = visualRot;
+					visualRot = Quaternion.LookRotation (Rotation.ToVector3 (0f));
+					SetRotationBuffer = true;
+					visualRotationReached = false;
+				}
+			}
+			else if (HasParent == false) {
+				if (SetRotationBuffer) {
+					//_rotationalTransform.rotation = visualRot;
+					SetRotationBuffer = false;
+				}
 			}
 		}
-#endif
-		#endregion
+
+		Vector3 lastVisualPos;
+		Quaternion lastVisualRot;
+		Quaternion visualRot = Quaternion.identity;
+		public void Visualize ()
+		{
+			if (HasParent) return;
+
+			if (SetPositionBuffer) {
+				_positionalTransform.position = Vector3.Lerp (_positionalTransform.position,
+				                                              Vector3.Lerp (lastVisualPos, visualPosition, PhysicsManager.LerpTime),
+				                                             PhysicsManager.LerpDamping);
+			}
+			
+			if (SetRotationBuffer) {
+				_rotationalTransform.rotation = Quaternion.Lerp(_rotationalTransform.rotation, Quaternion.LerpUnclamped (lastVisualRot, visualRot, PhysicsManager.LerpTime), PhysicsManager.LerpDamping * 2f);
+			}
+		}
+		public void LerpOverReset () {
+			if (HasParent) return;
+			SetPositionBuffer = false;
+			SetRotationBuffer = false;
+		}
+		
+		public void UpdateLocalPosition ()
+		{
+			if (HasParent) {
+				LocalPosition = _position - _parent._position;
+				LocalPosition.Rotate (_parent.Rotation.x, _parent.Rotation.y);
+			}
+		}
+		
+		public void UpdatePosition ()
+		{
+			if (HasParent) {
+				_position = LocalPosition;
+				_position.RotateInverse (_parent.Rotation.x, _parent.Rotation.y);
+				_position += _parent._position;
+				PositionChanged = true;
+			}
+		}
+		
+		public void UpdateRotation ()
+		{
+			if (HasParent) {
+				Rotation = LocalRotation;
+				Rotation.RotateInverse (_parent.Rotation.x, _parent.Rotation.y);
+				RotationChanged = true;
+			}
+		}
+		
+		public void UpdateLocalRotation ()
+		{
+			if (HasParent) {
+				LocalRotation = Rotation;
+				LocalRotation.Rotate (_parent.Rotation.x, _parent.Rotation.y);
+			}
+		}
+		
+		public void Rotate (long cos, long sin)
+		{
+			if (HasParent)
+				LocalRotation.Rotate (cos, sin);
+			else
+				Rotation.Rotate (cos, sin);
+			RotationChanged = true;
+		}
+		
+		public void SetRotation (long x, long y)
+		{
+			Rotation = new Vector2d (x, y);
+			RotationChanged = true;
+		}
+		
+		public Vector2d TransformDirection (Vector2d worldPos)
+		{
+			worldPos -= _position;
+			worldPos.RotateInverse (Rotation.x, Rotation.y);
+			return worldPos;
+		}
+		
+		public Vector2d InverseTransformDirection (Vector2d localPos)
+		{
+			localPos.Rotate (Rotation.x, Rotation.y);
+			localPos += _position;
+			return localPos;
+		}
+		
+		
 		public override int GetHashCode ()
 		{
 			return ID;
 		}
-	}
+		
+		public void Deactivate ()
+		{
+			Parent = null;
+			if (Children .IsNotNull ())
+			for (int i = 0; i < Children.PeakCount; i++) {
+				if (Children.arrayAllocation [i]) {
+					Children [i].Parent = null;
+				}
+			}
+            PhysicsManager.Dessimilate(this);
+		} 
 
+		public void Teleport (Vector2d destination) {
+			this._position = destination;
+			this.visualPosition = destination.ToVector3 (visualPosition.y);
+			this.lastVisualPos = visualPosition;
+			this._positionalTransform.position = visualPosition;
+		}
+		
+		public bool GetAgentAbility<T> (out T abil) where T : Ability{
+			if (Agent .IsNotNull ()) {
+				abil = Agent.GetAbility<T> ();
+				if (abil .IsNotNull ()) {
+					return true;
+				}
+			}
+			abil = null;
+			return false;
+		}
+
+        long GetCeiledSnap (long f, long snap) {
+            return (f + snap - 1) / snap * snap;
+        }
+        long GetFlooredSnap (long f, long snap) {
+            return (f / snap) * snap;
+        }
+        public void GetCoveredSnappedPositions (long snapSpacing, FastList<Vector2d> output) {
+            long referenceX = 0,
+            referenceY = 0;
+            long xmin = GetFlooredSnap (this.XMin - FixedMath.Half, snapSpacing);
+            long ymin = GetFlooredSnap (this.YMin - FixedMath.Half, snapSpacing);
+
+            long xmax = GetCeiledSnap (this.XMax + FixedMath.Half - xmin, snapSpacing) + xmin;
+            long ymax = GetCeiledSnap (this.YMax + FixedMath.Half - ymin, snapSpacing) + ymin;
+            //Used for getting snapped positions this body covered
+            for (long x = xmin; x < xmax; x+= snapSpacing) {
+                for (long y = ymin; y < ymax; y += snapSpacing) {
+                    Vector2d checkPos = new Vector2d(x,y);
+                    if (IsPositionCovered (checkPos)) {
+                        output.Add (checkPos);
+                    }
+                }
+            }
+        }
+        public bool IsPositionCovered (Vector2d position) {
+            //Checks if this body covers a position
+
+            //Different techniques for different shapes
+            switch (this.Shape) {
+                case ColliderType.Circle:
+                    long maxDistance = this.Radius + FixedMath.Half;
+                    maxDistance *= maxDistance;
+                    if ((this._position - position).FastMagnitude() > maxDistance)
+                        return false;
+                    goto case ColliderType.AABox;
+                case ColliderType.AABox:
+                    return position.x + FixedMath.Half >= this.XMin && position.x - FixedMath.Half <= this.XMax
+                        && position.y + FixedMath.Half >= this.YMin && position.y - FixedMath.Half <= this.YMax;
+                    break;
+            }
+            return false;
+        }
+        void OnDrawGizmos () {
+            switch (this.Shape) {
+                case ColliderType.Circle:
+                    Gizmos.DrawWireSphere(this._position.ToVector3(transform.position.y + .5f),this.Radius.ToFloat());
+                    break;
+            }
+        }
+	}
+	
 	public enum ColliderType : byte
 	{
 		None,
