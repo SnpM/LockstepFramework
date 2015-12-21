@@ -349,6 +349,12 @@ namespace Lockstep
             {
                 Agent.StopCast(ID);
                 RegisterGroup();
+                if (straightPath)
+                {
+                } else
+                {
+                    repathCount /= 4;
+                }
             }
         }
 
@@ -357,13 +363,7 @@ namespace Lockstep
             MoveOnGroupProcessed = moveOnProcessed;
             MovementGroupHandler.LastCreatedGroup.Add(this);
 			
-            if (straightPath)
-            {
-                repathCount /= 8;
-            } else
-            {
-                repathCount /= 4;
-            }
+
         }
 
         public void Arrive()

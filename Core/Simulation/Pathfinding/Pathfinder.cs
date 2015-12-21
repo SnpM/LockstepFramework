@@ -196,50 +196,26 @@ namespace Lockstep
 
             }
             #if true
-            oldNode = startNode;
-            currentNode = TracePath [TracePath.Count - 1];
-            oldX = currentNode.gridX - oldNode.gridX;
-            oldY = currentNode.gridY - oldNode.gridY;
-
+            oldX = 0;
+            oldY = 0;
+            currentNode = TracePath[TracePath.Count - 1];
             for (i = TracePath.Count - 2; i >= 0; i--) {
                 oldNode = currentNode;
                 currentNode = TracePath.innerArray [i];
                 newX = currentNode.gridX - oldNode.gridX;
                 newY = currentNode.gridY - oldNode.gridY;
 
-            #if false
+                #if true
                 if (newX != oldX || newY != oldY) {
 
                     outputPath.Add (oldNode);
                     oldX = newX;
                     oldY = newY;
                 }
-            #else
-            outputPath.Add (currentNode);
-            #endif
+                #else
+                outputPath.Add (currentNode);
+                #endif
             }
-            #else
-
-            oldNode = startNode;
-            currentNode = TracePath [TracePath.Count - 1];
-            oldX = currentNode.gridX - oldNode.gridX;
-            oldY = currentNode.gridY - oldNode.gridY;
-
-            for (i = TracePath.Count - 2; i >= 0; i--) {
-                oldNode = currentNode;
-                currentNode = TracePath.innerArray [i];
-                newX = currentNode.gridX - oldNode.gridX;
-                newY = currentNode.gridY - oldNode.gridY;
-
-                if (newX != oldX || newY != oldY) {
-
-                    outputPath.Add (oldNode);
-                    oldX = newX;
-                    oldY = newY;
-                }
-                //outputPath.Add (currentNode);
-            }
-            outputPath.Add (endNode);
             #endif
         }
 

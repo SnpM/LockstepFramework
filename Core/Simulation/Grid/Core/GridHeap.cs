@@ -44,7 +44,7 @@ namespace Lockstep
 	
 		public static void UpdateItem (GridNode item)
 		{
-            SortUp (item);
+            //SortUp (item);
 		}
 	
 		public static bool Contains (GridNode item)
