@@ -234,7 +234,7 @@ namespace Lockstep
 
                 for (j = -1; j <= 1; j++)
                 {
-                    if (i == 0 && j == 0)
+                    if (i == 0 && j == 0) //Don't do anything for the same node
                         continue;
                     checkY = gridY + j;
                     if (GridManager.ValidateCoordinates(checkX, checkY))
