@@ -361,7 +361,8 @@ namespace Lockstep
         public void RegisterGroup(bool moveOnProcessed = true)
         {
             MoveOnGroupProcessed = moveOnProcessed;
-            MovementGroupHandler.LastCreatedGroup.Add(this);
+            if (MovementGroupHelper.CheckValidAndAlert ())
+            MovementGroupHelper.LastCreatedGroup.Add(this);
 			
 
         }
@@ -477,6 +478,7 @@ namespace Lockstep
             {
                 if (IsMoving && CanCollisionStop)
                 {
+                    Debug.Log(this.MyMovementGroupID + ", " + otherMover.MyMovementGroupID);
                     if (otherMover.MyMovementGroupID == MyMovementGroupID)
                     {
                         if (otherMover.IsMoving == false && otherMover.Arrived && otherMover.stopTime > MinimumOtherStopTime)

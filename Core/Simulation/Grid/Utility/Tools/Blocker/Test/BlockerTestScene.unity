@@ -452,7 +452,8 @@ GameObject:
   - 114: {fileID: 2075938913}
   - 114: {fileID: 2075938912}
   - 114: {fileID: 2075938916}
-  - 114: {fileID: 2075938918}
+  - 114: {fileID: 2075938920}
+  - 114: {fileID: 2075938919}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -598,7 +599,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
---- !u!114 &2075938918
+--- !u!114 &2075938919
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -606,10 +607,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 2075938911}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6bd63e17efd3d4a0ab163adbad18defc, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d542151ddc4cc34bb08012015d24a5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Show: 1
-  LeGridType: 0
-  LeHeight: 1
-  NodeSize: 0.4
+--- !u!114 &2075938920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2075938911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 000d295d6162e4e5194b36e39cea7b07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
