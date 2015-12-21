@@ -23,7 +23,7 @@ namespace Lockstep
         public int MapHeight {get {return _mapHeight;}}
 
         [SerializeField]
-        private bool _useDiagonalConnections;
+        private bool _useDiagonalConnections = true;
         public bool UseDiagonalConnetions {get {return _useDiagonalConnections;}}
 
         protected override void OnSave()

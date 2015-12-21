@@ -33,7 +33,7 @@ namespace Lockstep {
 		public void Add (T item)
 		{
 			EnsureCapacity ();
-			innerArray [Count++] = item;
+ 			innerArray [Count++] = item;
 		}
 		
 		public T Pop ()
@@ -48,7 +48,7 @@ namespace Lockstep {
 		
 		private void EnsureCapacity ()
 		{
-            EnsureCapacity (Count);
+            EnsureCapacity (Count + 1);
 		}
         public void EnsureCapacity (int min) {
             if (Capacity < min) {

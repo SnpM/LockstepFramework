@@ -183,6 +183,7 @@ namespace Lockstep
 		}
 
         private static void DestinationReached () {
+            
             outputPath.FastClear ();
             TracePath.FastClear ();
 
@@ -193,7 +194,32 @@ namespace Lockstep
                 TracePath.Add (currentNode);
                 oldNode = currentNode;
                 currentNode = currentNode.parent;
+
             }
+            #if true
+            oldNode = startNode;
+            currentNode = TracePath [TracePath.Count - 1];
+            oldX = currentNode.gridX - oldNode.gridX;
+            oldY = currentNode.gridY - oldNode.gridY;
+
+            for (i = TracePath.Count - 2; i >= 0; i--) {
+                oldNode = currentNode;
+                currentNode = TracePath.innerArray [i];
+                newX = currentNode.gridX - oldNode.gridX;
+                newY = currentNode.gridY - oldNode.gridY;
+
+            #if false
+                if (newX != oldX || newY != oldY) {
+
+                    outputPath.Add (oldNode);
+                    oldX = newX;
+                    oldY = newY;
+                }
+            #else
+            outputPath.Add (currentNode);
+            #endif
+            }
+            #else
 
             oldNode = startNode;
             currentNode = TracePath [TracePath.Count - 1];
@@ -215,6 +241,7 @@ namespace Lockstep
                 //outputPath.Add (currentNode);
             }
             outputPath.Add (endNode);
+            #endif
         }
 
 		public static bool NeedsPath (GridNode startNode, GridNode endNode, int unitSize)

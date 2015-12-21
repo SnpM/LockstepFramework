@@ -180,6 +180,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 822347815}
   - 114: {fileID: 822347814}
+  - 114: {fileID: 822347816}
   m_Layer: 0
   m_Name: Saver
   m_TagString: Untagged
@@ -220,6 +221,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
+--- !u!114 &822347816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 822347813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 541180206f00c4698ba970e811b88d73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapCenter:
+    x: 0
+    y: 0
+  _mapWidth: 100
+  _mapHeight: 100
+  _useDiagonalConnections: 1
+  Show: 0
 --- !u!1 &1402651888
 GameObject:
   m_ObjectHideFlags: 0
@@ -313,8 +332,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _blockPathfinding: 1
-  _blockFlying: 0
-  _blockSight: 0
 --- !u!114 &1549629538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -327,7 +344,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visualPosition: {x: 0, y: 0, z: 0}
-  Position:
+  _position:
     x: -732692
     y: 627179
   SetPositionBuffer: 0
@@ -553,6 +570,7 @@ MonoBehaviour:
   _saverObject: {fileID: 822347813}
   _savers:
   - {fileID: 822347814}
+  - {fileID: 822347816}
 --- !u!114 &2075938916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -566,7 +584,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _helpers: []
   _spawnCode: TestAgent
-  _spawnAmount: 2
+  _spawnAmount: 30
 --- !u!4 &2075938917
 Transform:
   m_ObjectHideFlags: 0

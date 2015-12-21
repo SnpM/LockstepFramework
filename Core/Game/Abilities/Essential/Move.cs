@@ -254,9 +254,11 @@ namespace Lockstep
                     {
                         if (pathIndex >= myPath.Count)
                         {
-                            pathIndex = myPath.Count - 1;
+                            targetPos = this.Destination;
                         }
-                        targetPos = myPath [pathIndex];
+                        else {
+                            targetPos = myPath [pathIndex];
+                        }
                     } else
                     {
                         targetPos = Destination;
@@ -504,6 +506,7 @@ namespace Lockstep
                 const float height = 0f;   
                 for (int i = 1; i < myPath.Count; i++)
                 {
+                    UnityEditor.Handles.Label(myPath[i - 1].ToVector3(height), i.ToString());
                     Gizmos.DrawLine(myPath[i - 1].ToVector3(height), myPath[i].ToVector3(height));
                 }
             }
