@@ -49,7 +49,7 @@ namespace Lockstep
 
                 if (attributes != null && attributes.Length > 0) {
                     Type propType = info.PropertyType;
-                    if (!propType.IsArray)
+                    if (propType.IsArray)
                     {
                         //Currently arrays can't be tracked
                         Debug.LogErrorFormat ("'{0}' of type '{1}' cannot be tracked since it's an array.", info, propType);
