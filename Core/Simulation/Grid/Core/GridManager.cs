@@ -26,6 +26,15 @@ namespace Lockstep
 		public const int SqrScanResolution = ScanResolution * ScanResolution;
         public static long OffsetX {get; private set;}
         public static long OffsetY {get; private set;}
+        private static bool _useDiagonalConnections = true;
+        public static bool UseDiagnalConnections {
+            get {
+                return _useDiagonalConnections;
+            }
+            set {
+                _useDiagonalConnections = value;
+            }
+        }
 
         private static bool _settingsChanged = true;
 

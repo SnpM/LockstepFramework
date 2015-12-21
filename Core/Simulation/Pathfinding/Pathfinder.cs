@@ -147,7 +147,7 @@ namespace Lockstep
 						continue;
 					}
 
-					newMovementCostToNeighbor = currentNode.gCost + (GridNode.IsNeighborDiagnal [i] ? 141 : 100);
+					newMovementCostToNeighbor = currentNode.gCost + (i >= 4 ? 141 : 100);
 
 					if (!GridHeap.Contains (neighbor)) {
 						neighbor.gCost = newMovementCostToNeighbor;
