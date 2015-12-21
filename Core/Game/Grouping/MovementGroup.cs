@@ -1,4 +1,5 @@
-﻿namespace Lockstep {
+﻿using UnityEngine;
+namespace Lockstep {
 public class MovementGroup
 {       
     const int MinGroupSize = 3;
