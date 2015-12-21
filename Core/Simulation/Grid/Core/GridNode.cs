@@ -243,7 +243,7 @@ namespace Lockstep
                         if ((i != 0 && j != 0)) 
                         {
                             //Diagonal
-                            if (GridManager.UseDiagnalConnections) {
+                            if (GridManager.UseDiagonalConnections) {
                                 neighborIndex = diagonalIndex++;
                             }
                             else

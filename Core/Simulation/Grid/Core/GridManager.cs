@@ -27,7 +27,7 @@ namespace Lockstep
         public static long OffsetX {get; private set;}
         public static long OffsetY {get; private set;}
         private static bool _useDiagonalConnections = true;
-        public static bool UseDiagnalConnections {
+        public static bool UseDiagonalConnections {
             get {
                 return _useDiagonalConnections;
             }
@@ -58,8 +58,7 @@ namespace Lockstep
 
         private static FastStack<GridNode> CachedGridNodes = new FastStack<GridNode> (GridManager.DefaultCapacity);
         private static FastStack<ScanNode> CachedScanNodes = new FastStack<ScanNode> (GridManager.DefaultCapacity);
-		private static void Generate ()
-		{
+        static void ApplySettings () {
             Width = Settings.Width;
             Height = Settings.Height;
             ScanHeight = Height / ScanResolution;
@@ -69,6 +68,11 @@ namespace Lockstep
             OffsetY = Settings.YOffset;
 
             ScanGridSize = ScanHeight * ScanWidth;
+            UseDiagonalConnections = Settings.UseDiagonalConnections;
+        }
+		private static void Generate ()
+		{
+
 
 
         #region Pooling; no need to create all those nodes again
@@ -127,7 +131,7 @@ namespace Lockstep
             if (_settingsChanged) {
                 if (_settings == null)
                     _settings = DefaultSettings;
-
+                ApplySettings ();
 
                 Generate ();
 

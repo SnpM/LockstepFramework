@@ -146,8 +146,18 @@ namespace Lockstep
                     if (neighbor.IsNull() || currentNode.Unpassable() || GridClosedSet.Contains (neighbor)) {
 						continue;
 					}
-
-					newMovementCostToNeighbor = currentNode.gCost + (i >= 4 ? 141 : 100);
+                    //0-3 = sides, 4-7 = diagonals
+                    if (i < 4) {
+                        newMovementCostToNeighbor = currentNode.gCost + 100;
+                    }
+                    else {
+                        if (GridManager.UseDiagonalConnections) {
+                            newMovementCostToNeighbor = currentNode.gCost + 141;
+                        }
+                        else {
+                            break;
+                        }
+                    }
 
 					if (!GridHeap.Contains (neighbor)) {
 						neighbor.gCost = newMovementCostToNeighbor;
