@@ -202,6 +202,7 @@ namespace Lockstep {
 		public float SelectionRadiusSquared {get; private set;}
 
         public AgentInterfacer Interfacer {get; private set;}
+        private readonly FastList<int> TrackedLockstepTickets = new FastList<int>();
 
         void Awake () {
             gameObject.SetActive(false);
@@ -241,6 +242,29 @@ namespace Lockstep {
 			SelectionRadiusSquared = _selectionRadius * _selectionRadius;
             if (StatsBarer != null)
 			StatsBarer.Setup (this);
+
+            this.RegisterLockstep();
+        }
+        private void RegisterLockstep () {
+            TrackedLockstepTickets.Add (LSVariableManager.Register(this.Body));
+            foreach (Ability abil in this.abilityManager.Abilitys) {
+                TrackedLockstepTickets.Add(LSVariableManager.Register(abil));
+            }
+        }
+        public IEnumerable<LSVariable> GetDesyncs (int[] compare) {
+            int position = 0;
+            foreach (int ticket in this.TrackedLockstepTickets) {
+                LSVariableContainer container = LSVariableManager.GetContainer(ticket);
+                int[] hashes = container.GetCompareHashes();
+                for (int i = 0; i < hashes.Length; i++) {
+                    if (compare[i] != hashes[position]) {
+                        yield return container.Variables[i];
+                    }
+                    position++;
+                }
+
+
+            }
         }
 
 		public void SessionReset () {

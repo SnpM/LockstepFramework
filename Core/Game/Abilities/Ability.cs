@@ -26,6 +26,7 @@ namespace Lockstep {
 		public int ID {get; private set;}
 		public Transform CachedTransform {get {return Agent.CachedTransform;}}
 		public GameObject CachedGameObject {get {return Agent.CachedGameObject;}}
+        public int LSVariableContainerTicket {get; private set;}
 
         public bool IsCasting {
             get {
@@ -44,6 +45,7 @@ namespace Lockstep {
         }
 
 
+
         public void Setup(LSAgent agent, int id) {
             System.Type mainType = this.GetType();
 
@@ -59,6 +61,7 @@ namespace Lockstep {
 			ID = id;
 			TemplateSetup ();
             OnSetup();
+            this.LSVariableContainerTicket = LSVariableManager.Register(this);
         }
 
 		protected virtual void TemplateSetup () {

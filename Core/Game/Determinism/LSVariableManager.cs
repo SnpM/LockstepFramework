@@ -22,7 +22,7 @@ namespace Lockstep
             LSVariableContainer container;
             if (!CachedLockstepPropertyNames.TryGetValue(type, out propertyNames)) {
                 bufferPropertyNames.FastClear();
-                container = new LSVariableContainer(GetVariables (type.GetProperties((BindingFlags)~0)));
+                container = new LSVariableContainer(GetVariables (type));
                 foreach (LSVariable info in container.Variables) {
                     bufferPropertyNames.Add(info.Info.Name);
                 }
@@ -34,14 +34,28 @@ namespace Lockstep
             return Containers.Add(container);
         }
         private static IEnumerable <LSVariable> GetVariables (Type type, string[] propertyNames) {
+            //Getting target variables with cache
             foreach (string name in propertyNames) {
                 yield return new LSVariable(type.GetProperty(name));
             }
         }
-        private static IEnumerable<LSVariable> GetVariables (PropertyInfo[] allProperties) {
-            foreach (PropertyInfo info in allProperties) {
+
+        private static IEnumerable<LSVariable> GetVariables (Type type) {
+            foreach (PropertyInfo info in type.GetProperties((BindingFlags)~0)) {
+                //Make sure the type is something we can work with
+
+                //Getting vars without cache
                 object[] attributes = info.GetCustomAttributes(typeof (LockstepAttribute), true);
+
                 if (attributes != null && attributes.Length > 0) {
+                    Type propType = info.PropertyType;
+                    if (!propType.IsArray)
+                    {
+                        //Currently arrays can't be tracked
+                        Debug.LogErrorFormat ("'{0}' of type '{1}' cannot be tracked since it's an array.", info, propType);
+                        continue;
+                    }
+
                     yield return new LSVariable(info);
                 }
             }

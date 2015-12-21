@@ -12,8 +12,8 @@ namespace Lockstep {
 		public Turn Turner {get; private set;}
 		public EnergyStore EnergyStorer {get; private set;}
 
-        private Ability[] Abilitys;
-        private ActiveAbility[] ActiveAbilitys;
+        public Ability[] Abilitys {get; private set;}
+        public ActiveAbility[] ActiveAbilitys {get; private set;}
 		public readonly FastList<AbilityInterfacer> Interfacers = new FastList<AbilityInterfacer>();
 
         public void Setup(LSAgent agent) {

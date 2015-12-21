@@ -11,12 +11,14 @@ namespace Lockstep
         //Must be PropertyInfo for PropertyInfo .Get[Get/Set]Method ()
         public LSVariable(PropertyInfo info)
         {
+            
             this.Info = info;
-            //For the Value property... more accessbility
+            //For the Value property... easier accessbility
             _getValue = (Func<object>)Delegate.CreateDelegate(typeof (Func<object>),info.GetGetMethod());
-            _setValue = (Action<object>)Delegate.CreateDelegate(typeof (Action<object>),info.GetSetMethod());
 
-            //Sets the base value fore resetting
+
+            _setValue = (Action<object>)Delegate.CreateDelegate(typeof (Action<object>),info.GetSetMethod());
+            //Sets the base value for resetting
             this._baseValue = this.Value;
         }
 
