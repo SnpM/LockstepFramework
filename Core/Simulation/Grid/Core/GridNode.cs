@@ -268,24 +268,12 @@ namespace Lockstep
 
         public void CalculateHeuristic()
         {
-            /*
+            
 			//Euclidian
 			dstX = HeuristicTargetX - gridX;
 			dstY = HeuristicTargetY - gridY;
 			hCost = (dstX * dstX + dstY * dstY);
-			/*if (hCost > 1) {
 
-				n = (hCost / 2) + 1;
-				n1 = (n + (hCost / n)) / 2;  
-				while (n1 < n) {
-					n = n1;  
-					n1 = (n + (hCost / n)) / 2;  
-				}
-				hCost = n;
-			}
-
-			fCost = gCost + hCost;
-*/
 			
             /*
 			if (gridX > HeuristicTargetX)
@@ -301,6 +289,7 @@ namespace Lockstep
 			fCost = gCost + hCost;
 			*/
 			
+            /*
             if (gridX > HeuristicTargetX)
                 dstX = gridX - HeuristicTargetX;
             else
@@ -315,6 +304,7 @@ namespace Lockstep
                 this.hCost = dstY * 141 + (dstX - dstY) * 100;
             else
                 this.hCost = dstX * 141 + (dstY - dstX) * 100;
+            */
             fCost = gCost + hCost;
 			
         }
