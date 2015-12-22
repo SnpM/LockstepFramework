@@ -2,7 +2,9 @@ Lockstep Framework
 ------------------------
 The Lockstep Framework (LSF) is a framework designed for games that especially need lockstep simulations. It includes a deterministic 2D physics engine, pathfinding, behavior system, and more. LSF is integrated with Unity.
 
-Under development by [John Pan](https://github.com/SnpM).
+Special thanks to Liv Games for supporting the development of Lockstep Framework.
+
+Under development by [John Pan](https://github.com/SnpM) and Lam Pham (https://github.com/LamPham).
 
 Features
 ________
