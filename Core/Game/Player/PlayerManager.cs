@@ -29,9 +29,7 @@ namespace Lockstep {
 			AgentControllers.FastClear();
 			selectionSetting = selSetting;
 
-			OrderMarker =
-                instance._orderMarker != null ? GameObject.Instantiate (instance._orderMarker).GetComponent<Marker> ():
-                GameObject.CreatePrimitive(PrimitiveType.Cube).AddComponent<Marker> ();
+            OrderMarker = null;
 
 			InterfaceManager.Initialize ();
 		}
