@@ -26,8 +26,11 @@ namespace Lockstep {
 		public int ID {get; private set;}
 		public Transform CachedTransform {get {return Agent.CachedTransform;}}
 		public GameObject CachedGameObject {get {return Agent.CachedGameObject;}}
-        public int LSVariableContainerTicket {get; private set;}
+        public int VariableContainerTicket {get; private set;}
 
+        private LSVariableContainer _variableContainer;
+        public LSVariableContainer VariableContainer {get {return _variableContainer;}}
+                
         public bool IsCasting {
             get {
 				return isCasting;
@@ -46,7 +49,7 @@ namespace Lockstep {
 
 
 
-        public void Setup(LSAgent agent, int id) {
+        internal void Setup(LSAgent agent, int id) {
             System.Type mainType = this.GetType();
 
             while (mainType.BaseType != typeof (Ability) && mainType.BaseType != typeof (ActiveAbility)) {
@@ -61,7 +64,8 @@ namespace Lockstep {
 			ID = id;
 			TemplateSetup ();
             OnSetup();
-            this.LSVariableContainerTicket = LSVariableManager.Register(this);
+            this.VariableContainerTicket = LSVariableManager.Register(this);
+            this._variableContainer = LSVariableManager.GetContainer(VariableContainerTicket);
         }
 
 		protected virtual void TemplateSetup () {
@@ -70,14 +74,15 @@ namespace Lockstep {
 
         protected virtual void OnSetup() {}
 
-        public void Initialize() {
+        internal void Initialize() {
+            VariableContainer.Reset();
             IsCasting = false;
             OnInitialize();
         }
 
         protected virtual void OnInitialize() {}
 
-        public void Simulate() {
+        internal void Simulate() {
             OnSimulate();
             if (isCasting) {
                 OnCast();
@@ -85,7 +90,7 @@ namespace Lockstep {
         }
         protected virtual void OnSimulate() {}
 
-		public void LateSimulate () {
+		internal void LateSimulate () {
 			OnLateSimulate ();
 		}
 		protected virtual void OnLateSimulate () {
@@ -94,7 +99,7 @@ namespace Lockstep {
 
         protected virtual void OnCast() {}
 
-        public void Visualize() {
+        internal void Visualize() {
             OnVisualize();
         }
 

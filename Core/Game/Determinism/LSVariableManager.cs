@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Linq;
 namespace Lockstep
 {
     public static class LSVariableManager
@@ -56,7 +57,7 @@ namespace Lockstep
                         continue;
                     }
 
-                    yield return new LSVariable(info);
+                    yield return new LSVariable(info, attributes.FirstOrDefault() as LockstepAttribute);
                 }
             }
         }

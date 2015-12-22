@@ -500,9 +500,13 @@ namespace Lockstep
 			if (HasParent) return;
 
 			if (SetPositionBuffer) {
+                //Interpolates between the current position and the interpolation between the last lockstep position and the current lockstep position
+                //LerpTime = time passed since last simulation frame
+                //LerpDamping = special value calculated based on Time.deltaTime for the extra layer of interpolation
 				_positionalTransform.position = Vector3.Lerp (_positionalTransform.position,
 				                                              Vector3.Lerp (lastVisualPos, visualPosition, PhysicsManager.LerpTime),
 				                                             PhysicsManager.LerpDamping);
+                
 			}
 			
 			if (SetRotationBuffer) {
