@@ -2,11 +2,11 @@
 using System.Collections;
 using Lockstep;
 
+//Blocker for static environment pieces in a scene.
 [RequireComponent (typeof (LSBody))]
 public class Blocker : EnvironmentObject
 {
     static readonly FastList<Vector2d> bufferCoordinates = new FastList<Vector2d>();
-
 
     [SerializeField]
     private bool _blockPathfinding;
