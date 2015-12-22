@@ -146,8 +146,17 @@ namespace Lockstep
                     if (neighbor.IsNull() || currentNode.Unpassable() || GridClosedSet.Contains (neighbor)) {
 						continue;
 					}
-
-					newMovementCostToNeighbor = currentNode.gCost + (GridNode.IsNeighborDiagnal [i] ? 141 : 100);
+                    //0-3 = sides, 4-7 = diagonals
+                    if (i < 4) {
+                        newMovementCostToNeighbor = currentNode.gCost + 100;
+                    }
+                    else {
+                        if (i == 4) {
+                            if (!GridManager.UseDiagonalConnections)
+                                break;
+                        }
+                        newMovementCostToNeighbor = currentNode.gCost + 141;
+                    }
 
 					if (!GridHeap.Contains (neighbor)) {
 						neighbor.gCost = newMovementCostToNeighbor;
@@ -173,6 +182,7 @@ namespace Lockstep
 		}
 
         private static void DestinationReached () {
+            
             outputPath.FastClear ();
             TracePath.FastClear ();
 
@@ -183,28 +193,30 @@ namespace Lockstep
                 TracePath.Add (currentNode);
                 oldNode = currentNode;
                 currentNode = currentNode.parent;
+
             }
-
-            oldNode = startNode;
-            currentNode = TracePath [TracePath.Count - 1];
-            oldX = currentNode.gridX - oldNode.gridX;
-            oldY = currentNode.gridY - oldNode.gridY;
-
+            #if true
+            oldX = 0;
+            oldY = 0;
+            currentNode = TracePath[TracePath.Count - 1];
             for (i = TracePath.Count - 2; i >= 0; i--) {
                 oldNode = currentNode;
                 currentNode = TracePath.innerArray [i];
                 newX = currentNode.gridX - oldNode.gridX;
                 newY = currentNode.gridY - oldNode.gridY;
 
+                #if true
                 if (newX != oldX || newY != oldY) {
 
                     outputPath.Add (oldNode);
                     oldX = newX;
                     oldY = newY;
                 }
-                //outputPath.Add (currentNode);
+                #else
+                outputPath.Add (currentNode);
+                #endif
             }
-            outputPath.Add (endNode);
+            #endif
         }
 
 		public static bool NeedsPath (GridNode startNode, GridNode endNode, int unitSize)

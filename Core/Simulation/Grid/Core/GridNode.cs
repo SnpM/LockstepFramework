@@ -86,7 +86,7 @@ namespace Lockstep
         {
             get
             {
-                return _gCost + Weight;
+                return _gCost;
             }
             set
             {
@@ -193,13 +193,14 @@ namespace Lockstep
             return false;
         }
 
+        GridNode _node;
         public bool UnpassableMedium()
         {
             for (_i = 0; _i < 8; i++)
             {
-                GridNode node = NeighborNodes [_i];
-                if (node != null)
-                if (node._unwalkable)
+                _node = NeighborNodes [_i];
+                if (_node != null)
+                if (_node._unwalkable)
                     return true;
             }
             return false;
@@ -217,66 +218,49 @@ namespace Lockstep
             return false;
         }
 
-        public int Weight;
         public GridNode[] NeighborNodes = new GridNode[8];
         public Vector2d WorldPos;
-        public static readonly bool[] IsNeighborDiagnal = new bool[]
-        {
-            true,
-            false,
-            true,
-            false,
-            false,
-            true,
-            false,
-            true
-        };
 
         private void GenerateNeighbors()
         {
+            //0-3 = sides, 4-7 = diagonals
+
+            int sideIndex = 0;
+            int diagonalIndex = 4; //I learned how to spell [s]diagnal[/s] diagonal!!!
+
             for (i = -1; i <= 1; i++)
             {
                 checkX = gridX + i;
 
                 for (j = -1; j <= 1; j++)
                 {
-                    if (i == 0 && j == 0)
+                    if (i == 0 && j == 0) //Don't do anything for the same node
                         continue;
-                    //if ((i != 0 && j != 0)) continue; //Disables diagnal connections 
                     checkY = gridY + j;
                     if (GridManager.ValidateCoordinates(checkX, checkY))
                     {
-                        
+                        int neighborIndex;
+                        if ((i != 0 && j != 0)) 
+                        {
+                            //Diagonal
+                            if (GridManager.UseDiagonalConnections) {
+                                neighborIndex = diagonalIndex++;
+                            }
+                            else
+                            continue;
+                        }
+                        else {
+                            neighborIndex = sideIndex++;
+                        }
                         GridNode checkNode = GridManager.Grid [GridManager.GetGridIndex(checkX, checkY)];
-                        NeighborNodes [GetNeighborIndex(i, j)] = checkNode;
+                        NeighborNodes [neighborIndex] = checkNode;
                     }
                 }
             }
 			
 			
         }
-
-        public static int GetNeighborIndex(int _i, int _j)
-        {
-            /*
-			if (_j == 0) {
-				if (_i == -1)
-					leIndex = 0;
-				else
-					leIndex = 3;
-			} else {
-				if (_j == -1)
-					leIndex = 1;
-				else
-					leIndex = 2;
-			}*/
-            leIndex = (_i + 1) * 3 + (_j + 1);
-            if (leIndex > 3)
-                leIndex--;
-            return leIndex;
-        }
-
-		
+            
         static int dstX;
         static int dstY;
         public static int HeuristicTargetX;
@@ -284,24 +268,12 @@ namespace Lockstep
 
         public void CalculateHeuristic()
         {
-            /*
+            
 			//Euclidian
 			dstX = HeuristicTargetX - gridX;
 			dstY = HeuristicTargetY - gridY;
 			hCost = (dstX * dstX + dstY * dstY);
-			/*if (hCost > 1) {
 
-				n = (hCost / 2) + 1;
-				n1 = (n + (hCost / n)) / 2;  
-				while (n1 < n) {
-					n = n1;  
-					n1 = (n + (hCost / n)) / 2;  
-				}
-				hCost = n;
-			}
-
-			fCost = gCost + hCost;
-*/
 			
             /*
 			if (gridX > HeuristicTargetX)
@@ -317,6 +289,7 @@ namespace Lockstep
 			fCost = gCost + hCost;
 			*/
 			
+            /*
             if (gridX > HeuristicTargetX)
                 dstX = gridX - HeuristicTargetX;
             else
@@ -331,6 +304,7 @@ namespace Lockstep
                 this.hCost = dstY * 141 + (dstX - dstY) * 100;
             else
                 this.hCost = dstX * 141 + (dstY - dstX) * 100;
+            */
             fCost = gCost + hCost;
 			
         }
@@ -345,17 +319,14 @@ namespace Lockstep
         public int ScanY { get { return LinkedScanNode.Y; } }
 
         public ScanNode LinkedScanNode;
-        const int weightPerUnit = 100;
 
         public void Add(LSInfluencer influencer)
         {
-            //Weight += weightPerUnit;
             LinkedScanNode.Add(influencer);
         }
 
         public void Remove(LSInfluencer influencer)
         {
-            //Weight -= weightPerUnit;
             LinkedScanNode.Remove(influencer);
         }
 

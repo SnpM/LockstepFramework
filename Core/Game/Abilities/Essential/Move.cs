@@ -254,9 +254,11 @@ namespace Lockstep
                     {
                         if (pathIndex >= myPath.Count)
                         {
-                            pathIndex = myPath.Count - 1;
+                            targetPos = this.Destination;
                         }
-                        targetPos = myPath [pathIndex];
+                        else {
+                            targetPos = myPath [pathIndex];
+                        }
                     } else
                     {
                         targetPos = Destination;
@@ -347,21 +349,22 @@ namespace Lockstep
             {
                 Agent.StopCast(ID);
                 RegisterGroup();
+                if (straightPath)
+                {
+                } else
+                {
+                    repathCount /= 4;
+                }
             }
         }
 
         public void RegisterGroup(bool moveOnProcessed = true)
         {
             MoveOnGroupProcessed = moveOnProcessed;
-            MovementGroupHandler.LastCreatedGroup.Add(this);
+            if (MovementGroupHelper.CheckValidAndAlert ())
+            MovementGroupHelper.LastCreatedGroup.Add(this);
 			
-            if (straightPath)
-            {
-                repathCount /= 8;
-            } else
-            {
-                repathCount /= 4;
-            }
+
         }
 
         public void Arrive()
@@ -475,6 +478,7 @@ namespace Lockstep
             {
                 if (IsMoving && CanCollisionStop)
                 {
+                    Debug.Log(this.MyMovementGroupID + ", " + otherMover.MyMovementGroupID);
                     if (otherMover.MyMovementGroupID == MyMovementGroupID)
                     {
                         if (otherMover.IsMoving == false && otherMover.Arrived && otherMover.stopTime > MinimumOtherStopTime)
@@ -504,6 +508,7 @@ namespace Lockstep
                 const float height = 0f;   
                 for (int i = 1; i < myPath.Count; i++)
                 {
+                    UnityEditor.Handles.Label(myPath[i - 1].ToVector3(height), i.ToString());
                     Gizmos.DrawLine(myPath[i - 1].ToVector3(height), myPath[i].ToVector3(height));
                 }
             }

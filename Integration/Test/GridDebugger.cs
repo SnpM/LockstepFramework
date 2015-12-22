@@ -35,7 +35,7 @@ namespace Lockstep
                     //Color depends on whether or not the node is walkable
                     //Red = Unwalkable, Green = Walkable
                     if (node.Unwalkable) Gizmos.color = Color.red;
-                    else Gizmos.color = Color.gray;
+                    else Gizmos.color = Color.green; //I'm part colorblind... grey doesn't work very well with red
                     Gizmos.DrawCube(node.WorldPos.ToVector3(LeHeight),nodeScale);
 
             }

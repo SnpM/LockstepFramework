@@ -3,7 +3,7 @@ using System.Collections;
 using Lockstep.Data;
 namespace Lockstep
 {
-	public class ScanGroupHandler : BehaviourHelper
+	public class ScanGroupHelper : BehaviourHelper
 	{
 		public override InputCode ListenInput {
 			get {
@@ -13,7 +13,7 @@ namespace Lockstep
 
 		protected override void OnExecute (Lockstep.Command com)
 		{
-			MovementGroupHandler.Execute (com);
+			MovementGroupHelper.Execute (com);
 		}
 	}
 }

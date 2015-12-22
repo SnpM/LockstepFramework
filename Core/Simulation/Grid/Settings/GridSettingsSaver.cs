@@ -22,13 +22,17 @@ namespace Lockstep
         private int _mapHeight = 100;
         public int MapHeight {get {return _mapHeight;}}
 
+        [SerializeField]
+        private bool _useDiagonalConnections = true;
+        public bool UseDiagonalConnetions {get {return _useDiagonalConnections;}}
+
         protected override void OnSave()
         {
             this._mapCenter = new Vector2d(transform.position);
         }
         protected override void OnApply()
         {
-            GridManager.Settings = new GridSettings(this.MapWidth,this.MapHeight,this.Offset.x,this.Offset.y);
+            GridManager.Settings = new GridSettings(this.MapWidth,this.MapHeight,this.Offset.x,this.Offset.y, this.UseDiagonalConnetions);
         }
 
         #if UNITY_EDITOR

@@ -247,7 +247,7 @@ namespace Lockstep
             UpdateDiplomacy(this);
 
             InstanceManagers.Add(this);
-            DiplomacyFlags [ControllerID] = AllegianceType.Friendly;
+            this.SetAllegiance(this,AllegianceType.Friendly);
         }
             
         public void AddToSelection(LSAgent agent)

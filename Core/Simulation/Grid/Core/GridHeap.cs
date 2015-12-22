@@ -1,9 +1,4 @@
-﻿//=======================================================================
-// Copyright (c) 2015 John Pan
-// Distributed under the MIT License.
-// (See accompanying file LICENSE or copy at
-// http://opensource.org/licenses/MIT)
-//=======================================================================
+﻿//Thanks to Sebastian Lague's tutorial: https://www.youtube.com/watch?v=3Dw5d7PlcTM
 
 using UnityEngine;
 using System.Collections;
@@ -34,20 +29,22 @@ namespace Lockstep
             }
         }
 		static GridNode curNode;
-	
+        static GridNode newNode;
 		public static GridNode RemoveFirst ()
 		{
 			curNode = items [0];
-			items [0] = items [--Count];
-			items [0].HeapIndex = 0;
-			SortDown (items [0]);
+            newNode = items[--Count];
+            items [0] = newNode;;
+			newNode.HeapIndex = 0;
+			SortDown (newNode);
+
 			curNode.HeapVersion--;
 			return curNode;
 		}
 	
 		public static void UpdateItem (GridNode item)
 		{
-			SortDown (item);
+            //SortUp (item);
 		}
 	
 		public static bool Contains (GridNode item)
@@ -84,14 +81,7 @@ namespace Lockstep
 					}
 				
 					swapNode = items[swapIndex];
-					if (item.fCost == swapNode.fCost)
-					{
-						if (item.hCost > swapNode.hCost)
-							Swap (item, swapNode);
-						else
-							return;
-					}
-					else if(item.fCost > swapNode.fCost) {
+					if(item.fCost > swapNode.fCost) {
 						Swap (item, swapNode);
 					} else {
 						return;
@@ -106,25 +96,19 @@ namespace Lockstep
 		static uint parentIndex;
 		static void SortUp (GridNode item)
 		{
-			if (parentIndex != 0)
+            if (item.HeapIndex == 0) return;
 			parentIndex = (item.HeapIndex-1) / 2;
 		
 			while (true) {
 				curNode = items [parentIndex];
-				if (item.fCost == curNode.fCost)
-				{
-					if (item.hCost < curNode.hCost)
-						Swap (item,curNode);
-					else
-						return;
-				}
-				else if(item.fCost < curNode.fCost) {
+                if(item.fCost < curNode.fCost) {
 					Swap (item, curNode);
 				} else {
-					break;
+					return;
 				}
-				if (parentIndex != 0)
-				parentIndex = (item.HeapIndex - 1) / 2;
+                if (parentIndex == 0)
+                    return;
+                parentIndex = (item.HeapIndex - 1) / 2;
 			}
 		}
 	
