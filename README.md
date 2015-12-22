@@ -8,13 +8,13 @@ Under development by [John Pan](https://github.com/SnpM) and Lam Pham (https://g
 
 Features
 ________
-- Deterministic 2D physics engine
+- Deterministic math library and simulation logic
+- 2D physics engine on the X-Z plane.
 - Behaviour system for both individual agents and globally
 - Lockstep variables - know when and where desyncs happen
-- Size-based pathfinding (big units won't go through those narrow gaps)
+- Size-based pathfinding (big units won't get stuck in those narrow gaps)
 - Customizable database system
 - Support for Forge Networking (DarkRift and Photon coming soon)
-- More stuff I can't remember cuz braindead right now
 
 Quick Setup
 -----------
