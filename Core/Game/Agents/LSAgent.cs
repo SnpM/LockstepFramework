@@ -21,7 +21,7 @@ namespace Lockstep {
     public class LSAgent : CerealBehaviour, IMousable {
 
         Vector3 IMousable.WorldPosition {
-            get {return this.Body.visualPosition;}
+            get {return this.Body._visualPosition;}
         }
         float IMousable.MousableRadius {
             get {return this.SelectionRadius;}
@@ -432,7 +432,7 @@ namespace Lockstep {
             hash ^= this.GlobalID;
             hash ^= this.LocalID;
             hash ^= this.Body._position.GetStateHash ();
-            hash ^= this.Body.Rotation.GetStateHash ();
+            hash ^= this.Body._rotation.GetStateHash ();
             hash ^= this.Body.Velocity.GetStateHash ();
             return hash;
         }
@@ -442,7 +442,7 @@ namespace Lockstep {
 			agent.Body.Parent = this.Body;
 			agent.Body.LocalPosition = localPos;
 			agent.Body.LocalRotation = Vector2d.up.rotatedRight;
-			agent.Body.visualPosition.y = localHeight + this.Body.LocalPosition.y;
+            agent.Body._visualPosition.y = localHeight + this.Body.LocalPosition.y;
 			agent.Body.UpdatePosition ();
 			agent.Body.UpdateRotation();
 			agent.Body.BuildChangedValues ();

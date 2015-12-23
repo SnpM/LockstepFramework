@@ -199,8 +199,8 @@ namespace Lockstep
                 //cachedTurn.StartTurn(targetDirection / mag);
                 bool withinTurn = TrackAttackAngle == false ||
                     (fastMag != 0 &&
-                     cachedBody.Rotation.Dot(targetDirection.x, targetDirection.y) > 0
-                     && cachedBody.Rotation.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
+                        cachedBody._rotation.Dot(targetDirection.x, targetDirection.y) > 0
+                        && cachedBody._rotation.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
                 bool needTurn = mag != 0 && !withinTurn;
                 if (needTurn)
                 {
@@ -451,7 +451,7 @@ namespace Lockstep
             _projectileOffset = new Vector2dHeight(base.transform.InverseTransformPoint (_projectileOrigin));
         }
         void OnDrawGizmos () {
-            Gizmos.DrawWireSphere (Application.isPlaying ? Agent.Body.visualPosition : this.transform.position,this.Range.ToFloat()); 
+            Gizmos.DrawWireSphere (Application.isPlaying ? Agent.Body._visualPosition : this.transform.position,this.Range.ToFloat()); 
         }
 #endif
     }

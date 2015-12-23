@@ -9,24 +9,26 @@ namespace Lockstep
     public sealed class LSVariable
     {
 
-        public LSVariable (PropertyInfo info) {
-            Init (info, info.GetCustomAttributes(typeof (LockstepAttribute), true).FirstOrDefault() as LockstepAttribute);
+        public LSVariable (object lockstepObject, PropertyInfo info) {
+            Init (lockstepObject, info, info.GetCustomAttributes(typeof (LockstepAttribute), true).FirstOrDefault() as LockstepAttribute);
         }
 
-        public LSVariable (PropertyInfo info, LockstepAttribute attribute) {
-            Init (info, attribute);
+        public LSVariable (object lockstepObject, PropertyInfo info, LockstepAttribute attribute) {
+            Init (lockstepObject, info, attribute);
         }
 
         //Must be PropertyInfo for PropertyInfo .Get[Get/Set]Method ()
-        private void Init (PropertyInfo info, LockstepAttribute attribute)
+        private void Init (object lockstepObject, PropertyInfo info, LockstepAttribute attribute)
         {
             this.Info = info;
+            this.LockstepObject = lockstepObject;
+
             //For the Value property... easier accessbility
-            _getValue = (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), info.GetGetMethod());
+            //_getValue = (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), info.GetGetMethod().);
 
             if (DoReset = attribute.DoReset)
             {
-                _setValue = (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), info.GetSetMethod());
+               // _setValue = (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), info.GetSetMethod());
                 //Sets the base value for resetting
                 this._baseValue = this.Value;
             }
@@ -34,6 +36,7 @@ namespace Lockstep
         public bool DoReset {get; private set;}
 
         public PropertyInfo Info { get; private set; }
+        public object LockstepObject {get; private set;}
 
         private object _baseValue;
 
@@ -50,11 +53,11 @@ namespace Lockstep
         {
             get
             {
-                return _getValue();
+                return Info.GetValue (LockstepObject, null);
             }
             private set
             {
-                _setValue(value);
+                Info.SetValue (LockstepObject, value, null);
             }
         }
 

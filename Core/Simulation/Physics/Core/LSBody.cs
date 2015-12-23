@@ -6,49 +6,90 @@
 //=======================================================================
 
 using UnityEngine;
-
+using UnityEngine.Serialization;
 namespace Lockstep
 {
 	public class LSBody : MonoBehaviour
 	{
-		public Vector3 visualPosition;
-        public Vector2d _position;
+        #region Core deterministic variables
+        [SerializeField] //For inspector debugging
+        internal Vector2d _position;
+        [SerializeField]
+        internal Vector2d _rotation = Vector2d.up;
+        internal long _height;
 
-		
+        public Vector2d _velocity;
+        #endregion
+
+        #region Lockstep variables
+        [Lockstep]
+        public bool PositionChanged { get; set; }
+        [Lockstep]
+        public Vector2d Position {
+            get {
+                return _position;
+            }
+            set {
+                _position = value;
+                this.PositionChanged = true;
+            }
+        }
+        [Lockstep]
+        public bool RotationChanged { get; set; }
+
+
+        [Lockstep]
+        public Vector2d Rotation {
+            get {
+                return _rotation;
+            }
+            set {
+                _rotation = value;
+                this.RotationChanged = true;
+            }
+        }
+
+        [Lockstep]
+        public long Height {
+            get {return _height;}
+            set {
+                _height = value;
+            }
+        }
+
+        [Lockstep]
+        public bool VelocityChanged { get; set; }
+        [Lockstep]
+        public Vector2d Velocity {
+            get { return _velocity; }
+            set {
+                _velocity = value;
+                VelocityChanged = true;
+            }
+        }
+        #endregion
+        internal Vector3 _visualPosition;
+        public Vector3 VisualPosition {get {return _visualPosition;}}
+        		
 		public LSAgent Agent { get; private set; }
 		
 		public long FastRadius { get; private set; }
-
-		
-		public bool PositionChanged { get; set; }
 		
 		public bool PositionChangedBuffer { get; private set; } //D
-		public bool SetPositionBuffer; //ND
-		public Vector2d Rotation = Vector2d.up;
-		
-		public bool RotationChanged { get; set; }
-		
-		private bool RotationChangedBuffer { get; set; } //D
-		private bool SetRotationBuffer; //ND
+        public bool SetPositionBuffer {get; private set;} //ND
 
-		bool SetVisualPosition;
-		bool SetVisualRotation;
 		
-        public bool Setted {get; private set;}
+		public bool RotationChangedBuffer { get; private set; } //D
+        private bool SetRotationBuffer {get; set;} //ND
 
-		public Vector2d _velocity;
+        bool SetVisualPosition {get; set;}
+        bool SetVisualRotation {get; set;}
 		
-		public Vector2d Velocity {
-			get { return _velocity; }
-			set {
-				_velocity = value;
-				VelocityChanged = true;
-			}
-		}
+        private bool Setted {get; set;}
+
 		
 		public long VelocityFastMagnitude { get; private set; }
 		
-		public bool VelocityChanged { get; set; }
 		
 		public LSBody Parent {
 			get { return HasParent ? _parent : null; }
@@ -73,8 +114,8 @@ namespace Lockstep
 						this._rotationalTransform.parent = _parent._rotationalTransform;
 						UpdateLocalPosition ();
 						UpdateLocalRotation ();
-						LocalRotation = Rotation;
-						LocalRotation.Rotate (_parent.Rotation.x, _parent.Rotation.y); 
+						LocalRotation = _rotation;
+						LocalRotation.Rotate (_parent._rotation.x, _parent._rotation.y); 
 						
 					}
 				}
@@ -115,32 +156,51 @@ namespace Lockstep
 		
 		public int ID { get; private set; }
 		
-		[SerializeField]
-		private int
-			_priority;
 		
 		public int Priority { get; set; }
-		
-		public uint RaycastVersion;
-		
+				
 		#region Serialized
-		public ColliderType Shape;
-		public bool IsTrigger;
-		public  int Layer;
-        public long HalfWidth = FixedMath.Half;
-        public long HalfHeight = FixedMath.Half;
+        [SerializeField, FormerlySerializedAs ("Shape")]
+        private ColliderType _shape = ColliderType.None;
+        public ColliderType Shape {get {return _shape;}}
+        [SerializeField, FormerlySerializedAs ("IsTrigger")]
+        private bool _isTrigger;
+        public bool IsTrigger {get {return _isTrigger;}}
+        [SerializeField, FormerlySerializedAs ("Layer")]
+        private int _layer;
+        public int Layer {get {return _layer;}}
+        [SerializeField,FixedNumber, FormerlySerializedAs("HalfWidth")]
+        private long _halfWidth = FixedMath.Half;
+        public long HalfWidth {get {return _halfWidth;}}
+        [SerializeField,FixedNumber, FormerlySerializedAs ("HalfHeight")]
+        public long _halfHeight = FixedMath.Half;
+        public long HalfHeight {get {return _halfHeight;}}
+        [SerializeField,FixedNumber, FormerlySerializedAs ("Radius")]
+        private long _radius = FixedMath.Half;
 		public long Radius;
+        [SerializeField, FormerlySerializedAs ("Immovable")]
+        private bool _immovable = false;
 		public bool Immovable;
+        [SerializeField, FormerlySerializedAs("_priority")]
+        private int _basePriority;
+        public int BasePriority {get {return _basePriority;}}
+        [SerializeField, FormerlySerializedAs("Vertices")]
+        private Vector2d[] _vertices;
+        public Vector2d[] Vertices {get {return _vertices;}}
+
 	
-		public Transform _positionalTransform;
-		public Transform _rotationalTransform;
+        [SerializeField]
+		private Transform _positionalTransform;
+        public Transform PositionalTransform {get {return _positionalTransform;}}
+        [SerializeField]
+		private Transform _rotationalTransform;
+        public Transform RotationalTransform {get {return _rotationalTransform;}}
 		#endregion
 		
 		private LSBody _parent;
 		private Vector2d[] RotatedPoints;
 		public Vector2d LocalPosition;
 		public Vector2d LocalRotation;
-		public Vector2d[] Vertices;
 		
 		public void Setup (LSAgent agent)
 		{
@@ -167,7 +227,7 @@ namespace Lockstep
 			RotatedPoints = new Vector2d[Vertices.Length];
 			for (int i = 0; i < Vertices.Length; i++) {
 				RotatedPoints [i] = Vertices [i];
-				RotatedPoints [i].Rotate (Rotation.x, Rotation.y);
+                RotatedPoints [i].Rotate (_rotation.x, _rotation.y);
 			}
 			RealPoints = new Vector2d[Vertices.Length];
 			EdgeNorms = new Vector2d[Vertices.Length];
@@ -196,16 +256,6 @@ namespace Lockstep
 			}
 		}
 		
-		public void InitializeSerialized ()
-		{
-            Initialize (this._position, Rotation);
-		}
-		
-		public void Initialize (Vector2d startPosition)
-		{
-			Initialize (startPosition, Rotation);
-		}
-		
 		public void Initialize (Vector2d StartPosition, Vector2d StartRotation)
         {
             if (!Setted) {
@@ -222,11 +272,11 @@ namespace Lockstep
 			PositionChangedBuffer = false;
 			RotationChangedBuffer = false;
 			
-			Priority = _priority;
+			Priority = _basePriority;
 			Velocity = Vector2d.zero;
 			VelocityFastMagnitude = 0;
 			_position = StartPosition;
-			Rotation = StartRotation;
+			_rotation = StartRotation;
 
 
 			_parent = null;
@@ -252,11 +302,11 @@ namespace Lockstep
 			ID = PhysicsManager.Assimilate (this);
 			Partition.PartitionObject (this);
 			
-			visualPosition = _position.ToVector3 (0f);
-			lastVisualPos = visualPosition;
-			_positionalTransform.position = visualPosition;
+			_visualPosition = _position.ToVector3 (0f);
+			lastVisualPos = _visualPosition;
+			_positionalTransform.position = _visualPosition;
             UnityEngine.Profiler.maxNumberOfSamplesPerFrame = 7000000;
-			visualRot = Quaternion.LookRotation (Rotation.ToVector3 (0f));
+			visualRot = Quaternion.LookRotation (_rotation.ToVector3 (0f));
 			lastVisualRot = visualRot;
 			_positionalTransform.rotation = visualRot;
 		}
@@ -278,7 +328,7 @@ namespace Lockstep
 			if (RotationChanged) {
 				for (int i = 0; i < VertLength; i++) {
 					RotatedPoints [i] = Vertices [i];
-					RotatedPoints [i].Rotate (Rotation.x, Rotation.y);
+					RotatedPoints [i].Rotate (_rotation.x, _rotation.y);
 					
 					EdgeNorms [i] = RotatedPoints [i];
 					if (i == 0) {
@@ -424,7 +474,7 @@ namespace Lockstep
 				if (HasParent)
 					LocalRotation.Normalize ();
 				else
-					Rotation.Normalize ();
+					_rotation.Normalize ();
 				RotationChangedBuffer = true;
 				RotationChanged = false;
 				this.SetVisualRotation = true;
@@ -445,7 +495,7 @@ namespace Lockstep
 			else {
 				if (SetVisualPosition == false) {
 					if (visualPositionReached == false)
-					visualPositionReached = !(SetVisualPosition = _positionalTransform.position != visualPosition);
+					visualPositionReached = !(SetVisualPosition = _positionalTransform.position != _visualPosition);
 				}
 				if (SetVisualRotation == false) {
 					if (visualRotationReached == false)
@@ -455,19 +505,19 @@ namespace Lockstep
 			if (test || this.SetVisualPosition)
 			{
 				if (HasParent) {
-					this._positionalTransform.localPosition = this.LocalPosition.rotatedLeft.ToVector3 (visualPosition.y - _parent.visualPosition.y);
+					this._positionalTransform.localPosition = this.LocalPosition.rotatedLeft.ToVector3 (_visualPosition.y - _parent._visualPosition.y);
 				}
 				else {
-					lastVisualPos = visualPosition;
-					visualPosition.x = _position.x.ToFloat ();
-					visualPosition.z = _position.y.ToFloat ();
+					lastVisualPos = _visualPosition;
+					_visualPosition.x = _position.x.ToFloat ();
+					_visualPosition.z = _position.y.ToFloat ();
 					SetPositionBuffer = true;
 					visualPositionReached = false;
 				}
 			}
 			else if (HasParent == false){
 				if (SetPositionBuffer) {
-					//_positionalTransform.position = visualPosition;
+					//_positionalTransform.position = _visualPosition;
 					SetPositionBuffer = false;
 				}
 			}
@@ -479,7 +529,7 @@ namespace Lockstep
 				}
 				else {
 					lastVisualRot = visualRot;
-					visualRot = Quaternion.LookRotation (Rotation.ToVector3 (0f));
+					visualRot = Quaternion.LookRotation (_rotation.ToVector3 (0f));
 					SetRotationBuffer = true;
 					visualRotationReached = false;
 				}
@@ -504,7 +554,7 @@ namespace Lockstep
                 //LerpTime = time passed since last simulation frame
                 //LerpDamping = special value calculated based on Time.deltaTime for the extra layer of interpolation
 				_positionalTransform.position = Vector3.Lerp (_positionalTransform.position,
-				                                              Vector3.Lerp (lastVisualPos, visualPosition, PhysicsManager.LerpTime),
+				                                              Vector3.Lerp (lastVisualPos, _visualPosition, PhysicsManager.LerpTime),
 				                                             PhysicsManager.LerpDamping);
                 
 			}
@@ -523,7 +573,7 @@ namespace Lockstep
 		{
 			if (HasParent) {
 				LocalPosition = _position - _parent._position;
-				LocalPosition.Rotate (_parent.Rotation.x, _parent.Rotation.y);
+				LocalPosition.Rotate (_parent._rotation.x, _parent._rotation.y);
 			}
 		}
 		
@@ -531,7 +581,7 @@ namespace Lockstep
 		{
 			if (HasParent) {
 				_position = LocalPosition;
-				_position.RotateInverse (_parent.Rotation.x, _parent.Rotation.y);
+				_position.RotateInverse (_parent._rotation.x, _parent._rotation.y);
 				_position += _parent._position;
 				PositionChanged = true;
 			}
@@ -540,8 +590,8 @@ namespace Lockstep
 		public void UpdateRotation ()
 		{
 			if (HasParent) {
-				Rotation = LocalRotation;
-				Rotation.RotateInverse (_parent.Rotation.x, _parent.Rotation.y);
+				_rotation = LocalRotation;
+				_rotation.RotateInverse (_parent._rotation.x, _parent._rotation.y);
 				RotationChanged = true;
 			}
 		}
@@ -549,8 +599,8 @@ namespace Lockstep
 		public void UpdateLocalRotation ()
 		{
 			if (HasParent) {
-				LocalRotation = Rotation;
-				LocalRotation.Rotate (_parent.Rotation.x, _parent.Rotation.y);
+				LocalRotation = _rotation;
+				LocalRotation.Rotate (_parent._rotation.x, _parent._rotation.y);
 			}
 		}
 		
@@ -559,30 +609,29 @@ namespace Lockstep
 			if (HasParent)
 				LocalRotation.Rotate (cos, sin);
 			else
-				Rotation.Rotate (cos, sin);
+				_rotation.Rotate (cos, sin);
 			RotationChanged = true;
 		}
 		
 		public void SetRotation (long x, long y)
 		{
-			Rotation = new Vector2d (x, y);
+			_rotation = new Vector2d (x, y);
 			RotationChanged = true;
 		}
 		
 		public Vector2d TransformDirection (Vector2d worldPos)
 		{
 			worldPos -= _position;
-			worldPos.RotateInverse (Rotation.x, Rotation.y);
+			worldPos.RotateInverse (_rotation.x, _rotation.y);
 			return worldPos;
 		}
 		
 		public Vector2d InverseTransformDirection (Vector2d localPos)
 		{
-			localPos.Rotate (Rotation.x, Rotation.y);
+			localPos.Rotate (_rotation.x, _rotation.y);
 			localPos += _position;
 			return localPos;
 		}
-		
 		
 		public override int GetHashCode ()
 		{
@@ -599,24 +648,6 @@ namespace Lockstep
 				}
 			}
             PhysicsManager.Dessimilate(this);
-		} 
-
-		public void Teleport (Vector2d destination) {
-			this._position = destination;
-			this.visualPosition = destination.ToVector3 (visualPosition.y);
-			this.lastVisualPos = visualPosition;
-			this._positionalTransform.position = visualPosition;
-		}
-		
-		public bool GetAgentAbility<T> (out T abil) where T : Ability{
-			if (Agent .IsNotNull ()) {
-				abil = Agent.GetAbility<T> ();
-				if (abil .IsNotNull ()) {
-					return true;
-				}
-			}
-			abil = null;
-			return false;
 		}
 
         long GetCeiledSnap (long f, long snap) {
@@ -660,6 +691,11 @@ namespace Lockstep
                     break;
             }
             return false;
+        }
+
+        void Reset () {
+            this._positionalTransform = this.transform;
+            this._rotationalTransform = this.transform;
         }
         void OnDrawGizmos () {
             switch (this.Shape) {

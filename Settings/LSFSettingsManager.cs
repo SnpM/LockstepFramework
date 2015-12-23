@@ -28,6 +28,7 @@ namespace Lockstep {
             if (MainSettings == null) {
                 throw new System.NullReferenceException ("No LockstepFrameworkSettings detected. Make sure there is one in the root directory of a Resources folder");
             }
+
         }
 
         public static LSFSettings GetSettings () {

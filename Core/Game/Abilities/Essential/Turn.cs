@@ -84,7 +84,7 @@ namespace Lockstep
 					}
 
 				} else {
-					if (cachedBody.Rotation.Dot (targetRotation.x, targetRotation.y) < 0) {
+					if (cachedBody._rotation.Dot (targetRotation.x, targetRotation.y) < 0) {
 						cachedBody.Rotate (turnCos, turnSin);
 					} else {
 						Arrive ();
@@ -97,7 +97,7 @@ namespace Lockstep
 		protected override void OnLateSimulate ()
 		{
 			if (targetReached == false) {
-				long check = cachedBody.Rotation.Cross (targetRotation.x, targetRotation.y);
+				long check = cachedBody._rotation.Cross (targetRotation.x, targetRotation.y);
 				if (check == 0 || ((cachedBeginCheck < 0) != (check < 0))) {
 					Arrive ();
 				}
@@ -110,7 +110,7 @@ namespace Lockstep
 
 		private void Arrive ()
 		{
-			cachedBody.Rotation = targetRotation;
+			cachedBody._rotation = targetRotation;
 			cachedBody.UpdateLocalRotation ();
 			cachedBody.RotationChanged = true;
 			targetReached = true;
@@ -131,12 +131,12 @@ namespace Lockstep
 		public void StartTurnRaw (Vector2d targetRot) {
 			targetRotation = targetRot;
 			targetReached = false;
-			cachedBeginCheck = cachedBody.Rotation.Cross (targetRot.x,targetRot.y);
+			cachedBeginCheck = cachedBody._rotation.Cross (targetRot.x,targetRot.y);
 		}
 		private void _StartTurn (Vector2d targetRot) {
 			long tempCheck;
-			if (targetRot.NotZero () && (tempCheck = cachedBody.Rotation.Cross (targetRot.x, targetRot.y)) != 0) {
-				if (tempCheck.AbsMoreThan (turnSin) == false && cachedBody.Rotation.Dot (targetRot.x,targetRot.y) > 0)
+			if (targetRot.NotZero () && (tempCheck = cachedBody._rotation.Cross (targetRot.x, targetRot.y)) != 0) {
+				if (tempCheck.AbsMoreThan (turnSin) == false && cachedBody._rotation.Dot (targetRot.x,targetRot.y) > 0)
 				{
 					targetRotation = targetRot;
 					Arrive ();
@@ -179,7 +179,7 @@ namespace Lockstep
 							const long collisionTurnTreshold = FixedMath.One;
 							if (this.cachedBody.VelocityFastMagnitude < other.VelocityFastMagnitude || other.VelocityFastMagnitude == 0) {
                                 contactDif += cachedBody._position - other._position;
-								if (cachedBody.Rotation.Dot (contactDif.x, contactDif.y) >= 0) {
+                                if (cachedBody._rotation.Dot (contactDif.x, contactDif.y) >= 0) {
 									contactCount++;
 									contactChecked = true;
 								}

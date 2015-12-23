@@ -182,7 +182,7 @@ namespace Lockstep
                 if (GlobalAgentActive [i])
                 {
                     LSAgent agent = GlobalAgents [i];
-                    int n1 = agent.Body._position.GetStateHash() + agent.Body.Rotation.GetStateHash();
+                    int n1 = agent.Body._position.GetStateHash() + agent.Body._rotation.GetStateHash();
                     switch (operationToggle)
                     {
                         case 0:
@@ -203,7 +203,7 @@ namespace Lockstep
                     if (agent.Body.IsNotNull())
                     {
                         hash ^= agent.Body._position.GetStateHash();
-                        hash ^= agent.Body.Rotation.GetStateHash();
+                        hash ^= agent.Body._position.GetStateHash();
                     }
                 }
             }
