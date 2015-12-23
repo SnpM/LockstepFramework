@@ -18,7 +18,6 @@ namespace Lockstep
         #region User-defined Variables
 
         public const bool SimulatePhysics = true;
-        public const int SimulationSpread = 1;
 
         static	int VisualSetSpread
         {
@@ -27,16 +26,16 @@ namespace Lockstep
                 return 2;
             }
         }
-
-        public const int FrameRate = LockstepManager.FrameRate / SimulationSpread;
-
+            
         static long FixedDeltaTicks
         {
             get
             {
-                return (long)((10000000L * VisualSetSpread) / FrameRate);
+                return (long)((10000000L * VisualSetSpread) / LockstepManager.FrameRate);
             }
         }
+
+
 
         #endregion
 
@@ -50,7 +49,6 @@ namespace Lockstep
         public static LSBody[] SimObjects = new LSBody[MaxSimObjects];
         private static Dictionary<int,CollisionPair> CollisionPairs = new Dictionary<int,CollisionPair>(MaxSimObjects);
         public static FastList<CollisionPair> FastCollisionPairs = new FastList<CollisionPair>(MaxSimObjects);
-        private static int simulationCount;
         private static int visualSetCount;
 
         #endregion
@@ -86,7 +84,6 @@ namespace Lockstep
 
             PeakCount = 0;
             AssimilatedCount = 0;
-            simulationCount = SimulationSpread;
 
             FastCollisionPairs.FastClear();
 
@@ -96,15 +93,6 @@ namespace Lockstep
 
         public static void Simulate()
         {
-            simulationCount--;
-            if (simulationCount <= 0)
-            {
-                simulationCount = SimulationSpread;
-            } else
-            {
-                return;
-            }
-
 
             for (int i = 0; i < PeakCount; i++)
             {
