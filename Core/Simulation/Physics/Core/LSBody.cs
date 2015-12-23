@@ -18,7 +18,7 @@ namespace Lockstep
         internal Vector2d _rotation = Vector2d.up;
         [SerializeField]
         internal long _heightPos;
-
+        [SerializeField]
         public Vector2d _velocity;
         #endregion
 
@@ -49,12 +49,14 @@ namespace Lockstep
                 this.RotationChanged = true;
             }
         }
-
+        [Lockstep]
+        public bool HeightPosChanged {get; set;}
         [Lockstep]
         public long HeightPos {
             get {return _heightPos;}
             set {
                 _heightPos = value;
+                this.HeightPosChanged = true;
             }
         }
 
@@ -140,14 +142,16 @@ namespace Lockstep
 		private FastBucket<LSBody> Children;
 		public Vector2d[] RealPoints;
 		public Vector2d[] EdgeNorms;
-		public long XMin;
-		public long XMax;
-		public long YMin;
-		public long YMax;
-		public long PastGridXMin;
+        public long XMin {get; private set;}
+        public long XMax {get; private set;}
+        public long YMin {get; private set;}
+        public long YMax {get; private set;}
+        public long PastGridXMin;
 		public long PastGridXMax;
 		public long PastGridYMin;
 		public long PastGridYMax;
+        public long HeightMin {get; private set;}
+        public long HeightMax {get; private set;}
 		
 		public delegate void CollisionFunction (LSBody other);
 		
@@ -352,6 +356,8 @@ namespace Lockstep
 		
 		public void BuildBounds ()
 		{
+            HeightMin = HeightPos;
+            HeightMax = HeightPos + Height;
 			if (Shape == ColliderType.Circle) {
 				XMin = -Radius + _position.x;
 				XMax = Radius + _position.x;
@@ -654,6 +660,13 @@ namespace Lockstep
 			}
             PhysicsManager.Dessimilate(this);
 		}
+
+        public bool HeightOverlaps (long heightPos) {
+            return heightPos >= HeightMin && HeightPos <= HeightMax;
+        }
+        public bool HeightOverlaps (long heightMin, long heightMax) {
+            return heightMax >= HeightMin && heightMin <= HeightMax;
+        }
 
         long GetCeiledSnap (long f, long snap) {
             return (f + snap - 1) / snap * snap;

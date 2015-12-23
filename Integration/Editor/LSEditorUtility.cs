@@ -103,9 +103,9 @@ namespace Lockstep
         {
             if (showBoolGrid = EditorGUILayout.Foldout (showBoolGrid, content))
             {
-                values.Width = EditorGUILayout.IntField ("Width", values.Width);
-                values.Height = EditorGUILayout.IntField ("Height", values.Height);
-
+                int newWidth = EditorGUILayout.IntField ("Width", values.Width);
+                int newHeight = EditorGUILayout.IntField ("Height", values.Height);
+                values.Resize (newWidth, newHeight);
                 const float cellWidth = 20;
                 const float cellHeight = 20f;
                 Rect drawSource = EditorGUILayout.GetControlRect ();

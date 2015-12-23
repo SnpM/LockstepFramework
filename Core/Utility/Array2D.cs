@@ -1,98 +1,155 @@
 ﻿using System;
 using UnityEngine;
-namespace Lockstep {
-//Note: Not Serializable - Unity can't serialize generics
-public class Array2D<T>{
-	[SerializeField]
-	private int _width = 0;
-	public int Width {
-		get {
-			return _width;
-		}
-		set {
-			if (_width != value)
-			{
-				if (StartVal .IsNotNull () && StartVal.GetType () == typeof (bool))
-				{
-				bool test = (bool)(object)StartVal;
-				}
-				int newWidth = value;
-				T[] newArray = new T[newWidth * _height];
-				for (int i = 0; i < _height; i++)
-				{
-					int rowIndex = i * newWidth;
-					Array.Copy (_innerArray, i * _width, newArray, rowIndex, _width < newWidth ? _width : newWidth);
-					if (_width < newWidth)
-					{
-						int fillStart = rowIndex + _width - 1;
-						if (fillStart < 0) fillStart = 0;
-						int fillEnd = rowIndex + newWidth;
 
-						for (int j = fillStart; j < fillEnd; j++)
-						{
-							newArray[j] = StartVal;
-						}
-					}
-				}
-				_innerArray = newArray;
-				_width = newWidth;
-			}
-		}
-	}
-	[SerializeField]
-	public int _height = 0;
-	public int Height {
-		get {
-			return _height;
-		}
-		set {
-			if (_height != value) {
-				int newHeight = value;
-				Array.Resize <T>(ref _innerArray, newHeight * _width);
-				for (int i = _height * _width; i < _innerArray.Length; i++)
-				{
-					_innerArray[i] = StartVal;
-				}
-				_height = newHeight;
-			}
-		}
-	}
-	[SerializeField]
-	private T[] _innerArray = new T[0];
+namespace Lockstep
+{
+    //Note: Not Serializable - Unity can't serialize generics
+    /// <summary>
+    /// Flattened 2D array wrapper with dynamic resizing.
+    /// </summary>
+    public class Array2D<T>
+    {
+        [SerializeField]
+        private int _width = 0;
 
-	public T[] InnerArray {get {return _innerArray;}}
+        public int Width
+        {
+            get
+            {
+                return _width;
+            }
+        }
 
-	private T StartVal;
+        [SerializeField]
+        public int _height = 0;
 
-	public Array2D (int width, int height, T startVal) : this (width,height) {
-		StartVal = startVal;
-	}
-	public Array2D (int width, int height) {
-		_innerArray = new T[width * height];
-		_width = width;
-		_height = height;
-	}
+        public int Height
+        {
+            get
+            {
+                return _height;
+            }
+        }
 
-	public T this [int w, int h] {
-		get {
-			int index = GetIndex (w,h);
-			return _innerArray[index];
-		}
-		set {
-			int index = GetIndex (w,h);
-			_innerArray[index] = value;
-		}
-	}
+        [SerializeField]
+        private T[] _innerArray = new T[0];
 
-	private int GetIndex (int w, int h) {
-		return w + h * Width;
-	}
+        public T[] InnerArray { get { return _innerArray; } }
 
-}
-[Serializable]
-public class BoolArray2D : Array2D<bool>{
-	public BoolArray2D (int i, int j, bool startVal) : base(i,j, startVal) {
+        private T StartVal;
 
-	}
-}
+        public Array2D(int width, int height, T startVal) : this(width, height)
+        {
+            StartVal = startVal;
+        }
+
+        public Array2D(int width, int height)
+        {
+            _innerArray = new T[width * height];
+            _width = width;
+            _height = height;
+        }
+
+        public T this [int w, int h]
+        {
+            get
+            {
+                int index = GetIndex(w, h);
+                return _innerArray [index];
+            }
+            set
+            {
+                int index = GetIndex(w, h);
+                _innerArray [index] = value;
+            }
+        }
+
+        public void Resize(int newWidth, int newHeight)
+        {
+            if (_height != newHeight || _width != newWidth)
+            {
+                //Height changes require remapping
+                T[] newArray = new T[newWidth * newHeight];
+
+                for (int i = _width - 1; i >= 0; i--)
+                {
+                    Array.Copy(_innerArray, i * _height, newArray, i * newHeight, Math.Min(_height, newHeight));
+                }
+
+                _innerArray = newArray;
+
+                _height = newHeight;
+                _width = newWidth;
+            }
+        }
+
+        public void Shift(int xShift, int yShift)
+        {
+            if (yShift != 0)
+            {
+                int absShift = Math.Abs(yShift);
+  
+                int shiftLength = _height - absShift;
+                if (shiftLength < 0)
+                {
+                    //If the shift is more than the array's height, clear all elements
+                    Array.Clear(_innerArray,0,_innerArray.Length);
+                }
+                else {
+                    T[] newArray = new T[_innerArray.Length];
+
+                    for (int i = _width - 1; i >= 0; i--) {
+                        int index = i * _height;
+                        int newIndex = index + yShift;
+                        if (yShift < 0)
+                        {
+                            index -= yShift;
+                            newIndex -= yShift;
+                        }
+                        Array.Copy(_innerArray,index,newArray,newIndex,shiftLength);
+                    }
+                    _innerArray = newArray;
+                }
+            }
+            if (xShift != 0) {
+
+                int absShift = Math.Abs(xShift);
+                if (absShift >= _width)
+                {
+                    //If the shift is more than the array's height, clear all elements
+                    Array.Clear(_innerArray,0,_innerArray.Length);
+                }
+                else {
+                    T[] newArray = new T[_innerArray.Length];
+                    int start = 0;
+                    int end = _width;
+                    if (xShift < 0)
+                        start -= xShift;
+                    else
+                        end -= xShift;
+                    for (int i = start; i < end; i++) {
+                        int index = i * _height;
+                        int newIndex = (i + xShift) * _height;
+                        Array.Copy (_innerArray, index, newArray, newIndex, _height);
+                    }
+                    _innerArray = newArray;
+                }
+            }
+        }
+
+        private int GetIndex(int w, int h)
+        {
+            return w * this._height + h;
+        }
+
+    }
+
+    [Serializable]
+    public class BoolArray2D : Array2D<bool>
+    {
+        public BoolArray2D(int i, int j, bool startVal) : base(i, j, startVal)
+        {
+
+        }
+    }
 }

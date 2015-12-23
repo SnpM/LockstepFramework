@@ -263,6 +263,10 @@ namespace Lockstep
 
         }
 
+        public bool CheckHeight () {
+            return Body1.HeightMax >= Body2.HeightMin && Body1.HeightMin <= Body2.HeightMax;
+        }
+
         public bool CheckCollision()
         {
             if ((Body1.PositionChanged || Body2.PositionChanged || Body1.PositionChangedBuffer || Body2.PositionChangedBuffer) == false)
