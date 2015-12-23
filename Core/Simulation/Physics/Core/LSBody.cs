@@ -698,6 +698,8 @@ namespace Lockstep
             this._rotationalTransform = this.transform;
         }
         void OnDrawGizmos () {
+            //Don't draw gizmos before initialization
+            if (Application.isPlaying == false) return;
             switch (this.Shape) {
                 case ColliderType.Circle:
                     Gizmos.DrawWireSphere(this._position.ToVector3(transform.position.y + .5f),this.Radius.ToFloat());
