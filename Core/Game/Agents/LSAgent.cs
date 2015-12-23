@@ -290,7 +290,7 @@ namespace Lockstep {
 
 			CachedGameObject.SetActive (true);
             if (Body .IsNotNull ()) {
-                Body.Initialize(position, rotation);
+                Body.Initialize(new Vector2dHeight(position), rotation);
             }
 
             if (Triggers.IsNotNull()) {

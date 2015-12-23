@@ -21,13 +21,19 @@ namespace Lockstep
 		public long Y { get {return _y;}}
 
 		[SerializeField]
-		private float _height;
-		public float Height {get {return _height;}}
+		private long _height;
+		public long Height {get {return _height;}}
+
+        public Vector2dHeight (Vector2d vec) {
+            _x = vec.x;
+            _y = vec.y;
+            _height = 0;
+        }
 
 		public Vector2dHeight (Vector3 vec3) {
 			_x = FixedMath.Create (vec3.x);
 			_y = FixedMath.Create (vec3.z);
-			_height = vec3.y;
+            _height = FixedMath.Create(vec3.y);
 		}
 
 		public Vector2d ToVector2d () {

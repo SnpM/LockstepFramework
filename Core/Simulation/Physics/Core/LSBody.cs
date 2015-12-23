@@ -16,7 +16,8 @@ namespace Lockstep
         internal Vector2d _position;
         [SerializeField]
         internal Vector2d _rotation = Vector2d.up;
-        internal long _height;
+        [SerializeField]
+        internal long _heightPos;
 
         public Vector2d _velocity;
         #endregion
@@ -50,10 +51,10 @@ namespace Lockstep
         }
 
         [Lockstep]
-        public long Height {
-            get {return _height;}
+        public long HeightPos {
+            get {return _heightPos;}
             set {
-                _height = value;
+                _heightPos = value;
             }
         }
 
@@ -187,7 +188,9 @@ namespace Lockstep
         [SerializeField, FormerlySerializedAs("Vertices")]
         private Vector2d[] _vertices;
         public Vector2d[] Vertices {get {return _vertices;}}
-
+        [SerializeField, FixedNumber]
+        private long _height = FixedMath.One;
+        public long Height {get {return _height;}}
 	
         [SerializeField]
 		private Transform _positionalTransform;
@@ -256,7 +259,7 @@ namespace Lockstep
 			}
 		}
 		
-		public void Initialize (Vector2d StartPosition, Vector2d StartRotation)
+		public void Initialize (Vector2dHeight StartPosition, Vector2d StartRotation)
         {
             if (!Setted) {
                 this.Setup(null);
@@ -275,7 +278,8 @@ namespace Lockstep
 			Priority = _basePriority;
 			Velocity = Vector2d.zero;
 			VelocityFastMagnitude = 0;
-			_position = StartPosition;
+            _position = StartPosition.ToVector2d();
+            _heightPos = StartPosition.Height;
 			_rotation = StartRotation;
 
 
@@ -302,7 +306,7 @@ namespace Lockstep
 			ID = PhysicsManager.Assimilate (this);
 			Partition.PartitionObject (this);
 			
-			_visualPosition = _position.ToVector3 (0f);
+            _visualPosition = _position.ToVector3 (HeightPos.ToFloat());
 			lastVisualPos = _visualPosition;
 			_positionalTransform.position = _visualPosition;
             UnityEngine.Profiler.maxNumberOfSamplesPerFrame = 7000000;
@@ -510,6 +514,7 @@ namespace Lockstep
 				else {
 					lastVisualPos = _visualPosition;
 					_visualPosition.x = _position.x.ToFloat ();
+                    _visualPosition.y = HeightPos.ToFloat();
 					_visualPosition.z = _position.y.ToFloat ();
 					SetPositionBuffer = true;
 					visualPositionReached = false;

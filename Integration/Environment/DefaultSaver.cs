@@ -42,7 +42,7 @@ namespace Lockstep
                 if (IsAgent(body)) continue;
                 EnvironmentBodyInfo bodyInfo = new EnvironmentBodyInfo(
                     body,
-                    new Vector2d(body.transform.position),
+                    new Vector2dHeight(body.transform.position),
                     new Vector2d (Mathf.Sin (body.transform.rotation.x), Mathf.Cos (body.transform.rotation.y))
                 );
                 bodiesBuffer.Add(bodyInfo);

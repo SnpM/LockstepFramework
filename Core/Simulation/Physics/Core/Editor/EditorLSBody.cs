@@ -24,6 +24,8 @@ namespace Lockstep.Integration
         //bool
         SerializedProperty Vertices;
         //Vector2d[]
+        SerializedProperty Height;
+        //long
         SerializedProperty PositionalTransform;
         //transform
         SerializedProperty RotationalTransform;
@@ -42,6 +44,7 @@ namespace Lockstep.Integration
             Radius = so.FindProperty("_radius");
             Immovable = so.FindProperty("_immovable");
             Vertices = so.FindProperty("_vertices");
+            Height = so.FindProperty("_height");
             PositionalTransform = so.FindProperty("_positionalTransform");
             RotationalTransform = so.FindProperty("_rotationalTransform");
         }
@@ -69,6 +72,7 @@ namespace Lockstep.Integration
                 IsTrigger.Draw();
                 if (IsTrigger.boolValue == false)
                     Immovable.Draw();
+                Height.Draw();
 
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Collider Settings", EditorStyles.boldLabel); 
@@ -83,9 +87,7 @@ namespace Lockstep.Integration
                 {
                     Vertices.Draw();
                 }
-
-                EditorGUILayout.Space();
-                EditorGUILayout.LabelField("Note: Scene editing is temporarily disabled.", EditorStyles.boldLabel);
+                    
                 SceneView.RepaintAll();
                 if (true)//EditorGUI.EndChangeCheck())
                 {
@@ -103,6 +105,7 @@ namespace Lockstep.Integration
         {
             //Have to reinitialize everything because can't apply modified properties on base.serializedObject
             SerializedObject so = new SerializedObject(target);
+            so.Update();
             SerializedProperty Shape = so.FindProperty("_shape");
             SerializedProperty IsTrigger = so.FindProperty("_isTrigger");
             SerializedProperty Layer = so.FindProperty("_layer");
@@ -111,6 +114,7 @@ namespace Lockstep.Integration
             SerializedProperty Radius = so.FindProperty("_radius");
             SerializedProperty Immovable = so.FindProperty("_immovable");
             SerializedProperty Vertices = so.FindProperty("_vertices");
+            SerializedProperty Height = so.FindProperty("_height");
             SerializedProperty PositionalTransform = so.FindProperty("_positionalTransform");
             SerializedProperty RotationalTransform = so.FindProperty("_rotationalTransform");
 
@@ -126,7 +130,11 @@ namespace Lockstep.Integration
                 return;
             const float dragHandleSize = .5f;
             const float spread = .02f;
+            int spreadMin = -1;
+            int spreadMax = 1;
             Handles.DrawCapFunction dragCap = Handles.SphereCap;
+
+            float xModifier = 0f;
             if (shape == ColliderType.Circle)
             {
                 //targetPos.x - Radius.longValue.ToFloat ():
@@ -137,59 +145,94 @@ namespace Lockstep.Integration
                         (Handles.FreeMoveHandle(
                             new Vector3(targetPos.x - Radius.longValue.ToFloat(), targetPos.y, targetPos.z)
                                 , Quaternion.identity,
-                                dragHandleSize,
-                                Vector3.zero,
-                                Handles.SphereCap))
+                            dragHandleSize,
+                            Vector3.zero,
+                            Handles.SphereCap))
                             .x - targetPos.x) 
-                    );
+                );
                 Handles.DrawLine(targetPos, new Vector3(targetPos.x + Radius.longValue.ToFloat(), targetPos.y, targetPos.z));
-                for (int i = -1; i < 2; i++)
-                    Handles.CircleCap(1,targetPos + Vector3.up * (float)i * spread,Quaternion.Euler(90,0,0),Radius.longValue.ToFloat());
-            }
-            else if (shape == ColliderType.AABox) {
-                HalfWidth.longValue =
-                    FixedMath.Create (
-                        Mathf.Abs (
-                            Handles.FreeMoveHandle (
-                                new Vector3(targetPos.x - HalfWidth.longValue.ToFloat(), targetPos.y, targetPos.z),
-                                Quaternion.identity,
-                                dragHandleSize,
-                                Vector3.zero,
-                                dragCap)
-                            .x - targetPos.x)
-                    );
-                HalfHeight.longValue =
-                    FixedMath.Create (
-                        Mathf.Abs (
-                            Handles.FreeMoveHandle (
-                                new Vector3(targetPos.x, targetPos.y, targetPos.z - HalfHeight.longValue.ToFloat()),
-                                Quaternion.identity,
-                                dragHandleSize,
-                                Vector3.zero,
-                                dragCap)
-                            .z - targetPos.z)
-                    );
-                float halfWidth = HalfWidth.longValue.ToFloat ();
-                float halfHeight = HalfHeight.longValue.ToFloat ();
-                for (int i = -1; i < 2; i++) {
-                    float height = targetPos.y + (float)i * spread;
-                    Vector3[] lines = new Vector3[] {
-                        new Vector3 (targetPos.x + halfWidth, height, targetPos.z + halfHeight),
-                        new Vector3 (targetPos.x + halfWidth, height, targetPos.z - halfHeight),
-
-                        new Vector3 (targetPos.x + halfWidth, height, targetPos.z - halfHeight),
-                        new Vector3 (targetPos.x - halfWidth, height, targetPos.z - halfHeight),
-
-                        new Vector3 (targetPos.x - halfWidth, height, targetPos.z - halfHeight),
-                        new Vector3 (targetPos.x - halfWidth, height, targetPos.z + halfHeight),
-
-                        new Vector3 (targetPos.x - halfWidth, height, targetPos.z + halfHeight),
-                        new Vector3 (targetPos.x + halfWidth, height, targetPos.z + halfHeight)
-                    };
-                    Handles.DrawLines (lines);
+                float baseHeight = targetPos.y;
+                for (int i = spreadMin; i <= spreadMax; i++)
+                {
+                    Handles.CircleCap(
+                        1,
+                        new Vector3(targetPos.x, baseHeight + (float)i * spread, targetPos.z)
+                        , Quaternion.Euler(90, 0, 0), Radius.longValue.ToFloat());
                 }
-            }
+                baseHeight = targetPos.y + Height.longValue.ToFloat();
+                for (int i = spreadMin; i <= spreadMax; i++)
+                {
+                    Handles.CircleCap(
+                        1,
+                        new Vector3(targetPos.x, baseHeight + (float)i * spread, targetPos.z)
+                        , Quaternion.Euler(90, 0, 0), Radius.longValue.ToFloat());
+                }
+                xModifier = Radius.longValue.ToFloat();
 
+            } else if (shape == ColliderType.AABox)
+            {
+                HalfWidth.longValue =
+                    FixedMath.Create(
+                    Mathf.Abs(
+                        Handles.FreeMoveHandle(
+                            new Vector3(targetPos.x - HalfWidth.longValue.ToFloat(), targetPos.y, targetPos.z),
+                            Quaternion.identity,
+                            dragHandleSize,
+                            Vector3.zero,
+                            dragCap)
+                            .x - targetPos.x)
+                );
+                HalfHeight.longValue =
+                    FixedMath.Create(
+                    Mathf.Abs(
+                        Handles.FreeMoveHandle(
+                            new Vector3(targetPos.x, targetPos.y, targetPos.z - HalfHeight.longValue.ToFloat()),
+                            Quaternion.identity,
+                            dragHandleSize,
+                            Vector3.zero,
+                            dragCap)
+                            .z - targetPos.z)
+                );
+                float halfWidth = HalfWidth.longValue.ToFloat();
+                float halfHeight = HalfHeight.longValue.ToFloat();
+                for (int i = 0; i < 1; i++)
+                {
+                    float height = targetPos.y + (float)i * spread;
+                    Vector3[] lines = new Vector3[]
+                    {
+                        new Vector3(targetPos.x + halfWidth, height, targetPos.z + halfHeight),
+                        new Vector3(targetPos.x + halfWidth, height, targetPos.z - halfHeight),
+
+                        new Vector3(targetPos.x + halfWidth, height, targetPos.z - halfHeight),
+                        new Vector3(targetPos.x - halfWidth, height, targetPos.z - halfHeight),
+
+                        new Vector3(targetPos.x - halfWidth, height, targetPos.z - halfHeight),
+                        new Vector3(targetPos.x - halfWidth, height, targetPos.z + halfHeight),
+
+                        new Vector3(targetPos.x - halfWidth, height, targetPos.z + halfHeight),
+                        new Vector3(targetPos.x + halfWidth, height, targetPos.z + halfHeight)
+                    };
+                    Handles.DrawLines(lines);
+                }
+
+                xModifier = halfWidth;
+            }
+            Handles.DrawLine(
+                new Vector3(targetPos.x + xModifier, targetPos.y, targetPos.z), 
+                new Vector3(targetPos.x + xModifier, targetPos.y + Height.longValue.ToFloat(), targetPos.z));
+
+            Vector3 movePos = targetPos;
+            movePos.x += xModifier;
+            movePos.y += Height.longValue.ToFloat();
+            movePos = 
+                Handles.FreeMoveHandle(
+                    movePos,
+                    Quaternion.identity,
+                    dragHandleSize,
+                    Vector3.zero,
+                    dragCap
+                );
+            Height.longValue = FixedMath.Create(Mathf.Max(Mathf.Abs(movePos.y - targetPos.y)));
             so.ApplyModifiedProperties();
         }
     }
