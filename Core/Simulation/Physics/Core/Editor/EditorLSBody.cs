@@ -33,9 +33,11 @@ namespace Lockstep.Integration
 
         SerializedObject so { get { return base.serializedObject; } }
 
+        bool MoreThanOne;
+
         void OnEnable()
         {
-            
+            MoreThanOne = targets.Length > 1;
             Shape = so.FindProperty("_shape");
             IsTrigger = so.FindProperty("_isTrigger");
             Layer = so.FindProperty("_layer");
@@ -85,6 +87,9 @@ namespace Lockstep.Integration
                     HalfHeight.Draw();
                 } else if (shape == ColliderType.Polygon)
                 {
+                    EditorGUIUtility.LookLikeControls();
+
+
                     Vertices.Draw();
                 }
                     
@@ -103,6 +108,9 @@ namespace Lockstep.Integration
 
         void OnSceneGUI()
         {
+            
+            if (MoreThanOne) return;
+
             //Have to reinitialize everything because can't apply modified properties on base.serializedObject
             SerializedObject so = new SerializedObject(target);
             so.Update();
@@ -173,9 +181,9 @@ namespace Lockstep.Integration
             {
                 HalfWidth.longValue =
                     FixedMath.Create(
-                    Mathf.Abs(
-                        Handles.FreeMoveHandle(
-                            new Vector3(targetPos.x - HalfWidth.longValue.ToFloat(), targetPos.y, targetPos.z),
+                        (double)Mathf.Abs(
+                            Handles.FreeMoveHandle(
+                                new Vector3(targetPos.x - (float)HalfWidth.longValue.ToFormattedDouble(), targetPos.y, targetPos.z),
                             Quaternion.identity,
                             dragHandleSize,
                             Vector3.zero,
@@ -184,9 +192,9 @@ namespace Lockstep.Integration
                 );
                 HalfHeight.longValue =
                     FixedMath.Create(
-                    Mathf.Abs(
-                        Handles.FreeMoveHandle(
-                            new Vector3(targetPos.x, targetPos.y, targetPos.z - HalfHeight.longValue.ToFloat()),
+                        (double)System.Math.Abs(
+                            Handles.FreeMoveHandle(
+                                new Vector3(targetPos.x, targetPos.y, targetPos.z - (float)HalfHeight.longValue.ToFormattedDouble()),
                             Quaternion.identity,
                             dragHandleSize,
                             Vector3.zero,
@@ -214,6 +222,25 @@ namespace Lockstep.Integration
                     };
                     Handles.DrawLines(lines);
                 }
+                for (int i = 0; i < 1; i++)
+                {
+                    float height = targetPos.y + (float)i * spread + Height.longValue.ToFloat();
+                    Vector3[] lines = new Vector3[]
+                    {
+                        new Vector3(targetPos.x + halfWidth, height, targetPos.z + halfHeight),
+                        new Vector3(targetPos.x + halfWidth, height, targetPos.z - halfHeight),
+
+                        new Vector3(targetPos.x + halfWidth, height, targetPos.z - halfHeight),
+                        new Vector3(targetPos.x - halfWidth, height, targetPos.z - halfHeight),
+
+                        new Vector3(targetPos.x - halfWidth, height, targetPos.z - halfHeight),
+                        new Vector3(targetPos.x - halfWidth, height, targetPos.z + halfHeight),
+
+                        new Vector3(targetPos.x - halfWidth, height, targetPos.z + halfHeight),
+                        new Vector3(targetPos.x + halfWidth, height, targetPos.z + halfHeight)
+                    };
+                    Handles.DrawLines(lines);
+                }
 
                 xModifier = halfWidth;
             }
@@ -223,7 +250,7 @@ namespace Lockstep.Integration
 
             Vector3 movePos = targetPos;
             movePos.x += xModifier;
-            movePos.y += Height.longValue.ToFloat();
+            movePos.y += (float)Height.longValue.ToFormattedDouble();
             movePos = 
                 Handles.FreeMoveHandle(
                     movePos,
@@ -241,7 +268,7 @@ namespace Lockstep.Integration
     {
         public static void Draw(this SerializedProperty prop)
         {
-            EditorGUILayout.PropertyField(prop);
+            EditorGUILayout.PropertyField(prop,true);
 
         }
     }

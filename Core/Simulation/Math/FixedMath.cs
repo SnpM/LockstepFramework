@@ -259,6 +259,10 @@ namespace Lockstep
 		{
 			return (float)(f1 / OneD);
 		}
+
+        public static float ToPreciseFloat (this long f1) {
+            return (float)ToDouble (f1);
+        }
 		/// <summary>
 		/// Converts to string.
 		/// </summary>
