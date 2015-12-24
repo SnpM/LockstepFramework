@@ -720,7 +720,12 @@ namespace Lockstep
             if (Application.isPlaying == false) return;
             switch (this.Shape) {
                 case ColliderType.Circle:
-                    Gizmos.DrawWireSphere(this._position.ToVector3(transform.position.y + .5f),this.Radius.ToFloat());
+                    Gizmos.DrawWireSphere(this._position.ToVector3(this.HeightPos.ToFloat()),this.Radius.ToFloat());
+                    break;
+                case ColliderType.AABox:
+                    Gizmos.DrawWireCube(
+                        this._position.ToVector3(this.HeightPos.ToFloat() + this.Height.ToFloat() / 2),
+                        new Vector3(this.HalfWidth.ToFloat() * 2, this.Height.ToFloat(), this.HalfHeight.ToFloat() * 2));
                     break;
             }
         }

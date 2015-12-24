@@ -352,9 +352,10 @@ namespace Lockstep
                 RegisterGroup();
                 if (straightPath)
                 {
+                    repathCount /= 8;
                 } else
                 {
-                    repathCount /= 4;
+                    repathCount /= 8;
                 }
             }
         }
