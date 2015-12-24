@@ -132,12 +132,14 @@ namespace Lockstep
                 int yShift = BoundY - boundYMin;
                 Nodes.Shift (xShift, yShift);
 
-                //Populating new array slots
                 BoundX = boundXMin;
                 BoundY = boundYMin;
 
+                //Populating new array slots
+                //TODO: Optimize? Any clean way to do this? Worth it?
                 for (int i = Nodes.InnerArray.Length - 1; i >= 0; i--) {
-                    Nodes.InnerArray[i] = new PartitionNode();
+                    if (Nodes.InnerArray[i] == null)
+                        Nodes.InnerArray[i] = new PartitionNode();
                 }
 
                 return true;
