@@ -35,7 +35,17 @@ namespace Lockstep
             }
         }
 
-
+        public static bool SettingsChanged {get; private set;}
+        private static PhysicsSettings _settings = new PhysicsSettings();
+        public static PhysicsSettings Settings {
+            get {
+                return _settings;
+            }
+            set {
+                _settings = value;
+                SettingsChanged = true;
+            }
+        }
 
         #endregion
 
@@ -88,6 +98,10 @@ namespace Lockstep
             FastCollisionPairs.FastClear();
 
             Partition.Initialize();
+
+            if (SettingsChanged) {
+                SettingsChanged = false;
+            }
         }
 
 

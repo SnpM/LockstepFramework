@@ -146,10 +146,10 @@ namespace Lockstep
         public long XMax {get; private set;}
         public long YMin {get; private set;}
         public long YMax {get; private set;}
-        public long PastGridXMin;
-		public long PastGridXMax;
-		public long PastGridYMin;
-		public long PastGridYMax;
+        public int PastGridXMin;
+		public int PastGridXMax;
+		public int PastGridYMin;
+		public int PastGridYMax;
         public long HeightMin {get; private set;}
         public long HeightMax {get; private set;}
 		
@@ -297,10 +297,10 @@ namespace Lockstep
 			YMax = 0;
 			
 			
-			PastGridXMin = long.MaxValue;
-			PastGridXMax = long.MaxValue;
-			PastGridYMin = long.MaxValue;
-			PastGridYMax = long.MaxValue;
+			PastGridXMin = int.MaxValue;
+			PastGridXMax = int.MaxValue;
+			PastGridYMin = int.MaxValue;
+			PastGridYMax = int.MaxValue;
 			
 			if (Shape != ColliderType.None) {
 				BuildPoints ();

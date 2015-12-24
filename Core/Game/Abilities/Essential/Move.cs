@@ -240,7 +240,8 @@ namespace Lockstep
                     {
                         if (hasPath)
                         {
-                            //repathCount--;
+                            //TODO: fix this shit
+                            repathCount--;
                         } else
                         {
                             repathCount--;

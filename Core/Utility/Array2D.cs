@@ -55,7 +55,13 @@ namespace Lockstep
             get
             {
                 int index = GetIndex(w, h);
+                try {
                 return _innerArray [index];
+                }
+                catch {
+                    Debug.Log(w + ", " + h);
+                    return default(T);
+                }
             }
             set
             {
@@ -63,6 +69,7 @@ namespace Lockstep
                 _innerArray [index] = value;
             }
         }
+
 
         public void Resize(int newWidth, int newHeight)
         {
@@ -135,6 +142,10 @@ namespace Lockstep
                     _innerArray = newArray;
                 }
             }
+        }
+
+        public void Clear () {
+            Array.Clear (_innerArray, 0, _innerArray.Length);
         }
 
         private int GetIndex(int w, int h)
