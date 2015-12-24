@@ -23,13 +23,13 @@ namespace Lockstep
 		public static uint _Version = 1;
         public static Array2D<PartitionNode> Nodes = new Array2D<PartitionNode> (DefaultCount, DefaultCount);
 		public static readonly FastBucket<PartitionNode> ActivatedNodes = new FastBucket<PartitionNode>();
+        private static readonly FastList<PartitionNode> AllocatedNodes = new FastList<PartitionNode>();
 
 		public static void Setup ()
 		{
 			_Version = 1;
-            for (int i = Nodes.InnerArray.Length - 1; i >= 0; i--) {
-                Nodes.InnerArray [i] = new PartitionNode ();
-			}
+
+
             BoundX = -DefaultCount / 2;
             BoundY = -DefaultCount / 2;
 
@@ -37,8 +37,8 @@ namespace Lockstep
 
 		public static void Initialize () {
             ActivatedNodes.FastClear ();
-            for (int i = Nodes.InnerArray.Length - 1; i >= 0; i--) {
-                Nodes.InnerArray[i].Initialize ();
+            for (int i = AllocatedNodes.Count - 1; i >= 0; i--) {
+                AllocatedNodes[i].Reset ();
 			}
 		}
 
@@ -54,14 +54,14 @@ namespace Lockstep
 				Body.PastGridYMax != GridYMax) {
 				for (int o = Body.PastGridXMin; o <= Body.PastGridXMax; o++) {
 					for (int p = Body.PastGridYMin; p <= Body.PastGridYMax; p++) {
-						PartitionNode node = Nodes [o,p];
+                        PartitionNode node = GetNode(o,p);
 						node.Remove (Body.ID);
 					}
 				}
 
 				for (int i = GridXMin; i <= GridXMax; i++) {
 					for (int j = GridYMin; j <= GridYMax; j++) {
-						PartitionNode node = Nodes [i,j];
+                        PartitionNode node = GetNode(i,j);
 
 						node.Add (Body.ID);
 					}
@@ -103,7 +103,7 @@ namespace Lockstep
 
 			for (int i = GridXMin; i <= GridXMax; i++) {
 				for (int j = GridYMin; j <= GridYMax; j++) {
-					PartitionNode node = Nodes [i,j];
+                    PartitionNode node = GetNode(i,j);
 					node.Add (Body.ID);
 				}
 			}
@@ -137,10 +137,12 @@ namespace Lockstep
 
                 //Populating new array slots
                 //TODO: Optimize? Any clean way to do this? Worth it?
-                for (int i = Nodes.InnerArray.Length - 1; i >= 0; i--) {
+                //DERP! Just allocate nodes as needed.
+
+                /*for (int i = Nodes.InnerArray.Length - 1; i >= 0; i--) {
                     if (Nodes.InnerArray[i] == null)
                         Nodes.InnerArray[i] = new PartitionNode();
-                }
+                }*/
 
                 return true;
             }
@@ -155,6 +157,16 @@ namespace Lockstep
         }
         public static int GetGridY (long yPos) {
             return (int)((yPos) >> ShiftSize) - BoundY;
+        }
+
+        public static PartitionNode GetNode (int indexX, int indexY) {
+            PartitionNode node = Nodes[indexX,indexY];
+            if (node.IsNull ())
+            {
+                node = new PartitionNode();
+                Nodes[indexX,indexY] = node;
+            }
+            return node;
         }
 
 		public static void CheckAndDistributeCollisions ()

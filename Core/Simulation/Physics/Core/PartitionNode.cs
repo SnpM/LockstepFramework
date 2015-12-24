@@ -7,7 +7,7 @@ public class PartitionNode {
 		public readonly FastBucket<int> ContainedObjects = new FastBucket<int> ();
 		public int Count {get {return ContainedObjects.Count;}}
 		public int PeakCount {get {return ContainedObjects.PeakCount;}}
-		public void Initialize () { 
+		public void Reset () { 
 			ContainedObjects.FastClear ();
 		}
 		int activationID;
@@ -22,6 +22,7 @@ public class PartitionNode {
 			if (ContainedObjects.Remove (item)) {
 				if (Count == 0) {
 					Partition.ActivatedNodes.RemoveAt (activationID);
+                    activationID = -1;
 				}
 			}
 		}
