@@ -136,6 +136,7 @@ namespace Lockstep {
 
 		static bool Stalled;
         internal static void Simulate() {
+            MainGameManager.MainNetworkHelper.Simulate();
             DefaultMessageRaiser.EarlySimulate ();
 			if (InfluenceCount == 0)
 			{

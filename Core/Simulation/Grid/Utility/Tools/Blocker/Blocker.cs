@@ -9,7 +9,7 @@ public class Blocker : EnvironmentObject
     static readonly FastList<Vector2d> bufferCoordinates = new FastList<Vector2d>();
 
     [SerializeField]
-    private bool _blockPathfinding;
+    private bool _blockPathfinding = true;
     public bool BlockPathfinding {get {return _blockPathfinding;}}
 
 
