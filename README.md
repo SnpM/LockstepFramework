@@ -36,7 +36,7 @@ These are high priority issues that are significantly big or complicated. Any he
 
 Road Map
 ---------
-- Semi-3D physics (may be coming soon!). Physics calculations on the Y axis will requires non-trivial changes but collision detection for objects like bullets may be able to be hacked in.
+- Semi-3D physics (may be coming soon!). Physics calculations on the Y axis requires non-trivial changes but collision detection for objects like bullets may be able to be hacked in.
 - Multi engine support. Customizable support for game engines in addition to Unity could make this framework viable for many more people.
 
 License
