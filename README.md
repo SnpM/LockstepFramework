@@ -7,7 +7,7 @@ Special thanks to Liv Games (http://www.livgames.com) and 360 Studio (http://www
 Under development by [John Pan](https://github.com/SnpM) and Lam Pham (https://github.com/LamPham).
 
 Features
-________
+__________
 - Deterministic math library and simulation logic
 - 2D physics engine on the X-Z plane.
 - Behaviour system for both individual agents and globally
@@ -26,7 +26,7 @@ Quick Setup
 Note: The example only shows the basic functionality of the framework. Comprehensive examples will be added close to the end of core development.
 
 TODO:
-______
+-------
 These are high priority issues that are significantly big or complicated. Any help on these aspects (as well as on any other lacking parts of the framework) would be very appreciated.
 - Interpolation. Currently, interpolation between the position of the last simualtion frame and the current simulation frame for a unit causes stuttering. To mitigate this issue, another layer of interpolation is used. The current code for smoothing interpolation and communicating the positions to Unity's transform system is in LSBody.Visualize, around line 506. Note that setting LerpDamping to 1 will remove the extra layer of interpolation and uncover the stuttering.
 - Pathfinding around corners. Even explaining to me a solution to this problem will help a lot.
@@ -35,7 +35,7 @@ These are high priority issues that are significantly big or complicated. Any he
 - Safe and scalable coding patterns. Anywhere you see something that might cause problems for a large-scale project, fixing it or raising an issue would be a big help. LSF started as a work of curiosity and passion. While it's introduced me to helpful experiences, I didn't always see the flaw in using statics everywhere. If there are any significantly limiting problems with a component's design, I'll do my best to fix it.
 
 Road Map
-________
+---------
 - Semi-3D physics (may be coming soon!). Physics calculations on the Y axis will requires non-trivial changes but collision detection for objects like bullets may be able to be hacked in.
 - Multi engine support. Customizable support for game engines in addition to Unity could make this framework viable for many more people.
 
