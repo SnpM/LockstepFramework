@@ -2,7 +2,8 @@
 using System.Collections;
 using System;
 using Lockstep.UI;
-public class InputManager : MonoBehaviour {
+namespace Lockstep {
+public static class InputManager {
 	public static readonly InputCode[] InputCodes = (InputCode[])Enum.GetValues(typeof(InputCode));
 	private static readonly UnityEngine.KeyCode[] mappedKeyCodes = new KeyCode[InputCodes.Length];
 	private static readonly uint[] cachedPressedDown = new uint[InputCodes.Length];
@@ -52,4 +53,5 @@ public class InputManager : MonoBehaviour {
 	{
 		_Version++;
 	}
+}
 }

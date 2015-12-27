@@ -24,23 +24,41 @@ namespace Lockstep {
 
         }
 
-        public abstract void Connect (string ip);
+        /// <summary>
+        /// Connecting to a server with IP address of ip. Note: Not all NetworkHelpers will require Connect.
+        /// </summary>
+        /// <param name="ip">Ip.</param>
+        public virtual void Connect (string ip) {
+            throw new System.NotImplementedException("Connecting not supported for " + this.ToString() + ".");
+        }
 
-        public abstract void Host (int roomSize);
+        /// <summary>
+        /// Host a server with the specified address. Note: Not all NetworkHelpers will require hosting.
+        /// </summary>
+        /// <param name="roomSize">Room size.</param>
+        public virtual void Host (int roomSize) {
+            throw new System.NotImplementedException("Hosting not supported for " + this.ToString() + ".");
+        }
+
+        public virtual void Simulate () {}
 
         public abstract void Disconnect ();
 
-        public abstract void SendMessageToServer (MessageType messageType, byte[] data);
+        public virtual void SendMessageToServer (MessageType messageType, byte[] data) {
+            this.Receive (messageType, data);
+        }
 
         /// <summary>
         /// Used by a locally hosted server. 
         /// </summary>
         /// <param name="messageType">Message type.</param>
         /// <param name="data">Data.</param>
-        public abstract void SendMessageToAll (MessageType messageType, byte[] data);
+        public virtual void SendMessageToAll (MessageType messageType, byte[] data) {
+            this.Receive(messageType, data);
+        }
 
         /// <summary>
-        /// Call from derived class.
+        /// Receives data and sends it to the lockstep frame logic. Call from derived class.
         /// </summary>
         /// <param name="messageType">Message type.</param>
         /// <param name="data">Data.</param>

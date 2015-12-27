@@ -59,14 +59,18 @@ namespace Lockstep
                 return _innerArray [index];
                 }
                 catch {
-                    Debug.Log(w + ", " + h);
-                    return default(T);
+                    throw new System.IndexOutOfRangeException(w + ", " + h);
                 }
             }
             set
             {
+                try {
                 int index = GetIndex(w, h);
                 _innerArray [index] = value;
+                }
+                catch {
+                    throw new System.IndexOutOfRangeException(w + ", " + h);
+                }
             }
         }
 

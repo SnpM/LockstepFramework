@@ -15,9 +15,13 @@ namespace Lockstep
 	{
 		#region Settings
 		public const int DefaultCount = 64;
-        public const int ShiftSize = FixedMath.SHIFT_AMOUNT + 2;
+        public const int AdditionalShiftSize = 2;
+        public const int ShiftSize = FixedMath.SHIFT_AMOUNT + AdditionalShiftSize;
         public static int BoundX {get; private set;} //Lower bound X
         public static int BoundY {get; private set;} //Lower bound Y
+        //Offset due to partition nodes being centered on grid positions
+        public const long Offset = (1 << ShiftSize) / 2;
+
 		#endregion
 
 		public static uint _Version = 1;
@@ -152,13 +156,44 @@ namespace Lockstep
 		static int id1, id2;
 		static CollisionPair pair;
 
+        /// <summary>
+        /// World pos to partition index.
+        /// </summary>
+        /// <returns>The grid x.</returns>
+        /// <param name="xPos">X position.</param>
         public static int GetGridX (long xPos) {
+            xPos += Offset;
             return (int)((xPos) >> ShiftSize) - BoundX;
         }
         public static int GetGridY (long yPos) {
+            yPos += Offset;
             return (int)((yPos) >> ShiftSize) - BoundY;
         }
-
+        /// <summary>
+        /// World pos to relative position on grid.
+        /// </summary>
+        /// <returns>The relative x.</returns>
+        /// <param name="xPos">X position.</param>
+        public static long GetRelativeX (long xPos) {
+            return (xPos >> AdditionalShiftSize) - (FixedMath.Create(BoundX));
+        }
+        public static long GetRelativeY (long yPos) {
+            return (yPos >> AdditionalShiftSize) - (FixedMath.Create(BoundY));
+        }
+        /// <summary>
+        /// Index to world position.
+        /// </summary>
+        /// <returns>The world x.</returns>
+        /// <param name="gridX">Grid x.</param>
+        public static long GetWorldX (int gridX) {
+            return (FixedMath.Create(gridX + BoundX)) << AdditionalShiftSize;
+        }
+        public static long GetWorldY (int gridY) {
+            return (FixedMath.Create(gridY + BoundY)) << AdditionalShiftSize;
+        }
+        public static bool CheckValid (int indexX, int indexY) {
+            return indexX >= 0 && indexX < Nodes.Width && indexY >= 0 && indexY < Nodes.Height;
+        }
         public static PartitionNode GetNode (int indexX, int indexY) {
             PartitionNode node = Nodes[indexX,indexY];
             if (node.IsNull ())

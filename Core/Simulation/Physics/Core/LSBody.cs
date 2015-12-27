@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 namespace Lockstep
 {
-	public class LSBody : MonoBehaviour
+	public sealed partial class LSBody : MonoBehaviour
 	{
         #region Core deterministic variables
         [SerializeField] //For inspector debugging
@@ -182,7 +182,7 @@ namespace Lockstep
         public long HalfHeight {get {return _halfHeight;}}
         [SerializeField,FixedNumber, FormerlySerializedAs ("Radius")]
         private long _radius = FixedMath.Half;
-		public long Radius;
+        public long Radius {get {return _radius;}}
         [SerializeField, FormerlySerializedAs ("Immovable")]
         private bool _immovable = false;
 		public bool Immovable;
@@ -243,12 +243,12 @@ namespace Lockstep
 		public void GenerateBounds ()
 		{
 			if (Shape == ColliderType.Circle) {
-				Radius = Radius;
+				_radius = Radius;
 			} else if (Shape == ColliderType.AABox) {
 				if (HalfHeight == HalfWidth) {
-					Radius = FixedMath.Sqrt ((HalfHeight * HalfHeight * 2) >> FixedMath.SHIFT_AMOUNT);
+					_radius = FixedMath.Sqrt ((HalfHeight * HalfHeight * 2) >> FixedMath.SHIFT_AMOUNT);
 				} else {
-					Radius = FixedMath.Sqrt ((HalfHeight * HalfHeight + HalfWidth * HalfWidth) >> FixedMath.SHIFT_AMOUNT);
+					_radius = FixedMath.Sqrt ((HalfHeight * HalfHeight + HalfWidth * HalfWidth) >> FixedMath.SHIFT_AMOUNT);
 				}
 
 			} else if (Shape == ColliderType.Polygon) {
@@ -259,7 +259,7 @@ namespace Lockstep
 						BiggestSqrRadius = sqrRadius;
 					}
 				}
-				Radius = FixedMath.Sqrt (BiggestSqrRadius);
+				_radius = FixedMath.Sqrt (BiggestSqrRadius);
 			}
 		}
 		
@@ -667,6 +667,9 @@ namespace Lockstep
         public bool HeightOverlaps (long heightMin, long heightMax) {
             return heightMax >= HeightMin && heightMin <= HeightMax;
         }
+
+
+
 
         long GetCeiledSnap (long f, long snap) {
             return (f + snap - 1) / snap * snap;
