@@ -1,4 +1,6 @@
 ﻿namespace Lockstep {
+    //TODO: Dynamic registering of command data
+
     public class Command {
         private const int CompressionShift = FixedMath.SHIFT_AMOUNT - 7;
         private const int FloatToInt = 100;
@@ -17,8 +19,10 @@
         private Selection _select;
         private byte _groupID;
         private string _text;
-        private VectorRotation _rotation;
+        private Vector2d _rotation;
         private byte[] _raw;
+        private Vector2d _rotation2;
+        private long _value;
 
         public bool HasPosition { get; private set; }
         public bool HasTarget { get; private set; }
@@ -30,6 +34,8 @@
         public bool HasText {get; private set;}
         public bool HasRotation {get; private set;}
         public bool HasRaw {get; private set;}
+        public bool HasRotation2 {get; private set;}
+        public bool HasValue;
 
         public bool Used;
         public byte ControllerID;
@@ -108,7 +114,7 @@
             }
         }
 
-        public VectorRotation Rotation {
+        public Vector2d Rotation {
             get {return _rotation;}
             set {
                 _rotation = value;
@@ -120,6 +126,22 @@
             set {
                 _raw = value;
                 HasRaw = true;
+            }
+        }
+
+        public Vector2d Rotation2 {
+            get {return _rotation2;}
+            set {
+                _rotation2 = value;
+                HasRotation2 = true;
+            }
+        }
+
+        public long Value {
+            get {return _value;}
+            set {
+                _value = value;
+                HasValue = true;
             }
         }
 
@@ -143,6 +165,8 @@
             HasText = GetMaskBool (ValuesMask, DataType.Text);
             HasRotation = GetMaskBool (ValuesMask, DataType.Rotation);
             HasRaw = GetMaskBool (ValuesMask, DataType.Raw);
+            HasRotation2 = GetMaskBool (ValuesMask, DataType.Raw);
+            HasValue = GetMaskBool (ValuesMask, DataType.Value);
 
             if (HasPosition) {
                 _position.x = reader.ReadShort() << CompressionShift;
@@ -180,11 +204,19 @@
             }
 
             if (HasRotation) {
-                _rotation = new VectorRotation (reader.ReadLong(), reader.ReadLong());
+                _rotation = new Vector2d (reader.ReadLong(), reader.ReadLong());
             }
 
             if (HasRaw) {
                 _raw = reader.ReadByteArray();
+            }
+
+            if (HasRotation2) {
+                _rotation2 = new Vector2d(reader.ReadLong(),reader.ReadLong());
+            }
+
+            if (HasValue) {
+                _value = reader.ReadLong();
             }
 
             return reader.Position - StartIndex;
@@ -212,7 +244,9 @@
                     | (HasSelect ? DataType.Select : 0) 
                     | (HasGroupID ? DataType.GroupID : 0)
                     | (HasText ?  DataType.Text : 0)
-                    | (HasRotation ? DataType.Rotation : 0);
+                    | (HasRotation ? DataType.Rotation : 0)
+                    | (HasRotation2 ? DataType.Rotation2 : 0)
+                    | (HasValue ? DataType.Value : 0);
 
                 ValuesMask = (uint) valueMaskDataType;
 
@@ -258,8 +292,20 @@
                 }
 
                 if (HasRotation) {
-                    writer.Write(_rotation.Cos);
-                    writer.Write(_rotation.Sin);
+                    writer.Write(_rotation.x);
+                    writer.Write(_rotation.y);
+                }
+                if (HasRaw) {
+                    writer.WriteByteArray(_raw);
+                }
+
+                if (HasRotation2) {
+                    writer.Write(_rotation2.x);
+                    writer.Write(_rotation2.y);
+                }
+
+                if (HasValue) {
+                    writer.Write(_value);
                 }
                 return serializeList.ToArray();
             }
@@ -277,5 +323,7 @@
         Text = 1 << 7,
         Rotation = 1 << 8,
         Raw = 1 << 9,
+        Rotation2 = 1 << 10,
+        Value = 1 << 11,
 	}
 }

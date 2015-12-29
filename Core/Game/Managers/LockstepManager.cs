@@ -65,7 +65,6 @@ namespace Lockstep {
 
 			PhysicsManager.Setup ();
 			ClientManager.Setup (MainGameManager.MainNetworkHelper);
-            InterfaceManager.Setup();
 
 			Application.targetFrameRate = 30;
 			Time.fixedDeltaTime = BaseDeltaTime;
@@ -92,13 +91,13 @@ namespace Lockstep {
 			SimulationTimer.Start ();
 			LSDatabaseManager.Initialize();
             LSUtility.Initialize(1);
-			Interfacing.Initialize ();
-			InfluenceCount = 0;
+            InfluenceCount = 0;
 			Time.timeScale = 1f;
 			Stalled = true;
 
             FrameCount = 0;
 			InfluenceFrameCount = 0;
+            MainGameManager.MainInterfacingHelper.Initialize();
 
             TriggerManager.Initialize();
 
@@ -123,9 +122,9 @@ namespace Lockstep {
 			Started = true;
             ClientManager.Initialize ();
 
-
             DefaultMessageRaiser.LateInitialize();
             BehaviourHelperManager.LateInitialize();
+            MainGameManager.MainInterfacingHelper.LateInitialize ();
         }
 
         static void InitializeHelpers () {
@@ -159,6 +158,9 @@ namespace Lockstep {
 				return;
 			}
 			if (FrameCount == 0) StartGame ();
+            MainGameManager.MainInterfacingHelper.Simulate();
+
+
 			BehaviourHelperManager.Simulate();
 			AgentController.Simulate();
             PhysicsManager.Simulate();
@@ -223,7 +225,7 @@ namespace Lockstep {
         internal static void Visualize() {
             DefaultMessageRaiser.EarlyVisualize();
 			PlayerManager.Visualize();
-
+            MainGameManager.MainInterfacingHelper.Visualize();
 			BehaviourHelperManager.Visualize();
 			PhysicsManager.Visualize();
 			AgentController.Visualize();
@@ -239,12 +241,17 @@ namespace Lockstep {
 
 		}
 
+        internal static void DrawGUI () {
+
+        }
+
         internal static void Deactivate() {
             DefaultMessageRaiser.EarlyDeactivate();
 
             if (Started == false) return;
             Selector.Clear();
             AgentController.Deactivate();
+            MainGameManager.MainInterfacingHelper.Deactivate();
 			BehaviourHelperManager.Deactivate ();
             ProjectileManager.Deactivate();
 			ClientManager.Deactivate ();
@@ -270,10 +277,5 @@ namespace Lockstep {
             hash += 1;
             return hash;
         }
-    }
-
-    public enum SelectionSetting {
-        PC_RTS,
-        Mobile
     }
 }

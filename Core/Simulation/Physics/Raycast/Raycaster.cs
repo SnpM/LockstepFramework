@@ -9,7 +9,7 @@ namespace Lockstep
     {
         public static IEnumerable<LSBody> RaycastAll(Vector2d start, Vector2d end)
         {
-            LSBody.PrepareOverlapCheck(start,end);
+            LSBody.PrepareAxisCheck(start,end);
             foreach (FractionalLineAlgorithm.Coordinate coor in
                 GetRelevantNodeCoordinates (start,end)
             ) {
@@ -28,6 +28,16 @@ namespace Lockstep
                 }
             }
             yield break;
+        }
+
+        public static IEnumerable<LSBody> RaycastAll (Vector2d start, Vector2d end, long startHeight, long heightSlope) {
+            foreach (LSBody body in RaycastAll(start,end)) {
+                long dist = body.GetClosestDist(start);
+                long heightAtBodyPosition = startHeight + (dist.Mul (heightSlope));
+                if (body.HeightOverlaps(heightAtBodyPosition)) {
+                    yield return body;
+                }
+            }
         }
 
         public static IEnumerable<FractionalLineAlgorithm.Coordinate> GetRelevantNodeCoordinates (Vector2d start, Vector2d end) {

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Lockstep;
-public class Marker : MonoBehaviour {
+public class OrderMarker : MonoBehaviour {
 	public Animation animation;
 	public Renderer renderer;
 	private Material material;

@@ -65,34 +65,34 @@ namespace Lockstep.Integration
 
                 Shape.Draw();
                 ColliderType shape = (ColliderType)Shape.intValue;
-                if (shape == ColliderType.None)
-                    return;
-
-                EditorGUILayout.Space();
-                EditorGUILayout.LabelField("General Collider Settings", EditorStyles.boldLabel);
-                Layer.Draw();
-                IsTrigger.Draw();
-                if (IsTrigger.boolValue == false)
-                    Immovable.Draw();
-                Height.Draw();
-
-                EditorGUILayout.Space();
-                EditorGUILayout.LabelField("Collider Settings", EditorStyles.boldLabel); 
-                if (shape == ColliderType.Circle)
+                if (shape != ColliderType.None)
                 {
-                    Radius.Draw();
-                } else if (shape == ColliderType.AABox)
-                {
-                    HalfWidth.Draw();
-                    HalfHeight.Draw();
-                } else if (shape == ColliderType.Polygon)
-                {
-                    EditorGUIUtility.LookLikeControls();
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.LabelField("General Collider Settings", EditorStyles.boldLabel);
+                    Layer.Draw();
+                    IsTrigger.Draw();
+                    if (IsTrigger.boolValue == false)
+                        Immovable.Draw();
+                    Height.Draw();
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.LabelField("Collider Settings", EditorStyles.boldLabel); 
+                    if (shape == ColliderType.Circle)
+                    {
+                        Radius.Draw();
+                    } else if (shape == ColliderType.AABox)
+                    {
+                        HalfWidth.Draw();
+                        HalfHeight.Draw();
+                    } else if (shape == ColliderType.Polygon)
+                    {
+                        EditorGUIUtility.LookLikeControls();
 
 
-                    Vertices.Draw();
+                        Vertices.Draw();
+                    }
                 }
-                    
                 SceneView.RepaintAll();
                 if (true)//EditorGUI.EndChangeCheck())
                 {
@@ -109,7 +109,8 @@ namespace Lockstep.Integration
         void OnSceneGUI()
         {
             
-            if (MoreThanOne) return;
+            if (MoreThanOne)
+                return;
 
             //Have to reinitialize everything because can't apply modified properties on base.serializedObject
             SerializedObject so = new SerializedObject(target);
@@ -181,9 +182,9 @@ namespace Lockstep.Integration
             {
                 HalfWidth.longValue =
                     FixedMath.Create(
-                        (double)Mathf.Abs(
-                            Handles.FreeMoveHandle(
-                                new Vector3(targetPos.x - (float)HalfWidth.longValue.ToFormattedDouble(), targetPos.y, targetPos.z),
+                    (double)Mathf.Abs(
+                        Handles.FreeMoveHandle(
+                            new Vector3(targetPos.x - (float)HalfWidth.longValue.ToFormattedDouble(), targetPos.y, targetPos.z),
                             Quaternion.identity,
                             dragHandleSize,
                             Vector3.zero,
@@ -192,9 +193,9 @@ namespace Lockstep.Integration
                 );
                 HalfHeight.longValue =
                     FixedMath.Create(
-                        (double)System.Math.Abs(
-                            Handles.FreeMoveHandle(
-                                new Vector3(targetPos.x, targetPos.y, targetPos.z - (float)HalfHeight.longValue.ToFormattedDouble()),
+                    (double)System.Math.Abs(
+                        Handles.FreeMoveHandle(
+                            new Vector3(targetPos.x, targetPos.y, targetPos.z - (float)HalfHeight.longValue.ToFormattedDouble()),
                             Quaternion.identity,
                             dragHandleSize,
                             Vector3.zero,
@@ -253,12 +254,12 @@ namespace Lockstep.Integration
             movePos.y += (float)Height.longValue.ToFormattedDouble();
             movePos = 
                 Handles.FreeMoveHandle(
-                    movePos,
-                    Quaternion.identity,
-                    dragHandleSize,
-                    Vector3.zero,
-                    dragCap
-                );
+                movePos,
+                Quaternion.identity,
+                dragHandleSize,
+                Vector3.zero,
+                dragCap
+            );
             Height.longValue = FixedMath.Create(Mathf.Max(Mathf.Abs(movePos.y - targetPos.y)));
             so.ApplyModifiedProperties();
         }
@@ -268,7 +269,7 @@ namespace Lockstep.Integration
     {
         public static void Draw(this SerializedProperty prop)
         {
-            EditorGUILayout.PropertyField(prop,true);
+            EditorGUILayout.PropertyField(prop, true);
 
         }
     }

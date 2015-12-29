@@ -6,7 +6,7 @@ namespace Lockstep
 {
     public class DefaultSaver : EnvironmentSaver
     {
-        [SerializeField, HideInInspector]
+        [SerializeField]
         private EnvironmentBodyInfo[] _environmentBodies;
         public EnvironmentBodyInfo[] EnvironmentBodies {get {return _environmentBodies;}}
         [SerializeField, HideInInspector]

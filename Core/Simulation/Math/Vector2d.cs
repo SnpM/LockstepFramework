@@ -37,6 +37,10 @@ namespace Lockstep
 			this.x = FixedMath.Create (xFloat);
 			this.y = FixedMath.Create (yFloat);
 		}
+        public Vector2d (double xDoub, double yDoub) {
+            this.x = FixedMath.Create(xDoub);
+            this.y = FixedMath.Create(yDoub);
+        }
 		public Vector2d (Vector3 vec)
 		{
 			this.x = FixedMath.Create (vec.x);
@@ -245,7 +249,15 @@ namespace Lockstep
 		{
 			return (v1x * v2y - v1y * v2x) >> FixedMath.SHIFT_AMOUNT;
 		}
-	#endregion
+        /// <summary>
+        /// Note: Not deterministic. Use only for serialization and sending in Commands.
+        /// </summary>
+        /// <returns>The from angle.</returns>
+        /// <param name="angle">Angle.</param>
+        public static Vector2d CreateFromAngle (float angle) {
+            return new Vector2d(Math.Sin(angle), Math.Cos(angle));
+        }
+        #endregion
 
 	#region Convert
 		public override string ToString ()
@@ -266,7 +278,7 @@ namespace Lockstep
 				);
 		}
 
-	    public Vector3 ToVector3(float y) {
+	    public Vector3 ToVector3(float y = 0f) {
 	        return new Vector3((float)FixedMath.ToDouble(this.x), y, (float)FixedMath.ToDouble(this.y));
 	    }
 

@@ -12,7 +12,7 @@ namespace Lockstep
         private static long axisMax;
         private static long cacheProjPerp;
 
-        public static void PrepareOverlapCheck(Vector2d p1, Vector2d p2)
+        public static void PrepareAxisCheck(Vector2d p1, Vector2d p2)
         {
             cacheP1 = p1;
             cacheP2 = p2;
@@ -56,6 +56,31 @@ namespace Lockstep
                     break;
             }
             return false;
+        }
+        public Vector2d GetClosestPoint (Vector2d target) {
+            switch (this.Shape) {
+                case ColliderType.Circle:
+                    {
+                        Vector2d delta = this._position - target;
+                        long mag = delta.Magnitude();
+                        delta *= mag - this._radius;
+                        return target + delta;
+                    }
+                    break;
+            }
+            return this._position - target;
+        }
+        public long GetClosestDist (Vector2d target) {
+            switch (this.Shape) {
+                case ColliderType.Circle:
+                    {
+                        Vector2d delta = this._position - target;
+                        long mag = delta.Magnitude();
+                        return mag - this._radius;
+                    }
+                    break;
+            }
+            return (this._position - target).Magnitude();
         }
     }
 }

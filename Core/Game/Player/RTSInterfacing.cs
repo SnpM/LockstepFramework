@@ -4,7 +4,7 @@ using System;
 
 namespace Lockstep
 {
-	public static class Interfacing
+	public static class RTSInterfacing
 	{
 		public static Camera mainCamera { get; private set; }
 
@@ -117,13 +117,15 @@ namespace Lockstep
 
 		public static void ActivateMarkerOnMouse (MarkerType markerType)
 		{
-			if (CachedDidHit) {
-				PlayerManager.OrderMarker.PlayOneShot (CachedHit.point, CachedHit.normal, markerType);
-				return;
-			}
-			Vector3 hitPoint = CachedRay.origin - CachedRay.direction * (CachedRay.origin.y / CachedRay .direction.y);
-            if (PlayerManager.OrderMarker != null)
-			PlayerManager.OrderMarker.PlayOneShot (hitPoint, Vector3.up, markerType);
+            #if false
+            if (CachedDidHit) {
+                PlayerManager.OrderMarker.PlayOneShot (CachedHit.point, CachedHit.normal, markerType);
+                return;
+            }
+            Vector3 hitPoint = CachedRay.origin - CachedRay.direction * (CachedRay.origin.y / CachedRay .direction.y);
+                     if (PlayerManager.OrderMarker != null)
+            PlayerManager.OrderMarker.PlayOneShot (hitPoint, Vector3.up, markerType);
+            #endif
 		}
 
 		private static Vector3 checkDir;

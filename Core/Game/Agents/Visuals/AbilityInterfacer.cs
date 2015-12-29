@@ -10,7 +10,7 @@ namespace Lockstep.Data {
         false,
         Rotorz.ReorderableList.ReorderableListFlagsUtility.DefinedItems,
         true,
-        typeof (Ability))]
+        typeof (ActiveAbility))]
 #endif
     [Serializable]
 
@@ -23,6 +23,12 @@ namespace Lockstep.Data {
             AbilityInterfacer[] interfacers = (LSDatabaseManager.CurrentDatabase as DefaultLSDatabase).AbilityData;
             for (int i = 0; i < interfacers.Length; i++) {
                 AbilityInterfacer interfacer = interfacers[i];
+                if (interfacer.Script.Type == null) {
+                    Debug.Log(interfacer.Name);
+
+                    //exception or ignore?
+                    continue;
+                }
                 CodeInterfacerMap.Add(interfacer.Name, interfacer);
                 TypeInterfacerMap.Add(interfacer.Script.Type, interfacer);
             }

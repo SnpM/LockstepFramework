@@ -25,6 +25,13 @@ namespace Lockstep {
             get;
         }
 
+        private static RTSPlayerInterfacingHelper _defaultHelper = new RTSPlayerInterfacingHelper();
+        public virtual PlayerInterfacingHelper MainInterfacingHelper {
+            get {
+                return _defaultHelper;
+            }
+        }
+
         public void ScanForHelpers () {
             //Currently deterministic but not guaranteed by Unity
             _helpers = this.gameObject.GetComponents<BehaviourHelper> ();

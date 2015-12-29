@@ -662,7 +662,7 @@ namespace Lockstep
 		}
 
         public bool HeightOverlaps (long heightPos) {
-            return heightPos >= HeightMin && HeightPos <= HeightMax;
+            return heightPos >= HeightMin && heightPos <= HeightMax;
         }
         public bool HeightOverlaps (long heightMin, long heightMax) {
             return heightMax >= HeightMin && heightMin <= HeightMax;
