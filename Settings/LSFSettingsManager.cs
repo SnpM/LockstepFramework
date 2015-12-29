@@ -6,7 +6,7 @@ using UnityEditor;
 #endif
 namespace Lockstep {
     public static class LSFSettingsManager {
-        public const string SETTINGS_NAME = "LockstepFrameworkSettings.asset";
+        public const string SETTINGS_NAME = "LockstepFrameworkSettings";
         static LSFSettings MainSettings;
 
         static LSFSettingsManager () {
