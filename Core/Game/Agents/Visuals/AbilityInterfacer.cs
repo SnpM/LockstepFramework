@@ -48,23 +48,35 @@ namespace Lockstep.Data {
                 return interfacer;
             return null;
         }
+        public static AbilityInterfacer FindInterfacer<TAbility> ()  where TAbility : ActiveAbility {
+            return FindInterfacer (typeof (TAbility));
+        }
 
         public string GetAbilityCode () {
             return this.Name;
         }
        
 
-		[SerializeField]
-        private InputCode _listenInput = InputCode.None;
-		public InputCode ListenInput {get {return _listenInput;}}
-		[SerializeField]
+        [SerializeField,DataCode ("Input")]
+        private string _listenInputCode;
+        bool ListenInputInitialized{get; set;}
+        private ushort _listenInputID;
+        public string ListenInputCode {get {return _listenInputCode;}}
+        public ushort ListenInputID {
+            get {
+                if (ListenInputInitialized) {
+                    return _listenInputID;
+                }
+                else {
+                    ListenInputInitialized = true;
+                    return _listenInputID = InputCodeManager.GetCodeID (_listenInputCode);
+                }
+            }
+        }
+        [SerializeField]
 		private InformationGatherType _informationGather;
 		public InformationGatherType InformationGather {get {return _informationGather;}}
-		[SerializeField]
-		private MarkerType _markType;
-		public MarkerType MarkType {get {return _markType;}}
 
-		public int TileIndex {get {return (int) ListenInput;}}
-	}
+    }
 
 }

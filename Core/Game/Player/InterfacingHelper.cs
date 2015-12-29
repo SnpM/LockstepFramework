@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Lockstep
 {
-    public abstract class PlayerInterfacingHelper
+    public abstract class InterfacingHelper
     {
         public void Initialize()
         {

@@ -37,16 +37,15 @@
         public bool HasRotation2 {get; private set;}
         public bool HasValue;
 
-        public bool Used;
         public byte ControllerID;
-        public InputCode LeInput;
+        public ushort LeInput;
 
         public Command() {}
 
-        public Command(InputCode inputCode) {
+        public Command(ushort inputCode) {
             LeInput = inputCode;
         }
-		public Command(InputCode inputCode, byte controllerID) {
+        public Command(ushort inputCode, byte controllerID) {
 			this.LeInput = inputCode;
 			this.ControllerID = controllerID;
 		}
@@ -149,10 +148,9 @@
         /// Reconstructs this command from a serialized command and returns the size of the command.
         /// </summary>
         public int Reconstruct(byte[] Source, int StartIndex) {
-            Used = false;
             reader.Initialize(Source, StartIndex);
             ControllerID = reader.ReadByte();
-            LeInput = (InputCode)reader.ReadByte();
+            LeInput = reader.ReadUShort();
             ValuesMask = reader.ReadUInt();
 
             HasPosition = GetMaskBool(ValuesMask, DataType.Position);
@@ -232,7 +230,7 @@
 
                 //Essential Information
                 writer.Write(ControllerID);
-                writer.Write((byte)LeInput);
+                writer.Write(LeInput);
 
                 //Header 
                 DataType valueMaskDataType = 

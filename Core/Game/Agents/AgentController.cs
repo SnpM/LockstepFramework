@@ -266,15 +266,6 @@ namespace Lockstep
 
         public void Execute(Command com)
         {
-            if (com.LeInput == InputCode.Spawn)
-            {
-                for (int i = 0; i < com.Count; i++)
-                {
-                    LSAgent agent = CreateAgent(GetAgentCode(com.Target), com.Position,null);
-                }
-                return;
-            }
-            
             
             if (com.HasGroupID)
             {
@@ -304,12 +295,17 @@ namespace Lockstep
 
         public static Command GenerateSpawnCommand(AgentController cont, string agentCode, int count, Vector2d position)
         {
+            //Temporarily disabled
+            //TODO: reimplement with BehaviourHelper system
+            /*
             Command com = new Command(InputCode.Spawn);
             com.ControllerID = cont.ControllerID;
             com.Position = position;
             com.Target = (ushort)AgentController.GetAgentCodeIndex(agentCode);
             com.Count = count;
             return com;
+            */
+            throw new System.NotImplementedException();
         }
 
         public LSAgent CreateAgent(

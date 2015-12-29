@@ -5,7 +5,7 @@ using Lockstep.Data;
 
 namespace Lockstep
 {
-    public class RTSPlayerInterfacingHelper : PlayerInterfacingHelper
+    public class RTSPlayerInterfacingHelper : InterfacingHelper
     {
         public static GUIManager GUIManager;
 
@@ -60,20 +60,20 @@ namespace Lockstep
 
             if (IsGathering)
             {
-                if (InputManager.GetQuickDown())
+                if (Input.GetMouseButtonDown(1))
                 {
                     IsGathering = false;
                     return;
                 }
 
-                if (InputManager.GetInformationDown() || CurrentInterfacer.InformationGather == InformationGatherType.None)
+                if (Input.GetMouseButtonDown(0) || CurrentInterfacer.InformationGather == InformationGatherType.None)
                 {
                     ProcessInterfacer(CurrentInterfacer);
                 }
             } else
             {
                 if (Selector.MainSelectedAgent != null) {
-                if (InputManager.GetQuickDown())
+                    if (Input.GetMouseButtonDown(1))
                 {
                     LSAgent target;
                     if (RTSInterfacing.MousedAgent.IsNotNull() &&
@@ -95,18 +95,18 @@ namespace Lockstep
             switch (facer.InformationGather)
             {
                 case InformationGatherType.Position:
-                    curCom = new Command(facer.ListenInput);
+                    curCom = new Command(facer.ListenInputID);
                     curCom.Position = RTSInterfacing.GetWorldPosD(Input.mousePosition);
                     break;
                 case InformationGatherType.Target:
-                    curCom = new Command(facer.ListenInput);
+                    curCom = new Command(facer.ListenInputID);
                     if (RTSInterfacing.MousedAgent .IsNotNull())
                     {
                         curCom.Target = RTSInterfacing.MousedAgent.LocalID;
                     }
                     break;
                 case InformationGatherType.PositionOrTarget:
-                    curCom = new Command(facer.ListenInput);
+                    curCom = new Command(facer.ListenInputID);
                     if (RTSInterfacing.MousedAgent .IsNotNull())
                     {
                         curCom.Target = RTSInterfacing.MousedAgent.GlobalID;
@@ -116,13 +116,10 @@ namespace Lockstep
                     }
                     break;
                 case InformationGatherType.None:
-                    curCom = new Command(facer.ListenInput);
+                    curCom = new Command(facer.ListenInputID);
                     break;
             }
-            if (facer.MarkType != MarkerType.None)
-            {
-                RTSInterfacing.ActivateMarkerOnMouse(facer.MarkType);
-            }
+
             Send(curCom);
         }
 

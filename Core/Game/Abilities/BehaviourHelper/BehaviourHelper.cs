@@ -14,8 +14,8 @@ public abstract class BehaviourHelper : MonoBehaviour, IBehaviourHelper
 	private static HashSet<Type> createdTypes = new HashSet<Type> ();
 	
 
-	public virtual InputCode ListenInput {
-        get {return InputCode.None;}
+	public virtual ushort ListenInput {
+        get {return 0;}
     }
 
 	public void Initialize ()

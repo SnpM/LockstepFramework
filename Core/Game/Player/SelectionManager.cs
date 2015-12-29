@@ -151,7 +151,7 @@ namespace Lockstep
 
 			} else {
 
-                if (RTSPlayerInterfacingHelper.IsGathering == false && InputManager.GetInformationDown ()) {
+                if (RTSPlayerInterfacingHelper.IsGathering == false && Input.GetMouseButtonDown (0)) {
 					CheckBoxDistance = true;
 					Boxing = true;
 					BoxingTime = 0f;

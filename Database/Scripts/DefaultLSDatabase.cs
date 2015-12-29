@@ -31,6 +31,26 @@ namespace Lockstep.Data
 
         #endregion
 
+        #region Input
+        [SerializeField]
+        [RegisterData ("Input")]
+        private InputDataItem[] _inputData = new InputDataItem[] {
+            new InputDataItem("Special1", KeyCode.Q),
+            new InputDataItem("Special2", KeyCode.W),
+            new InputDataItem("Special3", KeyCode.E),
+            new InputDataItem("Special4", KeyCode.R),
+            new InputDataItem("Core1", KeyCode.A),
+            new InputDataItem("Core2", KeyCode.S),
+            new InputDataItem("Core3", KeyCode.D),
+            new InputDataItem("Core4",KeyCode.F),
+            new InputDataItem("Item1", KeyCode.Z),
+            new InputDataItem("Item2",KeyCode.X),
+            new InputDataItem("Item3",KeyCode.C),
+            new InputDataItem("Item4",KeyCode.V)
+        };
+        public InputDataItem[] InputData {get {return _inputData;}}
+        #endregion
+
         #region Projectiles
 
         [SerializeField,RegisterData("Projectiles")]
