@@ -20,7 +20,7 @@ namespace Lockstep
 
         public static ushort PeakGlobalID { get; private set; }
 
-        public const int MaxAgents = 512;
+        public const int MaxAgents = 16384;
         private static readonly Dictionary<string,AgentInterfacer> CodeInterfacerMap = new Dictionary<string, AgentInterfacer>();
 
         public static void Setup()

@@ -273,12 +273,8 @@
                 }
 
                 if (HasSelect) {
-                    writer.Write(_select.Header);
-					for (int i = 0; i < 64; i++) {
-                        if (_select.Data[i] != 0) {
-                            writer.Write(_select.Data[i]);
-                        }
-                    }
+                    writer.Write(_select.GetBytes());
+
                 }
 
                 if (HasGroupID) {
