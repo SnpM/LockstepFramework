@@ -52,7 +52,17 @@ namespace Lockstep
 
         public static bool Loaded { get; private set; }
 
-        public static GameManager MainGameManager { get; private set; }
+        private GameManager _mainGameManager;
+        public static GameManager MainGameManager {
+            get {
+                if (_mainGameManager == null)
+                    throw new System.Exception("MainGameManager has exploded!");
+                return _mainGameManager;
+            }
+            private set {
+                _mainGameManager = value;
+            }
+        }
 
         internal static void Setup()
         {
