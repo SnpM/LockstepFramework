@@ -88,7 +88,7 @@ namespace Lockstep {
 					}
 					com.ControllerID = cont.ControllerID;
 					com.Select.Serialize (AgentControllers[i].SelectedAgents);
-					CommandManager.SendCommand (com);
+                    CommandManager.SendCommand (com);
 				}
 			}
 		}

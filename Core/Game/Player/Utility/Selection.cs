@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using Stopwatch = System.Diagnostics.Stopwatch;
 namespace Lockstep {
     public class Selection {
         private static readonly FastList<byte> bufferBites = new FastList<byte>();
@@ -28,6 +29,8 @@ namespace Lockstep {
         }
 
         public byte[] GetBytes () {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             bufferBites.FastClear();
             //Serialize header
             int headerLength = Header.Length;
@@ -46,10 +49,12 @@ namespace Lockstep {
                     bufferBites.Add(Data[i]);
                 }
             }
+            sw.Stop();
             return bufferBites.ToArray();
         }
 
         public void Serialize(FastEnumerable<LSAgent> selectedAgents) {
+
             Data.FastClear();
             selectedAgentLocalIDs.FastClear ();
 			bufferAgents.FastClear ();
@@ -64,6 +69,7 @@ namespace Lockstep {
 			for (int i = 0; i < bufferAgents.Count; i++) {
                 SerializeAgent(bufferAgents[i]);
             }
+
         }
 
         private void SerializeAgent(LSAgent agent) {
@@ -82,6 +88,7 @@ namespace Lockstep {
         }
 
         public int Reconstruct(byte[] source, int startIndex) {
+
             curIndex = startIndex;
 
             byte headerArraySize = source[curIndex++];
@@ -95,7 +102,6 @@ namespace Lockstep {
                 if (Header.Get(i)) {
 
                     cullGroup = source[curIndex++];
-                    Debug.Log(cullGroup);
 
 					for (int j = 0; j < 8; j++) {
                         castedSmallIndex = (byte)(1 << j);
@@ -105,6 +111,7 @@ namespace Lockstep {
                     }
                 }
             }
+
             return curIndex - startIndex;
         }
 

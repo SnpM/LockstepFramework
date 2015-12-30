@@ -18,17 +18,24 @@ namespace Lockstep
         }
         public static ushort GetCodeID (string code) {
             if (!Setted)
-            throw NotSetupException;
+                throw NotSetupException;
+
+            if (string.IsNullOrEmpty(code))
+                return 0;
             try {
+                
                 return InputMap[code];
             }
             catch {
+
                 throw new System.Exception(string.Format("Code '{0}' does not exist in the current database", code));
             }
         }
         public static string GetIDCode (ushort id) {
             if (!Setted)
-            throw NotSetupException;
+                throw NotSetupException;
+            if (id == 0)
+                return "";
             return InputMap.GetReversed(id);
         }
         static System.Exception NotSetupException {

@@ -25,7 +25,7 @@ namespace Lockstep {
             get;
         }
 
-        private static RTSPlayerInterfacingHelper _defaultHelper = new RTSPlayerInterfacingHelper();
+        private static RTSInterfacingHelper _defaultHelper = new RTSInterfacingHelper();
         public virtual InterfacingHelper MainInterfacingHelper {
             get {
                 return _defaultHelper;

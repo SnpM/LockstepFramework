@@ -5,7 +5,7 @@ using Lockstep.Data;
 
 namespace Lockstep
 {
-    public class RTSPlayerInterfacingHelper : InterfacingHelper
+    public class RTSInterfacingHelper : InterfacingHelper
     {
         public static GUIManager GUIManager;
 

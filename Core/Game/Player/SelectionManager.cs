@@ -142,7 +142,7 @@ namespace Lockstep
 					if (CanClearSelection) {
 						ClearSelection ();
 					}
-                    if (RTSPlayerInterfacingHelper.IsGathering == false) {
+                    if (RTSInterfacingHelper.IsGathering == false) {
 						SelectBoxedAgents ();
 					}
 
@@ -151,7 +151,7 @@ namespace Lockstep
 
 			} else {
 
-                if (RTSPlayerInterfacingHelper.IsGathering == false && Input.GetMouseButtonDown (0)) {
+                if (RTSInterfacingHelper.IsGathering == false && Input.GetMouseButtonDown (0)) {
 					CheckBoxDistance = true;
 					Boxing = true;
 					BoxingTime = 0f;
