@@ -29,8 +29,7 @@ namespace Lockstep {
         }
 
         public byte[] GetBytes () {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+
             bufferBites.FastClear();
             //Serialize header
             int headerLength = Header.Length;
@@ -49,8 +48,7 @@ namespace Lockstep {
                     bufferBites.Add(Data[i]);
                 }
             }
-            sw.Stop();
-            return bufferBites.ToArray();
+
         }
 
         public void Serialize(FastEnumerable<LSAgent> selectedAgents) {
