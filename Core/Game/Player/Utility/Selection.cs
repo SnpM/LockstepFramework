@@ -30,6 +30,7 @@ namespace Lockstep {
 
         public byte[] GetBytes () {
 
+
             bufferBites.FastClear();
             //Serialize header
             int headerLength = Header.Length;
@@ -48,7 +49,7 @@ namespace Lockstep {
                     bufferBites.Add(Data[i]);
                 }
             }
-
+            return bufferBites.ToArray();
         }
 
         public void Serialize(FastEnumerable<LSAgent> selectedAgents) {

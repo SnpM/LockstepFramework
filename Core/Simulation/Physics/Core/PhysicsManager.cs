@@ -19,19 +19,12 @@ namespace Lockstep
 
         public const bool SimulatePhysics = true;
 
-        static	int VisualSetSpread
-        {
-            get
-            {
-                return 2;
-            }
-        }
             
         static long FixedDeltaTicks
         {
             get
             {
-                return (long)((10000000L * VisualSetSpread) / LockstepManager.FrameRate);
+                return (long)((10000000L) / LockstepManager.FrameRate);
             }
         }
 
@@ -59,7 +52,6 @@ namespace Lockstep
         public static LSBody[] SimObjects = new LSBody[MaxSimObjects];
         private static Dictionary<int,CollisionPair> CollisionPairs = new Dictionary<int,CollisionPair>(MaxSimObjects);
         public static FastList<CollisionPair> FastCollisionPairs = new FastList<CollisionPair>(MaxSimObjects);
-        private static int visualSetCount;
 
         #endregion
 
@@ -130,17 +122,9 @@ namespace Lockstep
 
         public static void LateSimulate()
         {
-            visualSetCount--;
 			
-            SetVisuals = visualSetCount <= 0;
 			
-            if (SetVisuals)
-            {
-                long curTicks = LockstepManager.Ticks;
-                LastDeltaTicks = curTicks - LastSimulateTicks;
-                LastSimulateTicks = curTicks;
-                visualSetCount = VisualSetSpread;
-            }
+
             for (int i = 0; i < PeakCount; i++)
             {
                 if (SimObjectExists [i])
@@ -148,15 +132,17 @@ namespace Lockstep
                     SimObjects [i].LateSimulate();
                 }
             }
-
+            if (SetVisuals)
+            {
+                SetVisuals = false;
+            }
         }
 
         public static bool SetVisuals {get; private set;}
         public static float LerpTime {get ;private set;}
         public static float LerpDamping {get; private set;}
         private static float LerpDampScaler;
-        static long LastSimulateTicks;
-        static long LastDeltaTicks;
+        private static long LastTicks {get; set;}
 
         public static void Visualize()
         {
@@ -164,10 +150,10 @@ namespace Lockstep
             LerpDampScaler = .3f / smoothDeltaTime;
             LerpDamping = Time.unscaledDeltaTime * LerpDampScaler;
             LerpDamping *= Time.timeScale;
+            LerpDamping = 1f;
             long curTicks = LockstepManager.Ticks;
-            LerpTime = (float)((curTicks - LastSimulateTicks) / (double)FixedDeltaTicks);
-            LerpTime *= Time.timeScale;
-            if (LerpTime <= 1f)
+            LerpTime += (float)((curTicks - LastTicks) / (double)FixedDeltaTicks) * Time.timeScale;
+            if (LerpTime < 1f)
             {
                 for (int i = 0; i < PeakCount; i++)
                 {
@@ -179,14 +165,18 @@ namespace Lockstep
                 }
             } else
             {
+                LerpTime = 0;
+                SetVisuals = true;
                 for (int i = 0; i < PeakCount; i++)
                 {
                     if (SimObjectExists [i])
                     {
+                        SimObjects[i].Visualize();
                         SimObjects [i].LerpOverReset();
                     }
                 }
             }
+            LastTicks = curTicks;
         }
 
         public static float ElapsedTime;

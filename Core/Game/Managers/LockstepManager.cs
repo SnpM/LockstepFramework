@@ -52,7 +52,7 @@ namespace Lockstep
 
         public static bool Loaded { get; private set; }
 
-        private GameManager _mainGameManager;
+        private static GameManager _mainGameManager;
         public static GameManager MainGameManager {
             get {
                 if (_mainGameManager == null)
