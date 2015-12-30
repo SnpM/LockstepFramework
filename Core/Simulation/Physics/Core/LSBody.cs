@@ -440,9 +440,7 @@ namespace Lockstep
 			if (HasParent) {
 				ChildSimulate ();
 			}
-			if (PhysicsManager.SetVisuals) {
-				SetVisuals ();
-			}
+
 			BuildChangedValues ();
 
 		}
@@ -559,7 +557,9 @@ namespace Lockstep
 		public void Visualize ()
 		{
 			if (HasParent) return;
-
+            if (PhysicsManager.SetVisuals) {
+                SetVisuals ();
+            }
 			if (SetPositionBuffer) {
                 //Interpolates between the current position and the interpolation between the last lockstep position and the current lockstep position
                 //LerpTime = time passed since last simulation frame

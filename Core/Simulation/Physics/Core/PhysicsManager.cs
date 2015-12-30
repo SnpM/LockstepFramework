@@ -175,6 +175,7 @@ namespace Lockstep
                         SimObjects [i].LerpOverReset();
                     }
                 }
+                SetVisuals = false;
             }
             LastTicks = curTicks;
         }
