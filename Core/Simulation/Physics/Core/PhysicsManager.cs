@@ -143,6 +143,7 @@ namespace Lockstep
         public static float LerpDamping {get; private set;}
         private static float LerpDampScaler;
         private static long LastTicks {get; set;}
+        public static long AccumulatedTicks {get; private set;}
 
         public static void Visualize()
         {
@@ -150,9 +151,10 @@ namespace Lockstep
             LerpDampScaler = .3f / smoothDeltaTime;
             LerpDamping = Time.unscaledDeltaTime * LerpDampScaler;
             LerpDamping *= Time.timeScale;
-            LerpDamping = 1f;
+            //LerpDamping = 1f;
             long curTicks = LockstepManager.Ticks;
-            LerpTime += (float)((curTicks - LastTicks) / (double)FixedDeltaTicks) * Time.timeScale;
+            AccumulatedTicks += (curTicks - LastTicks);
+            LerpTime = (float)(AccumulatedTicks / (double)FixedDeltaTicks) * Time.timeScale;
             if (LerpTime < 1f)
             {
                 for (int i = 0; i < PeakCount; i++)
@@ -165,14 +167,17 @@ namespace Lockstep
                 }
             } else
             {
-                LerpTime = 0;
+                AccumulatedTicks %= FixedDeltaTicks;
+                LerpTime = (float)(AccumulatedTicks / (double)FixedDeltaTicks) * Time.timeScale;
+
                 SetVisuals = true;
                 for (int i = 0; i < PeakCount; i++)
                 {
                     if (SimObjectExists [i])
                     {
-                        SimObjects[i].Visualize();
-                        SimObjects [i].LerpOverReset();
+                        LSBody b1 = SimObjects[i];
+                        b1.Visualize();
+                        b1.LerpOverReset();
                     }
                 }
                 SetVisuals = false;

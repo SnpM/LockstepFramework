@@ -436,19 +436,7 @@ namespace Lockstep {
             hash ^= this.Body.Velocity.GetStateHash ();
             return hash;
         }
-
-		public LSAgent BuildChild (string agentCode, Vector2d localPos, float localHeight) {
-			LSAgent agent = this.Controller.CreateAgent (agentCode);
-			agent.Body.Parent = this.Body;
-			agent.Body.LocalPosition = localPos;
-			agent.Body.LocalRotation = Vector2d.up.rotatedRight;
-            agent.Body._visualPosition.y = localHeight + this.Body.LocalPosition.y;
-			agent.Body.UpdatePosition ();
-			agent.Body.UpdateRotation();
-			agent.Body.BuildChangedValues ();
-			if (onBuildChild .IsNotNull ()) onBuildChild (agent);
-			return agent;
-		}
+            
 
         private void LoadComponents () {
             _cachedTransform = base.transform;

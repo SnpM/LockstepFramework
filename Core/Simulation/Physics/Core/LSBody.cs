@@ -92,41 +92,8 @@ namespace Lockstep
 
 		
 		public long VelocityFastMagnitude { get; private set; }
-		
-		
-		public LSBody Parent {
-			get { return HasParent ? _parent : null; }
-			set {
-				if (value != _parent) {
-					if (HasParent) {
-						_parent.RemoveChild (this);
-					}
-					if (value == null) {
-						HasParent = false;
-					} else {
-						if (value.HasParent) {
-							throw new System.Exception ("Cannot parent object to object with parent");
-						}
-						if (this.Children .IsNotNull () && this.Children.Count > 0) {
-							throw new System.Exception ("Cannot child object with children");
-						}
-						HasParent = true;
-						_parent = value;
-						_parent.AddChild (this);
-						this._positionalTransform.parent = _parent._positionalTransform;
-						this._rotationalTransform.parent = _parent._rotationalTransform;
-						UpdateLocalPosition ();
-						UpdateLocalRotation ();
-						LocalRotation = _rotation;
-						LocalRotation.Rotate (_parent._rotation.x, _parent._rotation.y); 
-						
-					}
-				}
-			}
-		}
-		
-		public bool HasParent { get; private set; }
-		
+	
+
 		private void AddChild (LSBody child)
 		{
 			if (Children == null)
@@ -204,10 +171,7 @@ namespace Lockstep
         public Transform RotationalTransform {get {return _rotationalTransform;}}
 		#endregion
 		
-		private LSBody _parent;
-		private Vector2d[] RotatedPoints;
-		public Vector2d LocalPosition;
-		public Vector2d LocalRotation;
+        private Vector2d[] RotatedPoints;
 		
 		public void Setup (LSAgent agent)
 		{
@@ -271,8 +235,7 @@ namespace Lockstep
             }
             CheckVariables ();
 
-			Parent = null;
-			
+
 			PositionChanged = true;
 			RotationChanged = true;
 			VelocityChanged = true;
@@ -286,11 +249,6 @@ namespace Lockstep
             _heightPos = StartPosition.Height;
 			_rotation = StartRotation;
 
-
-			_parent = null;
-			LocalPosition = Vector2d.zero;
-			LocalRotation = Vector2d.up;
-			
 			XMin = 0;
 			XMax = 0;
 			YMin = 0;
@@ -392,8 +350,7 @@ namespace Lockstep
 		
 		public void EarlySimulate ()
 		{
-			if (HasParent)
-				return;
+
 
 			if (VelocityChanged) {
 				VelocityFastMagnitude = Velocity.FastMagnitude ();
@@ -416,9 +373,8 @@ namespace Lockstep
 		
 		public void Simulate ()
 		{
-			if (HasParent)
-				return;
-			
+
+
 			if (PositionChanged || RotationChanged) {
 				if (PositionChanged) {
 
@@ -437,30 +393,12 @@ namespace Lockstep
 		
 		public void LateSimulate ()
 		{
-			if (HasParent) {
-				ChildSimulate ();
-			}
+
 
 			BuildChangedValues ();
 
 		}
 		
-		private void ChildSimulate ()
-		{
-			
-			if (_parent.RotationChangedBuffer) {
-				UpdateRotation ();
-				UpdatePosition ();
-			} else {
-				if (_parent.PositionChangedBuffer || this.PositionChanged) {
-					UpdatePosition ();
-				}
-				if (this.RotationChanged) {
-					UpdateRotation ();
-				}
-			}
-			
-		}
 		
 		public void BuildChangedValues ()
 		{
@@ -479,9 +417,7 @@ namespace Lockstep
 			
 			if (RotationChanged) {
 				
-				if (HasParent)
-					LocalRotation.Normalize ();
-				else
+
 					_rotation.Normalize ();
 				RotationChangedBuffer = true;
 				RotationChanged = false;
@@ -497,10 +433,8 @@ namespace Lockstep
 		private void SetVisuals () {
 
 			const bool test = false;
-			if (HasParent) {
 
-			}
-			else {
+
 				if (SetVisualPosition == false) {
 					if (visualPositionReached == false)
 					visualPositionReached = !(SetVisualPosition = _positionalTransform.position != _visualPosition);
@@ -509,22 +443,21 @@ namespace Lockstep
 					if (visualRotationReached == false)
 					visualRotationReached = !(SetVisualRotation = _rotationalTransform.rotation != this.visualRot);
 				}
-			}
+			
+
 			if (test || this.SetVisualPosition)
 			{
-				if (HasParent) {
-					this._positionalTransform.localPosition = this.LocalPosition.rotatedLeft.ToVector3 (_visualPosition.y - _parent._visualPosition.y);
-				}
-				else {
+
+
 					lastVisualPos = _visualPosition;
 					_visualPosition.x = _position.x.ToFloat ();
                     _visualPosition.y = HeightPos.ToFloat();
 					_visualPosition.z = _position.y.ToFloat ();
 					SetPositionBuffer = true;
 					visualPositionReached = false;
-				}
+				
 			}
-			else if (HasParent == false){
+			else {
 				if (SetPositionBuffer) {
 					//_positionalTransform.position = _visualPosition;
 					SetPositionBuffer = false;
@@ -533,17 +466,15 @@ namespace Lockstep
 
 			if (test || this.SetVisualRotation)
 			{
-				if (HasParent) {
-					this._rotationalTransform.localRotation = Quaternion.LookRotation (this.LocalRotation.rotatedLeft.ToVector3 (0f));
-				}
-				else {
+
+
 					lastVisualRot = visualRot;
 					visualRot = Quaternion.LookRotation (_rotation.ToVector3 (0f));
 					SetRotationBuffer = true;
 					visualRotationReached = false;
-				}
+				
 			}
-			else if (HasParent == false) {
+            else {
 				if (SetRotationBuffer) {
 					//_rotationalTransform.rotation = visualRot;
 					SetRotationBuffer = false;
@@ -556,7 +487,6 @@ namespace Lockstep
 		Quaternion visualRot = Quaternion.identity;
 		public void Visualize ()
 		{
-			if (HasParent) return;
             if (PhysicsManager.SetVisuals) {
                 SetVisuals ();
             }
@@ -575,51 +505,15 @@ namespace Lockstep
 			}
 		}
 		public void LerpOverReset () {
-			if (HasParent) return;
-			SetPositionBuffer = false;
+            SetPositionBuffer = false;
 			SetRotationBuffer = false;
 		}
 		
-		public void UpdateLocalPosition ()
-		{
-			if (HasParent) {
-				LocalPosition = _position - _parent._position;
-				LocalPosition.Rotate (_parent._rotation.x, _parent._rotation.y);
-			}
-		}
-		
-		public void UpdatePosition ()
-		{
-			if (HasParent) {
-				_position = LocalPosition;
-				_position.RotateInverse (_parent._rotation.x, _parent._rotation.y);
-				_position += _parent._position;
-				PositionChanged = true;
-			}
-		}
-		
-		public void UpdateRotation ()
-		{
-			if (HasParent) {
-				_rotation = LocalRotation;
-				_rotation.RotateInverse (_parent._rotation.x, _parent._rotation.y);
-				RotationChanged = true;
-			}
-		}
-		
-		public void UpdateLocalRotation ()
-		{
-			if (HasParent) {
-				LocalRotation = _rotation;
-				LocalRotation.Rotate (_parent._rotation.x, _parent._rotation.y);
-			}
-		}
+	
 		
 		public void Rotate (long cos, long sin)
 		{
-			if (HasParent)
-				LocalRotation.Rotate (cos, sin);
-			else
+
 				_rotation.Rotate (cos, sin);
 			RotationChanged = true;
 		}
@@ -651,13 +545,6 @@ namespace Lockstep
 		
 		public void Deactivate ()
 		{
-			Parent = null;
-			if (Children .IsNotNull ())
-			for (int i = 0; i < Children.PeakCount; i++) {
-				if (Children.arrayAllocation [i]) {
-					Children [i].Parent = null;
-				}
-			}
             PhysicsManager.Dessimilate(this);
 		}
 

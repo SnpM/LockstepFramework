@@ -47,8 +47,7 @@ namespace Lockstep
 		protected override void OnSimulate ()
 		{
 			if (targetReached) {
-				if (cachedBody.HasParent == false) {
-					if (contactChecked) {
+                if (contactChecked) {
 						contactChecked = false;
 						checkCollisionCount = checkCollisionTurnRate;
 						contactDif /= contactCount;
@@ -59,7 +58,7 @@ namespace Lockstep
 					} else if (checkCollisionCount > 0) {
 						checkCollisionCount--;
 					}
-				}
+				
 			}
 
 
@@ -111,8 +110,7 @@ namespace Lockstep
 		private void Arrive ()
 		{
 			cachedBody._rotation = targetRotation;
-			cachedBody.UpdateLocalRotation ();
-			cachedBody.RotationChanged = true;
+            cachedBody.RotationChanged = true;
 			targetReached = true;
 		}
 
@@ -172,8 +170,7 @@ namespace Lockstep
 		private void HandleContact (LSBody other)
 		{
 			contacted = true;
-			if (cachedBody.HasParent == false) {
-				if (targetReached == true && Agent.IsCasting == false) {
+            if (targetReached == true && Agent.IsCasting == false) {
 					if (other.Priority >= cachedBody.Priority) {
 						if (checkCollisionCount == 0) {
 							const long collisionTurnTreshold = FixedMath.One;
@@ -187,7 +184,7 @@ namespace Lockstep
 						}
 
 					}
-				}
+				
 			}
 		}
 	}

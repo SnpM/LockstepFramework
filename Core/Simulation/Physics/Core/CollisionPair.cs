@@ -114,8 +114,6 @@ namespace Lockstep
                 Body2.OnContact(Body1);
             }
 
-            if (DoPhysics && Body1.HasParent == false && Body2.HasParent == false)
-            {
                 switch (LeCollisionType)
                 {
                     case CollisionType.Circle_Circle:
@@ -211,14 +209,14 @@ namespace Lockstep
 
                         break;
                 }
-            }
+
 
         }
 
         public void CheckAndDistributeCollision()
         {
 
-            if (!Active || Body1.HasParent || Body2.HasParent)
+            if (!Active)
             {
                 return;
             }
