@@ -460,6 +460,8 @@ namespace Lockstep
 
         private void HandleCollision(LSBody other)
         {
+            if (this.Agent.GlobalID == 0) Debug.Log(other.Agent.GlobalID);
+
             if (!CanMove)
             {
                 return;

@@ -169,7 +169,7 @@ namespace Lockstep
 
 		private void HandleContact (LSBody other)
 		{
-			contacted = true;
+            contacted = true;
             if (targetReached == true && Agent.IsCasting == false) {
 					if (other.Priority >= cachedBody.Priority) {
 						if (checkCollisionCount == 0) {

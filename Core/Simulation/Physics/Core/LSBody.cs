@@ -188,7 +188,8 @@ namespace Lockstep
 				GenerateBounds ();
 			}
 			Agent = agent;
-		}
+            Setted = true;
+        }
 		
 		public void GeneratePoints ()
 		{
@@ -231,7 +232,6 @@ namespace Lockstep
         {
             if (!Setted) {
                 this.Setup(null);
-                Setted = true;
             }
             CheckVariables ();
 
@@ -440,8 +440,7 @@ namespace Lockstep
                 );
             }
 			
-
-			if (this.SetVisualRotation)
+            if (this.SetVisualRotation)
 			{
                 DoSetVisualRotation (_rotation);
             }
@@ -457,8 +456,7 @@ namespace Lockstep
             SetRotationBuffer = true;
         }
         public void SetExtrapolatedVisuals () {
-
-
+            
             if (this.SetVisualPosition) {
                 Vector3 lastPos = this.lastVisualPos;
                 Vector3 curPos = this._position.ToVector3(_heightPos.ToFloat());
@@ -467,7 +465,6 @@ namespace Lockstep
                 DoSetVisualPosition (prediction);
             }
             if (this.SetVisualRotation) {
-                
             }
 
         }
@@ -485,9 +482,14 @@ namespace Lockstep
 				                                             PhysicsManager.LerpDamping);
                 
 			}
-			
+            const float rotationLerpDamping = .5f;
 			if (SetRotationBuffer) {
-				_rotationalTransform.rotation = Quaternion.Lerp(_rotationalTransform.rotation, Quaternion.LerpUnclamped (lastVisualRot, visualRot, PhysicsManager.LerpTime), PhysicsManager.LerpDamping * 2f);
+                _rotationalTransform.rotation =
+                    Quaternion.Lerp(
+                        _rotationalTransform.rotation,
+                        Quaternion.LerpUnclamped (lastVisualRot, visualRot, PhysicsManager.LerpTime),
+                        rotationLerpDamping
+                    );
 			}
 		}
 		public void LerpOverReset () {

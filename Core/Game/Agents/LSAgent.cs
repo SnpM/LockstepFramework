@@ -51,8 +51,12 @@ namespace Lockstep {
         public event Action<bool, bool> onInteraction;
 		public event Action<LSAgent> onBuildChild;
         public event Action<LSAgent> onInitialized;
-        public ushort GlobalID { get; private set; }
-        public ushort LocalID { get; private set; }
+
+        [SerializeField]
+        private int _globalID;
+        public ushort GlobalID { get {return(ushort) _globalID;} private set {_globalID = (int)value;} }
+
+        public ushort LocalID { get; private set;}
         public uint BoxVersion { get; set; }
 
 		[SerializeField]
@@ -462,6 +466,7 @@ namespace Lockstep {
             output.Add("_selectionRadius");
             output.Add("_statsBarOffset");
             output.Add("_visualCenter");
+            output.Add("_globalID");
             return true;
         }
 		/*protected override bool OnSerialize ()

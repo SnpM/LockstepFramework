@@ -15,6 +15,7 @@ namespace Lockstep
 {
     public static class PhysicsManager
     {
+
         #region User-defined Variables
 
         public const bool SimulatePhysics = true;
