@@ -34,7 +34,11 @@ namespace Lockstep
     {
         public static readonly System.Diagnostics.Stopwatch SimulationTimer = new System.Diagnostics.Stopwatch();
 
-        public static long Ticks { get { return SimulationTimer.ElapsedTicks; } }
+        /// <summary>
+        /// Seconds since start if the last session.
+        /// </summary>
+        /// <value>The seconds.</value>
+        public static double Seconds { get { return SimulationTimer.ElapsedTicks / (double)System.TimeSpan.TicksPerSecond; } }
 
         public static MonoBehaviour UnityInstance { get; private set; }
 
@@ -66,7 +70,6 @@ namespace Lockstep
 
         internal static void Setup()
         {
-
             DefaultMessageRaiser.EarlySetup();
 
             LSDatabaseManager.Setup();
@@ -87,7 +90,7 @@ namespace Lockstep
             PhysicsManager.Setup();
             ClientManager.Setup(MainGameManager.MainNetworkHelper);
 
-            Application.targetFrameRate = 30;
+            Application.targetFrameRate = 60;
             Time.fixedDeltaTime = BaseDeltaTime;
             Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
             InputCodeManager.Setup();
@@ -98,6 +101,7 @@ namespace Lockstep
 
         internal static void Initialize(GameManager gameManager)
         {
+            Application.targetFrameRate = 30;
             MainGameManager = gameManager;
 
             if (!Loaded)
@@ -109,7 +113,7 @@ namespace Lockstep
 
 
             DefaultMessageRaiser.EarlyInitialize();
-
+            SimulationTimer.Stop();
             SimulationTimer.Reset();
             SimulationTimer.Start();
             LSDatabaseManager.Initialize();
