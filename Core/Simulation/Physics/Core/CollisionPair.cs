@@ -24,11 +24,12 @@ namespace Lockstep
         public static long PenetrationX;
         public static long PenetrationY;
         public static CollisionPair CurrentCollisionPair;
-        bool IsValid {get; set;}
+
+        bool IsValid { get; set; }
 
         public void Initialize(LSBody b1, LSBody b2)
         {
-            IsValid = PhysicsManager.RequireCollisionPair(b1,b2);
+            IsValid = PhysicsManager.RequireCollisionPair(b1, b2);
 
             PartitionVersion = 0;
             Body1 = b1;
@@ -42,7 +43,8 @@ namespace Lockstep
 
             CacheSqrDistance = b1.Radius + b2.Radius;
             CacheSqrDistance *= CacheSqrDistance;
-            if (!IsValid) return;
+            if (!IsValid)
+                return;
 
             LeCollisionType = CollisionType.None;
             if (Body1.Shape == ColliderType.None || Body2.Shape == ColliderType.None)
@@ -104,7 +106,8 @@ namespace Lockstep
         private void DistributeCollision()
         {
 
-            if (Body1 == Body2) Debug.Log("boom");
+            if (Body1 == Body2)
+                Debug.Log("boom");
             if (Body1.OnContact.IsNotNull())
             {
                 Body1.OnContact(Body2);
@@ -114,101 +117,101 @@ namespace Lockstep
                 Body2.OnContact(Body1);
             }
 
-                switch (LeCollisionType)
-                {
-                    case CollisionType.Circle_Circle:
-                        DistX = Body1._position.x - Body2._position.x;
-                        DistY = Body1._position.y - Body2._position.y;
-                        dist = FixedMath.Sqrt((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT);
+            switch (LeCollisionType)
+            {
+                case CollisionType.Circle_Circle:
+                    DistX = Body1._position.x - Body2._position.x;
+                    DistY = Body1._position.y - Body2._position.y;
+                    dist = FixedMath.Sqrt((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT);
                         
-                        if (dist == 0)
-                        {
-                            const int randomMax = (int)((long)int.MaxValue % (FixedMath.One / 64));
-                            Body1._position.x += LSUtility.GetRandom(randomMax);
-                            Body1._position.y += LSUtility.GetRandom(randomMax);
-                            Body1.PositionChanged = true;
-                            Body2._position.x += LSUtility.GetRandom(randomMax);
-                            Body2._position.y += LSUtility.GetRandom(randomMax);
-                            Body2.PositionChanged = true;
-                            return;
-                        }
+                    if (dist == 0)
+                    {
+                        const int randomMax = (int)((long)int.MaxValue % (FixedMath.One / 64));
+                        Body1._position.x += LSUtility.GetRandom(randomMax) - randomMax / 2;
+                        Body1._position.y += LSUtility.GetRandom(randomMax) - randomMax / 2;
+                        Body1.PositionChanged = true;
+                        Body2._position.x += LSUtility.GetRandom(randomMax) - randomMax / 2;
+                        Body2._position.y += LSUtility.GetRandom(randomMax) - randomMax / 2;
+                        Body2.PositionChanged = true;
+                        return;
+                    }
 
 
-                        depth = (Body1.Radius + Body2.Radius - dist);
+                    depth = (Body1.Radius + Body2.Radius - dist);
 
-                        if (depth <= 0)
-                        {
-                            return;
-                        }
-                        DistX = (DistX * depth / dist) / 2L;
-                        DistY = (DistY * depth / dist) / 2L;
+                    if (depth <= 0)
+                    {
+                        return;
+                    }
+                    DistX = (DistX * depth / dist) / 2L;
+                    DistY = (DistY * depth / dist) / 2L;
 
-                        const bool applyVelocity = true;
+                    const bool applyVelocity = true;
                     //Resolving collision
-                        if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority))
+                    if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority))
+                    {
+                        Body2._position.x -= DistX;
+                        Body2._position.y -= DistY;
+                        Body2.PositionChanged = true;
+                        if (applyVelocity)
                         {
-                            Body2._position.x -= DistX;
-                            Body2._position.y -= DistY;
-                            Body2.PositionChanged = true;
-                            if (applyVelocity)
-                            {
-                                Body2._velocity.x -= DistX;
-                                Body2._velocity.y -= DistY;
-                                Body2.VelocityChanged = true;
-                            }
-                        } else if (Body2.Immovable || Body2.Priority > Body1.Priority)
-                        {
+                            Body2._velocity.x -= DistX;
+                            Body2._velocity.y -= DistY;
+                            Body2.VelocityChanged = true;
+                        }
+                    } else if (Body2.Immovable || Body2.Priority > Body1.Priority)
+                    {
 
-                            Body1._position.x += DistX;
-                            Body1._position.y += DistY;
-                            Body1.PositionChanged = true;
-                            if (applyVelocity)
-                            {
-                                Body1._velocity.x += DistX;
-                                Body1._velocity.y += DistY;
-                                Body1.VelocityChanged = true;
-                            }
-                        } else
+                        Body1._position.x += DistX;
+                        Body1._position.y += DistY;
+                        Body1.PositionChanged = true;
+                        if (applyVelocity)
                         {
-                            DistX /= 2;
-                            DistY /= 2;
+                            Body1._velocity.x += DistX;
+                            Body1._velocity.y += DistY;
+                            Body1.VelocityChanged = true;
+                        }
+                    } else
+                    {
+                        DistX /= 2;
+                        DistY /= 2;
 
-                            Body1._position.x += DistX;
-                            Body1._position.y += DistY;
-                            Body2._position.x -= DistX;
-                            Body2._position.y -= DistY;
+                        Body1._position.x += DistX;
+                        Body1._position.y += DistY;
+                        Body2._position.x -= DistX;
+                        Body2._position.y -= DistY;
                         
-                            Body1.PositionChanged = true;
-                            Body2.PositionChanged = true;
-                            if (applyVelocity)
-                            {
-
-                                DistX /= 8;
-                                DistY /= 8;
-                                Body1._velocity.x += DistX;
-                                Body1._velocity.y += DistY;
-                                Body1.VelocityChanged = true;
-                            
-                                Body2._velocity.x -= DistX;
-                                Body2._velocity.y -= DistY;
-                                Body2.VelocityChanged = true;
-                            }
-                        }
-                        break;
-                    case CollisionType.Circle_AABox:
-                        if (Body1.Shape == ColliderType.AABox)
+                        Body1.PositionChanged = true;
+                        Body2.PositionChanged = true;
+                        if (applyVelocity)
                         {
-                            DistributeCircle_Box(Body1, Body2);
-                        } else
-                        {
-                            DistributeCircle_Box(Body2, Body1);
-                        }
-                        break;
-                            
-                    case CollisionType.Circle_Polygon:
 
-                        break;
-                }
+                            DistX /= 8;
+                            DistY /= 8;
+                            Body1._velocity.x += DistX;
+                            Body1._velocity.y += DistY;
+                            Body1.VelocityChanged = true;
+                            
+                            Body2._velocity.x -= DistX;
+                            Body2._velocity.y -= DistY;
+                            Body2.VelocityChanged = true;
+                        }
+                    }
+                    break;
+                case CollisionType.Circle_AABox:
+                    if (Body1.Shape == ColliderType.AABox)
+                    {
+                        DistributeCircle_Box(Body1, Body2);
+                    } else
+                    {
+                        DistributeCircle_Box(Body2, Body1);
+                    }
+                    break;
+                            
+                case CollisionType.Circle_Polygon:
+
+                    break;
+            }
 
 
         }
@@ -261,7 +264,8 @@ namespace Lockstep
 
         }
 
-        public bool CheckHeight () {
+        public bool CheckHeight()
+        {
             return Body1.HeightMax >= Body2.HeightMin && Body1.HeightMin <= Body2.HeightMax;
         }
 

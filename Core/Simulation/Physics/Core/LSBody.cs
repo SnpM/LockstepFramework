@@ -35,8 +35,16 @@ namespace Lockstep
                 this.PositionChanged = true;
             }
         }
+        private bool _rotationChanged;
         [Lockstep]
-        public bool RotationChanged { get; set; }
+        public bool RotationChanged {
+            get {
+                return _rotationChanged;
+            }
+            set {
+                _rotationChanged = value;
+            }
+        }
 
 
         [Lockstep]
@@ -70,6 +78,8 @@ namespace Lockstep
                 VelocityChanged = true;
             }
         }
+
+        public Vector2d LastPosition {get; private set;}
         #endregion
         internal Vector3 _visualPosition;
         public Vector3 VisualPosition {get {return _visualPosition;}}
@@ -407,6 +417,7 @@ namespace Lockstep
 				BuildBounds ();
 			}
 			if (PositionChanged) {
+                LastPosition = _position;
 				PositionChangedBuffer = true;
 				PositionChanged = false;
 				this.SetVisualPosition = true;

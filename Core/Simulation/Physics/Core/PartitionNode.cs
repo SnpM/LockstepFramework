@@ -31,6 +31,7 @@ namespace Lockstep
 
         public void Remove(int item)
         {
+            
             if (ContainedObjects.Remove(item))
             {
                 if (Count == 0)
