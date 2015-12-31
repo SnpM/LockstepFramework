@@ -104,7 +104,7 @@ namespace Lockstep
         private void DistributeCollision()
         {
 
-
+            if (Body1 == Body2) Debug.Log("boom");
             if (Body1.OnContact.IsNotNull())
             {
                 Body1.OnContact(Body2);

@@ -34,10 +34,10 @@ public class PartitionNode {
 			for (int j = 0; j < nodePeakCount; j++) {
 				if (ContainedObjects.arrayAllocation[j])
 				{
-					id1 = this[j];
+                    id1 = ContainedObjects[j];
 					for (int k = j + 1; k < nodePeakCount; k++) {
 						if (ContainedObjects.arrayAllocation[k]) {
-							id2 = this [k];
+                            id2 = ContainedObjects [k];
                             pair = PhysicsManager.GetCollisionPair(id1,id2);
 							if (System.Object.ReferenceEquals (null, pair) == false && (pair.PartitionVersion != Partition._Version)) {
 								pair.CheckAndDistributeCollision ();
