@@ -31,7 +31,7 @@ namespace Lockstep
 
         static void Setup()
         {
-            QuickPos = AbilityInterfacer.FindInterfacer ("Move");
+            QuickPos = AbilityInterfacer.FindInterfacer ("Scan");
             QuickTarget = AbilityInterfacer.FindInterfacer("Scan");
 
             Setted = true;
@@ -96,23 +96,23 @@ namespace Lockstep
             {
                 case InformationGatherType.Position:
                     curCom = new Command(facer.ListenInputID);
-                    curCom.Position = RTSInterfacing.GetWorldPosD(Input.mousePosition);
+                    curCom.Add<Vector2d> ( RTSInterfacing.GetWorldPosD(Input.mousePosition));
                     break;
                 case InformationGatherType.Target:
                     curCom = new Command(facer.ListenInputID);
                     if (RTSInterfacing.MousedAgent .IsNotNull())
                     {
-                        curCom.Target = RTSInterfacing.MousedAgent.LocalID;
+                        curCom.SetData<DefaultData> (new DefaultData(DataType.UShort,RTSInterfacing.MousedAgent.LocalID));
                     }
                     break;
                 case InformationGatherType.PositionOrTarget:
                     curCom = new Command(facer.ListenInputID);
                     if (RTSInterfacing.MousedAgent .IsNotNull())
                     {
-                        curCom.Target = RTSInterfacing.MousedAgent.GlobalID;
+                        curCom.Add<DefaultData> (new DefaultData(DataType.UShort,RTSInterfacing.MousedAgent.GlobalID));
                     } else
                     {
-                        curCom.Position = RTSInterfacing.GetWorldPosD(Input.mousePosition);
+                        curCom.Add<Vector2d> (RTSInterfacing.GetWorldPosD(Input.mousePosition));
                     }
                     break;
                 case InformationGatherType.None:

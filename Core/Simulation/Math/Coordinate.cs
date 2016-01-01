@@ -22,6 +22,15 @@ namespace Lockstep
             return "(" + x.ToString() + ", " + y.ToString() + ")";
         }
 
+        public void Write (Writer writer) {
+            writer.Write (x);
+            writer.Write(y);
+        }
+        public void Read (Reader reader) {
+            this.x = reader.ReadInt ();
+            this.y = reader.ReadInt();
+        }
+
         #if UNITY_EDITOR
         public void OnSerializeGUI()
         {

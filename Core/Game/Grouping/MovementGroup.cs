@@ -19,9 +19,9 @@ public class MovementGroup
 
     public void Initialize(Command com)
     {
-        Destination = com.Position;
+        Destination = com.GetData<Vector2d> ();;
         calculatedBehaviors = false;
-        movers = new FastList<Move>(com.Select.selectedAgentLocalIDs.Count);
+        movers = new FastList<Move>(com.GetData<Selection>().selectedAgentLocalIDs.Count);
     }
 
     public void Add(Move mover)

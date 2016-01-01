@@ -6,7 +6,7 @@ namespace Lockstep
 {
     public class Scan : ActiveAbility
     {
-        private const int SearchRate =  (int)(LockstepManager.FrameRate / 2);
+        private const int SearchRate = (int)(LockstepManager.FrameRate / 2);
         public const long MissModifier = FixedMath.One / 2;
 
         public virtual bool CanMove { get; private set; }
@@ -41,17 +41,23 @@ namespace Lockstep
 
         public virtual string ProjCode { get { return _projectileCode; } }
 
-        public virtual long Range { get { return _range; } } //Range
+        public virtual long Range { get { return _range; } }
+        //Range
 
-        public virtual long Sight { get { return _sight; } } //Approximate radius that's scanned for targets
+        public virtual long Sight { get { return _sight; } }
+        //Approximate radius that's scanned for targets
 
-        public virtual long Damage { get { return _damage; } } //Damage of attack
+        public virtual long Damage { get { return _damage; } }
+        //Damage of attack
 
-        public virtual int AttackRate { get { return _attackRate; } } //Frames between each attack
+        public virtual int AttackRate { get { return _attackRate; } }
+        //Frames between each attack
 
-        public virtual bool TrackAttackAngle { get { return _trackAttackAngle; } } //Whether or not to require the unit to face the target for attacking
+        public virtual bool TrackAttackAngle { get { return _trackAttackAngle; } }
+        //Whether or not to require the unit to face the target for attacking
 
-        public long AttackAngle { get { return _attackAngle; } } //The angle in front of the unit that the target must be located in
+        public long AttackAngle { get { return _attackAngle; } }
+        //The angle in front of the unit that the target must be located in
 
         protected virtual AllegianceType TargetAllegiance //Allegiance to the target
         {
@@ -60,15 +66,18 @@ namespace Lockstep
 
         protected virtual PlatformType TargetPlatform //PlatformType of the target
         {
-            get {return this._targetPlatform;}
+            get { return this._targetPlatform; }
         }
 
-        public Vector2d ProjectileOffset { get { return _projectileOffset.ToOrientedVector2d(); } } //Offset of projectile
+        public Vector2d ProjectileOffset { get { return _projectileOffset.ToOrientedVector2d(); } }
+        //Offset of projectile
 
-        public float ProjectileHeightOffset { get { return _projectileOffset.Height; } } //Offset of projectile on the Y axis
+        public float ProjectileHeightOffset { get { return _projectileOffset.Height; } }
+        //Offset of projectile on the Y axis
 
         #region Serialized Values (Further description in properties)
-        [SerializeField,DataCode ("Projectiles")]
+
+        [SerializeField,DataCode("Projectiles")]
         protected string _projectileCode;
         [FixedNumber, SerializeField]
         protected long _range = FixedMath.One * 6;
@@ -103,7 +112,9 @@ namespace Lockstep
         private int attackFrameCount;
         private Move cachedMove;
         private Turn cachedTurn;
-        private LSBody cachedBody {get {return Agent.Body;}}
+
+        private LSBody cachedBody { get { return Agent.Body; } }
+
         private int rangeDeltaCount;
         private int baseDeltaCount;
         private int basePriority;
@@ -130,20 +141,21 @@ namespace Lockstep
             attackFrameCount = AttackRate;
             basePriority = cachedBody.Priority;
 
-            CanMove = cachedMove .IsNotNull();
+            CanMove = cachedMove.IsNotNull();
             if (CanMove)
             {
                 cachedMove.OnArrive += HandleOnArrive;
                 cachedMove.onGroupProcessed += _HandleMoveGroupProcessed;
             }
 
-            CanTurn = cachedTurn .IsNotNull();
+            CanTurn = cachedTurn.IsNotNull();
 
         }
 
         private void HandleOnArrive()
         {
-            if (this.isAttackMoving) {
+            if (this.isAttackMoving)
+            {
                 if (this.HasTarget == false)
                     isAttackMoving = false;
             }
@@ -192,15 +204,15 @@ namespace Lockstep
                 if (!inRange)
                 {
                     if (CanMove)
-                    cachedMove.StopMove();
+                        cachedMove.StopMove();
                 }
                 Agent.SetState(AnimState.Engaging);
                 long mag = FixedMath.Sqrt(fastMag >> FixedMath.SHIFT_AMOUNT);
                 //cachedTurn.StartTurn(targetDirection / mag);
                 bool withinTurn = TrackAttackAngle == false ||
-                    (fastMag != 0 &&
-                        cachedBody._rotation.Dot(targetDirection.x, targetDirection.y) > 0
-                        && cachedBody._rotation.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
+                                  (fastMag != 0 &&
+                                  cachedBody._rotation.Dot(targetDirection.x, targetDirection.y) > 0
+                                  && cachedBody._rotation.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
                 bool needTurn = mag != 0 && !withinTurn;
                 if (needTurn)
                 {
@@ -209,8 +221,7 @@ namespace Lockstep
                         targetDirection /= mag;
                         cachedTurn.StartTurn(targetDirection);
                     }
-                } 
-                else
+                } else
                 {
                     if (attackCount <= 0)
                     {
@@ -283,7 +294,7 @@ namespace Lockstep
                 }
             }
         }
-        
+
         public void Fire()
         {
             if (Agent.UseEnergy(this.EnergyCost))
@@ -313,14 +324,14 @@ namespace Lockstep
             if (other != Agent)
             {
                 cachedTargetHealth = other.Healther;
-                if (cachedTargetHealth .IsNotNull())
+                if (cachedTargetHealth.IsNotNull())
                 {
                     Target = other;
 
                     HasTarget = true;
                     targetVersion = Target.SpawnVersion;
                     IsCasting = true;
-                    fastRangeToTarget = Range + (Target.Body .IsNotNull() ? Target.Body.Radius : 0);
+                    fastRangeToTarget = Range + (Target.Body.IsNotNull() ? Target.Body.Radius : 0);
                     fastRangeToTarget *= fastRangeToTarget;
                 }
             }
@@ -369,33 +380,34 @@ namespace Lockstep
         protected override void OnExecute(Command com)
         {
             Agent.StopCast(this.ID);
+            Vector2d pos;
+            DefaultData target;
 
-            if (com.HasPosition || com.HasTarget)
+            if (com.TryGetData<Vector2d>(out pos) && CanMove)
             {
-                if (com.HasPosition && CanMove)
+
+                if (HasTarget)
                 {
-
-                    if (HasTarget)
-                    {
-                        cachedMove.RegisterGroup(false);
-                    } else
-                    {
-                        cachedMove.RegisterGroup();
-                    }
-
-                    isAttackMoving = true;
-                    isFocused = false;
-
-                } else if (com.HasTarget)
+                    cachedMove.RegisterGroup(false);
+                } else
                 {
-
-                    isFocused = true;
-                    isAttackMoving = false;
-                    LSAgent tempTarget;
-                    AgentController.TryGetAgentInstance(com.Target, out tempTarget);
-                    Engage(tempTarget);
+                    cachedMove.RegisterGroup();
                 }
+
+                isAttackMoving = true;
+                isFocused = false;
+
+            } else if (com.TryGetData<DefaultData> (out target) && target.Is(DataType.UShort))
+            {
+                isFocused = true;
+                isAttackMoving = false;
+                LSAgent tempTarget;
+                DefaultData data;
+                ushort targetValue = (ushort)target.Value;
+                AgentController.TryGetAgentInstance(targetValue, out tempTarget);
+                Engage(tempTarget);
             }
+
         
         }
 
@@ -438,21 +450,24 @@ namespace Lockstep
                 return true;
             }
         }
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         [SerializeField, Visualize]
         private Vector3 _projectileOrigin;
-        protected override void OnAfterSerialize  ()
+
+        protected override void OnAfterSerialize()
         {
             if (transform.position != Vector3.zero)
             {
-                Debug.LogWarning ("Visual editting can only be used when transform is at origin.");
+                Debug.LogWarning("Visual editting can only be used when transform is at origin.");
                 return;
             }
-            _projectileOffset = new Vector2dHeight(base.transform.InverseTransformPoint (_projectileOrigin));
+            _projectileOffset = new Vector2dHeight(base.transform.InverseTransformPoint(_projectileOrigin));
         }
-        void OnDrawGizmos () {
-            Gizmos.DrawWireSphere (Application.isPlaying ? Agent.Body._visualPosition : this.transform.position,this.Range.ToFloat()); 
+
+        void OnDrawGizmos()
+        {
+            Gizmos.DrawWireSphere(Application.isPlaying ? Agent.Body._visualPosition : this.transform.position, this.Range.ToFloat()); 
         }
-#endif
+        #endif
     }
 }

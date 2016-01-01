@@ -68,7 +68,7 @@ namespace Lockstep
 
         public static void Execute(Command com)
         {
-            if (com.HasPosition)
+            if (com.ContainsData<Vector2d> ())
             {
                 CreateGroup(com);
             }

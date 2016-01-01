@@ -266,26 +266,18 @@ namespace Lockstep
 
         public void Execute(Command com)
         {
-            
-            if (com.HasGroupID)
+           
             {
-                /*var group = AgentGroupController.GetGroup(com.GroupID);
-                if (group .IsNotNull ()) {
-                    for (i = 0; i < group.Agents.Count; i++) {
-                        group.Agents[i].Execute(com);
-                    }
-                }*/
-            } else
-            {
-                if (com.HasSelect == false)
-                    com.Select = previousSelection;
-                previousSelection = com.Select;
+                if (com.ContainsData<Selection>() == false)
+                    com.SetData<Selection>( previousSelection);
+                previousSelection = com.GetData<Selection>();
             }
-            
+
+
             BehaviourHelperManager.Execute(com);
-            for (int i = 0; i < com.Select.selectedAgentLocalIDs.Count; i++)
+            for (int i = 0; i < com.GetData<Selection>().selectedAgentLocalIDs.Count; i++)
             {
-                ushort selectedAgentID = com.Select.selectedAgentLocalIDs [i];
+                ushort selectedAgentID = com.GetData<Selection>().selectedAgentLocalIDs [i];
                 if (LocalAgentActive [selectedAgentID])
                 {
                     LocalAgents [selectedAgentID].Execute(com);

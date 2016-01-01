@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine;
 using Stopwatch = System.Diagnostics.Stopwatch;
 namespace Lockstep {
-    public class Selection {
+    public class Selection : ICommandData{
         private static readonly FastList<byte> bufferBites = new FastList<byte>();
         static readonly FastList<LSAgent> bufferAgents = new FastList<LSAgent>();
 
@@ -112,6 +112,14 @@ namespace Lockstep {
             }
 
             return curIndex - startIndex;
+        }
+
+        public void Write (Writer writer) {
+            writer.Write(this.GetBytes());
+        }
+        public void Read (Reader reader) {
+            int move = this.Reconstruct(reader.Source, reader.Position);
+            reader.MovePosition(move);
         }
 
         public override string ToString() {

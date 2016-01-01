@@ -72,22 +72,23 @@ namespace Lockstep {
 
 		public static void SendCommand (Command com)
 		{
-			com.Select = new Selection ();
+            com.Add<Selection>( new Selection ());
 			for (int i = 0; i < AgentControllers.Count; i++)
 			{
 				AgentController cont = AgentControllers[i];
 				if (cont.SelectedAgents.Count > 0)
 				{
+                    com.ControllerID = cont.ControllerID;
+
 					if (cont.SelectionChanged)
 					{
-						com.Select = new Selection(cont.SelectedAgents);
-						cont.SelectionChanged = false;
+                        com.SetData<Selection>( new Selection(cont.SelectedAgents));
+                        cont.SelectionChanged = false;
+
 					}
 					else {
-						com.HasSelect = false;
+                        com.ClearData<Selection> ();
 					}
-					com.ControllerID = cont.ControllerID;
-					com.Select.Serialize (AgentControllers[i].SelectedAgents);
                     CommandManager.SendCommand (com);
 				}
 			}
