@@ -31,7 +31,7 @@ namespace Lockstep
 
         static void Setup()
         {
-            QuickPos = AbilityInterfacer.FindInterfacer ("Scan");
+            QuickPos = AbilityInterfacer.FindInterfacer ("Move");
             QuickTarget = AbilityInterfacer.FindInterfacer("Scan");
 
             Setted = true;

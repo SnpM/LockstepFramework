@@ -7,6 +7,7 @@ namespace Lockstep
 {
     public class DefaultData : ICommandData
     {
+        public DefaultData () {}
         public DefaultData(DataType dataType, object value)
         {
             Value = value;
