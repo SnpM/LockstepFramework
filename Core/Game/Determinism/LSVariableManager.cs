@@ -37,7 +37,7 @@ namespace Lockstep
         private static IEnumerable <LSVariable> GetVariables (object lockstepObject, Type type, string[] propertyNames) {
             //Getting target variables with cache
             foreach (string name in propertyNames) {
-                yield return new LSVariable(lockstepObject, type.GetProperty(name));
+                yield return new LSVariable(lockstepObject, type.GetProperty(name,(BindingFlags)~0));
             }
         }
 

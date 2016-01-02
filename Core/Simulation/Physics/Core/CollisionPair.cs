@@ -146,7 +146,7 @@ namespace Lockstep
                     DistX = (DistX * depth / dist) / 2L;
                     DistY = (DistY * depth / dist) / 2L;
 
-                    const bool applyVelocity = true;
+                    const bool applyVelocity = false;
                     //Resolving collision
                     if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority))
                     {
@@ -156,7 +156,6 @@ namespace Lockstep
                         if (applyVelocity)
                         {
                             Body2._velocity.x -= DistX;
-                            Body2._velocity.y -= DistY;
                             Body2.VelocityChanged = true;
                         }
                     } else if (Body2.Immovable || Body2.Priority > Body1.Priority)
@@ -224,7 +223,7 @@ namespace Lockstep
                 return;
             }
             CurrentCollisionPair = this;
-
+            if (CheckHeight())
             if (CheckCollision())
             {
                 if (IsColliding == false)
@@ -398,13 +397,7 @@ namespace Lockstep
                 return true;
             }
 
-            /*if (Body1.VelocityFastMagnitude != 0 || Body2.VelocityFastMagnitude != 0) {
-                DistX = Body1.FuturePosition.x - Body2.FuturePosition.x;
-                DistY = Body1.FuturePosition.y - Body2.FuturePosition.y;
-                if ((DistX * DistX + DistY * DistY) <= CacheSqrDistance) {
-                    return true;
-                }
-            }*/
+
 
             return false;
         }
@@ -424,17 +417,7 @@ namespace Lockstep
                     }
                 }
             }
-            /*if (Body1.VelocityFastMagnitude != 0 || Body2.VelocityFastMagnitude != 0) {
-                if (Body1.FutureXMin < Body2.FutureXMax) {
-                    if (Body1.FutureXMax > Body2.FutureXMin) {
-                        if (Body1.FutureYMin < Body2.FutureYMax) {
-                            if (Body1.FutureYMax > Body2.FutureYMin) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }*/
+
             return false;
         }
 
@@ -558,9 +541,7 @@ namespace Lockstep
             //Resolving
             circle._position.x -= PenetrationX;//(PenetrationX * Multiplier) >> FixedMath.SHIFT_AMOUNT;
             circle._position.y -= PenetrationY;//(PenetrationY * Multiplier) >> FixedMath.SHIFT_AMOUNT;
-            circle._velocity.x -= PenetrationX;
-            circle._velocity.y -= PenetrationY;
-            circle.VelocityChanged = true;
+
             circle.PositionChanged = true;
             circle.BuildBounds();
         }

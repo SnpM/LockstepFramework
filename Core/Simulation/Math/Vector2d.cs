@@ -153,7 +153,11 @@ namespace Lockstep
             this.y = (this.x * -sin + this.y * cos) >> FixedMath.SHIFT_AMOUNT;
             this.x = temp1;
         }
-
+        public Vector2d Rotated (long cos, long sin) {
+            Vector2d vec = this;
+            vec.Rotate(cos,sin);
+            return vec;
+        }
         public void RotateInverse(long cos, long sin)
         {
             Rotate(cos, -sin);

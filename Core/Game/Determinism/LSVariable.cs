@@ -10,6 +10,7 @@ namespace Lockstep
     {
 
         public LSVariable (object lockstepObject, PropertyInfo info) {
+            
             Init (lockstepObject, info, info.GetCustomAttributes(typeof (LockstepAttribute), true).FirstOrDefault() as LockstepAttribute);
         }
 

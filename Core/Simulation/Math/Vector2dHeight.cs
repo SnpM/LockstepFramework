@@ -5,7 +5,7 @@ using System;
 namespace Lockstep
 {
 	[Serializable]
-	public struct Vector2dHeight
+	public struct Vector2dHeight : ICommandData
 	{
 		[SerializeField, FixedNumber]
 		private long
@@ -48,6 +48,18 @@ namespace Lockstep
         public override string ToString()
         {
             return string.Format("({0}, {1}, {2})", X.ToFloat(), Height, Y.ToFloat());
+        }
+
+        public void Write (Writer writer) {
+            writer.Write(this._x);
+            writer.Write(this._y);
+            writer.Write(this._height);
+        }
+
+        public void Read (Reader reader) {
+            this._x = reader.ReadLong();
+            this._y = reader.ReadLong();
+            this._height = reader.ReadLong();
         }
 
         public static explicit operator Vector2dHeight (Vector3 vec3) {

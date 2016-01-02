@@ -112,11 +112,11 @@ namespace Lockstep
 
         public static void Simulate()
         {
-
             for (int i = 0; i < PeakCount; i++)
             {
                 if (SimObjectExists [i])
                 {
+
                     LSBody b1 = SimObjects [i];
                     b1.EarlySimulate();
                 }
