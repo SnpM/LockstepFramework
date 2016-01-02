@@ -289,7 +289,7 @@ namespace Lockstep
             LockstepManager.Deactivate();
 
             TeamManager.Deactivate();
-            ClientManager.NetworkHelper.Disconnect();
+            ClientManager.Quit();
             Started = false;
 
             DefaultMessageRaiser.LateDeactivate();

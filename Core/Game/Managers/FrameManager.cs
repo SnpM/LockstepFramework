@@ -8,6 +8,7 @@ namespace Lockstep
         private const int StartCapacity = 30000;
         private static bool[] hasFrame = new bool[StartCapacity];
         private static Frame[] frames = new Frame[StartCapacity];
+        public static Frame[] Frames {get {return frames;}}
         private static int capacity = StartCapacity;
         private static int _foreSight;
 

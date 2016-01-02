@@ -4,7 +4,7 @@ using System;
 
 namespace Lockstep
 {
-	public class ClientManager : MonoBehaviour
+	public class ClientManager
 	{
         public static NetworkHelper NetworkHelper;
 		const bool SimulateNetworking = false;
@@ -63,7 +63,7 @@ namespace Lockstep
 		}
         public static bool Registered {get; private set;}
         private static void Register () {
-            SendMessageToServer (MessageType.Register,LSUtility.EmptyBytes);
+            SendMessageToServer (MessageType.Register,new byte[1]);
         }
 		public static void HandleFrameData (byte[] data) {
 			if (GameStarted) {

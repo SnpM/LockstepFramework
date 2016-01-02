@@ -49,7 +49,7 @@ namespace Lockstep {
         }
 
         /// <summary>
-        /// Used by a locally hosted server. 
+        /// Used by a locally hosted server.
         /// </summary>
         /// <param name="messageType">Message type.</param>
         /// <param name="data">Data.</param>
@@ -65,7 +65,6 @@ namespace Lockstep {
         protected void Receive (MessageType messageType, byte[] data) {
             if (OnDataReceived != null)
                 OnDataReceived (messageType,data);
-
             //Huge switch statement for distributing data based on MessageType
             switch (messageType) {
                 case MessageType.Input:
