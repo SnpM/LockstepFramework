@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 
 namespace Lockstep {
-    public abstract class NetworkHelper {
+    public abstract class NetworkHelper : MonoBehaviour{
         public abstract bool IsConnected { get; }
 
         public abstract int ID { get; }
