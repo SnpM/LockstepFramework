@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Rotorz.ReorderableList {
+namespace Lockstep.Rotorz.ReorderableList {
 
 	/// <summary>
 	/// Utility class for drawing reorderable lists.

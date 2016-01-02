@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Rotorz.ReorderableList {
+namespace Lockstep.Rotorz.ReorderableList {
 
 	/// <summary>
 	/// Factory methods that create <see cref="IElementAdderMenuBuilder{TContext}"/>

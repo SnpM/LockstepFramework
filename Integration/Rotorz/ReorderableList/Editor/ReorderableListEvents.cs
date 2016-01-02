@@ -5,7 +5,7 @@ using System;
 using System.ComponentModel;
 using UnityEngine;
 
-namespace Rotorz.ReorderableList {
+namespace Lockstep.Rotorz.ReorderableList {
 	
 	/// <summary>
 	/// Arguments which are passed to <see cref="AddMenuClickedEventHandler"/>.

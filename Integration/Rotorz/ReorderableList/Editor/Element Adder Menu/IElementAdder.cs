@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Rotorz.ReorderableList {
+namespace Lockstep.Rotorz.ReorderableList {
 
 	/// <summary>
 	/// Interface for an object which adds elements to a context object of the type
