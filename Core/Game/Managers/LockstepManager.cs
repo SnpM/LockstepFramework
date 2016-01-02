@@ -43,7 +43,7 @@ namespace Lockstep
         public static MonoBehaviour UnityInstance { get; private set; }
 
         public const int FrameRate = 32;
-        public const int InfluenceResolution = 2;
+        public const int InfluenceResolution = 1;
         public const float BaseDeltaTime = (float)(1d / FrameRate);
 
         private static int InfluenceCount;

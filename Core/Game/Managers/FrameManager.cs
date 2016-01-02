@@ -26,16 +26,15 @@ namespace Lockstep
 
         public static void TweakFramerate()
         {
-            if (CommandManager.sendType == SendState.Network && ClientManager.NetworkHelper.IsServer == false)
+            if (CommandManager.sendType == SendState.Network)
             {
                 float scaler = (float)(ForeSight);
-                scaler -= 2;
-                scaler /= 32;
-                Time.timeScale = Mathf.Lerp(Time.timeScale, 1f + (scaler), .5f);
-                Debug.Log(scaler);
+                scaler -= 0;
+                scaler /= 16;
+                Time.timeScale = Mathf.Lerp(Time.timeScale, 1f + (scaler), 1f);
             } else
             {
-                //Time.timeScale = 1f;
+                Time.timeScale = 1f;
             }
         }
 
