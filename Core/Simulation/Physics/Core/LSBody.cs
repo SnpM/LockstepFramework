@@ -605,6 +605,7 @@ namespace Lockstep
             this._rotationalTransform = this.transform;
         }
         void OnDrawGizmos () {
+            return;
             //Don't draw gizmos before initialization
             if (Application.isPlaying == false) return;
             switch (this.Shape) {

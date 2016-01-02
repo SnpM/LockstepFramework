@@ -18,6 +18,12 @@ namespace Lockstep {
             }
         }
 
+        public static void GameStart () {
+            foreach (var helper in Helpers) {
+                helper.GameStart();
+            }
+        }
+
         public static void Simulate () {
             foreach (BehaviourHelper helper in Helpers) {
                 helper.Simulate ();
@@ -32,9 +38,10 @@ namespace Lockstep {
 
         public static void Execute (Command com) {
             foreach (BehaviourHelper helper in Helpers) {
-                if (helper.ListenInput == com.LeInput) {
+                if (helper.CachedListenInput == com.LeInput) {
                     helper.Execute (com);
                 }
+                helper.RawExecute(com);
             }
         }
 

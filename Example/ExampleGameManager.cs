@@ -28,8 +28,8 @@ namespace Lockstep.Example {
         }
 
 
-        protected override void OnStartGame () {
-            AgentController ac = new AgentController();
+        protected override void OnGameStart () {
+            AgentController ac = AgentController.Create();
             PlayerManager.AddController (ac);
 
             for (int i = 0; i < _spawnAmount; i++) {

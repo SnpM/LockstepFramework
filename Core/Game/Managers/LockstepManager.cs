@@ -57,13 +57,17 @@ namespace Lockstep
         public static bool Loaded { get; private set; }
 
         private static GameManager _mainGameManager;
-        public static GameManager MainGameManager {
-            get {
+
+        public static GameManager MainGameManager
+        {
+            get
+            {
                 if (_mainGameManager == null)
                     throw new System.Exception("MainGameManager has exploded!");
                 return _mainGameManager;
             }
-            private set {
+            private set
+            {
                 _mainGameManager = value;
             }
         }
@@ -74,7 +78,8 @@ namespace Lockstep
 
             LSDatabaseManager.Setup();
 
-            UnityInstance = GameObject.CreatePrimitive(PrimitiveType.Sphere).AddComponent<MonoBehaviour>();
+            UnityInstance = GameObject.CreatePrimitive(PrimitiveType.Quad).AddComponent<MonoBehaviour>();
+            GameObject.Destroy(UnityInstance.GetComponent<Collider>());
             UnityInstance.GetComponent<Renderer>().enabled = false;
             GameObject.DontDestroyOnLoad(UnityInstance.gameObject);
 
@@ -177,8 +182,10 @@ namespace Lockstep
                     return;
                 }
                 Stalled = false;
-                MainGameManager.GameStart();
-
+                if (InfluenceFrameCount == 0)
+                {
+                    GameStart ();
+                }
                 FrameManager.Simulate();
                 InfluenceFrameCount++;
             } else
@@ -189,8 +196,7 @@ namespace Lockstep
             {
                 return;
             }
-            if (FrameCount == 0)
-                StartGame();
+
             MainGameManager.MainInterfacingHelper.Simulate();
 
 
@@ -209,9 +215,11 @@ namespace Lockstep
 
         }
 
-        private static void StartGame()
+        private static void GameStart()
         {
-            GameManager.StartGame();
+            GameManager.GameStart();
+            BehaviourHelperManager.GameStart();
+
         }
 
         private static void LateSimulate()

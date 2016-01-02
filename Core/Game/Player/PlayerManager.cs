@@ -28,7 +28,7 @@ namespace Lockstep {
 		}
 		
         public static AgentController CreateController () {
-            AgentController ac = new AgentController();
+            AgentController ac = AgentController.Create();
             return ac;
         }
 

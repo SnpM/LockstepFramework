@@ -17,7 +17,7 @@ namespace Lockstep
 
 		public static bool GameStarted { get; private set; }
 
-		public static ushort ID {
+		public static int ClientID {
 			get {
 				return NetworkHelper.ID;
 			}

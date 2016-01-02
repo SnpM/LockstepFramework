@@ -12,7 +12,7 @@ namespace Lockstep.Example {
         public override void Host (int roomSize) {
 
         }
-        public override ushort ID {
+        public override int ID {
             get {
                 return 0;
             }

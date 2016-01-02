@@ -233,7 +233,11 @@ namespace Lockstep
         private readonly FastList<AllegianceType> DiplomacyFlags = new FastList<AllegianceType>();
         private readonly FastStack<ushort> OpenLocalIDs = new FastStack<ushort>();
 
-        internal AgentController()
+        public static AgentController Create () {
+            return new AgentController();
+        }
+
+        private AgentController()
         {
             
             OpenLocalIDs.FastClear();
@@ -262,14 +266,14 @@ namespace Lockstep
             SelectionChanged = true;
         }
 
-        private Selection previousSelection;
+        private Selection previousSelection = new Selection();
 
         public void Execute(Command com)
         {
            
             {
                 if (com.ContainsData<Selection>() == false)
-                    com.SetData<Selection>( previousSelection);
+                    com.Add<Selection>( previousSelection);
                 previousSelection = com.GetData<Selection>();
             }
 

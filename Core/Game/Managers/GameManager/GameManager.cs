@@ -57,12 +57,6 @@ namespace Lockstep {
 
         }
     
-        public void GameStart () {
-            this.OnGameStart();
-        }
-        protected virtual void OnGameStart () {
-            //When the game starts (first simulation frame)
-        }
 
         protected void FixedUpdate () {
             LockstepManager.Simulate ();
@@ -105,12 +99,12 @@ namespace Lockstep {
             LockstepManager.LateVisualize ();
         }
 
-        public static void StartGame () {
-            Instance.OnStartGame ();
+        public static void GameStart () {
+            Instance.OnGameStart ();
         }
 
-        protected virtual void OnStartGame () {
-        
+        protected virtual void OnGameStart () {
+            //When the game starts (first simulation frame)
         }
     
         void OnDisable () {

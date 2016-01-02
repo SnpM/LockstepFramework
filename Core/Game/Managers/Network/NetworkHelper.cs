@@ -6,7 +6,7 @@ namespace Lockstep {
     public abstract class NetworkHelper {
         public abstract bool IsConnected { get; }
 
-        public abstract ushort ID { get; }
+        public abstract int ID { get; }
 
         public abstract bool IsServer { get; }
 
