@@ -32,11 +32,6 @@ namespace Lockstep.Example {
                 return 1;
             }
         }
-        public override void SendMessageToAll (MessageType messageType, byte[] data) {
-            base.Receive (messageType, data);
-        }
-        public override void SendMessageToServer (MessageType messageType, byte[] data) {
-            base.Receive (messageType, data);
-        }
+
     }
 }

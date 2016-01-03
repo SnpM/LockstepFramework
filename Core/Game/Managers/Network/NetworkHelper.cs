@@ -44,16 +44,37 @@ namespace Lockstep {
 
         public abstract void Disconnect ();
 
-        public virtual void SendMessageToServer (MessageType messageType, byte[] data) {
+        /// <summary>
+        /// Sends the message to server. If this client is the server, automatically sends message directly.
+        /// </summary>
+        /// <param name="messageType">Message type.</param>
+        /// <param name="data">Data.</param>
+        public void SendMessageToServer (MessageType messageType, byte[] data) {
+            if (this.IsServer) {
+                this.Receive(messageType,data);
+            }
+            else {
+                OnSendMessageToServer (messageType,data);
+            }
+        }
+        protected virtual void OnSendMessageToServer (MessageType messageType, byte[] data) {
             this.Receive (messageType, data);
         }
 
         /// <summary>
-        /// Used by a locally hosted server.
+        /// Used by the server to send a message to everyone.
         /// </summary>
         /// <param name="messageType">Message type.</param>
         /// <param name="data">Data.</param>
-        public virtual void SendMessageToAll (MessageType messageType, byte[] data) {
+        public void SendMessageToAll (MessageType messageType, byte[] data) {
+            if (this.IsServer) {
+                OnSendMessageToAll (messageType,data);
+            }
+            else {
+                Debug.LogError("Only server can send message to all!");
+            }
+        }
+        protected virtual void OnSendMessageToAll (MessageType messageType, byte[] data) {
             this.Receive(messageType, data);
         }
 

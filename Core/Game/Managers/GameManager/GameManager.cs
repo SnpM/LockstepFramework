@@ -21,9 +21,21 @@ namespace Lockstep {
         static long stateHash;
         static bool hashChecked;
 
-        public abstract NetworkHelper MainNetworkHelper {
-            get;
+        private NetworkHelper _mainNetworkHelper;
+
+        public virtual NetworkHelper MainNetworkHelper {
+            get {
+                if (_mainNetworkHelper == null) {
+                    _mainNetworkHelper = GetComponent<NetworkHelper> ();
+                    if (_mainNetworkHelper == null) {
+                        Debug.Log("NetworkHelper not found on this GameManager's GameObject. Defaulting to ExampleNetworkHelper...");
+                        _mainNetworkHelper = new Example.ExampleNetworkHelper();
+                    }
+                }
+                return _mainNetworkHelper;
+            }
         }
+
 
         private static RTSInterfacingHelper _defaultHelper = new RTSInterfacingHelper();
         public virtual InterfacingHelper MainInterfacingHelper {

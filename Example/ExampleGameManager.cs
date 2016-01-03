@@ -11,7 +11,7 @@ namespace Lockstep.Example {
         [SerializeField]
         private int _spawnAmount;
 
-        private NetworkHelper _mainNetworkHelper = new ExampleNetworkHelper ();
+        private NetworkHelper _mainNetworkHelper;
 
         protected FastList<LSAgent> spawnedAgents = new FastList<LSAgent>();
 
@@ -23,6 +23,12 @@ namespace Lockstep.Example {
 
         public override NetworkHelper MainNetworkHelper {
             get {
+                if (_mainNetworkHelper == null) {
+                    _mainNetworkHelper = GetComponent<NetworkHelper> ();
+                    if (_mainNetworkHelper == null) {
+                        throw new System.NotImplementedException ("A NetworkHelper needs to be attached to the same object as the GameManager.");
+                    }
+                }
                 return _mainNetworkHelper;
             }
         }
