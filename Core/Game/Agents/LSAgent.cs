@@ -208,14 +208,9 @@ namespace Lockstep {
         public AgentInterfacer Interfacer {get; private set;}
         private readonly FastList<int> TrackedLockstepTickets = new FastList<int>();
 
-        void Awake () {
-            gameObject.SetActive(false);
-        }
-
         public void Setup(AgentInterfacer interfacer) {
 			
             LoadComponents ();
-
 
 			GameObject.DontDestroyOnLoad(gameObject);
 
@@ -248,6 +243,9 @@ namespace Lockstep {
 			StatsBarer.Setup (this);
 
             this.RegisterLockstep();
+
+            gameObject.SetActive(false);
+
         }
         private void RegisterLockstep () {
             TrackedLockstepTickets.Add (LSVariableManager.Register(this.Body));
