@@ -412,7 +412,7 @@ namespace Lockstep {
 
         private void Pool() {
             AgentController.CacheAgent(this);
-			if (CachedGameObject .IsNotNull ())
+			if (CachedGameObject != null)
             CachedGameObject.SetActive (false);
         }
 
