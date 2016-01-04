@@ -52,7 +52,7 @@ namespace Lockstep
 
         public static int FrameCount { get; private set; }
 
-        public static bool Started { get; private set; }
+        public static bool GameStarted { get; private set; }
 
         public static bool Loaded { get; private set; }
 
@@ -151,7 +151,6 @@ namespace Lockstep
             InfluenceManager.Initialize();
             ProjectileManager.Initialize();
 
-            Started = true;
             ClientManager.Initialize();
 
             DefaultMessageRaiser.LateInitialize();
@@ -199,7 +198,6 @@ namespace Lockstep
 
             MainGameManager.MainInterfacingHelper.Simulate();
 
-
             BehaviourHelperManager.Simulate();
             AgentController.Simulate();
             PhysicsManager.Simulate();
@@ -219,6 +217,7 @@ namespace Lockstep
         {
             GameManager.GameStart();
             BehaviourHelperManager.GameStart();
+            GameStarted = true;
 
         }
 
@@ -239,8 +238,11 @@ namespace Lockstep
 
         internal static void Execute(Command com)
         {
-            
-
+            if (!GameStarted) 
+            {
+                Debug.LogError("BOOM");
+                return;
+            }
             AgentController cont = AgentController.InstanceManagers [com.ControllerID];
             cont.Execute(com);
 
@@ -251,6 +253,7 @@ namespace Lockstep
 
         internal static void Visualize()
         {
+            if (!GameStarted) return;
             DefaultMessageRaiser.EarlyVisualize();
             PlayerManager.Visualize();
             MainGameManager.MainInterfacingHelper.Visualize();
@@ -278,7 +281,7 @@ namespace Lockstep
         {
             DefaultMessageRaiser.EarlyDeactivate();
 
-            if (Started == false)
+            if (GameStarted == false)
                 return;
             Selector.Clear();
             AgentController.Deactivate();
@@ -289,7 +292,7 @@ namespace Lockstep
 
             TeamManager.Deactivate();
             ClientManager.Quit();
-            Started = false;
+            GameStarted = false;
 
             DefaultMessageRaiser.LateDeactivate();
         }

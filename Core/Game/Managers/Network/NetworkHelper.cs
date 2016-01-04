@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-namespace Lockstep {
+namespace Lockstep.NetworkHelpers {
     public abstract class NetworkHelper : MonoBehaviour{
         public abstract bool IsConnected { get; }
 
@@ -81,37 +81,37 @@ namespace Lockstep {
         /// <param name="data">Data.</param>
         protected void Receive (MessageType messageType, byte[] data) {
             if (OnDataReceived != null)
-                OnDataReceived (messageType,data);
+                OnDataReceived.Invoke (messageType,data);
             //Huge switch statement for distributing data based on MessageType
             switch (messageType) {
                 case MessageType.Input:
                     if (OnInputData != null) {
-                        OnInputData (data);
+                        OnInputData.Invoke (data);
                     }
                     break;
                 case MessageType.Frame:
                     if (OnFrameData != null) {
-                        OnFrameData (data);
+                        OnFrameData.Invoke (data);
                     }
                     break;
                 case MessageType.Init:
                     if (OnInitData != null) {
-                        OnInitData (data);
+                        OnInitData.Invoke (data);
                     }
                     break;
                 case MessageType.Matchmaking:
                     if (OnMatchmakingData != null) {
-                        OnMatchmakingData (data);
+                        OnMatchmakingData.Invoke (data);
                     }
                     break;
                 case MessageType.Register:
                     if (OnRegisterData != null) {
-                        OnRegisterData (data);
+                        OnRegisterData.Invoke (data);
                     }
                     break;
                 case MessageType.Test:
                     if (OnTestData != null) {
-                        OnTestData (data);
+                        OnTestData.Invoke (data);
                     }
                     break;
             }

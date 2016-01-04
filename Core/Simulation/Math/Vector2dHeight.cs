@@ -43,11 +43,11 @@ namespace Lockstep
 			return new Vector2d (_y, -_x);
 		}
         public Vector3 ToVector3 () {
-            return new Vector3(_x.ToFloat(), _height, _y.ToFloat());
+            return new Vector3(_x.ToFloat(), _height.ToFloat(), _y.ToFloat());
         }
         public override string ToString()
         {
-            return string.Format("({0}, {1}, {2})", X.ToFloat(), Height, Y.ToFloat());
+            return string.Format("({0}, {1}, {2})", X.ToFloat(), Height.ToFloat(), Y.ToFloat());
         }
 
         public void Write (Writer writer) {

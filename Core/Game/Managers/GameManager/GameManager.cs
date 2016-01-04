@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Collections;
 using TypeReferences;
 using System;
+using Lockstep.NetworkHelpers;
 namespace Lockstep {
     public abstract class GameManager : MonoBehaviour{
 
@@ -29,7 +30,7 @@ namespace Lockstep {
                     _mainNetworkHelper = GetComponent<NetworkHelper> ();
                     if (_mainNetworkHelper == null) {
                         Debug.Log("NetworkHelper not found on this GameManager's GameObject. Defaulting to ExampleNetworkHelper...");
-                        _mainNetworkHelper = new Example.ExampleNetworkHelper();
+                        _mainNetworkHelper = new ExampleNetworkHelper();
                     }
                 }
                 return _mainNetworkHelper;
@@ -120,7 +121,7 @@ namespace Lockstep {
         }
     
         void OnDisable () {
-            //LockstepManager.Deactivate ();
+            LockstepManager.Deactivate ();
         }
 
         void OnApplicationQuit () {

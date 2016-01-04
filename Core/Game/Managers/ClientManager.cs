@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-
+using Lockstep.NetworkHelpers;
 namespace Lockstep
 {
 	public class ClientManager

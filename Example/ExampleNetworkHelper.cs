@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Lockstep.Example {
+namespace Lockstep.NetworkHelpers {
     public class ExampleNetworkHelper : NetworkHelper {
         public override void Connect (string ip) {
 
