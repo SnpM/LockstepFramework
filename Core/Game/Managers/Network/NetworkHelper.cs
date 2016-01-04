@@ -50,12 +50,8 @@ namespace Lockstep {
         /// <param name="messageType">Message type.</param>
         /// <param name="data">Data.</param>
         public void SendMessageToServer (MessageType messageType, byte[] data) {
-            if (this.IsServer) {
-                this.Receive(messageType,data);
-            }
-            else {
-                OnSendMessageToServer (messageType,data);
-            }
+
+            OnSendMessageToServer (messageType,data);
         }
         protected virtual void OnSendMessageToServer (MessageType messageType, byte[] data) {
             this.Receive (messageType, data);
