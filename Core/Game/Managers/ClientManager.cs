@@ -84,7 +84,6 @@ namespace Lockstep
                 }
                 return;
             }
-			if (CommandManager.sendType == SendState.Network) {
 				if (SimulateNetworking) {
 
 				} else {
@@ -97,7 +96,7 @@ namespace Lockstep
 						}
 					}
 				}
-			}
+			
 		}
 
 		private static FastQueue<byte[]> bufferedSendData = new FastQueue<byte[]> ();
@@ -129,31 +128,8 @@ namespace Lockstep
 				NetworkHelper.Disconnect ();
 			}
 		}
-
-
-		void OnGUI ()
-		{
-			if (SimulateNetworking == false && CommandManager.sendType == SendState.Network) {
-				if (isConnected == false) {
-					GUILayout.Label ("Host Address: ");
-
-					IP = GUILayout.TextField (IP.ToString ());
-
-					if (GUILayout.Button ("Connect", GUILayout.Width (200f))) {
-						Connect (IP);
-					}
-
-					GUILayout.Space (10f);
-					GUILayout.Label ("Room Size: ");
-					int.TryParse (GUILayout.TextField (RoomSize.ToString ()), out _roomSize);
-					if (GUILayout.Button ("Host", GUILayout.Width (200f))) {
-						NetworkHelper.Host (RoomSize);
-					}
-				} else {
-
-				}
-			}
-		}
+            
+		
 
 		private static void SendMessageToServer (MessageType messageType, byte[] data)
 		{

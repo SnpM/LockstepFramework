@@ -54,8 +54,7 @@ namespace Lockstep
         {
             SelectionManager.Update();
 
-            if (CommandManager.sendType == SendState.None)
-                return;
+
             RTSInterfacing.Visualize();
 
             if (IsGathering)

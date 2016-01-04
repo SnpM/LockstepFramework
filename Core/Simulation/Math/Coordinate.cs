@@ -6,7 +6,7 @@ namespace Lockstep
     #if UNITY_EDITOR
     using UnityEditor;
     #endif
-    public struct Coordinate
+    public struct Coordinate : ICommandData
     {
         public int x;
         public int y;
@@ -24,7 +24,7 @@ namespace Lockstep
 
         public void Write (Writer writer) {
             writer.Write (x);
-            writer.Write(y);
+            writer.Write (y);
         }
         public void Read (Reader reader) {
             this.x = reader.ReadInt ();

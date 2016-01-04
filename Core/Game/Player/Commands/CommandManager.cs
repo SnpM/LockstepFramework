@@ -5,9 +5,7 @@ namespace Lockstep
 {
     public static class CommandManager
     {
-        const int defaultSize = 1 << 15;
-        public const SendState defaultSendState = SendState.Network;
-        public static SendState sendType = defaultSendState;
+        const int defaultSize = 1000;
 
         public static int LastCommandedFrameCount { get; private set; }
 
@@ -17,55 +15,19 @@ namespace Lockstep
 
         #endregion
 
-        static int NextFrameCount;
         static readonly FastList<Command> outCommands = new FastList<Command>(defaultSize);
         static readonly FastList<byte> bufferedBytes = new FastList<byte>(256);
-        const bool SendAggregated = false;
 
         public static void Initialize()
         {
             RecordedBytes.FastClear();
             outCommands.FastClear();
-            NextFrameCount = 0;
             LastCommandedFrameCount = -1;
         }
 
         public static void Simulate()
         {
-            if (sendType == SendState.None)
-            {
-                return;
-            }
-
-            {
-                bufferedBytes.FastClear();
-
-                switch (sendType)
-                {
-                    case SendState.Network:
-                        if (SendAggregated)
-                        {
-                            for (int i = 0; i < outCommands.Count; i++)
-                            {
-                                bufferedBytes.AddRange(outCommands [i].Serialized);
-                            }
-                            if (bufferedBytes.Count > 0)
-                                ClientManager.Distribute(bufferedBytes.ToArray());
-                        }
-                        break;
-                    case SendState.Offline:
-                        bufferedBytes.AddRange(BitConverter.GetBytes(LockstepManager.InfluenceFrameCount));
-                        for (int i = 0; i < outCommands.Count; i++)
-                        {
-                            bufferedBytes.AddRange(outCommands [i].Serialized);
-                        }
-                        ProcessPacket(bufferedBytes.ToArray());
-                        break;
-                }
-                outCommands.FastClear();
-                NextFrameCount++;
-                
-            }
+            SendOut ();
         }
 
         public static void ProcessPacket(byte[] packet)
@@ -114,40 +76,32 @@ namespace Lockstep
             }
         }
 
-        public static void SendCommand(Command com)
-        {
-            if (sendType == SendState.None)
-            {
-                return;
-            }
-            outCommands.Add(com);
-            if (SendAggregated == false)
-            {
+        /// <summary>
+        /// Sends out all Commands
+        /// </summary>
+        public static void SendOut () {
+            if (outCommands.Count > 0) {
                 bufferedBytes.FastClear();
-                if (sendType == SendState.Network)
-                {
-                    for (int i = 0; i < outCommands.Count; i++)
-                    {
-                        bufferedBytes.AddRange(outCommands [i].Serialized);
-                    }
-                    if (bufferedBytes.Count > 0)
-                    {
-                        ClientManager.Distribute(bufferedBytes.ToArray());
-                    }
-                    outCommands.FastClear();
 
+                for (int i = 0; i < outCommands.Count; i++)
+                {
+                    bufferedBytes.AddRange(outCommands [i].Serialized);
                 }
+                if (bufferedBytes.Count > 0)
+                    ClientManager.Distribute(bufferedBytes.ToArray());
+
+                outCommands.FastClear();
+            }
+        }
+
+        public static void SendCommand(Command com, bool immediate = false)
+        {
+            outCommands.Add(com);
+            if (immediate)
+            {
+                SendOut ();
             }
         }
     }
 
-    public enum SendState
-    {
-        None,
-        //Sends no commands and processes no bytes
-        Offline,
-        //Automatically sends commands offline
-        Network
-        //Sends and receives commands from the network
-    }
 }

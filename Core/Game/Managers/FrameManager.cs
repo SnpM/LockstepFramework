@@ -23,15 +23,23 @@ namespace Lockstep
 
             }
         }
-
+        private static bool _adjustFramerate;
+        public static bool AdjustFramerate {
+            get {
+                return _adjustFramerate;
+            }
+            set {
+                _adjustFramerate = value;
+            }
+        }
         public static void TweakFramerate()
         {
-            if (CommandManager.sendType == SendState.Network)
+            if (AdjustFramerate)
             {
                 float scaler = (float)(ForeSight);
                 scaler -= 0;
                 scaler /= 16;
-                Time.timeScale = Mathf.Lerp(Time.timeScale, 1f + (scaler), 1f);
+                Time.timeScale = 1 + scaler;
             } else
             {
                 Time.timeScale = 1f;
@@ -46,7 +54,7 @@ namespace Lockstep
 
         public static bool CanAdvanceFrame
         {
-            get { return (FreeSimulate || ForeSight > 0 && (CommandManager.sendType != SendState.Network || ClientManager.GameStarted));}
+            get { return (FreeSimulate || ForeSight > 0 && (ClientManager.GameStarted));}
         }
 
         public static bool HasFrame(int frame)
