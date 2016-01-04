@@ -32,6 +32,10 @@ namespace Lockstep.Example {
                 return 1;
             }
         }
+        protected override void OnSendMessageToAll(MessageType messageType, byte[] data)
+        {
+            base.OnSendMessageToAll(messageType,data);
+        }
 
     }
 }
