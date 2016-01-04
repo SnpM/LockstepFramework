@@ -286,7 +286,6 @@ namespace Lockstep
             BehaviourHelperManager.Deactivate();
             ProjectileManager.Deactivate();
             ClientManager.Deactivate();
-            LockstepManager.Deactivate();
 
             TeamManager.Deactivate();
             ClientManager.Quit();
