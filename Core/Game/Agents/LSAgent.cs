@@ -207,9 +207,12 @@ namespace Lockstep {
 
         public AgentInterfacer Interfacer {get; private set;}
         private readonly FastList<int> TrackedLockstepTickets = new FastList<int>();
+        void Awake () {
+            gameObject.SetActive(false);
 
+        }
         public void Setup(AgentInterfacer interfacer) {
-			
+            gameObject.SetActive(true);
             LoadComponents ();
 
 			GameObject.DontDestroyOnLoad(gameObject);
@@ -244,7 +247,6 @@ namespace Lockstep {
 
             this.RegisterLockstep();
 
-            gameObject.SetActive(false);
 
         }
         private void RegisterLockstep () {
@@ -290,7 +292,7 @@ namespace Lockstep {
 			Selectable = true;
 
 
-			CachedGameObject.SetActive (true);
+            CachedGameObject.SetActiveIfNot (true);
             if (Body .IsNotNull ()) {
                 Body.Initialize(new Vector2dHeight(position), rotation);
             }
