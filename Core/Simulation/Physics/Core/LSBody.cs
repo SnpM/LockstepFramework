@@ -152,6 +152,7 @@ namespace Lockstep
         public Vector2d[] RealPoints;
         public Vector2d[] EdgeNorms;
 
+        
         public long XMin { get; private set; }
 
         public long XMax { get; private set; }

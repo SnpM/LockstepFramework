@@ -239,7 +239,9 @@ namespace Lockstep
 
         private AgentController()
         {
-            
+            if (InstanceManagers.Count > byte.MaxValue) {
+                throw new System.Exception("Cannot have more than 256 AgentControllers");
+            }
             OpenLocalIDs.FastClear();
             PeakLocalID = 0;
             ControllerID = (byte)InstanceManagers.Count;
