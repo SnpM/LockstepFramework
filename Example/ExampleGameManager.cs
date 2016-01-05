@@ -11,8 +11,6 @@ namespace Lockstep.Example {
         [SerializeField]
         private int _spawnAmount;
 
-        private NetworkHelper _mainNetworkHelper = new ExampleNetworkHelper ();
-
         protected FastList<LSAgent> spawnedAgents = new FastList<LSAgent>();
 
         public override void GetBehaviourHelpers (FastList<BehaviourHelper> output) {
@@ -21,18 +19,13 @@ namespace Lockstep.Example {
 
         }
 
-        public override NetworkHelper MainNetworkHelper {
-            get {
-                return _mainNetworkHelper;
-            }
-        }
 
 
-        protected override void OnStartGame () {
-            AgentController ac = new AgentController();
+        protected override void OnGameStart () {
+            AgentController ac = AgentController.Create();
+            PlayerManager.AddController (ac);
 
             for (int i = 0; i < _spawnAmount; i++) {
-                PlayerManager.AddController (ac);
                 spawnedAgents.Add (ac.CreateAgent (_spawnCode,Vector2d.zero));
             }
         }

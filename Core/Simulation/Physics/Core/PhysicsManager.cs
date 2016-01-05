@@ -15,26 +15,40 @@ namespace Lockstep
 {
     public static class PhysicsManager
     {
+
         #region User-defined Variables
 
         public const bool SimulatePhysics = true;
-        public const int SimulationSpread = 1;
 
-        static	int VisualSetSpread
+            
+        static double FixedDeltaTime
         {
             get
             {
+                return 1d / LockstepManager.FrameRate;
+            }
+        }
+
+        static int VisualSetSpread {
+            get {
                 return 2;
             }
         }
 
-        public const int FrameRate = LockstepManager.FrameRate / SimulationSpread;
+        public static bool SettingsChanged { get; private set; }
 
-        static long FixedDeltaTicks
+        private static PhysicsSettings _settings = new PhysicsSettings();
+
+        public static PhysicsSettings Settings
         {
             get
             {
-                return (long)((10000000L * VisualSetSpread) / FrameRate);
+                return _settings;
+            }
+            set
+            {
+                _settings = value;
+                SettingsChanged = true;
             }
         }
 
@@ -50,8 +64,6 @@ namespace Lockstep
         public static LSBody[] SimObjects = new LSBody[MaxSimObjects];
         private static Dictionary<int,CollisionPair> CollisionPairs = new Dictionary<int,CollisionPair>(MaxSimObjects);
         public static FastList<CollisionPair> FastCollisionPairs = new FastList<CollisionPair>(MaxSimObjects);
-        private static int simulationCount;
-        private static int visualSetCount;
 
         #endregion
 
@@ -86,30 +98,25 @@ namespace Lockstep
 
             PeakCount = 0;
             AssimilatedCount = 0;
-            simulationCount = SimulationSpread;
 
             FastCollisionPairs.FastClear();
 
             Partition.Initialize();
+
+            if (SettingsChanged)
+            {
+                SettingsChanged = false;
+            }
         }
 
 
         public static void Simulate()
         {
-            simulationCount--;
-            if (simulationCount <= 0)
-            {
-                simulationCount = SimulationSpread;
-            } else
-            {
-                return;
-            }
-
-
             for (int i = 0; i < PeakCount; i++)
             {
                 if (SimObjectExists [i])
                 {
+
                     LSBody b1 = SimObjects [i];
                     b1.EarlySimulate();
                 }
@@ -123,22 +130,14 @@ namespace Lockstep
                     b1.Simulate();
                 }
             }
-
+            Simulated = true;
         }
 
         public static void LateSimulate()
         {
-            visualSetCount--;
 			
-            SetVisuals = visualSetCount <= 0;
 			
-            if (SetVisuals)
-            {
-                long curTicks = LockstepManager.Ticks;
-                LastDeltaTicks = curTicks - LastSimulateTicks;
-                LastSimulateTicks = curTicks;
-                visualSetCount = VisualSetSpread;
-            }
+
             for (int i = 0; i < PeakCount; i++)
             {
                 if (SimObjectExists [i])
@@ -149,23 +148,26 @@ namespace Lockstep
 
         }
 
-        public static bool SetVisuals {get; private set;}
-        public static float LerpTime {get ;private set;}
-        public static float LerpDamping {get; private set;}
+
+        public static float LerpTime { get ; private set; }
+        public static float ExtrapolationAmount {get; private set;}
+        public static float LerpDamping { get; private set; }
+
         private static float LerpDampScaler;
-        static long LastSimulateTicks;
-        static long LastDeltaTicks;
+
+        private static double LastTime { get; set; }
+
+        public static double AccumulatedTime { get; private set; }
+
+        public static bool Simulated { get; private set; }
 
         public static void Visualize()
         {
-            float smoothDeltaTime = Mathf.Max(Time.unscaledDeltaTime, 1f / 256);
-            LerpDampScaler = .3f / smoothDeltaTime;
-            LerpDamping = Time.unscaledDeltaTime * LerpDampScaler;
-            LerpDamping *= Time.timeScale;
-            long curTicks = LockstepManager.Ticks;
-            LerpTime = (float)((curTicks - LastSimulateTicks) / (double)FixedDeltaTicks);
-            LerpTime *= Time.timeScale;
-            if (LerpTime <= 1f)
+            LerpDamping = 1f;
+            double curTime = LockstepManager.Seconds;
+            AccumulatedTime += (curTime - LastTime) * Time.timeScale;
+            LerpTime = (float)(AccumulatedTime / FixedDeltaTime);
+            if (LerpTime < 1f)
             {
                 for (int i = 0; i < PeakCount; i++)
                 {
@@ -177,14 +179,44 @@ namespace Lockstep
                 }
             } else
             {
-                for (int i = 0; i < PeakCount; i++)
+                AccumulatedTime %= FixedDeltaTime;
+                ExtrapolationAmount = LerpTime;
+                LerpTime = (float)(AccumulatedTime / FixedDeltaTime);
+
+                if (Simulated)
                 {
-                    if (SimObjectExists [i])
+                    for (int i = 0; i < PeakCount; i++)
                     {
-                        SimObjects [i].LerpOverReset();
+                        if (SimObjectExists [i])
+                        {
+                            LSBody b1 = SimObjects [i];
+                            b1.LerpOverReset();
+
+                            b1.SetVisuals();
+
+                            b1.Visualize();
+
+
+                        }
+                    }
+                    Simulated = false;
+                }
+                else {
+                    for (int i = 0; i < PeakCount; i++) {
+                        if (SimObjectExists[i]) {
+                            LSBody b1 = SimObjects[i];
+
+                            b1.LerpOverReset();
+                            b1.SetExtrapolatedVisuals();
+
+                            b1.Visualize();
+
+                        }
                     }
                 }
+
             }
+            LastTime = curTime;
         }
 
         public static float ElapsedTime;
@@ -213,7 +245,7 @@ namespace Lockstep
 
         private static CollisionPair CreatePair(LSBody body1, LSBody body2)
         {
-            int pairIndex = GetCollisionPairIndex (body1.ID,body2.ID);
+            int pairIndex = GetCollisionPairIndex(body1.ID, body2.ID);
             CollisionPair pair = new CollisionPair();
             CollisionPairs [pairIndex] = pair;
             FastCollisionPairs.Add(pair);

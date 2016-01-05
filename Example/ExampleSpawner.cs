@@ -20,6 +20,7 @@ namespace Lockstep.Example
 		 */
 		protected override void OnExecute (Command com)
 		{
+<<<<<<< HEAD
 			byte conID = com.ControllerID;
             Vector2d pos = com.GetData<Vector2d>(0);
             Vector2d rot = com.GetData<Vector2d>(1);
@@ -31,6 +32,18 @@ namespace Lockstep.Example
             Debug.Log(rot);
 			for (int i = 0; i < count; i++) {
 				ac.CreateAgent (agentCode, pos, rot);
+=======
+			Debug.Log (com.HasPosition + " After");
+			byte conID = com.ControllerID;
+			Vector2d pos = com.Position;
+			ushort target = com.Target;
+			int count = com.Count;
+
+			AgentController ac = AgentController.InstanceManagers [conID];
+			string agentCode = AgentController.GetAgentCode (target);
+			for (int i = 0; i < count; i++) {
+				ac.CreateAgent (agentCode, pos);
+>>>>>>> origin/master
 			}
 		}
 	}

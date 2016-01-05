@@ -11,7 +11,7 @@ public class SetHeight : Ability {
 	protected override void OnInitialize ()
 	{
 		changed = false;
-		Agent.Body.visualPosition.y = Offset;
+		Agent.Body._visualPosition.y = Offset;
 	}
 	protected override void OnVisualize ()
 	{
@@ -20,7 +20,7 @@ public class SetHeight : Ability {
 		}
 
 		if (changed) {
-			Agent.Body.visualPosition.y = Offset;
+			Agent.Body._visualPosition.y = Offset;
 		}
 	}
 }

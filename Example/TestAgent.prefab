@@ -186,7 +186,7 @@ MonoBehaviour:
     x: 0
     y: 0
   CanMove: 1
-  Speed: 262144
+  Speed: 196608
   Acceleration: 65536
   Flying: 0
   DrawPath: 1
@@ -244,7 +244,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visualPosition: {x: 0, y: 0, z: 0}
-  _position:
+  Position:
     x: 0
     y: 0
   SetPositionBuffer: 0
@@ -266,15 +266,15 @@ MonoBehaviour:
   PastGridYMax: 0
   _priority: 0
   RaycastVersion: 0
-  Shape: 1
+  Shape: 0
   IsTrigger: 0
   Layer: 0
-  HalfWidth: 0
-  HalfHeight: 0
-  Radius: 32768
+  HalfWidth: 32768
+  HalfHeight: 32768
+  Radius: 0
   Immovable: 0
-  _positionalTransform: {fileID: 0}
-  _rotationalTransform: {fileID: 0}
+  _positionalTransform: {fileID: 465378}
+  _rotationalTransform: {fileID: 465378}
   LocalPosition:
     x: 0
     y: 0
@@ -401,6 +401,26 @@ Prefab:
       propertyPath: DrawPath
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _radius
+      value: 32112
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Speed
+      value: 655360
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _attackAngle
+      value: 11380
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _positionalTransform
+      value: 
+      objectReference: {fileID: 465378}
+    - target: {fileID: 0}
+      propertyPath: _rotationalTransform
+      value: 
+      objectReference: {fileID: 465378}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 100310}

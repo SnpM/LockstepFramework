@@ -5,9 +5,9 @@ namespace Lockstep
 {
 	public class ScanGroupHelper : BehaviourHelper
 	{
-		public override InputCode ListenInput {
+		public override ushort ListenInput {
 			get {
-                return AbilityInterfacer.FindInterfacer(typeof (Scan)).ListenInput;
+                return AbilityInterfacer.FindInterfacer(typeof (Scan)).ListenInputID;
 			}
 		}
 

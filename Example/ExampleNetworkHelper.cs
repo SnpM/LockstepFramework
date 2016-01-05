@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Lockstep.Example {
+namespace Lockstep.NetworkHelpers {
     public class ExampleNetworkHelper : NetworkHelper {
         public override void Connect (string ip) {
 
@@ -12,7 +12,7 @@ namespace Lockstep.Example {
         public override void Host (int roomSize) {
 
         }
-        public override ushort ID {
+        public override int ID {
             get {
                 return 0;
             }
@@ -32,11 +32,10 @@ namespace Lockstep.Example {
                 return 1;
             }
         }
-        public override void SendMessageToAll (MessageType messageType, byte[] data) {
-            base.Receive (messageType, data);
+        protected override void OnSendMessageToAll(MessageType messageType, byte[] data)
+        {
+            base.OnSendMessageToAll(messageType,data);
         }
-        public override void SendMessageToServer (MessageType messageType, byte[] data) {
-            base.Receive (messageType, data);
-        }
+
     }
 }

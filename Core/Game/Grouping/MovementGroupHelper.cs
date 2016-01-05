@@ -5,11 +5,11 @@ namespace Lockstep
 {
     public class MovementGroupHelper : BehaviourHelper
     {
-        public override InputCode ListenInput
+        public override ushort ListenInput
         {
             get
             {
-                return AbilityInterfacer.FindInterfacer(typeof (Move)).ListenInput;
+                return AbilityInterfacer.FindInterfacer(typeof (Move)).ListenInputID;
             }
         }
 
@@ -68,7 +68,7 @@ namespace Lockstep
 
         public static void Execute(Command com)
         {
-            if (com.HasPosition)
+            if (com.ContainsData<Vector2d> ())
             {
                 CreateGroup(com);
             }

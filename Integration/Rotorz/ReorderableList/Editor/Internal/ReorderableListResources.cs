@@ -5,7 +5,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace Rotorz.ReorderableList.Internal {
+namespace Lockstep.Rotorz.ReorderableList {
 
 	/// <exclude/>
 	public enum ReorderableListTexture {

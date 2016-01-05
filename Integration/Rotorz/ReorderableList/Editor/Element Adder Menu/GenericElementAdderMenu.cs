@@ -4,7 +4,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Rotorz.ReorderableList {
+namespace Lockstep.Rotorz.ReorderableList {
 
 	internal sealed class GenericElementAdderMenu : IElementAdderMenu {
 

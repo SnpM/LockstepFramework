@@ -15,7 +15,8 @@ namespace Lockstep
             }
             #region Setting IP and RoomSize via GUI
             GUILayout.BeginVertical(GUILayout.Width(300f));
-            GUI.color = Color.black;
+            GUILayout.Label("Time: " + Time.time.ToString());
+            GUI.color = Color.white;
             GUILayout.Label("IP: ");
             IP = GUILayout.TextField(IP);
 

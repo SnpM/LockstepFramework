@@ -57,6 +57,7 @@ namespace Lockstep.Integration
             {
 
                 EditorGUI.BeginChangeCheck();
+<<<<<<< HEAD
                 if (GUILayout.Button("Reset Transforms")) {
                     for (int i = 0; i < targets.Length; i++) {
                         SerializedObject ser = new SerializedObject(targets[i]);
@@ -66,6 +67,8 @@ namespace Lockstep.Integration
                     }
                     so.Update();
                 }
+=======
+>>>>>>> origin/master
                 if (targets.Length == 1)
                 {
                     PositionalTransform.Draw();

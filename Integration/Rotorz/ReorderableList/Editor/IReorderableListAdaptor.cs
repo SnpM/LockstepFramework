@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace Rotorz.ReorderableList {
+namespace Lockstep.Rotorz.ReorderableList {
 
 	/// <summary>
 	/// Adaptor allowing reorderable list control to interface with list data.

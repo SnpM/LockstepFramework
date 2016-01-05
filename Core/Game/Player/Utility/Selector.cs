@@ -4,13 +4,6 @@ namespace Lockstep {
 		private static LSAgent _mainAgent;
 		public static LSAgent MainSelectedAgent {get {return _mainAgent;}
 			private set{
-				if (value .IsNotNull ())
-				{
-					CommandCard.Inject (value.Interfacers);
-				}
-				else {
-					CommandCard.Reset ();
-				}
 				_mainAgent = value;
 			}
 		}

@@ -47,7 +47,7 @@ namespace Lockstep.UI
 
 		public void Visualize ()
 		{
-			if (InterfaceManager.GUIManager.CameraChanged && TrackedAgent.IsVisible) {
+            if (RTSInterfacingHelper.GUIManager.CameraChanged && TrackedAgent.IsVisible) {
 				this.UpdatePos ();
 				this.UpdateScale ();
 			} else if (TrackedAgent.VisualPositionChanged) {
@@ -55,7 +55,7 @@ namespace Lockstep.UI
 			}
 		}
 
-        static GUIManager GUIManager {get {return InterfaceManager.GUIManager;}}
+        static GUIManager GUIManager {get {return RTSInterfacingHelper.GUIManager;}}
 		static Camera MainCam { get { return GUIManager.MainCam; } }
 
 		static Vector3 screenPos;

@@ -4,6 +4,7 @@ using System;
 
 namespace Lockstep
 {
+    //TODO: Make this an attribute for Vector2d
     [Serializable]
     public struct VectorRotation
     {

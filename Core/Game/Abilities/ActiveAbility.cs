@@ -3,11 +3,11 @@ using Lockstep.Data;
 namespace Lockstep {
     public abstract class ActiveAbility : Ability {
 
-		public InputCode ListenInput {get; private set;}
+		public ushort ListenInput {get; private set;}
 
 		protected sealed override void TemplateSetup ()
 		{
-			ListenInput = Interfacer.ListenInput;
+            ListenInput = Interfacer.ListenInputID;
 		}
 
         public void Execute(Command com) {

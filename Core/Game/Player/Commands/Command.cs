@@ -3,11 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace Lockstep
 {
+<<<<<<< HEAD
     public sealed class Command
+=======
+    public partial class Command
+>>>>>>> origin/master
     {
 
 		public static void Setup () {
             RegisterDefaults ();
+<<<<<<< HEAD
+=======
+            RegisterBackwards ();
+>>>>>>> origin/master
         }
 
         private const int CompressionShift = FixedMath.SHIFT_AMOUNT - 7;

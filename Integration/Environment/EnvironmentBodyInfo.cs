@@ -8,7 +8,7 @@ namespace Lockstep
     {
         public EnvironmentBodyInfo (
             LSBody body,
-            Vector2d position,
+            Vector2dHeight position,
             Vector2d rotation
         )
         {
@@ -18,7 +18,7 @@ namespace Lockstep
         }
 
         public LSBody Body;
-        public Vector2d Position;
+        public Vector2dHeight Position;
         public Vector2d Rotation;
     }
 }
