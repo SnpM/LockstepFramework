@@ -291,19 +291,19 @@ namespace Lockstep
             }
         }
 
-        public static Command GenerateSpawnCommand(AgentController cont, string agentCode, int count, Vector2d position)
+        public static Command GenerateSpawnCommand(AgentController cont, string agentCode, int count, Vector2d position, Vector2d? rotation = null)
         {
-            //Temporarily disabled
-            //TODO: reimplement with BehaviourHelper system
-            /*
-            Command com = new Command(InputCode.Spawn);
-            com.ControllerID = cont.ControllerID;
-            com.Position = position;
-            com.Target = (ushort)AgentController.GetAgentCodeIndex(agentCode);
-            com.Count = count;
+            if (rotation == null)
+            {
+                rotation = new Vector2d? (new Vector2d(0,1));
+            }
+            Command com = new Command(InputCodeManager.GetCodeID("Spawn"));
+            com.Add<Vector2d>(position);
+            com.Add<Vector2d>(rotation.Value);
+            com.Add<DefaultData> (new DefaultData(DataType.UShort, AgentController.GetAgentCodeIndex(agentCode)));
+            com.Add<DefaultData> (new DefaultData(DataType.UShort, (ushort)count));
             return com;
-            */
-            throw new System.NotImplementedException();
+
         }
 
         public LSAgent CreateAgent(
