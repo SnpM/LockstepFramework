@@ -38,6 +38,7 @@ namespace Lockstep
             {
                 long dist = body.GetClosestDist(start);
                 long heightAtBodyPosition = startHeight + (dist.Mul(heightSlope));
+
                 if (body.HeightOverlaps(heightAtBodyPosition))
                 {
                     yield return body;

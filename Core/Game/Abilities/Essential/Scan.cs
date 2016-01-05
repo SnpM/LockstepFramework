@@ -72,7 +72,7 @@ namespace Lockstep
         public Vector2d ProjectileOffset { get { return _projectileOffset.ToOrientedVector2d(); } }
         //Offset of projectile
 
-        public float ProjectileHeightOffset { get { return _projectileOffset.Height; } }
+        public float ProjectileHeightOffset { get { return _projectileOffset.Height.ToFloat(); } }
         //Offset of projectile on the Y axis
 
         #region Serialized Values (Further description in properties)

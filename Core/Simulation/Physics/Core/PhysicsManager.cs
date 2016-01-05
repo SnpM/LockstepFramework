@@ -107,6 +107,9 @@ namespace Lockstep
             {
                 SettingsChanged = false;
             }
+
+            AccumulatedTime = 0;
+            LastTime = 0;
         }
 
 
