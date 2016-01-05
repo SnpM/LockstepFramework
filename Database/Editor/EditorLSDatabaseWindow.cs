@@ -84,7 +84,7 @@ namespace Lockstep.Data {
                 
                 
                 if (GUILayout.Button ("Load", GUILayout.MaxWidth (50f))) {
-                    DatabasePath = EditorUtility.OpenFilePanel ("Database File", "NewDatabase", "asset");
+                    DatabasePath = EditorUtility.OpenFilePanel ("Database File", Application.dataPath, "asset");
                     if (!string.IsNullOrEmpty (DatabasePath)) {
                         
                         EditorPrefs.SetString (databasePathKey, DatabasePath);
