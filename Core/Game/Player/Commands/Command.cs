@@ -183,7 +183,8 @@ namespace Lockstep
         {
             get
             {
-                writer.canvas.FastClear();
+                writer.Reset();
+                
 
                 //Essential Information
                 writer.Write(ControllerID);
@@ -197,7 +198,6 @@ namespace Lockstep
                     {
                         pair.Value [i].Write(writer);
                     }
-                    pair.Value.Clear();
                 }
 
                 return serializeList.ToArray();

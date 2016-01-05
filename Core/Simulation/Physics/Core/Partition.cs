@@ -49,9 +49,8 @@ namespace Lockstep
 		static int GridXMin, GridXMax, GridYMin, GridYMax;
 
         public static void UpdateObject (LSBody Body) {
+
             GetGridBounds (Body);
-
-
 			if (Body.PastGridXMin != GridXMin ||
 				Body.PastGridXMax != GridXMax ||
 				Body.PastGridYMin != GridYMin ||
@@ -62,20 +61,7 @@ namespace Lockstep
 						node.Remove (Body.ID);
 					}
 				}
-
-				for (int i = GridXMin; i <= GridXMax; i++) {
-					for (int j = GridYMin; j <= GridYMax; j++) {
-                        PartitionNode node = GetNode(i,j);
-
-						node.Add (Body.ID);
-					}
-				}
-
-
-				Body.PastGridXMin = GridXMin;
-				Body.PastGridXMax = GridXMax;
-				Body.PastGridYMin = GridYMin;
-				Body.PastGridYMax = GridYMax;
+                PartitionObject (Body, true);
 			}
 		}
 
@@ -97,7 +83,8 @@ namespace Lockstep
             }
         }
             
-		public static void PartitionObject (LSBody Body) {
+		public static void PartitionObject (LSBody Body, bool gridBoundsCalculated = false) {
+            if (gridBoundsCalculated == false)
             GetGridBounds (Body);
 
 			Body.PastGridXMin = GridXMin;
