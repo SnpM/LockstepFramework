@@ -293,17 +293,15 @@ namespace Lockstep
 
         public static Command GenerateSpawnCommand(AgentController cont, string agentCode, int count, Vector2d position)
         {
-            //Temporarily disabled
-            //TODO: reimplement with BehaviourHelper system
-            /*
-            Command com = new Command(InputCode.Spawn);
+			Command com = new Command (InputCodeManager.GetCodeID ("Spawn"));
             com.ControllerID = cont.ControllerID;
             com.Position = position;
+			Debug.Log (com.HasPosition);
+
             com.Target = (ushort)AgentController.GetAgentCodeIndex(agentCode);
             com.Count = count;
             return com;
-            */
-            throw new System.NotImplementedException();
+
         }
 
         public LSAgent CreateAgent(

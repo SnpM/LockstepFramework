@@ -75,7 +75,6 @@ namespace Lockstep.Data
             }
         }
 
-        public bool IsValid { get; private set; }
 
         public LSDatabase Database { get; private set; }
 
@@ -95,20 +94,20 @@ namespace Lockstep.Data
             Database = database;
 
             InitializeData();
-            IsValid = true;
+			bool isValid = true;
             for (int i = 0; i < DataItemInfos.Count; i++)
             {
                 DataItemInfo info = DataItemInfos [i];
-                bool isValid;
-                CreateDataHelper(info, out isValid);
-                if (!isValid)
+				bool bufferValid;
+				CreateDataHelper(info, out bufferValid);
+				if (!bufferValid)
                 {
                     Debug.LogError("Database does not match database type described by the database editor. Make sure Lockstep_Database.asset is the correct database type.");
-                    IsValid = false;
+                    isValid = false;
                     break;
                 }
             }
-            valid = IsValid;
+            valid = isValid;
         }
 
         public void RegisterData(Type targetType, string dataName, string dataFieldName, params SortInfo[] sorts)

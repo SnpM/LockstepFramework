@@ -77,6 +77,7 @@ namespace Lockstep
             DefaultMessageRaiser.EarlySetup();
 
             LSDatabaseManager.Setup();
+			Command.Setup ();
 
             UnityInstance = GameObject.CreatePrimitive(PrimitiveType.Quad).AddComponent<MonoBehaviour>();
             GameObject.Destroy(UnityInstance.GetComponent<Collider>());
