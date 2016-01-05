@@ -57,6 +57,15 @@ namespace Lockstep.Integration
             {
 
                 EditorGUI.BeginChangeCheck();
+                if (GUILayout.Button("Reset Transforms")) {
+                    for (int i = 0; i < targets.Length; i++) {
+                        SerializedObject ser = new SerializedObject(targets[i]);
+                        ser.FindProperty("_positionalTransform").objectReferenceValue = ((LSBody)targets[i]).transform;
+                        ser.FindProperty("_rotationalTransform").objectReferenceValue = ((LSBody)targets[i]).transform;
+                        ser.ApplyModifiedProperties();
+                    }
+                    so.Update();
+                }
                 if (targets.Length == 1)
                 {
                     PositionalTransform.Draw();
