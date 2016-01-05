@@ -29,7 +29,14 @@ namespace Lockstep
 
     public class FrameCountAttribute : PropertyAttribute
     {
-
+        public bool IsRate;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Lockstep.FrameCountAttribute"/> class.
+        /// </summary>
+        /// <param name="isRate">Is this FrameCount a rate (true) or a count?</param>
+        public FrameCountAttribute (bool isRate = false) {
+            this.IsRate = isRate;
+        }
     }
 
     public class VisualizeAttribute : PropertyAttribute

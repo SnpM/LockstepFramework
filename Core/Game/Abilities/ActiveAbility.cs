@@ -13,7 +13,15 @@ namespace Lockstep {
         public void Execute(Command com) {
             OnExecute(com);
         }
+            
+        protected virtual void OnExecute(Command com) {}
+        public bool DoRawExecute {get; protected set;}
 
-        protected abstract void OnExecute(Command com);
+        public void RawExecute (Command com) {
+            OnRawExecute (com);
+        }
+        protected virtual void OnRawExecute (Command com) {
+
+        }
     }
 }

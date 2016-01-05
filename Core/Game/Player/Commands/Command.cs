@@ -8,12 +8,8 @@ namespace Lockstep
 
         static Command () {
             RegisterDefaults ();
-            RegisterBackwards ();
         }
 
-        private const int CompressionShift = FixedMath.SHIFT_AMOUNT - 7;
-        private const int FloatToInt = 100;
-        private const float IntToFloat = 1f / FloatToInt;
 
 
         private static readonly FastList<byte> serializeList = new FastList<byte>();
@@ -43,7 +39,12 @@ namespace Lockstep
         }
 
         public byte ControllerID;
-        public ushort LeInput;
+        public ushort InputCode;
+        /// <summary>
+        /// Backward compatability for InputCode
+        /// </summary>
+        /// <value>The le input.</value>
+        public ushort LeInput {get {return InputCode;} set {InputCode = value;}}
         private Dictionary<ushort,FastList<ICommandData>> ContainedData = new Dictionary<ushort,FastList<ICommandData>>();
         private ushort ContainedTypesCount;
 
@@ -55,13 +56,13 @@ namespace Lockstep
         public Command(ushort inputCode)
         {
             this.Initialize();
-            LeInput = inputCode;
+            InputCode = inputCode;
         }
 
         public Command(ushort inputCode, byte controllerID)
         {
             this.Initialize();
-            this.LeInput = inputCode;
+            this.InputCode = inputCode;
             this.ControllerID = controllerID;
         }
 
@@ -158,7 +159,7 @@ namespace Lockstep
         {
             reader.Initialize(Source, StartIndex);
             ControllerID = reader.ReadByte();
-            LeInput = reader.ReadUShort();
+            InputCode = reader.ReadUShort();
             this.ContainedTypesCount = reader.ReadUShort();
 
             for (int i = 0; i < this.ContainedTypesCount; i++)
@@ -188,7 +189,7 @@ namespace Lockstep
 
                 //Essential Information
                 writer.Write(ControllerID);
-                writer.Write(LeInput);
+                writer.Write(InputCode);
                 writer.Write(ContainedTypesCount);
                 foreach (KeyValuePair<ushort,FastList<ICommandData>> pair in ContainedData)
                 {

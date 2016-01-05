@@ -38,7 +38,7 @@ namespace Lockstep {
 
         public static void Execute (Command com) {
             foreach (BehaviourHelper helper in Helpers) {
-                if (helper.CachedListenInput == com.LeInput) {
+                if (helper.CachedListenInput == com.InputCode) {
                     helper.Execute (com);
                 }
                 helper.RawExecute(com);

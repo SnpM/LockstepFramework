@@ -55,9 +55,19 @@ namespace Lockstep
         {
             public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
             {
-                property.intValue =
+                FrameCountAttribute a = attribute as FrameCountAttribute;
+                if (a.IsRate == false)
+                {
+                    property.intValue =
                 (int)(EditorGUI.DoubleField(position, label,
-                    property.intValue / (double)LockstepManager.FrameRate) * LockstepManager.FrameRate);
+                        property.intValue / (double)LockstepManager.FrameRate) * LockstepManager.FrameRate);
+                }
+                else {
+                    double showVal = 1d / (property.intValue / (double)LockstepManager.FrameRate);
+                    showVal = EditorGUI.DoubleField(position,label,showVal);
+                    property.intValue = (int)((1d / showVal) * LockstepManager.FrameRate);
+                }
+
             }
         }
 

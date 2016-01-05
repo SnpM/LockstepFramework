@@ -71,8 +71,11 @@ namespace Lockstep {
         public void Execute(Command com) {
             for (int k = 0; k < ActiveAbilitys.Length; k++) {
                 ActiveAbility abil = ActiveAbilitys[k];
-                if (abil.ListenInput == com.LeInput) {
+                if (abil.ListenInput == com.InputCode) {
                     abil.Execute(com);
+                }
+                if (abil.DoRawExecute) {
+                    abil.RawExecute(com);
                 }
             }
         }
@@ -109,6 +112,7 @@ namespace Lockstep {
             }
             return null;
         }
+
 
     }
 }

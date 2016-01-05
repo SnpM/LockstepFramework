@@ -9,9 +9,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Lockstep.UI;
 using Lockstep.Data;
+using System.Collections.Generic;
+
 #if UNITY_EDITOR
 using UnityEditor;
-using Lockstep.Integration;
+
 #endif
 namespace Lockstep {
 	[RequireComponent (typeof (LSBody))]
@@ -99,6 +101,8 @@ namespace Lockstep {
 		private GameObject _cachedGameObject;
 		public GameObject CachedGameObject {get {return _cachedGameObject;}}
 		#endregion
+
+        //TODO: Put all this stuff in an extendible class
         public LSInfluencer Influencer { get; private set; }
 		public Health Healther { get {return abilityManager.Healther;} }
 		public Scan Scanner { get {return abilityManager.Scanner;} }
@@ -484,6 +488,8 @@ namespace Lockstep {
 			_selectionRadius = 1f;
 			_visualCenter = transform;
 		}
+
+
 #endif
     }
 }

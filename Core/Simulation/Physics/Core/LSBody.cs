@@ -788,6 +788,27 @@ namespace Lockstep
                     break;
             }
         }
+
+        FastList<UnityEngine.Coroutine> flashRoutines = new FastList<UnityEngine.Coroutine>();
+        public void TestFlash () {
+            flashRoutines.Add(base.StartCoroutine(_TestFlash()));
+        }
+
+        private System.Collections.IEnumerator _TestFlash () {
+            foreach (UnityEngine.Coroutine co in flashRoutines) {
+                base.StopCoroutine(co);
+            }
+            flashRoutines.Clear();
+
+            Renderer ren = this.GetComponentInChildren<Renderer>();
+            Color col = Color.white;
+            ren.material.color = Color.red;
+            yield return null;
+            yield return new WaitForSeconds(.08f);
+            ren.material.color = col;
+
+            yield break;
+        }
     }
 
     public enum ColliderType : byte

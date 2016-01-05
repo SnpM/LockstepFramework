@@ -39,6 +39,8 @@ namespace Lockstep
                 return DataType.Long;
             if (type == typeof(byte))
                 return DataType.Byte;
+            if (type == typeof(bool))
+                return DataType.Bool;
             if (type == typeof(string))
                 return DataType.String;
             if (type == typeof(byte[]))
