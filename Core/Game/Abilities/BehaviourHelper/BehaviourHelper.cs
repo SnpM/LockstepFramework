@@ -3,104 +3,76 @@ using System.Collections;
 using Lockstep;
 using System.Collections.Generic;
 using System;
-
 public abstract class BehaviourHelper : MonoBehaviour, IBehaviourHelper
 {
 
-    public BehaviourHelper()
-    {
+    public BehaviourHelper () {
 
     }
 
-    private static FastList<BehaviourHelper> behaviourHelpers = new FastList<BehaviourHelper>();
-    private static HashSet<Type> createdTypes = new HashSet<Type>();
+	private static FastList<BehaviourHelper> behaviourHelpers = new FastList<BehaviourHelper> ();
+	private static HashSet<Type> createdTypes = new HashSet<Type> ();
+	
 
-    public ushort CachedListenInput {get; private set;}
-
-    public virtual ushort ListenInput
-    {
-        get { return 0; }
+	public virtual InputCode ListenInput {
+        get {return InputCode.None;}
     }
 
-    public void Initialize()
-    {
-        CachedListenInput = ListenInput;
-        OnInitialize();
-    }
-
-    protected virtual void OnInitialize()
-    {
-    }
-
-    public void LateInitialize()
-    {
+	public void Initialize ()
+	{
+		OnInitialize ();
+	}
+	
+	protected virtual void OnInitialize ()
+	{
+	}
+    public void LateInitialize () {
         this.OnLateInitialize();
     }
-
-    protected virtual void OnLateInitialize()
-    {
+    protected virtual void OnLateInitialize () {
 
     }
-
-    public void Simulate()
-    {
-        OnSimulate();
+    public void Simulate ()
+	{
+		OnSimulate ();
+	}
+	
+	protected virtual void OnSimulate ()
+	{
+	}
+    public void LateSimulate () {
+        OnLateSimulate ();
     }
-
-    protected virtual void OnSimulate()
-    {
-    }
-
-    public void LateSimulate()
-    {
-        OnLateSimulate();
-    }
-
-    protected virtual void OnLateSimulate()
-    {
+    protected virtual void OnLateSimulate (){
 
     }
-
-    public void Visualize()
-    {
-        OnVisualize();
-    }
-
-    protected virtual void OnVisualize()
-    {
-    }
-
-    public void Execute(Command com)
-    {
-        OnExecute(com);
-    }
-
-    protected virtual void OnExecute(Command com)
-    {
-    }
-
-    public void RawExecute (Command com) {
-        OnRawExecute (com);
-    }
-    protected virtual void OnRawExecute (Command com) {
-
-    }
-
-    public void GameStart () {
-        OnGameStart ();
-    }
-
-    protected virtual void OnGameStart () {
-
-    }
-
-    public void Deactivate()
-    {
-        OnDeactivate();
-    }
-
-    protected virtual void OnDeactivate()
-    {
+	
+    public void Visualize ()
+	{
+		OnVisualize ();
+	}
+	
+	protected virtual void OnVisualize ()
+	{
+	}
+	
+    public void Execute (Command com)
+	{
+		OnExecute (com);
+	}
+	
+	protected virtual void OnExecute (Command com)
+	{
+	}
+	
+    public void Deactivate ()
+	{
+			OnDeactivate ();
+	}
+	
+	protected virtual void OnDeactivate ()
+	{
 		
-    }
+		
+	}
 }

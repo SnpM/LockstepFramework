@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace Lockstep.Rotorz.ReorderableList {
+namespace Rotorz.ReorderableList {
 
 	/// <summary>
 	/// Interface for a menu command that can be included in an <see cref="IElementAdderMenu"/>

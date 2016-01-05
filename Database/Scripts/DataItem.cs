@@ -8,9 +8,6 @@ namespace Lockstep.Data
     [System.Serializable]
     public class DataItem
     {
-        public DataItem (string name) {
-            _name = name;
-        }
         public DataItem() {}
 
         [SerializeField]

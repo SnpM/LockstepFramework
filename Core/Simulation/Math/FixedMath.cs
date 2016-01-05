@@ -180,7 +180,7 @@ namespace Lockstep
 		/// <param name="f1">F1.</param>
 		public static long Truncate (long f1)
 		{
-			return ((f1) >> SHIFT_AMOUNT) << SHIFT_AMOUNT;
+			return ((f1 + Half) >> SHIFT_AMOUNT) << SHIFT_AMOUNT;
 		}
 		/// <summary>
 		/// Round the specified fixed point number.
@@ -190,7 +190,10 @@ namespace Lockstep
 		{
 			return ((f1 + FixedMath.Half - 1) >> SHIFT_AMOUNT) << SHIFT_AMOUNT;
 		}
-
+		public static long RoundToInteger (long f1)
+		{
+			return ((f1 + FixedMath.Half - 1) >> SHIFT_AMOUNT) << SHIFT_AMOUNT;
+		}
 		/// <summary>
 		/// Ceil the specified fixed point number.
 		/// </summary>
@@ -256,10 +259,6 @@ namespace Lockstep
 		{
 			return (float)(f1 / OneD);
 		}
-
-        public static float ToPreciseFloat (this long f1) {
-            return (float)ToDouble (f1);
-        }
 		/// <summary>
 		/// Converts to string.
 		/// </summary>

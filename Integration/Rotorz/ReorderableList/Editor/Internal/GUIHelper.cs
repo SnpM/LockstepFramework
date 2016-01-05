@@ -6,7 +6,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lockstep.Rotorz.ReorderableList {
+namespace Rotorz.ReorderableList.Internal {
 
 	/// <summary>
 	/// Utility functions to assist with GUIs.

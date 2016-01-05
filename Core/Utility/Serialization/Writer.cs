@@ -71,8 +71,5 @@ namespace Lockstep
             canvas.AddRange(byteArray);
         }
 
-        public void Reset () {
-            this.canvas.FastClear();
-        }
 	}
 }

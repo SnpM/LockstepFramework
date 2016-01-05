@@ -2,21 +2,53 @@
 using UnityEngine;
 
 namespace Lockstep {
-	public static class PlayerManager {
-
+	public class PlayerManager : MonoBehaviour {
+		[SerializeField]
+		private GUIStyle selectionBoxStyle = new GUIStyle();
+		[SerializeField]
+		private GameObject _orderMarker;
+		public static Marker OrderMarker {get; private set;}
+		
+		private static PlayerManager instance;
+		
+		public static SelectionSetting selectionSetting {get; private set;}
 		public static readonly FastBucket<AgentController> AgentControllers = new FastBucket<AgentController>();
 		public static AgentController MainController {get; private set;}
+		public static bool IsInterfacing {
+			get {
+				return InterfaceManager.IsGathering;
+			}
+		}
 
-        public static void Initialize() {
-			AgentControllers.FastClear();
-
+		void Awake () {
+            instance = this;
         }
+
+		
+		public static void Initialize(SelectionSetting selSetting = SelectionSetting.PC_RTS) {
+			AgentControllers.FastClear();
+			selectionSetting = selSetting;
+
+			OrderMarker =
+                instance._orderMarker != null ? GameObject.Instantiate (instance._orderMarker).GetComponent<Marker> ():
+                GameObject.CreatePrimitive(PrimitiveType.Cube).AddComponent<Marker> ();
+
+			InterfaceManager.Initialize ();
+		}
 		
 		public static void Simulate() {}
 		
 		public static void Visualize() {
+			switch (selectionSetting) {
+			case SelectionSetting.PC_RTS:
+				SelectionManager.Update();
+				CommandCard.Visualize ();
+				InterfaceManager.Visualize ();
+				break;
+			case SelectionSetting.Mobile:
 
-
+				break;
+			}
 		}
 		
 		public static int AgentControllerCount {
@@ -28,7 +60,7 @@ namespace Lockstep {
 		}
 		
         public static AgentController CreateController () {
-            AgentController ac = AgentController.Create();
+            AgentController ac = new AgentController();
             return ac;
         }
 
@@ -72,27 +104,35 @@ namespace Lockstep {
 
 		public static void SendCommand (Command com)
 		{
-            com.Add<Selection>( new Selection ());
+			com.Select = new Selection ();
 			for (int i = 0; i < AgentControllers.Count; i++)
 			{
 				AgentController cont = AgentControllers[i];
 				if (cont.SelectedAgents.Count > 0)
 				{
-                    com.ControllerID = cont.ControllerID;
-
 					if (cont.SelectionChanged)
 					{
-                        com.SetData<Selection>( new Selection(cont.SelectedAgents));
-                        cont.SelectionChanged = false;
-
+						com.Select = new Selection(cont.SelectedAgents);
+						cont.SelectionChanged = false;
 					}
 					else {
-                        com.ClearData<Selection> ();
+						com.HasSelect = false;
 					}
-                    CommandManager.SendCommand (com);
+					com.ControllerID = cont.ControllerID;
+					com.Select.Serialize (AgentControllers[i].SelectedAgents);
+					CommandManager.SendCommand (com);
 				}
 			}
 		}
-
+		
+		private void OnGUI() {
+			switch (selectionSetting) {
+			case SelectionSetting.PC_RTS:
+				SelectionManager.DrawBox(selectionBoxStyle);
+				break;
+			case SelectionSetting.Mobile:
+				break;
+			}
+		}
 	}
 }

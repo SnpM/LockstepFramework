@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lockstep.Rotorz.ReorderableList {
+namespace Rotorz.ReorderableList {
 
 	internal sealed class GenericElementAdderMenuBuilder<TContext> : IElementAdderMenuBuilder<TContext> {
 

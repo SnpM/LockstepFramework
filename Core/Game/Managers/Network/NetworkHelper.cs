@@ -2,11 +2,11 @@
 using System.Collections;
 using System;
 
-namespace Lockstep.NetworkHelpers {
-    public abstract class NetworkHelper : MonoBehaviour{
+namespace Lockstep {
+    public abstract class NetworkHelper {
         public abstract bool IsConnected { get; }
 
-        public abstract int ID { get; }
+        public abstract ushort ID { get; }
 
         public abstract bool IsServer { get; }
 
@@ -24,94 +24,60 @@ namespace Lockstep.NetworkHelpers {
 
         }
 
-        /// <summary>
-        /// Connecting to a server with IP address of ip. Note: Not all NetworkHelpers will require Connect.
-        /// </summary>
-        /// <param name="ip">Ip.</param>
-        public virtual void Connect (string ip) {
-            throw new System.NotImplementedException("Connecting not supported for " + this.ToString() + ".");
-        }
+        public abstract void Connect (string ip);
 
-        /// <summary>
-        /// Host a server with the specified address. Note: Not all NetworkHelpers will require hosting.
-        /// </summary>
-        /// <param name="roomSize">Room size.</param>
-        public virtual void Host (int roomSize) {
-            throw new System.NotImplementedException("Hosting not supported for " + this.ToString() + ".");
-        }
-
-        public virtual void Simulate () {}
+        public abstract void Host (int roomSize);
 
         public abstract void Disconnect ();
 
+        public abstract void SendMessageToServer (MessageType messageType, byte[] data);
+
         /// <summary>
-        /// Sends the message to server. If this client is the server, automatically sends message directly.
+        /// Used by a locally hosted server. 
         /// </summary>
         /// <param name="messageType">Message type.</param>
         /// <param name="data">Data.</param>
-        public void SendMessageToServer (MessageType messageType, byte[] data) {
-
-            OnSendMessageToServer (messageType,data);
-        }
-        protected virtual void OnSendMessageToServer (MessageType messageType, byte[] data) {
-            this.Receive (messageType, data);
-        }
+        public abstract void SendMessageToAll (MessageType messageType, byte[] data);
 
         /// <summary>
-        /// Used by the server to send a message to everyone.
-        /// </summary>
-        /// <param name="messageType">Message type.</param>
-        /// <param name="data">Data.</param>
-        public void SendMessageToAll (MessageType messageType, byte[] data) {
-            if (this.IsServer) {
-                OnSendMessageToAll (messageType,data);
-            }
-            else {
-                Debug.LogError("Only server can send message to all!");
-            }
-        }
-        protected virtual void OnSendMessageToAll (MessageType messageType, byte[] data) {
-            this.Receive(messageType, data);
-        }
-
-        /// <summary>
-        /// Receives data and sends it to the lockstep frame logic. Call from derived class.
+        /// Call from derived class.
         /// </summary>
         /// <param name="messageType">Message type.</param>
         /// <param name="data">Data.</param>
         protected void Receive (MessageType messageType, byte[] data) {
             if (OnDataReceived != null)
-                OnDataReceived.Invoke (messageType,data);
+                OnDataReceived (messageType,data);
+
             //Huge switch statement for distributing data based on MessageType
             switch (messageType) {
                 case MessageType.Input:
                     if (OnInputData != null) {
-                        OnInputData.Invoke (data);
+                        OnInputData (data);
                     }
                     break;
                 case MessageType.Frame:
                     if (OnFrameData != null) {
-                        OnFrameData.Invoke (data);
+                        OnFrameData (data);
                     }
                     break;
                 case MessageType.Init:
                     if (OnInitData != null) {
-                        OnInitData.Invoke (data);
+                        OnInitData (data);
                     }
                     break;
                 case MessageType.Matchmaking:
                     if (OnMatchmakingData != null) {
-                        OnMatchmakingData.Invoke (data);
+                        OnMatchmakingData (data);
                     }
                     break;
                 case MessageType.Register:
                     if (OnRegisterData != null) {
-                        OnRegisterData.Invoke (data);
+                        OnRegisterData (data);
                     }
                     break;
                 case MessageType.Test:
                     if (OnTestData != null) {
-                        OnTestData.Invoke (data);
+                        OnTestData (data);
                     }
                     break;
             }

@@ -19,16 +19,13 @@ namespace Lockstep
 		const int checkCollisionTurnRate = 1;//LockstepManager.FrameRate;
 		private int checkCollisionCount;
 
-        private long collisionTurnThreshold;
-
 		protected override void OnSetup ()
 		{
 			cachedBody = Agent.Body;
 
 			turnSin = _turnRate.Sin;
 			turnCos = _turnRate.Cos;
-            collisionTurnThreshold = cachedBody.Radius / LockstepManager.FrameRate;
-            collisionTurnThreshold *= collisionTurnThreshold;
+
 			cachedBody.OnContact += HandleContact;
 		}
 
@@ -36,18 +33,47 @@ namespace Lockstep
 		{
 			targetReached = true;
 			targetRotation = Vector2d.up;
-            checkCollisionCount = 0;
-            cachedBeginCheck = 0;
+			contactChecked = false;
+			checkCollisionCount = 0;
+			contactDif = Vector2d.zero;
+			cachedBeginCheck = 0;
+
+			contacted = false;
+			isContactTurning = false;
 
 			bufferStartTurn = false;
 		}
 
 		protected override void OnSimulate ()
 		{
+			if (targetReached) {
+				if (cachedBody.HasParent == false) {
+					if (contactChecked) {
+						contactChecked = false;
+						checkCollisionCount = checkCollisionTurnRate;
+						contactDif /= contactCount;
+						TurnDirection (contactDif);
+						isContactTurning = true;
+						contactDif = Vector2d.zero;
+						contactCount = 0;
+					} else if (checkCollisionCount > 0) {
+						checkCollisionCount--;
+					}
+				}
+			}
 
 
 			if (targetReached == false) {
+				if (isContactTurning) {
+					if (contacted) {
 
+						contacted = false;
+					}
+					else {
+						targetReached = true;
+						isContactTurning = false;
+					}
+				}
 				if (cachedBeginCheck != 0) {
 					{
 						if (cachedBeginCheck < 0) {
@@ -58,20 +84,20 @@ namespace Lockstep
 					}
 
 				} else {
-					if (cachedBody._rotation.Dot (targetRotation.x, targetRotation.y) < 0) {
+					if (cachedBody.Rotation.Dot (targetRotation.x, targetRotation.y) < 0) {
 						cachedBody.Rotate (turnCos, turnSin);
 					} else {
 						Arrive ();
 					}
 				}
 				cachedBody.RotationChanged = true;
-			}
+			} 
 		}
 
 		protected override void OnLateSimulate ()
 		{
 			if (targetReached == false) {
-				long check = cachedBody._rotation.Cross (targetRotation.x, targetRotation.y);
+				long check = cachedBody.Rotation.Cross (targetRotation.x, targetRotation.y);
 				if (check == 0 || ((cachedBeginCheck < 0) != (check < 0))) {
 					Arrive ();
 				}
@@ -84,8 +110,9 @@ namespace Lockstep
 
 		private void Arrive ()
 		{
-			cachedBody._rotation = targetRotation;
-            cachedBody.RotationChanged = true;
+			cachedBody.Rotation = targetRotation;
+			cachedBody.UpdateLocalRotation ();
+			cachedBody.RotationChanged = true;
 			targetReached = true;
 		}
 
@@ -97,21 +124,22 @@ namespace Lockstep
 
 		public void StartTurn (Vector2d targetRot)
 		{
-            bufferStartTurn = true;
+			bufferStartTurn = true;
 			bufferTargetRot = targetRot;
-        }
+			isContactTurning = false;
+		}
 		public void StartTurnRaw (Vector2d targetRot) {
 			targetRotation = targetRot;
 			targetReached = false;
-			cachedBeginCheck = cachedBody._rotation.Cross (targetRot.x,targetRot.y);
+			cachedBeginCheck = cachedBody.Rotation.Cross (targetRot.x,targetRot.y);
 		}
 		private void _StartTurn (Vector2d targetRot) {
 			long tempCheck;
-			if (targetRot.NotZero () && (tempCheck = cachedBody._rotation.Cross (targetRot.x, targetRot.y)) != 0) {
-				if (tempCheck.AbsMoreThan (turnSin) == false && cachedBody._rotation.Dot (targetRot.x,targetRot.y) > 0)
+			if (targetRot.NotZero () && (tempCheck = cachedBody.Rotation.Cross (targetRot.x, targetRot.y)) != 0) {
+				if (tempCheck.AbsMoreThan (turnSin) == false && cachedBody.Rotation.Dot (targetRot.x,targetRot.y) > 0)
 				{
 					targetRotation = targetRot;
-                    Arrive ();
+					Arrive ();
 				}
 				else {
 					cachedBeginCheck = tempCheck;
@@ -134,16 +162,32 @@ namespace Lockstep
 		{
 			StopTurn ();
 		}
-            
+
+		private bool isContactTurning;
+		private bool contactChecked;
+		private Vector2d contactDif;
+		private int contactCount;
+		private bool contacted;
 
 		private void HandleContact (LSBody other)
 		{
-            if (targetReached == true && Agent.IsCasting == false) {
-                Vector2d delta = this.cachedBody._position - this.cachedBody.LastPosition;
-                if (delta.FastMagnitude() > collisionTurnThreshold) {
-                    delta.Normalize();
-                    this.StartTurn(delta);
-                }
+			contacted = true;
+			if (cachedBody.HasParent == false) {
+				if (targetReached == true && Agent.IsCasting == false) {
+					if (other.Priority >= cachedBody.Priority) {
+						if (checkCollisionCount == 0) {
+							const long collisionTurnTreshold = FixedMath.One;
+							if (this.cachedBody.VelocityFastMagnitude < other.VelocityFastMagnitude || other.VelocityFastMagnitude == 0) {
+                                contactDif += cachedBody._position - other._position;
+								if (cachedBody.Rotation.Dot (contactDif.x, contactDif.y) >= 0) {
+									contactCount++;
+									contactChecked = true;
+								}
+							}
+						}
+
+					}
+				}
 			}
 		}
 	}

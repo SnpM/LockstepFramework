@@ -432,7 +432,7 @@ namespace Lockstep
 			this.AliveTime = 0;
 			if (Source.Scanner .IsNotNull ()) {
 				this.Position = Source.Scanner.ProjectileOffset;
-                this.Position.RotateInverse (source.Body._rotation.x,source.Body._rotation.y);
+				this.Position.RotateInverse (source.Body.Rotation.x,source.Body.Rotation.y);
 				this.Position += this.Source.Body._position;
 				this.CurrentHeight = this.Source.CachedTransform.position.y + source.Scanner.ProjectileHeightOffset;
 			}
@@ -514,7 +514,7 @@ namespace Lockstep
 				ApplyArea (this.TargetPosition, this.Radius, this.DealDamageAction);
 				break;
 			case DamageType.Cone:
-                    ApplyCone (this.Position, this.Source.Body._rotation, this.Radius, this.Angle, DealDamageAction, this.TargetPlatform);
+				ApplyCone (this.Position, this.Source.Body.Rotation, this.Radius, this.Angle, DealDamageAction, this.TargetPlatform);
 				break;
 			}
 		}

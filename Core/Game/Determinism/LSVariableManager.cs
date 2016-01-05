@@ -3,7 +3,6 @@ using System.Collections;
 using System;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Linq;
 namespace Lockstep
 {
     public static class LSVariableManager
@@ -23,25 +22,25 @@ namespace Lockstep
             LSVariableContainer container;
             if (!CachedLockstepPropertyNames.TryGetValue(type, out propertyNames)) {
                 bufferPropertyNames.FastClear();
-                container = new LSVariableContainer(GetVariables (lockstepObject, type));
+                container = new LSVariableContainer(GetVariables (type));
                 foreach (LSVariable info in container.Variables) {
                     bufferPropertyNames.Add(info.Info.Name);
                 }
                 CachedLockstepPropertyNames.Add (type, bufferPropertyNames.ToArray());
             }
             else {
-                container = new LSVariableContainer(GetVariables (lockstepObject, type, propertyNames));
+                container = new LSVariableContainer(GetVariables (type, propertyNames));
             }
             return Containers.Add(container);
         }
-        private static IEnumerable <LSVariable> GetVariables (object lockstepObject, Type type, string[] propertyNames) {
+        private static IEnumerable <LSVariable> GetVariables (Type type, string[] propertyNames) {
             //Getting target variables with cache
             foreach (string name in propertyNames) {
-                yield return new LSVariable(lockstepObject, type.GetProperty(name,(BindingFlags)~0));
+                yield return new LSVariable(type.GetProperty(name));
             }
         }
 
-        private static IEnumerable<LSVariable> GetVariables (object lockstepObject, Type type) {
+        private static IEnumerable<LSVariable> GetVariables (Type type) {
             foreach (PropertyInfo info in type.GetProperties((BindingFlags)~0)) {
                 //Make sure the type is something we can work with
 
@@ -57,7 +56,7 @@ namespace Lockstep
                         continue;
                     }
 
-                    yield return new LSVariable(lockstepObject, info, attributes.FirstOrDefault() as LockstepAttribute);
+                    yield return new LSVariable(info);
                 }
             }
         }

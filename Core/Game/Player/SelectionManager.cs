@@ -42,7 +42,7 @@ namespace Lockstep
 		{
 
 			MousePosition = Input.mousePosition;
-			MouseWorldPosition = RTSInterfacing.GetWorldPos (MousePosition);
+			MouseWorldPosition = Interfacing.GetWorldPos (MousePosition);
 			CanClearSelection = !Input.GetKey (KeyCode.LeftShift);
 			GetMousedAgent ();
 
@@ -78,10 +78,10 @@ namespace Lockstep
 						RaycastTopRight.y = BoxStart.y;
 					}
 
-					Box_TopLeft = RTSInterfacing.GetWorldPos (RaycastTopLeft);
-					Box_TopRight = RTSInterfacing.GetWorldPos (RaycastTopRight);
-					Box_BottomLeft = RTSInterfacing.GetWorldPos (RaycastBotLeft);
-					Box_BottomRight = RTSInterfacing.GetWorldPos (RaycastBotRight);
+					Box_TopLeft = Interfacing.GetWorldPos (RaycastTopLeft);
+					Box_TopRight = Interfacing.GetWorldPos (RaycastTopRight);
+					Box_BottomLeft = Interfacing.GetWorldPos (RaycastBotLeft);
+					Box_BottomRight = Interfacing.GetWorldPos (RaycastBotRight);
 				}
 
 				ClearBox ();
@@ -142,7 +142,7 @@ namespace Lockstep
 					if (CanClearSelection) {
 						ClearSelection ();
 					}
-                    if (RTSInterfacingHelper.IsGathering == false) {
+					if (PlayerManager.IsInterfacing == false) {
 						SelectBoxedAgents ();
 					}
 
@@ -151,7 +151,7 @@ namespace Lockstep
 
 			} else {
 
-                if (RTSInterfacingHelper.IsGathering == false && Input.GetMouseButtonDown (0)) {
+				if (PlayerManager.IsInterfacing == false && InputManager.GetInformationDown ()) {
 					CheckBoxDistance = true;
 					Boxing = true;
 					BoxingTime = 0f;
@@ -256,7 +256,7 @@ namespace Lockstep
 
 		private static void GetMousedAgent ()
 		{            
-			MouseOver (RTSInterfacing.GetScreenAgent (Input.mousePosition, (agent) => {
+			MouseOver (Interfacing.GetScreenAgent (Input.mousePosition, (agent) => {
 				return agent.CanSelect && PlayerManager.ContainsController (agent.Controller);}));
 
 		}

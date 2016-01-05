@@ -21,7 +21,7 @@ namespace Lockstep {
     public class LSAgent : CerealBehaviour, IMousable {
 
         Vector3 IMousable.WorldPosition {
-            get {return this.Body._visualPosition;}
+            get {return this.Body.visualPosition;}
         }
         float IMousable.MousableRadius {
             get {return this.SelectionRadius;}
@@ -51,12 +51,8 @@ namespace Lockstep {
         public event Action<bool, bool> onInteraction;
 		public event Action<LSAgent> onBuildChild;
         public event Action<LSAgent> onInitialized;
-
-        [SerializeField]
-        private int _globalID;
-        public ushort GlobalID { get {return(ushort) _globalID;} private set {_globalID = (int)value;} }
-
-        public ushort LocalID { get; private set;}
+        public ushort GlobalID { get; private set; }
+        public ushort LocalID { get; private set; }
         public uint BoxVersion { get; set; }
 
 		[SerializeField]
@@ -207,13 +203,15 @@ namespace Lockstep {
 
         public AgentInterfacer Interfacer {get; private set;}
         private readonly FastList<int> TrackedLockstepTickets = new FastList<int>();
+
         void Awake () {
             gameObject.SetActive(false);
-
         }
+
         public void Setup(AgentInterfacer interfacer) {
-            gameObject.SetActive(true);
+			
             LoadComponents ();
+
 
 			GameObject.DontDestroyOnLoad(gameObject);
 
@@ -246,8 +244,6 @@ namespace Lockstep {
 			StatsBarer.Setup (this);
 
             this.RegisterLockstep();
-
-
         }
         private void RegisterLockstep () {
             TrackedLockstepTickets.Add (LSVariableManager.Register(this.Body));
@@ -292,9 +288,9 @@ namespace Lockstep {
 			Selectable = true;
 
 
-            CachedGameObject.SetActiveIfNot (true);
+			CachedGameObject.SetActive (true);
             if (Body .IsNotNull ()) {
-                Body.Initialize(new Vector2dHeight(position), rotation);
+                Body.Initialize(position, rotation);
             }
 
             if (Triggers.IsNotNull()) {
@@ -412,7 +408,7 @@ namespace Lockstep {
 
         private void Pool() {
             AgentController.CacheAgent(this);
-			if (CachedGameObject != null)
+			if (CachedGameObject .IsNotNull ())
             CachedGameObject.SetActive (false);
         }
 
@@ -436,11 +432,23 @@ namespace Lockstep {
             hash ^= this.GlobalID;
             hash ^= this.LocalID;
             hash ^= this.Body._position.GetStateHash ();
-            hash ^= this.Body._rotation.GetStateHash ();
+            hash ^= this.Body.Rotation.GetStateHash ();
             hash ^= this.Body.Velocity.GetStateHash ();
             return hash;
         }
-            
+
+		public LSAgent BuildChild (string agentCode, Vector2d localPos, float localHeight) {
+			LSAgent agent = this.Controller.CreateAgent (agentCode);
+			agent.Body.Parent = this.Body;
+			agent.Body.LocalPosition = localPos;
+			agent.Body.LocalRotation = Vector2d.up.rotatedRight;
+			agent.Body.visualPosition.y = localHeight + this.Body.LocalPosition.y;
+			agent.Body.UpdatePosition ();
+			agent.Body.UpdateRotation();
+			agent.Body.BuildChangedValues ();
+			if (onBuildChild .IsNotNull ()) onBuildChild (agent);
+			return agent;
+		}
 
         private void LoadComponents () {
             _cachedTransform = base.transform;
@@ -466,7 +474,6 @@ namespace Lockstep {
             output.Add("_selectionRadius");
             output.Add("_statsBarOffset");
             output.Add("_visualCenter");
-            output.Add("_globalID");
             return true;
         }
 		/*protected override bool OnSerialize ()

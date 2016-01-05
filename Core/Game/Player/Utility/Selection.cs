@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
-using UnityEngine;
-using Stopwatch = System.Diagnostics.Stopwatch;
 namespace Lockstep {
-    public class Selection : ICommandData{
-        private static readonly FastList<byte> bufferBites = new FastList<byte>();
-        static readonly FastList<LSAgent> bufferAgents = new FastList<LSAgent>();
-
+    public class Selection {
         private static int bigIndex, smallIndex;
         private static ulong castedBigIndex;
         private static byte cullGroup;
@@ -15,60 +9,28 @@ namespace Lockstep {
         private static int curIndex;
 
 		public FastList<ushort> selectedAgentLocalIDs = new FastList<ushort>();
-        private  BitArray Header;
-        private readonly FastList<byte> Data = new FastList<byte>();
-       
+        public ulong Header;
+        public readonly byte[] Data = new byte[64];
+
         private AgentController leAgentController;
 
         public Selection() {}
 
+		static readonly FastList<LSAgent> bufferAgents = new FastList<LSAgent>();
 
         public Selection(FastEnumerable<LSAgent> selectedAgents) {
-            
             Serialize(selectedAgents);
         }
 
-        public byte[] GetBytes () {
-
-
-            bufferBites.FastClear();
-            //Serialize header
-            int headerLength = Header.Length;
-            int headerArraySize = (headerLength - 1) / 8 + 1;
-
-            bufferBites.Add((byte)headerArraySize);
-            byte[] headerBytes = new byte[headerArraySize];
-
-            Header.CopyTo(headerBytes, 0);
-
-            bufferBites.AddRange(headerBytes);
-
-            //Serializing the good stuff
-            for (int i = 0; i < Header.Length; i++) {
-                if (Header.Get(i)) {
-                    bufferBites.Add(Data[i]);
-                }
-            }
-            return bufferBites.ToArray();
-        }
-
         public void Serialize(FastEnumerable<LSAgent> selectedAgents) {
-
-            Data.FastClear();
-            selectedAgentLocalIDs.FastClear ();
+            Array.Clear(Data, 0, 64);
+            Header = 0;
+			selectedAgentLocalIDs.FastClear ();
 			bufferAgents.FastClear ();
 			selectedAgents.Enumerate (bufferAgents);
-            ushort highestID = 0;
-            for (int i = 0; i < bufferAgents.Count; i++) {
-                ushort id = bufferAgents[i].LocalID;
-                if (id > highestID) highestID = id;
-            }
-            int headerLength = (highestID + 1 - 1) / 8 + 1;
-            Header = new BitArray(headerLength, false);
 			for (int i = 0; i < bufferAgents.Count; i++) {
                 SerializeAgent(bufferAgents[i]);
             }
-
         }
 
         private void SerializeAgent(LSAgent agent) {
@@ -79,29 +41,24 @@ namespace Lockstep {
             bigIndex = (agent.LocalID / 8);
             smallIndex = (agent.LocalID % 8);
 
-            Header.Set(bigIndex, true);
-            Data.EnsureCapacity(bigIndex + 1);
+            Header |= (ulong)1 << bigIndex;
             Data[bigIndex] |= (byte)(1 << smallIndex);
 
 			selectedAgentLocalIDs.Add (agent.LocalID);
         }
 
         public int Reconstruct(byte[] source, int startIndex) {
-
             curIndex = startIndex;
+            Header = BitConverter.ToUInt64(source, curIndex);
+            curIndex += 8;
 
-            byte headerArraySize = source[curIndex++];
-
-            byte[] headerBytes = new byte[headerArraySize];
-            Array.Copy(source,curIndex,headerBytes,0,headerArraySize);
-            curIndex += headerArraySize;
-            Header = new BitArray(headerBytes);
             selectedAgentLocalIDs.FastClear();
-            for (int i = 0; i < Header.Length; i++) {
-                if (Header.Get(i)) {
+            
 
+			for (int i = 0; i < 64; i++) {
+                castedBigIndex = (ulong)1 << i;
+                if ((Header & castedBigIndex) == castedBigIndex) {
                     cullGroup = source[curIndex++];
-
 					for (int j = 0; j < 8; j++) {
                         castedSmallIndex = (byte)(1 << j);
                         if ((cullGroup & (castedSmallIndex)) == castedSmallIndex) {
@@ -110,16 +67,7 @@ namespace Lockstep {
                     }
                 }
             }
-
             return curIndex - startIndex;
-        }
-
-        public void Write (Writer writer) {
-            writer.Write(this.GetBytes());
-        }
-        public void Read (Reader reader) {
-            int move = this.Reconstruct(reader.Source, reader.Position);
-            reader.MovePosition(move);
         }
 
         public override string ToString() {

@@ -100,7 +100,6 @@ namespace Lockstep
             for (int i = ScanWidth - 1; i >= 0; i--) {
                 for (int j = ScanHeight - 1; j >= 0; j--) {
                     ScanNode node = CachedScanNodes.Count > 0 ? CachedScanNodes.Pop() : new ScanNode ();
-                    node.Setup(i,j);
                     ScanGrid [GetScanIndex (i, j)] = node;
 				}
 			}

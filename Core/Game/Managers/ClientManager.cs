@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-using Lockstep.NetworkHelpers;
+
 namespace Lockstep
 {
-	public class ClientManager
+	public class ClientManager : MonoBehaviour
 	{
         public static NetworkHelper NetworkHelper;
 		const bool SimulateNetworking = false;
@@ -17,7 +17,7 @@ namespace Lockstep
 
 		public static bool GameStarted { get; private set; }
 
-		public static int ClientID {
+		public static ushort ID {
 			get {
 				return NetworkHelper.ID;
 			}
@@ -63,7 +63,7 @@ namespace Lockstep
 		}
         public static bool Registered {get; private set;}
         private static void Register () {
-            SendMessageToServer (MessageType.Register,new byte[1]);
+            SendMessageToServer (MessageType.Register,LSUtility.EmptyBytes);
         }
 		public static void HandleFrameData (byte[] data) {
 			if (GameStarted) {
@@ -84,6 +84,7 @@ namespace Lockstep
                 }
                 return;
             }
+			if (CommandManager.sendType == SendState.Network) {
 				if (SimulateNetworking) {
 
 				} else {
@@ -96,7 +97,7 @@ namespace Lockstep
 						}
 					}
 				}
-			
+			}
 		}
 
 		private static FastQueue<byte[]> bufferedSendData = new FastQueue<byte[]> ();
@@ -128,8 +129,31 @@ namespace Lockstep
 				NetworkHelper.Disconnect ();
 			}
 		}
-            
-		
+
+
+		void OnGUI ()
+		{
+			if (SimulateNetworking == false && CommandManager.sendType == SendState.Network) {
+				if (isConnected == false) {
+					GUILayout.Label ("Host Address: ");
+
+					IP = GUILayout.TextField (IP.ToString ());
+
+					if (GUILayout.Button ("Connect", GUILayout.Width (200f))) {
+						Connect (IP);
+					}
+
+					GUILayout.Space (10f);
+					GUILayout.Label ("Room Size: ");
+					int.TryParse (GUILayout.TextField (RoomSize.ToString ()), out _roomSize);
+					if (GUILayout.Button ("Host", GUILayout.Width (200f))) {
+						NetworkHelper.Host (RoomSize);
+					}
+				} else {
+
+				}
+			}
+		}
 
 		private static void SendMessageToServer (MessageType messageType, byte[] data)
 		{

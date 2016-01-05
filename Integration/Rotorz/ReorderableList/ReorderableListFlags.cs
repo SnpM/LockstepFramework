@@ -3,7 +3,7 @@
 #if UNITY_EDITOR
 using System;
 
-namespace Lockstep.Rotorz.ReorderableList
+namespace Rotorz.ReorderableList
 {
 
     /// <summary>

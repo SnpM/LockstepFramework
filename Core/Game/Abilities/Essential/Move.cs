@@ -240,8 +240,7 @@ namespace Lockstep
                     {
                         if (hasPath)
                         {
-                            //TODO: fix this shit
-                            repathCount--;
+                            //repathCount--;
                         } else
                         {
                             repathCount--;
@@ -281,7 +280,7 @@ namespace Lockstep
                 if (distance > closingDistance || movingToWaypoint)
                 {
                     desiredVelocity = (movementDirection);
-                    if (movementDirection.Cross(lastMovementDirection.x, lastMovementDirection.y).AbsMoreThan(FixedMath.Half))
+                    if (movementDirection.Cross(lastMovementDirection.x, lastMovementDirection.y) != 0)
                     {
                         lastMovementDirection = movementDirection;
                         cachedTurn.StartTurnRaw(movementDirection);
@@ -308,8 +307,31 @@ namespace Lockstep
                 cachedBody._velocity += (desiredVelocity - cachedBody._velocity) * timescaledAcceleration;
 
                 cachedBody.VelocityChanged = true;
-               
-
+                if (collidedWithTrackedAgent)
+                {
+                    if (collidedCount >= CollisionStopCount)
+                    {
+                        collidedCount = 0;
+                        collidingAgent = null;
+                        Arrive();
+                    } else
+                    {
+                        if (lastPosition.FastDistance(cachedBody._position.x, cachedBody._position.y)
+                        < collisionStopTreshold)
+                        {
+                            collidedCount++;
+                        } else
+                        {
+                            lastPosition = cachedBody._position;
+                            collidedCount = 0;
+                        }
+                    }
+                    collidedWithTrackedAgent = false;
+                } else
+                {
+                    collidingAgent = null;
+                    collidedCount = 0;
+                }
             } else
             {
                 if (cachedBody.VelocityFastMagnitude > 0)
@@ -323,16 +345,15 @@ namespace Lockstep
 
         protected override void OnExecute(Command com)
         {
-            if (com.ContainsData<Vector2d> ())
+            if (com.HasPosition)
             {
                 Agent.StopCast(ID);
                 RegisterGroup();
                 if (straightPath)
                 {
-                    repathCount /= 8;
                 } else
                 {
-                    repathCount /= 8;
+                    repathCount /= 4;
                 }
             }
         }
@@ -431,12 +452,12 @@ namespace Lockstep
 
         private int collidedCount;
         private ushort collidedID;
-
+        private LSAgent collidingAgent;
+        private bool collidedWithTrackedAgent;
         static LSAgent tempAgent;
 
         private void HandleCollision(LSBody other)
         {
-            
             if (!CanMove)
             {
                 return;
@@ -445,12 +466,19 @@ namespace Lockstep
             {
                 return;
             }
-
+            if (tempAgent == collidingAgent)
+                collidedWithTrackedAgent = true;
+            else if (collidingAgent == null)
+            {
+                collidingAgent = tempAgent;
+                collidedWithTrackedAgent = true;
+            }
             Move otherMover = tempAgent.Mover;
             if (ReferenceEquals(otherMover, null) == false)
             {
                 if (IsMoving && CanCollisionStop)
                 {
+                    Debug.Log(this.MyMovementGroupID + ", " + otherMover.MyMovementGroupID);
                     if (otherMover.MyMovementGroupID == MyMovementGroupID)
                     {
                         if (otherMover.IsMoving == false && otherMover.Arrived && otherMover.stopTime > MinimumOtherStopTime)

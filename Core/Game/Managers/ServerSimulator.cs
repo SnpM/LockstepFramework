@@ -54,7 +54,7 @@ namespace Lockstep
 			float accumulator = 0;
 			while (true)
 			{
-				if (IsSimulating && LockstepManager.GameStarted) {
+				if (IsSimulating && LockstepManager.Started) {
 					bufferBytes.FastClear ();
 					bufferBytes.AddRange (BitConverter.GetBytes (InfluenceFrameCount));
 					InfluenceFrameCount++;

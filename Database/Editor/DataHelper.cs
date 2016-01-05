@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using Lockstep;
 using System.Reflection;
-using Lockstep.Rotorz.ReorderableList;
+using Rotorz.ReorderableList;
 namespace Lockstep.Data
 {
 

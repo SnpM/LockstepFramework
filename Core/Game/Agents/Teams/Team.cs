@@ -36,7 +36,7 @@ namespace Lockstep
             TeamManager.Teams.Add(this);
 			this.SetAllegiance (this, AllegianceType.Friendly);
 
-			MainController = AgentController.Create();
+			MainController = new AgentController();
 			MainController.JoinTeam (this);
 
 		}

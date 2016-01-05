@@ -8,7 +8,6 @@ namespace Lockstep
         private const int StartCapacity = 30000;
         private static bool[] hasFrame = new bool[StartCapacity];
         private static Frame[] frames = new Frame[StartCapacity];
-        public static Frame[] Frames {get {return frames;}}
         private static int capacity = StartCapacity;
         private static int _foreSight;
 
@@ -23,26 +22,19 @@ namespace Lockstep
 
             }
         }
-        private static bool _adjustFramerate;
-        public static bool AdjustFramerate {
-            get {
-                return _adjustFramerate;
-            }
-            set {
-                _adjustFramerate = value;
-            }
-        }
+
         public static void TweakFramerate()
         {
-            if (AdjustFramerate)
+            if (CommandManager.sendType == SendState.Network && ClientManager.NetworkHelper.IsServer == false)
             {
                 float scaler = (float)(ForeSight);
-                scaler -= 0;
-                scaler /= 16;
-                Time.timeScale = 1 + scaler;
+                scaler -= 2;
+                scaler /= 32;
+                Time.timeScale = Mathf.Lerp(Time.timeScale, 1f + (scaler), .5f);
+                Debug.Log(scaler);
             } else
             {
-                Time.timeScale = 1f;
+                //Time.timeScale = 1f;
             }
         }
 
@@ -54,7 +46,7 @@ namespace Lockstep
 
         public static bool CanAdvanceFrame
         {
-            get { return (FreeSimulate || ForeSight > 0 && (ClientManager.GameStarted));}
+            get { return (FreeSimulate || ForeSight > 0 && (CommandManager.sendType != SendState.Network || ClientManager.GameStarted));}
         }
 
         public static bool HasFrame(int frame)

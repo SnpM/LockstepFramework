@@ -83,15 +83,13 @@ namespace Lockstep
 			}
 		}
 
-		public bool Remove (T item)
+		public void Remove (T item)
 		{
 			
 			int index = Array.IndexOf (innerArray, item, 0, Count);
 			if (index >= 0) {
 				RemoveAt (index);
-                return true;
 			}
-            return false;
 		}
 
 		public void RemoveAt (int index)

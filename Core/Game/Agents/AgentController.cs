@@ -20,7 +20,7 @@ namespace Lockstep
 
         public static ushort PeakGlobalID { get; private set; }
 
-        public const int MaxAgents = 16384;
+        public const int MaxAgents = 512;
         private static readonly Dictionary<string,AgentInterfacer> CodeInterfacerMap = new Dictionary<string, AgentInterfacer>();
 
         public static void Setup()
@@ -182,7 +182,7 @@ namespace Lockstep
                 if (GlobalAgentActive [i])
                 {
                     LSAgent agent = GlobalAgents [i];
-                    int n1 = agent.Body._position.GetStateHash() + agent.Body._rotation.GetStateHash();
+                    int n1 = agent.Body._position.GetStateHash() + agent.Body.Rotation.GetStateHash();
                     switch (operationToggle)
                     {
                         case 0:
@@ -203,7 +203,7 @@ namespace Lockstep
                     if (agent.Body.IsNotNull())
                     {
                         hash ^= agent.Body._position.GetStateHash();
-                        hash ^= agent.Body._position.GetStateHash();
+                        hash ^= agent.Body.Rotation.GetStateHash();
                     }
                 }
             }
@@ -233,15 +233,9 @@ namespace Lockstep
         private readonly FastList<AllegianceType> DiplomacyFlags = new FastList<AllegianceType>();
         private readonly FastStack<ushort> OpenLocalIDs = new FastStack<ushort>();
 
-        public static AgentController Create () {
-            return new AgentController();
-        }
-
-        private AgentController()
+        internal AgentController()
         {
-            if (InstanceManagers.Count > byte.MaxValue) {
-                throw new System.Exception("Cannot have more than 256 AgentControllers");
-            }
+            
             OpenLocalIDs.FastClear();
             PeakLocalID = 0;
             ControllerID = (byte)InstanceManagers.Count;
@@ -268,22 +262,39 @@ namespace Lockstep
             SelectionChanged = true;
         }
 
-        private Selection previousSelection = new Selection();
+        private Selection previousSelection;
 
         public void Execute(Command com)
         {
-           
+            if (com.LeInput == InputCode.Spawn)
             {
-                if (com.ContainsData<Selection>() == false)
-                    com.Add<Selection>( previousSelection);
-                previousSelection = com.GetData<Selection>();
+                for (int i = 0; i < com.Count; i++)
+                {
+                    LSAgent agent = CreateAgent(GetAgentCode(com.Target), com.Position,null);
+                }
+                return;
             }
-
-
-            BehaviourHelperManager.Execute(com);
-            for (int i = 0; i < com.GetData<Selection>().selectedAgentLocalIDs.Count; i++)
+            
+            
+            if (com.HasGroupID)
             {
-                ushort selectedAgentID = com.GetData<Selection>().selectedAgentLocalIDs [i];
+                /*var group = AgentGroupController.GetGroup(com.GroupID);
+                if (group .IsNotNull ()) {
+                    for (i = 0; i < group.Agents.Count; i++) {
+                        group.Agents[i].Execute(com);
+                    }
+                }*/
+            } else
+            {
+                if (com.HasSelect == false)
+                    com.Select = previousSelection;
+                previousSelection = com.Select;
+            }
+            
+            BehaviourHelperManager.Execute(com);
+            for (int i = 0; i < com.Select.selectedAgentLocalIDs.Count; i++)
+            {
+                ushort selectedAgentID = com.Select.selectedAgentLocalIDs [i];
                 if (LocalAgentActive [selectedAgentID])
                 {
                     LocalAgents [selectedAgentID].Execute(com);
@@ -293,15 +304,12 @@ namespace Lockstep
 
         public static Command GenerateSpawnCommand(AgentController cont, string agentCode, int count, Vector2d position)
         {
-			Command com = new Command (InputCodeManager.GetCodeID ("Spawn"));
+            Command com = new Command(InputCode.Spawn);
             com.ControllerID = cont.ControllerID;
             com.Position = position;
-			Debug.Log (com.HasPosition);
-
             com.Target = (ushort)AgentController.GetAgentCodeIndex(agentCode);
             com.Count = count;
             return com;
-
         }
 
         public LSAgent CreateAgent(

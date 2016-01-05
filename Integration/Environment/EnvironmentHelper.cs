@@ -6,11 +6,11 @@ namespace Lockstep
     public class EnvironmentHelper : BehaviourHelper
     {
 
-        public override ushort ListenInput
+        public override InputCode ListenInput
         {
             get
             {
-                return 0;
+                return InputCode.None;
             }
         }
 

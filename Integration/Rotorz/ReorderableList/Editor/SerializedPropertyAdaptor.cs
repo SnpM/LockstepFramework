@@ -1,12 +1,12 @@
 // Copyright (c) Rotorz Limited. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root.
 #if UNITY_EDITOR
-using Lockstep.Rotorz.ReorderableList.Internal;
+using Rotorz.ReorderableList.Internal;
 using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lockstep.Rotorz.ReorderableList {
+namespace Rotorz.ReorderableList {
 
 	/// <summary>
 	/// Reorderable list adaptor for serialized array property.

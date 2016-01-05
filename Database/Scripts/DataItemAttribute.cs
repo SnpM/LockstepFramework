@@ -1,5 +1,5 @@
 ﻿#if UNITY_EDITOR
-using Lockstep.Rotorz.ReorderableList;
+using Rotorz.ReorderableList;
 #endif
 using System;
 

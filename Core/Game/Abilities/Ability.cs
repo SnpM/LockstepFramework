@@ -6,58 +6,37 @@
 //=======================================================================
 using UnityEngine;
 using Lockstep.Data;
-
-namespace Lockstep
-{
+namespace Lockstep {
     public abstract class Ability : CerealBehaviour
     {
         private bool isCasting;
         
-        private LSAgent _agent;
-
-        public LSAgent Agent
-        {
-            get
-            {
+		private LSAgent _agent;
+		public LSAgent Agent {
+			get {
 #if UNITY_EDITOR
-                if (_agent == null)
-                    return this.GetComponent<LSAgent>();
+				if (_agent == null) return this.GetComponent<LSAgent> ();
 #endif
-                return _agent;
-            }
-        }
+				return _agent;
+			}
+		}
+        public string MyAbilityCode {get; private set;}
+        public AbilityInterfacer Interfacer {get; private set;}
 
-        public string MyAbilityCode { get; private set; }
+		public int ID {get; private set;}
+		public Transform CachedTransform {get {return Agent.CachedTransform;}}
+		public GameObject CachedGameObject {get {return Agent.CachedGameObject;}}
+        public int LSVariableContainerTicket {get; private set;}
 
-        public AbilityInterfacer Interfacer { get; private set; }
-
-        public int ID { get; private set; }
-
-        public Transform CachedTransform { get { return Agent.CachedTransform; } }
-
-        public GameObject CachedGameObject { get { return Agent.CachedGameObject; } }
-
-        public int VariableContainerTicket { get; private set; }
-
-        private LSVariableContainer _variableContainer;
-
-        public LSVariableContainer VariableContainer { get { return _variableContainer; } }
-
-        public bool IsCasting
-        {
-            get
-            {
-                return isCasting;
-            }
-            protected set
-            {
-                if (value != isCasting)
-                {
-                    if (value == true)
-                    {
+        public bool IsCasting {
+            get {
+				return isCasting;
+			}
+            protected set {
+                if (value != isCasting) {
+                    if (value == true) {
                         Agent.CheckCasting = false;
-                    } else
-                    {
+                    } else {
                         Agent.CheckCasting = true;
                     }
                     isCasting = value;
@@ -67,116 +46,77 @@ namespace Lockstep
 
 
 
-        internal void Setup(LSAgent agent, int id)
-        {
+        public void Setup(LSAgent agent, int id) {
             System.Type mainType = this.GetType();
-            if (mainType.IsSubclassOf(typeof(ActiveAbility)))
-            {
-                while ( mainType.BaseType != typeof(ActiveAbility))
-                {
-                    mainType = mainType.BaseType;
-                }
-                Interfacer = AbilityInterfacer.FindInterfacer(mainType);
 
-                if (Interfacer == null)
-                {
-                    throw new System.ArgumentException("The Ability of type " + mainType + " has not been registered in database");
-                }
-                this.MyAbilityCode = Interfacer.Name;
-            } else
-            {
-                this.MyAbilityCode = mainType.Name;
+            while (mainType.BaseType != typeof (Ability) && mainType.BaseType != typeof (ActiveAbility)) {
+                mainType = mainType.BaseType;
             }
+            Interfacer = AbilityInterfacer.FindInterfacer(mainType);
+            if (Interfacer == null) {
+                throw new System.ArgumentException("The Ability of type " + mainType + " has not been registered in database");
+            }
+            this.MyAbilityCode = Interfacer.Name;
             _agent = agent;
-            ID = id;
-            TemplateSetup();
+			ID = id;
+			TemplateSetup ();
             OnSetup();
-            this.VariableContainerTicket = LSVariableManager.Register(this);
-            this._variableContainer = LSVariableManager.GetContainer(VariableContainerTicket);
+            this.LSVariableContainerTicket = LSVariableManager.Register(this);
         }
 
-        protected virtual void TemplateSetup()
-        {
+		protected virtual void TemplateSetup () {
 
-        }
+		}
 
-        protected virtual void OnSetup()
-        {
-        }
+        protected virtual void OnSetup() {}
 
-        internal void Initialize()
-        {
-            VariableContainer.Reset();
+        public void Initialize() {
             IsCasting = false;
             OnInitialize();
         }
 
-        protected virtual void OnInitialize()
-        {
-        }
+        protected virtual void OnInitialize() {}
 
-        internal void Simulate()
-        {
+        public void Simulate() {
             OnSimulate();
-            if (isCasting)
-            {
+            if (isCasting) {
                 OnCast();
             }
         }
+        protected virtual void OnSimulate() {}
 
-        protected virtual void OnSimulate()
-        {
-        }
+		public void LateSimulate () {
+			OnLateSimulate ();
+		}
+		protected virtual void OnLateSimulate () {
 
-        internal void LateSimulate()
-        {
-            OnLateSimulate();
-        }
+		}
 
-        protected virtual void OnLateSimulate()
-        {
+        protected virtual void OnCast() {}
 
-        }
-
-        protected virtual void OnCast()
-        {
-        }
-
-        internal void Visualize()
-        {
+        public void Visualize() {
             OnVisualize();
         }
 
-        protected virtual void OnVisualize()
-        {
-        }
+        protected virtual void OnVisualize() {}
 
-        public void BeginCast()
-        {
+        public void BeginCast() {
             OnBeginCast();
         }
 
-        protected virtual void OnBeginCast()
-        {
-        }
+        protected virtual void OnBeginCast() {}
 
-        public void StopCast()
-        {
+        public void StopCast() {
             OnStopCast();
         }
 
-        protected virtual void OnStopCast()
-        {
-        }
+        protected virtual void OnStopCast() {}
 
-        public void Deactivate()
-        {
+        public void Deactivate() {
             IsCasting = false;
             OnDeactivate();
         }
 
-        protected virtual void OnDeactivate()
-        {
-        }
+        protected virtual void OnDeactivate() {}
     }
 }

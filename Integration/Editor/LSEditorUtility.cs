@@ -4,7 +4,7 @@ using System.Collections;
 using Lockstep;
 using System;
 using UnityEditor;
-using Lockstep.Rotorz.ReorderableList;
+using Rotorz.ReorderableList;
 using TypeReferences;
 using System.Reflection.Emit;
 using System.Reflection;
@@ -103,9 +103,9 @@ namespace Lockstep
         {
             if (showBoolGrid = EditorGUILayout.Foldout (showBoolGrid, content))
             {
-                int newWidth = EditorGUILayout.IntField ("Width", values.Width);
-                int newHeight = EditorGUILayout.IntField ("Height", values.Height);
-                values.Resize (newWidth, newHeight);
+                values.Width = EditorGUILayout.IntField ("Width", values.Width);
+                values.Height = EditorGUILayout.IntField ("Height", values.Height);
+
                 const float cellWidth = 20;
                 const float cellHeight = 20f;
                 Rect drawSource = EditorGUILayout.GetControlRect ();
