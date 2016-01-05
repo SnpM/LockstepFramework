@@ -489,7 +489,7 @@ namespace Lockstep
                 PositionChanged = true;
             }
 			
-            if (PositionChanged)
+            if (PositionChanged || this.PositionChangedBuffer)
             {
                 Partition.UpdateObject(this);
             }
