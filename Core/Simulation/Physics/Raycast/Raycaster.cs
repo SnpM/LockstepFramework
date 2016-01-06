@@ -40,13 +40,27 @@ namespace Lockstep
             foreach (LSBody body in RaycastAll(start,end))
             {
                 bool heightIntersects = false;
+                bool mined = false;
+                bool maxed = false;
                 for (int i = bufferIntersectionPoints.Count - 1; i >= 0; i--) {
                     long dist = bufferIntersectionPoints[i].Distance(start);
                     long heightAtBodyPosition = startHeight + (dist.Mul(heightSlope));
-                    //TODO: Make this more accurate
-                    if (body.HeightOverlaps(heightAtBodyPosition))
-                    {
 
+                    //TODO: Make this more accurate
+                    if (heightAtBodyPosition < body.HeightMin)
+                    {
+                        mined = true;
+                    }
+                    else if (heightAtBodyPosition > body.HeightMax)
+                    {
+                        maxed = true;
+                    }
+                    else
+                    {
+                        heightIntersects = true;
+                        break;
+                    }
+                    if (mined && maxed) {
                         heightIntersects = true;
                         break;
                     }

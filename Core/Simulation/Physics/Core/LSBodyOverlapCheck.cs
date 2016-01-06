@@ -26,10 +26,9 @@ namespace Lockstep
             cacheProjPerp = cacheP1.Dot(cacheAxisNormal.x,cacheAxisNormal.y);
         }
 
-        public bool Overlaps (FastList<Vector2d> intersectionPoints) {
-            if (this.Agent != null) return false;
+        public bool Overlaps (FastList<Vector2d> outputIntersectionPoints) {
 
-            intersectionPoints.FastClear();
+            outputIntersectionPoints.FastClear();
             //Checks if this object overlaps the line formed by p1 and p2
             switch (this.Shape) {
                 case ColliderType.Circle:
@@ -50,12 +49,12 @@ namespace Lockstep
                                 long cos = FixedMath.Sqrt(_radius.Mul(_radius) - sin.Mul (sin));
                                 Vector2d perpVector = cacheAxisNormal * cacheProjPerp;
                                 if (cos == 0) {
-                                    intersectionPoints.Add ((cacheAxis * projPos) + perpVector);
+                                    outputIntersectionPoints.Add ((cacheAxis * projPos) + perpVector);
                                 }
                                 else {
                                     
-                                    intersectionPoints.Add (cacheAxis * (projPos - cos) + perpVector);
-                                    intersectionPoints.Add (cacheAxis * (projPos + cos) + perpVector);
+                                    outputIntersectionPoints.Add (cacheAxis * (projPos - cos) + perpVector);
+                                    outputIntersectionPoints.Add (cacheAxis * (projPos + cos) + perpVector);
                                 }
                             }
                         }
@@ -64,13 +63,13 @@ namespace Lockstep
                             long p1Dist = _position.FastDistance (cacheP1.x,cacheP2.y);
                             if (p1Dist <= this.FastRadius)
                             {
-                                intersectionPoints.Add(cacheP1);
+                                outputIntersectionPoints.Add(cacheP1);
                                 overlaps = true;
                             }
                             long p2Dist = _position.FastDistance (cacheP2.x,cacheP2.y);
                             if (p2Dist <= this.FastRadius)
                             {
-                                intersectionPoints.Add(cacheP2);
+                                outputIntersectionPoints.Add(cacheP2);
                                 overlaps = true;
                             }
 
@@ -86,6 +85,7 @@ namespace Lockstep
             }
             return false;
         }
+       
 
     }
 }
