@@ -8,6 +8,9 @@ namespace Lockstep
 
     public static class Raycaster
     {
+        
+        public static readonly FastList<Vector2d> bufferIntersectionPoints = new FastList<Vector2d>();
+
         public static IEnumerable<LSBody> RaycastAll(Vector2d start, Vector2d end)
         {
             LSBody.PrepareAxisCheck(start, end);
@@ -24,7 +27,7 @@ namespace Lockstep
                 for (int i = node.ContainedObjects.Count - 1; i >= 0; i--)
                 {
                     LSBody body = PhysicsManager.SimObjects [node.ContainedObjects [i]];
-                    if (body.Overlaps())
+                    if (body.Overlaps(bufferIntersectionPoints))
                         yield return body;
                     
                 }
@@ -36,13 +39,21 @@ namespace Lockstep
         {
             foreach (LSBody body in RaycastAll(start,end))
             {
-                long dist = body.GetClosestDist(start);
-                long heightAtBodyPosition = startHeight + (dist.Mul(heightSlope));
+                bool heightIntersects = false;
+                for (int i = bufferIntersectionPoints.Count - 1; i >= 0; i--) {
+                    long dist = bufferIntersectionPoints[i].Distance(start);
+                    long heightAtBodyPosition = startHeight + (dist.Mul(heightSlope));
+                    //TODO: Make this more accurate
+                    if (body.HeightOverlaps(heightAtBodyPosition))
+                    {
 
-                if (body.HeightOverlaps(heightAtBodyPosition))
-                {
-                    yield return body;
+                        heightIntersects = true;
+                        break;
+                    }
                 }
+                if (heightIntersects)
+                    yield return body;
+
             }
         }
 

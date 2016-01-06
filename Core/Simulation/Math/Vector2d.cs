@@ -209,6 +209,12 @@ namespace Lockstep
             this.y = temp2 + temp2 - this.y;
         }
 
+        public Vector2d Reflected (long axisX, long axisY) {
+            Vector2d vec = this;
+            vec.Reflect(axisX,axisY);
+            return vec;
+        }
+
         public long Dot(long otherX, long otherY)
         {
             return (this.x * otherX + this.y * otherY) >> FixedMath.SHIFT_AMOUNT;
