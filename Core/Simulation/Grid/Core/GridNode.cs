@@ -196,7 +196,7 @@ namespace Lockstep
         GridNode _node;
         public bool UnpassableMedium()
         {
-            for (_i = 0; _i < 8; i++)
+            for (_i = 0; _i < 8; _i++)
             {
                 _node = NeighborNodes [_i];
                 if (_node != null)
