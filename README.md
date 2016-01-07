@@ -15,6 +15,7 @@ __________
 - Size-based pathfinding (big units won't get stuck in those narrow gaps)
 - Customizable database system
 - Support for Forge Networking (DarkRift and Photon coming soon)
+- 3D Raycasting
 
 Quick Setup
 -----------
@@ -33,11 +34,11 @@ These are high priority issues that are significantly big or complicated. Any he
 - Integrations for various networking solutions (i.e. DarkRift, Photon, UNet, Bolt)
 - Safe and scalable coding patterns. Anywhere you see something that might cause problems for a large-scale project, fixing it or raising an issue would be a big help. LSF started as a work of curiosity and passion. While it's introduced me to helpful experiences, I didn't always see the flaw in using statics everywhere. If there are any significantly limiting problems with a component's design, I'll do my best to fix it.
 - Implement and test polygon colliders.
+- Deterministic heightmap system with possibly multiple layers
 
 Road Map
 ---------
-- Semi-3D physics (may be coming soon!). Physics calculations on the Y axis requires non-trivial changes but collision detection for objects like bullets may be able to be hacked in.
-- Multi engine support. Customizable support for game engines in addition to Unity could make this framework viable for many more people.
+- Gamestate syncing... probably need to flesh out Lockstep Variables for this.
 
 License
 --------
