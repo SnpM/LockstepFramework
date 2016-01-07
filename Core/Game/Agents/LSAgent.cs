@@ -34,7 +34,17 @@ namespace Lockstep {
 		[SerializeField, FrameCount]
         private int _deathTime = LockstepManager.FrameRate * 2;
 
-        public string MyAgentCode { get; private set; }
+		[SerializeField, DataCode ("Agents")]
+		private string _myAgentCode;
+		public string MyAgentCode
+		{
+			get {
+				return _myAgentCode;
+			}
+			private set {
+				_myAgentCode = value;
+			}
+		}
 
         [SerializeField, HideInInspector]
         private AgentType _agentType;
