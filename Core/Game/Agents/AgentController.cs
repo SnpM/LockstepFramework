@@ -347,7 +347,7 @@ namespace Lockstep
             return curAgent;
         }*/
         
-        private void InitializeAgent(LSAgent agent,
+        public void InitializeAgent(LSAgent agent,
                                       Vector2d position,
         Vector2d rotation)
         {
