@@ -8,10 +8,16 @@ namespace Lockstep
     public class FixedNumberAttribute : PropertyAttribute
     {
         public bool Timescaled = false;
+        public bool Ranged;
+        public long Min;
+        public long Max;
 
-        public FixedNumberAttribute(bool timescaled = false)
+        public FixedNumberAttribute(bool timescaled = false, bool ranged = false, long min = 0, long max = FixedMath.One)
         {
             Timescaled = timescaled;
+            Ranged = ranged;
+            Max = max;
+            Min = min;
         }
     }
 
@@ -25,6 +31,8 @@ namespace Lockstep
             Timescaled = timescaled;
             Max = max;
         }
+
+       
     }
 
     public class FrameCountAttribute : PropertyAttribute

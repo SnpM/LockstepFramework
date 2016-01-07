@@ -126,7 +126,9 @@ namespace Lockstep
             this.x = (this.x << FixedMath.SHIFT_AMOUNT) / mag;
             this.y = (this.y << FixedMath.SHIFT_AMOUNT) / mag;
         }
-
+        public void Lerp (Vector2d target, long amount) {
+            Lerp (target.x,target.y,amount);
+        }
         /// <summary>
         /// Lerp this vector to target by amount.
         /// </summary>
@@ -146,7 +148,11 @@ namespace Lockstep
             this.x = (targetx * amount + this.x * (FixedMath.One - amount)) >> FixedMath.SHIFT_AMOUNT;
             this.y = (targety * amount + this.y * (FixedMath.One - amount)) >> FixedMath.SHIFT_AMOUNT;
         }
-
+        public Vector2d Lerped (Vector2d target, long amount) {
+            Vector2d vec = this;
+            vec.Lerp(target.x,target.y,amount);
+            return vec;
+        }
         public void Rotate(long cos, long sin)
         {
             temp1 = (this.x * cos + this.y * sin) >> FixedMath.SHIFT_AMOUNT;
