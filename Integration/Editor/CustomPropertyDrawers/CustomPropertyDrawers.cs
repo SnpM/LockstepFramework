@@ -18,13 +18,20 @@ namespace Lockstep
         {
             public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
             {
+                FixedNumberAttribute a = ((FixedNumberAttribute)this.attribute);
                 long value = property.longValue;
                 LSEditorUtility.DoubleField(
                     position,
                     label,
                     ref value,
-                    ((FixedNumberAttribute)this.attribute).Timescaled
+                    a.Timescaled
                 );
+                if (a.Ranged) {
+                    if (value > a.Max)
+                        value = a.Max;
+                    else if (value < a.Min)
+                        value = a.Min;
+                }
                 property.longValue = value;
             }
         }
