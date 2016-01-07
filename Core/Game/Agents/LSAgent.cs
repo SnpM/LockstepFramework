@@ -481,6 +481,7 @@ namespace Lockstep {
             output.Add("_statsBarOffset");
             output.Add("_visualCenter");
             output.Add("_globalID");
+			output.Add("_myAgentCode");
             return true;
         }
 		/*protected override bool OnSerialize ()
