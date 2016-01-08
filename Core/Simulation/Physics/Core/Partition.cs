@@ -26,8 +26,8 @@ namespace Lockstep
 
 		public static uint _Version = 1;
         public static Array2D<PartitionNode> Nodes = new Array2D<PartitionNode> (DefaultCount, DefaultCount);
-		public static readonly FastBucket<PartitionNode> ActivatedNodes = new FastBucket<PartitionNode>();
-        private static readonly FastList<PartitionNode> AllocatedNodes = new FastList<PartitionNode>();
+		private static readonly FastBucket<PartitionNode> ActivatedNodes = new FastBucket<PartitionNode>();
+		private static readonly FastList<PartitionNode> AllocatedNodes = new FastList<PartitionNode>();
 
 		public static void Setup ()
 		{
@@ -40,10 +40,16 @@ namespace Lockstep
 		}
 
 		public static void Initialize () {
-            ActivatedNodes.FastClear ();
-            for (int i = AllocatedNodes.Count - 1; i >= 0; i--) {
-                AllocatedNodes[i].Reset ();
+			for (int i = AllocatedNodes.Count - 1; i >= 0; i--) {
+				AllocatedNodes[i].Reset ();
 			}
+
+			ActivatedNodes.FastClear ();
+			AllocatedNodes.FastClear();
+		}
+
+		public static void Deactivate()
+		{
 		}
 
 		static int GridXMin, GridXMax, GridYMin, GridYMax;
@@ -193,7 +199,6 @@ namespace Lockstep
 
 		public static void CheckAndDistributeCollisions ()
 		{
-
 			_Version++;
             for (int i = ActivatedNodes.PeakCount - 1; i >= 0; i--) {
 				if (ActivatedNodes.arrayAllocation[i])
@@ -202,7 +207,18 @@ namespace Lockstep
 					node.Distribute ();
 				}
 			}
+		}
 
+		public static int AddNode(PartitionNode node)
+		{
+			int activationID = ActivatedNodes.Add(node);
+			AllocatedNodes.Add(node);
+			return activationID;
+		}
+
+		public static void RemoveNode(int id)
+		{
+			ActivatedNodes.RemoveAt(id);
 		}
 	}
 	public enum Quadrant : int

@@ -292,6 +292,7 @@ namespace Lockstep
 
             TeamManager.Deactivate();
             ClientManager.Quit();
+			PhysicsManager.Deactivate();
             GameStarted = false;
 			LSServer.Deactivate();
             DefaultMessageRaiser.LateDeactivate();
