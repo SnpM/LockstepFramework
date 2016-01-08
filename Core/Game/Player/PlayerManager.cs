@@ -8,6 +8,7 @@ namespace Lockstep {
 		public static AgentController MainController {get; private set;}
 
         public static void Initialize() {
+			MainController = null;
 			AgentControllers.FastClear();
 
         }

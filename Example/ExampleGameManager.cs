@@ -30,5 +30,38 @@ namespace Lockstep.Example {
             }
         }
 
+		void OnGUI ()
+		{
+			GUI.matrix = Matrix4x4.TRS (new Vector3(0, 0, 0), Quaternion.identity, new Vector3 (2.5f, 2.5f, 1)); 
+
+			if (ReplayManager.CurrentReplay != null)
+			{
+				if (GUILayout.Button ("Stop")) {
+					ReplayManager.CurrentReplay = null;
+					ReplayManager.Stop ();
+					Application.LoadLevel (Application.loadedLevel);
+				}
+
+				if (GUILayout.Button ("Rewind")) {
+					ReplayManager.Play ();
+					Application.LoadLevel (Application.loadedLevel);
+				}
+			}
+
+			if (ReplayManager.IsPlayingBack) {
+			} else {
+				if (GUILayout.Button ("Restart")) {
+					Application.LoadLevel (Application.loadedLevel);
+				}
+
+				if (GUILayout.Button ("Save")) {
+					ReplayManager.Save ();
+					ReplayManager.Play ();
+					Application.LoadLevel (Application.loadedLevel);
+				}
+			}
+		}
+
+
     }
 }

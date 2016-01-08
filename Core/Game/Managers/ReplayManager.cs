@@ -1,5 +1,3 @@
-//TODO: Reimplement ReplayManager with up-to-date tools
-#if false
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -9,139 +7,132 @@ using System.Collections;
 
 namespace Lockstep
 {
-    public static class ReplayManager
-    {
+	public static class ReplayManager
+	{
 
-        #region public members
+		#region public members
+		public static bool IsPlayingBack;
+		public static Replay CurrentReplay;
+		#endregion
 
-        public static bool IsPlayingBack;
-        public static Replay CurrentReplay;
+		#region private members
+		private static UnityEngine.Coroutine streamer;
+		#endregion
 
-        #endregion
+		static ReplayManager ()
+		{
 
-        #region private members
+		}
 
-        private static UnityEngine.Coroutine streamer;
+		#region public methods
+		const string DemoName = "Demo";
 
-        #endregion
+		public static void Play ()
+		{
+			CurrentReplay = FileManager.RetrieveReplay (DemoName);
+			Play (CurrentReplay);
+		}
 
-        static ReplayManager()
-        {
+		public static void Play (Replay replay)
+		{
+			IsPlayingBack = true;
+			StartStreaming (replay);
+		}
 
-        }
+		public static void Stop ()
+		{
+			if (IsPlayingBack)
+			{
+				AgentController.Deactivate ();
+				IsPlayingBack = false;
+				StopStreaming ();
+			}
+		}
 
-        #region public methods
+		public static Replay Save ()
+		{
+			return Save (DateTime.UtcNow.ToString ());
+		}
 
-        const string DemoName = "Demo";
+		public static Replay Save (string name)
+		{
+			byte[] saveBytes = CommandManager.RecordedBytes.ToArray ();
+			CurrentReplay = new Replay ();
+			CurrentReplay.Content = saveBytes;
+			CurrentReplay.Name = name;
+			CurrentReplay.Date = DateTime.UtcNow;
+			CurrentReplay.FrameCount = LockstepManager.FrameCount;
+			CurrentReplay.LastCommandedFrameCount = CommandManager.LastCommandedFrameCount;
+			CurrentReplay.hash = LockstepManager.GetStateHash();
 
-        public static void Play()
-        {
-            CurrentReplay = FileManager.RetrieveReplay(DemoName);
-            Play(CurrentReplay);
-        }
+			FileManager.SaveReplay (DemoName, CurrentReplay);
 
-        public static void Play(Replay replay)
-        {
-            CommandManager.sendType = SendState.None;
-            IsPlayingBack = true;
-            StartStreaming(replay);
-        }
+			return CurrentReplay;
+		}
 
-        public static void Stop()
-        {
+		static FastList<byte> bufferBytes = new FastList<byte> ();
 
-            if (IsPlayingBack)
-            {
-                AgentController.Deactivate();
-                IsPlayingBack = false;
-                CommandManager.sendType = CommandManager.defaultSendState;
-                StopStreaming();
-            }
-        }
+		public static IEnumerator StreamPlayback (Replay playbackReplay)
+		{
+			int lastFrameByteCount = 0;
+			int playbackPosition = 0;
+			byte[] playbackBytes = playbackReplay.Content;
 
-        public static Replay Save()
-        {
-            return Save(DateTime.UtcNow.ToString());
-        }
-
-        public static Replay Save(string name)
-        {
-            byte[] saveBytes = CommandManager.RecordedBytes.ToArray();
-            CurrentReplay = new Replay();
-            CurrentReplay.Content = saveBytes;
-            CurrentReplay.Name = name;
-            CurrentReplay.Date = DateTime.UtcNow;
-            CurrentReplay.FrameCount = LockstepManager.FrameCount;
-            CurrentReplay.LastCommandedFrameCount = CommandManager.LastCommandedFrameCount;
-            FileManager.SaveReplay(DemoName, CurrentReplay);
-
-            return CurrentReplay;
-        }
-
-        static FastList<byte> bufferBytes = new FastList<byte>();
-
-        public static IEnumerator StreamPlayback(Replay playbackReplay)
-        {
-            int lastFrameByteCount = 0;
-            int playbackPosition = 0;
-            byte[] playbackBytes = playbackReplay.Content;
-            
-            bool getNextStream = true;
-            int frameCount = 0;
-            int nextFrame = -1;
-            
-            
-            yield return null;
-            FrameManager.EndFrame = playbackReplay.LastCommandedFrameCount;
-            
-            while (playbackPosition < playbackBytes.Length || frameCount <= nextFrame)
-            {
-                if (getNextStream == true)
-                {
-                    bufferBytes.FastClear();
-                    lastFrameByteCount = (int)BitConverter.ToUInt16(playbackBytes, playbackPosition);
-                    playbackPosition += 2;
-                    nextFrame = BitConverter.ToInt32(playbackBytes, playbackPosition);
-                    bufferBytes.AddRange(playbackBytes, playbackPosition, lastFrameByteCount);
-                    playbackPosition += lastFrameByteCount;
-                    getNextStream = false;
-                }
-
-                if (nextFrame == frameCount)
-                {
-                    getNextStream = true;
-                    CommandManager.ProcessPacket (bufferBytes);
-                }
-                else {
-                    CommandManager.ProcessPacket (BitConverter.GetBytes (frameCount));
-                }
-                frameCount++;
-            }
-            yield break;
-        }
+			bool getNextStream = true;
+			int frameCount = 0;
+			int nextFrame = -1;
 
 
-        private static void StartStreaming (Replay replay)
-        {
-            StopStreaming ();
-            streamer = LockstepManager.UnityInstance.StartCoroutine (StreamPlayback (replay));
-        }
+			yield return null;
+			FrameManager.EndFrame = playbackReplay.LastCommandedFrameCount;
 
-        private static void StopStreaming ()
-        {
-            if (streamer .IsNotNull ()) {
-                LockstepManager.UnityInstance.StopCoroutine (streamer);
-                streamer = null;
-            }
-        }
-        #endregion
-    }
-    
-    public enum RecordState
-    {
-        None,
-        Record,
-        Playback
-    }
+			while (playbackPosition < playbackBytes.Length || frameCount <= nextFrame)
+			{
+				if (getNextStream == true)
+				{
+					bufferBytes.FastClear ();
+					lastFrameByteCount = (int)BitConverter.ToUInt16 (playbackBytes, playbackPosition);
+					playbackPosition += 2;
+					nextFrame = BitConverter.ToInt32 (playbackBytes, playbackPosition);
+					bufferBytes.AddRange (playbackBytes, playbackPosition, lastFrameByteCount);
+					playbackPosition += lastFrameByteCount;
+					getNextStream = false;
+				}
+
+				if (nextFrame == frameCount)
+				{
+					getNextStream = true;
+					CommandManager.ProcessPacket (bufferBytes);
+				}
+				else {
+					CommandManager.ProcessPacket (BitConverter.GetBytes (frameCount));
+				}
+				frameCount++;
+			}
+			yield break;
+		}
+
+
+		private static void StartStreaming (Replay replay)
+		{
+			StopStreaming ();
+			streamer = LockstepManager.UnityInstance.StartCoroutine (StreamPlayback (replay));
+		}
+
+		private static void StopStreaming ()
+		{
+			if (streamer .IsNotNull ()) {
+				LockstepManager.UnityInstance.StopCoroutine (streamer);
+				streamer = null;
+			}
+		}
+		#endregion
+	}
+
+	public enum RecordState
+	{
+		None,
+		Record,
+		Playback
+	}
 }
-#endif

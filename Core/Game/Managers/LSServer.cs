@@ -7,9 +7,6 @@ namespace Lockstep
 	{
 		public static uint InfluenceFrameCount { get; private set; }
 		public static void Setup () {
-			ClientManager.NetworkHelper.OnInputData += HandleOnInputData;
-            ClientManager.NetworkHelper.OnRegisterData += HandleOnRegisterData;
-
 		}
 
         static void HandleOnRegisterData (byte[] obj)
@@ -23,9 +20,17 @@ namespace Lockstep
 
 		public static void Initialize ()
 		{
+			ClientManager.NetworkHelper.OnInputData += HandleOnInputData;
+			ClientManager.NetworkHelper.OnRegisterData += HandleOnRegisterData;
             InitedPlayerCount = 0;
 			InfluenceFrameCount = 0;
 			GameStarted = false;
+		}
+
+		public static void Deactivate()
+		{
+			ClientManager.NetworkHelper.OnInputData -= HandleOnInputData;
+			ClientManager.NetworkHelper.OnRegisterData -= HandleOnRegisterData;
 		}
 
 		static void HandleOnInputData (byte[] obj)
