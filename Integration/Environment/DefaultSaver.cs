@@ -9,7 +9,7 @@ namespace Lockstep
         [SerializeField]
         private EnvironmentBodyInfo[] _environmentBodies;
         public EnvironmentBodyInfo[] EnvironmentBodies {get {return _environmentBodies;}}
-        [SerializeField, HideInInspector]
+        [SerializeField]
         private EnvironmentObject[] _environmentObjects;
         public EnvironmentObject[] EnvironmentObjects {get {return _environmentObjects;}}
 
