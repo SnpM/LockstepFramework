@@ -151,6 +151,12 @@ namespace Lockstep
 
         }
 
+		public static void Deactivate()
+		{
+			FastCollisionPairs.Clear();
+			CollisionPairs.Clear();
+			Partition.Deactivate();
+		}
 
         public static float LerpTime { get ; private set; }
         public static float ExtrapolationAmount {get; private set;}

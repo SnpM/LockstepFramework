@@ -24,7 +24,7 @@ namespace Lockstep
         {
             if (Count == 0)
             {
-                activationID = Partition.ActivatedNodes.Add(this);
+                activationID = Partition.AddNode(this);
             }
             ContainedObjects.Add(item);
         }
@@ -36,8 +36,8 @@ namespace Lockstep
             {
                 if (Count == 0)
                 {
-                    Partition.ActivatedNodes.RemoveAt(activationID);
-                    activationID = -1;
+					Partition.RemoveNode(activationID);
+					activationID = -1;
                 }
             }
         }

@@ -93,7 +93,7 @@ namespace Lockstep
             EffectManager.Setup();
 
             PhysicsManager.Setup();
-            ClientManager.Setup(MainGameManager.MainNetworkHelper);
+            ClientManager.Setup();
 
             Application.targetFrameRate = 60;
             Time.fixedDeltaTime = BaseDeltaTime;
@@ -114,8 +114,6 @@ namespace Lockstep
                 Setup();
                 Loaded = true;
             }
-            InitializeHelpers();
-
 
             DefaultMessageRaiser.EarlyInitialize();
             SimulationTimer.Stop();
@@ -130,6 +128,8 @@ namespace Lockstep
             FrameCount = 0;
             InfluenceFrameCount = 0;
             MainGameManager.MainInterfacingHelper.Initialize();
+
+			ClientManager.Initialize(MainGameManager.MainNetworkHelper);
 
             TriggerManager.Initialize();
 
@@ -151,7 +151,7 @@ namespace Lockstep
             InfluenceManager.Initialize();
             ProjectileManager.Initialize();
 
-            ClientManager.Initialize();
+			InitializeHelpers();
 
             DefaultMessageRaiser.LateInitialize();
             BehaviourHelperManager.LateInitialize();
@@ -292,8 +292,9 @@ namespace Lockstep
 
             TeamManager.Deactivate();
             ClientManager.Quit();
+			PhysicsManager.Deactivate();
             GameStarted = false;
-
+			LSServer.Deactivate();
             DefaultMessageRaiser.LateDeactivate();
         }
 

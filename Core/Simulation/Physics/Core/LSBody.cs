@@ -214,8 +214,8 @@ namespace Lockstep
         public long Radius { get { return _radius; } }
 
         [SerializeField, FormerlySerializedAs("Immovable")]
-        private bool _immovable = false;
         public bool Immovable;
+
         [SerializeField, FormerlySerializedAs("_priority")]
         private int _basePriority;
 
@@ -346,7 +346,7 @@ namespace Lockstep
             Priority = _basePriority;
             Velocity = Vector2d.zero;
             VelocityFastMagnitude = 0;
-            _position = StartPosition.ToVector2d();
+			LastPosition = _position = StartPosition.ToVector2d();
             _heightPos = StartPosition.Height;
             _rotation = StartRotation;
 

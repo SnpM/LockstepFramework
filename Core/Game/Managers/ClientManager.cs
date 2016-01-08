@@ -38,20 +38,20 @@ namespace Lockstep
         }
 
 
-		public static void Setup (NetworkHelper networkHelper)
+		public static void Setup ()
 		{
-            NetworkHelper = networkHelper;
 			if (SimulateNetworking) {
 				ServerSimulator.Setup ();
 			}
-
-			NetworkHelper.OnFrameData += HandleFrameData;
-			NetworkHelper.OnInitData += HandleInitData;
 			LSServer.Setup ();
 		}
 
-		public static void Initialize ()
+		public static void Initialize (NetworkHelper networkHelper)
 		{
+			NetworkHelper = networkHelper;
+			NetworkHelper.OnFrameData += HandleFrameData;
+			NetworkHelper.OnInitData += HandleInitData;
+
 			LSServer.Initialize ();
 			GameStarted = false;
 			if (SimulateNetworking) {
@@ -118,6 +118,9 @@ namespace Lockstep
 
 		public static void Deactivate ()
 		{
+			NetworkHelper.OnFrameData -= HandleFrameData;
+			NetworkHelper.OnInitData -= HandleInitData;
+
 			GameStarted = false;
 			ServerSimulator.Stop ();
 		}
