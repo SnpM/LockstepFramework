@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Lockstep.UI;
 using Lockstep.Data;
-using System.Collections.Generic;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -196,7 +195,7 @@ namespace Lockstep {
 
         public bool IsVisible {
             //get { return cachedRenderer == null || (cachedRenderer.enabled && cachedRenderer.isVisible); }
-            get { return true; } //TODO: Return true only if viable
+			get { return true; } //TODO: Return true only if viable GladFox: seen for what kind of camera? :)
         }
 
         public AllegianceType GetAllegiance(LSAgent other) {
