@@ -20,11 +20,10 @@ namespace Lockstep.Example
 		 */
 		protected override void OnExecute (Command com)
 		{
-			Debug.Log (com.HasPosition + " After");
 			byte conID = com.ControllerID;
-			Vector2d pos = com.Position;
-			ushort target = com.Target;
-			int count = com.Count;
+            Vector2d pos = com.GetData<Vector2d>();
+            ushort target = (ushort)com.GetData<DefaultData>(0).Value;
+            ushort count = (ushort)com.GetData<DefaultData>(1).Value;
 
 			AgentController ac = AgentController.InstanceManagers [conID];
 			string agentCode = AgentController.GetAgentCode (target);

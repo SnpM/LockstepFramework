@@ -295,11 +295,10 @@ namespace Lockstep
         {
 			Command com = new Command (InputCodeManager.GetCodeID ("Spawn"));
             com.ControllerID = cont.ControllerID;
-            com.Position = position;
-			Debug.Log (com.HasPosition);
+            com.Add<Vector2d>(position);
 
-            com.Target = (ushort)AgentController.GetAgentCodeIndex(agentCode);
-            com.Count = count;
+            com.Add<DefaultData>(new DefaultData(DataType.UShort,(ushort)AgentController.GetAgentCodeIndex(agentCode)));
+            com.Add<DefaultData>(new DefaultData(DataType.UShort,(ushort)count));
             return com;
 
         }
