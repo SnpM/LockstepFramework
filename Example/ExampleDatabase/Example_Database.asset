@@ -37,19 +37,21 @@ MonoBehaviour:
     _icon: {fileID: 0}
     _script:
       _classRef: Lockstep.Move, Assembly-CSharp
-    _listenInputCode: Core3
+    _listenInputCode: 
     _informationGather: 1
   - _name: Scan
     _description: 
     _icon: {fileID: 0}
     _script:
       _classRef: Lockstep.Scan, Assembly-CSharp
-    _listenInputCode: Core1
+    _listenInputCode: 
     _informationGather: 3
   - _name: Stop
     _description: 
     _icon: {fileID: 0}
     _script:
       _classRef: Lockstep.Stop, Assembly-CSharp
-    _listenInputCode: Core2
+    _listenInputCode: 
     _informationGather: 0
+
+    

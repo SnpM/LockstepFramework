@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using UnityEngine;
 namespace Lockstep
 {
     public partial class Command
     {
 
-        static Command () {
+		public static void Setup () {
             RegisterDefaults ();
         }
 
@@ -117,7 +117,11 @@ namespace Lockstep
 
         public TData GetData <TData>(int index = 0) where TData : ICommandData
         {
-            return (TData)this.ContainedData [RegisteredData [typeof(TData)]] [index];
+			TData item;
+			if (TryGetData (out item, index)) {
+				return item;
+			}
+			return default(TData);
         }
         public bool TryGetData<TData> (out TData data, int index = 0) where TData : ICommandData
         {

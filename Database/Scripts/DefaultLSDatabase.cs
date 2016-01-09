@@ -3,7 +3,9 @@ using System.Collections;
 
 namespace Lockstep.Data
 {
+	//PROTECTED NOT PRIVATE... private dun serialize in derived class
     [System.Serializable]
+
     public class DefaultLSDatabase : LSDatabase
     {
         #region Agents
@@ -22,7 +24,7 @@ namespace Lockstep.Data
             "OrderBuildingsFirst"
         )]
             
-         
+        
         protected AgentInterfacer[]
             _agentData;
 
@@ -31,12 +33,10 @@ namespace Lockstep.Data
 
         #endregion
 
-        //  InputData item types. Make sure that the registered data has protected access
-        //  to ensure that subclasses of DefaultLSDatabase still function.
         #region Input
         [SerializeField]
         [RegisterData ("Input")]
-        protected InputDataItem[] _inputData = new InputDataItem[] {
+		protected InputDataItem[] _inputData = new InputDataItem[] {
             new InputDataItem("Special1", KeyCode.Q),
             new InputDataItem("Special2", KeyCode.W),
             new InputDataItem("Special3", KeyCode.E),
@@ -48,7 +48,8 @@ namespace Lockstep.Data
             new InputDataItem("Item1", KeyCode.Z),
             new InputDataItem("Item2",KeyCode.X),
             new InputDataItem("Item3",KeyCode.C),
-            new InputDataItem("Item4",KeyCode.V)
+            new InputDataItem("Item4",KeyCode.V),
+			new InputDataItem("Spawn",KeyCode.None)
         };
         public InputDataItem[] InputData {get {return _inputData;}}
         #endregion

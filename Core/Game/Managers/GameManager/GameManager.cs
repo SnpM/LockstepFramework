@@ -50,7 +50,7 @@ namespace Lockstep
                     if (_mainNetworkHelper == null)
                     {
                         Debug.Log("NetworkHelper not found on this GameManager's GameObject. Defaulting to ExampleNetworkHelper...");
-                        _mainNetworkHelper = new ExampleNetworkHelper();
+                        _mainNetworkHelper = base.gameObject.AddComponent<ExampleNetworkHelper>();
                     }
                 }
                 return _mainNetworkHelper;

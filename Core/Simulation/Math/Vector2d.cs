@@ -225,6 +225,9 @@ namespace Lockstep
         {
             return (this.x * otherX + this.y * otherY) >> FixedMath.SHIFT_AMOUNT;
         }
+        public long Dot (Vector2d other) {
+            return this.Dot(other.x,other.y);
+        }
 
         public long Dot (Vector2d other) {
             return this.Dot(other.x,other.y);
