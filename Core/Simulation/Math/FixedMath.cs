@@ -133,10 +133,15 @@ namespace Lockstep
 		/// </summary>
 		/// <param name="f1">f1.</param>
 		/// <param name="f2">f2.</param>
-		public static long Mod (this long f1, long f2)
+		public static long Remainder (this long f1, long f2)
 		{
 			return f1 % f2;
 		}
+
+        public static long Mod (this long f1, long f2) {
+            long f = f1 % f2;
+            return f < 0 ? f + f2 : f;
+        }
 
 		/// <summary>
 		/// Square root.
