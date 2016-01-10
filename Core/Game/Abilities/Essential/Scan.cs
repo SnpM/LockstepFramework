@@ -144,7 +144,7 @@ namespace Lockstep
             CanMove = cachedMove.IsNotNull();
             if (CanMove)
             {
-                cachedMove.OnArrive += HandleOnArrive;
+                cachedMove.onArrive += HandleOnArrive;
                 cachedMove.onGroupProcessed += _HandleMoveGroupProcessed;
             }
 

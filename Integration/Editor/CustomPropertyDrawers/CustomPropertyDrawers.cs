@@ -96,20 +96,6 @@ namespace Lockstep
             }
         }
 
-        [CustomPropertyDrawer(typeof(HideInInspectorGUI))]
-        public class EditorHideInInspectorGUI : PropertyDrawer
-        {
-            public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-            {
-                return 0;
-            }
-
-            public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-            {
-
-            }
-        }
-
         public class EditorVisualize : LSScenePropertyDrawer
         {
             public override Type TargetType
