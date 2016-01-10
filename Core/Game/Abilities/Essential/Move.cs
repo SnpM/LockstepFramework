@@ -42,7 +42,6 @@ namespace Lockstep
 
         public bool IsMoving { get; private set; }
 
-        private const bool canPathfind = true;
         private bool hasPath;
         private bool straightPath;
         private bool viableDestination;
@@ -68,16 +67,16 @@ namespace Lockstep
         public bool Arrived { get; private set; }
 
         //Called when unit arrives at destination
-        public event Action OnArrive;
+        public event Action onArrive;
 
         //Called whenever movement is stopped... i.e. to attack
         public event Action OnStopMove;
 
 
-        private LSBody cachedBody;
-        private Turn cachedTurn;
+        private LSBody cachedBody {get; set;}
+        private Turn cachedTurn {get; set;}
 
-        private long timescaledSpeed
+        public long timescaledSpeed
         {
             get
             {
@@ -108,13 +107,20 @@ namespace Lockstep
         #region Serialized
 
         [SerializeField]
-        private bool CanMove = true;
-        [SerializeField, FixedNumber]
-        private long Speed = FixedMath.One * 4;
-        [SerializeField, FixedNumber]
-        private long Acceleration = FixedMath.One;
+        private bool _canMove = true;
+        public bool CanMove {get {return _canMove;}}
         [SerializeField]
-        private bool Flying;
+        private bool _canTurn = true;
+        public bool CanTurn {get; private set;}
+        [SerializeField, FixedNumber]
+        private long _speed = FixedMath.One * 4;
+        public long Speed {get {return _speed;}}
+        [SerializeField, FixedNumber]
+        private long _acceleration = FixedMath.One;
+        public long Acceleration {get {return _acceleration;}}
+        [SerializeField, UnityEngine.Serialization.FormerlySerializedAs ("Flying")]
+        private bool _canPathfind;
+        public bool CanPathfind {get; private set;}
 
         #endregion
 
@@ -123,6 +129,7 @@ namespace Lockstep
             cachedBody = Agent.Body;
             cachedBody.OnContact += HandleCollision;
             cachedTurn = Agent.Turner;
+            CanTurn = _canTurn && cachedTurn != null;
             collisionStopTreshold = FixedMath.Mul(timescaledSpeed, CollisionStopTreshold);
             collisionStopTreshold *= collisionStopTreshold;
             timescaledAcceleration = Acceleration * 32 / LockstepManager.FrameRate;
@@ -131,6 +138,7 @@ namespace Lockstep
             closingDistance = cachedBody.Radius;
             stuckTolerance = ((Agent.Body.Radius * Speed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
             stuckTolerance *= stuckTolerance;
+            CanPathfind = _canPathfind;
         }
 
         protected override void OnInitialize()
@@ -169,7 +177,7 @@ namespace Lockstep
             }
             if (IsMoving)
             {
-                if (canPathfind)
+                if (CanPathfind)
                 {
                     if (repathCount <= 0)
                     {
@@ -284,6 +292,7 @@ namespace Lockstep
                     if (movementDirection.Cross(lastMovementDirection.x, lastMovementDirection.y).AbsMoreThan(FixedMath.Half))
                     {
                         lastMovementDirection = movementDirection;
+                        if (CanTurn)
                         cachedTurn.StartTurnRaw(movementDirection);
                     }
                 } else
@@ -348,12 +357,17 @@ namespace Lockstep
 
         public void Arrive()
         {
-            if (OnArrive.IsNotNull())
+            if (onArrive.IsNotNull())
             {
-                OnArrive();
+                onArrive();
             }
+            this.OnArrive();
             Arrived = true;
             StopMove();
+        }
+
+        protected virtual void OnArrive () {
+
         }
 
 
@@ -406,6 +420,7 @@ namespace Lockstep
                 //TODO: guard return
             } else
             {
+                if (CanTurn)
                 cachedTurn.TurnDirection(destination - cachedBody._position);
                 Agent.SetState(AnimState.Moving);
                 hasPath = false;

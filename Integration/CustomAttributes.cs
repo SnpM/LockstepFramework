@@ -32,7 +32,6 @@ namespace Lockstep
             Max = max;
         }
 
-       
     }
 
     public class FrameCountAttribute : PropertyAttribute
@@ -56,8 +55,10 @@ namespace Lockstep
 
     }
 
-    public class HideInInspectorGUI : PropertyAttribute
-    {
+    /// <summary>
+    /// Allows customization of a derived ActiveAbility in the database.
+    /// </summary>
+    public class CustomActiveAbilityAttribute :System.Attribute {
 
     }
 

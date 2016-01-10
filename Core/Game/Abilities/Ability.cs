@@ -21,7 +21,7 @@ namespace Lockstep
             {
 #if UNITY_EDITOR
                 if (_agent == null)
-                    return this.GetComponent<LSAgent>();
+                    return GetComponent<LSAgent>();
 #endif
                 return _agent;
             }

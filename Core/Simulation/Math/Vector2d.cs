@@ -229,9 +229,6 @@ namespace Lockstep
             return this.Dot(other.x,other.y);
         }
 
-        public long Dot (Vector2d other) {
-            return this.Dot(other.x,other.y);
-        }
 
         public long Cross(long otherX, long otherY)
         {
