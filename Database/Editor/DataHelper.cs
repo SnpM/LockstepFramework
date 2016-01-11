@@ -184,7 +184,10 @@ namespace Lockstep.Data
             Type activeAbilityType = typeof (ActiveAbility);
             for (int i = 0; i < filteredTypes.Count; i++) {
                 if (filteredTypes[i].BaseType != abilityType && filteredTypes[i].BaseType != activeAbilityType)
+                {
+                    if (filteredTypes[i].GetCustomAttributes(typeof (CustomActiveAbilityAttribute),false).Length == 0)
                     continue;
+                }
                 lackingTypes.Add(filteredTypes[i]);
             }
             for (int i = 0; i < data.Length; i++) {

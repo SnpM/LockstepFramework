@@ -96,6 +96,9 @@ namespace Lockstep
 
         public static void SendCommand(Command com, bool immediate = false)
         {
+            if (com == null) {
+                return;
+            }
             outCommands.Add(com);
             if (immediate)
             {

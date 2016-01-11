@@ -213,8 +213,9 @@ namespace Lockstep
 
         public long Radius { get { return _radius; } }
 
-        [SerializeField, FormerlySerializedAs("Immovable")]
-        public bool Immovable;
+        [SerializeField]
+        private bool _immovable;
+        public bool Immovable {get {return _immovable;}}
 
         [SerializeField, FormerlySerializedAs("_priority")]
         private int _basePriority;
@@ -271,7 +272,6 @@ namespace Lockstep
 
             if (Shape == ColliderType.Polygon)
             {
-                Immovable = true;
             }
             if (Shape != ColliderType.None)
             {
