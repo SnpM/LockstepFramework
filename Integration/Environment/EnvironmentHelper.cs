@@ -24,9 +24,22 @@ namespace Lockstep
                 Debug.Log ("Please assign 'Saver Object'");
                 return;
             }
-            _savers = SaverObject.GetComponents<EnvironmentSaver> (); //Gets savers from SaverObject
+            InitializeEnvironmentFromObject();
             foreach (EnvironmentSaver saver in Savers) {
                 saver.Save();
+            }
+        }
+
+        protected void Awake()
+        {
+            InitializeEnvironmentFromObject();
+        }
+
+        protected void InitializeEnvironmentFromObject()
+        {
+            if(SaverObject != null)
+            {
+                _savers = SaverObject.GetComponents<EnvironmentSaver>(); //Gets savers from SaverObject
             }
         }
 

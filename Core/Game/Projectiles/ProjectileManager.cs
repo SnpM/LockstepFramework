@@ -3,7 +3,6 @@ using System.Collections;
 using System;
 using Lockstep.Data;
 using System.Collections.Generic;
-using Lockstep.Data;
 namespace Lockstep {
     public static class ProjectileManager {
 		public const int MaxProjectiles = 1 << 13;

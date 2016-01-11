@@ -16,10 +16,6 @@ namespace Lockstep
 
 		void HandleOnImpulsePlay (AnimImpulse obj)
 		{
-			switch (obj)
-			{
-
-			}
 		}
 
 		void HandleOnStatePlay (AnimState obj)
