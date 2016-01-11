@@ -57,11 +57,13 @@ namespace Lockstep.Integration
             {
 
                 EditorGUI.BeginChangeCheck();
-                if (GUILayout.Button("Reset Transforms")) {
-                    for (int i = 0; i < targets.Length; i++) {
-                        SerializedObject ser = new SerializedObject(targets[i]);
-                        ser.FindProperty("_positionalTransform").objectReferenceValue = ((LSBody)targets[i]).transform;
-                        ser.FindProperty("_rotationalTransform").objectReferenceValue = ((LSBody)targets[i]).transform;
+                if (GUILayout.Button("Reset Transforms"))
+                {
+                    for (int i = 0; i < targets.Length; i++)
+                    {
+                        SerializedObject ser = new SerializedObject(targets [i]);
+                        ser.FindProperty("_positionalTransform").objectReferenceValue = ((LSBody)targets [i]).transform;
+                        ser.FindProperty("_rotationalTransform").objectReferenceValue = ((LSBody)targets [i]).transform;
                         ser.ApplyModifiedProperties();
                     }
                     so.Update();
@@ -140,7 +142,9 @@ namespace Lockstep.Integration
             if (shape == ColliderType.None)
                 return;
             Handles.color = Color.blue;
-            Vector3 targetPos = (target as LSBody).transform.position;
+            LSBody Body = (LSBody)target;
+
+            Vector3 targetPos = Body.transform.position;
             const int ImprecisionLimit = 100000;
             if (Mathf.Abs(targetPos.x) >= ImprecisionLimit ||
                 Mathf.Abs(targetPos.y) >= ImprecisionLimit ||
@@ -151,11 +155,10 @@ namespace Lockstep.Integration
             int spreadMin = -1;
             int spreadMax = 1;
             Handles.DrawCapFunction dragCap = Handles.SphereCap;
-
+            float height = targetPos.y;
             float xModifier = 0f;
             if (shape == ColliderType.Circle)
             {
-                //targetPos.x - Radius.longValue.ToFloat ():
                 //Minus so the move handle doesn't end up on the same axis as the transform.position move handle
                 Radius.longValue =
                     FixedMath.Create(
@@ -185,7 +188,7 @@ namespace Lockstep.Integration
                         new Vector3(targetPos.x, baseHeight + (float)i * spread, targetPos.z)
                         , Quaternion.Euler(90, 0, 0), Radius.longValue.ToFloat());
                 }
-                xModifier = Radius.longValue.ToFloat();
+                xModifier = 0;//Radius.longValue.ToFloat();
 
             } else if (shape == ColliderType.AABox)
             {
@@ -215,7 +218,7 @@ namespace Lockstep.Integration
                 float halfHeight = HalfHeight.longValue.ToFloat();
                 for (int i = 0; i < 1; i++)
                 {
-                    float height = targetPos.y + (float)i * spread;
+                    height = targetPos.y + (float)i * spread;
                     Vector3[] lines = new Vector3[]
                     {
                         new Vector3(targetPos.x + halfWidth, height, targetPos.z + halfHeight),
@@ -234,7 +237,7 @@ namespace Lockstep.Integration
                 }
                 for (int i = 0; i < 1; i++)
                 {
-                    float height = targetPos.y + (float)i * spread + Height.longValue.ToFloat();
+                    height = targetPos.y + (float)i * spread + Height.longValue.ToFloat();
                     Vector3[] lines = new Vector3[]
                     {
                         new Vector3(targetPos.x + halfWidth, height, targetPos.z + halfHeight),
@@ -252,8 +255,46 @@ namespace Lockstep.Integration
                     Handles.DrawLines(lines);
                 }
 
-                xModifier = halfWidth;
+                xModifier = 0;//halfWidth;
+            } else if (shape == ColliderType.Polygon)
+            {
+                float yRot = Body.transform.eulerAngles.y * Mathf.Deg2Rad;
+                Vector2d rotation = Vector2d.CreateFromAngle(yRot);
+                bool changed = false;
+                Vector3[] draws = new Vector3[Body.Vertices.Length + 1];
+                for (int i = 0; i < Body.Vertices.Length; i++)
+                {
+                    Vector2d vertex = Body.Vertices [i];
+                    vertex.RotateInverse(rotation.x, rotation.y);
+                    Vector3 drawPos = vertex.ToVector3() + targetPos;
+                    Vector3 newDrawPos = Handles.FreeMoveHandle(drawPos, Quaternion.identity, .4f, new Vector3(0, float.PositiveInfinity, 0), Handles.SphereCap);
+                    if (newDrawPos.V3SqrDistance(drawPos) >= .001f)
+                    {
+                        newDrawPos -= targetPos;
+                        vertex = new Vector2d(newDrawPos);
+                        vertex.Rotate(rotation.x, rotation.y);
+                        Body.Vertices [i] = vertex;
+                        changed = true;
+                    }
+                    draws[i] = drawPos;
+                }
+                if (Body.Vertices.Length > 0) {
+                    draws[draws.Length - 1] = draws[0];
+                    Handles.DrawPolyLine(draws);
+                    for (int i = 0; i < draws.Length; i++)
+                    {
+                        Vector3 highPos = draws[i];
+                        highPos.y += Body.Height.ToFloat();
+                        Handles.DrawLine(draws[i],highPos);
+                        draws[i] = highPos;
+                    }
+                    Handles.DrawPolyLine(draws);
+                }
+                if (changed)
+                    so.Update();
             }
+
+
             Handles.DrawLine(
                 new Vector3(targetPos.x + xModifier, targetPos.y, targetPos.z), 
                 new Vector3(targetPos.x + xModifier, targetPos.y + Height.longValue.ToFloat(), targetPos.z));
