@@ -31,10 +31,12 @@ namespace Lockstep.Data
 
         #endregion
 
+        //  InputData item types. Make sure that the registered data has protected access
+        //  to ensure that subclasses of DefaultLSDatabase still function.
         #region Input
         [SerializeField]
         [RegisterData ("Input")]
-        private InputDataItem[] _inputData = new InputDataItem[] {
+        protected InputDataItem[] _inputData = new InputDataItem[] {
             new InputDataItem("Special1", KeyCode.Q),
             new InputDataItem("Special2", KeyCode.W),
             new InputDataItem("Special3", KeyCode.E),
