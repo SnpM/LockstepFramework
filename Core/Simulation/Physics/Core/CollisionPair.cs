@@ -208,16 +208,26 @@ namespace Lockstep
                     break;
                             
                 case CollisionType.Circle_Polygon:
-
+                    if (Body1.Shape == ColliderType.Circle) {
+                        this.DistributeCircle_Poly(Body1,Body2);
+                    }
+                    else {
+                        this.DistributeCircle_Poly(Body2,Body1);
+                    }
                     break;
             }
 
 
         }
 
-        void DistributeCircle_Polygon(LSBody circle, LSBody poly)
+        void DistributeCircle_Poly(LSBody circle, LSBody poly)
         {
-            
+            Vector2d edgeAxis = ClosestAxis.rotatedRight;
+            long horProjection = circle._position.Dot(edgeAxis.x,edgeAxis.y);
+            long verProjection = ClosestAxisProjection + ClosestDist;
+            Vector2d newPos = ClosestAxis * verProjection + edgeAxis * horProjection;
+            circle._position = newPos; 
+            circle.PositionChanged = true;
         }
 
         public void CheckAndDistributeCollision()
@@ -232,6 +242,7 @@ namespace Lockstep
             if (CheckHeight())
             if (CheckCollision())
             {
+
                 if (IsColliding == false)
                 {
                     if (Body1.OnContactEnter.IsNotNull())
@@ -477,10 +488,13 @@ namespace Lockstep
             }
             return false;
         }
-
+        private static Vector2d ClosestAxis;
+        private static long ClosestDist;
+        private static long ClosestAxisProjection;
         public static bool CheckCircle_Poly(LSBody circle, LSBody poly)
         {
             int EdgeCount = poly.EdgeNorms.Length;
+            ClosestDist = long.MaxValue;
             for (int i = 0; i < EdgeCount; i++)
             {
                 Vector2d axis = poly.EdgeNorms [i];
@@ -491,9 +505,25 @@ namespace Lockstep
                 long PolyMin;
                 long PolyMax;
                 ProjectPolygon(axis.x, axis.y, poly, out PolyMin, out PolyMax);
-
-                if (!CheckOverlap(CircleMin, CircleMax, PolyMin, PolyMax))
+                //TODO: Cache PolyMin and PolyMax?
+                if (CheckOverlap (CircleMin, CircleMax, PolyMin, PolyMax))
                 {
+                    long dist1 = PolyMax - CircleMin;
+                    long dist2 = CircleMax - PolyMin;
+                    long localCloseDist = 0;
+                    if (dist1 <= dist2) {
+                        localCloseDist = dist1;
+                    }
+                    else {
+                        localCloseDist = -dist2;
+                    }
+                    if (localCloseDist.Abs() < ClosestDist.Abs()) {
+                        ClosestDist = localCloseDist;
+                        ClosestAxis = axis;
+                        ClosestAxisProjection = CircleProjection;
+                    }
+                }
+                else {
                     return false;
                 }
             }

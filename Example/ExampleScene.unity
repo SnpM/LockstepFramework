@@ -195,7 +195,7 @@ MonoBehaviour:
       _height: 0
     Rotation:
       x: 0
-      y: 49823
+      y: 65536
   _environmentObjects: []
 --- !u!4 &357143950
 Transform:
@@ -456,7 +456,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1546989393}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071067}
   m_LocalPosition: {x: 5.35, y: 0, z: 0.38}
   m_LocalScale: {x: 5, y: 1, z: 5}
   m_Children:

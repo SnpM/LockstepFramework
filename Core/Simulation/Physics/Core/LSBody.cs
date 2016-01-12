@@ -335,7 +335,6 @@ namespace Lockstep
 
         public void Initialize(Vector2dHeight StartPosition, Vector2d StartRotation)
         {
-            Debug.Log(StartRotation);
             if (!Setted)
             {
                 this.Setup(null);
@@ -415,7 +414,6 @@ namespace Lockstep
                 for (int i = 0; i < VertLength; i++)
                 {
                     RotatedPoints [i] = Vertices [i];
-                    Debug.Log(_rotation);
                     RotatedPoints [i].RotateInverse(_rotation.x, _rotation.y);
 					
                     EdgeNorms [i] = RotatedPoints [i];
