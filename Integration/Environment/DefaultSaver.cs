@@ -40,10 +40,12 @@ namespace Lockstep
             FastList<EnvironmentBodyInfo> bodiesBuffer = new FastList<EnvironmentBodyInfo>();
             foreach (LSBody body in allBodies) {
                 if (IsAgent(body)) continue;
+                Vector2dHeight pos = new Vector2dHeight(body.transform.position);
+                Vector2d rot = Vector2d.CreateFromAngle(body.transform.eulerAngles.y * Mathf.Deg2Rad);
                 EnvironmentBodyInfo bodyInfo = new EnvironmentBodyInfo(
                     body,
-                    new Vector2dHeight(body.transform.position),
-                    new Vector2d (Mathf.Sin (body.transform.rotation.x), Mathf.Cos (body.transform.rotation.y))
+                    pos,
+                    rot
                 );
                 bodiesBuffer.Add(bodyInfo);
             }

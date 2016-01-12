@@ -215,7 +215,8 @@ namespace Lockstep
 
         }
 
-        void DistributeCircle_Polygon (LSBody circle, LSBody poly){
+        void DistributeCircle_Polygon(LSBody circle, LSBody poly)
+        {
             
         }
 
@@ -227,6 +228,7 @@ namespace Lockstep
                 return;
             }
             CurrentCollisionPair = this;
+    
             if (CheckHeight())
             if (CheckCollision())
             {
@@ -246,9 +248,7 @@ namespace Lockstep
 
                 }
                 DistributeCollision();
-                if (this.LeCollisionType == CollisionType.Circle_Polygon) {
-                    Debug.Log("a");
-                }
+
             } else
             {
                 if (IsColliding)
@@ -317,7 +317,6 @@ namespace Lockstep
                     break;
             
                 case CollisionType.Circle_Polygon:
-                    return false;
                     if (CheckCircle())
                     {
                         if (Body1.Shape == ColliderType.Circle)
@@ -326,9 +325,12 @@ namespace Lockstep
                             {
                                 return true;
                             }
-                        } else if (CheckCircle_Poly(Body2, Body1))
+                        } else
                         {
-                            return true;
+                            if (CheckCircle_Poly(Body2, Body1))
+                            {
+                                return true;
+                            }
                         }
                     }
                     break;

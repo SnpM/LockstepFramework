@@ -215,7 +215,8 @@ namespace Lockstep
 
         [SerializeField]
         private bool _immovable;
-        public bool Immovable {get {return _immovable;}}
+
+        public bool Immovable { get { return _immovable; } }
 
         [SerializeField, FormerlySerializedAs("_priority")]
         private int _basePriority;
@@ -238,11 +239,15 @@ namespace Lockstep
         public Transform PositionalTransform { get { return _positionalTransform; } }
 
         private bool _canSetVisualPosition;
-        public bool CanSetVisualPosition {
-            get {
+
+        public bool CanSetVisualPosition
+        {
+            get
+            {
                 return _canSetVisualPosition;
             }
-            set {
+            set
+            {
                 _canSetVisualPosition = value && _positionalTransform != null;
             }
         }
@@ -253,11 +258,15 @@ namespace Lockstep
         public Transform RotationalTransform { get { return _rotationalTransform; } }
 
         private bool _canSetVisualRotation;
-        public bool CanSetVisualRotation {
-            get {
+
+        public bool CanSetVisualRotation
+        {
+            get
+            {
                 return _canSetVisualRotation;
             }
-            set {
+            set
+            {
                 _canSetVisualRotation = value && _rotationalTransform;
             }
         }
@@ -277,6 +286,7 @@ namespace Lockstep
             {
                 GeneratePoints();
                 GenerateBounds();
+
             }
             Agent = agent;
             Setted = true;
@@ -289,11 +299,6 @@ namespace Lockstep
                 return;
             }
             RotatedPoints = new Vector2d[Vertices.Length];
-            for (int i = 0; i < Vertices.Length; i++)
-            {
-                RotatedPoints [i] = Vertices [i];
-                RotatedPoints [i].Rotate(_rotation.x, _rotation.y);
-            }
             RealPoints = new Vector2d[Vertices.Length];
             EdgeNorms = new Vector2d[Vertices.Length];
         }
@@ -330,6 +335,7 @@ namespace Lockstep
 
         public void Initialize(Vector2dHeight StartPosition, Vector2d StartRotation)
         {
+            Debug.Log(StartRotation);
             if (!Setted)
             {
                 this.Setup(null);
@@ -346,7 +352,7 @@ namespace Lockstep
             Priority = _basePriority;
             Velocity = Vector2d.zero;
             VelocityFastMagnitude = 0;
-			LastPosition = _position = StartPosition.ToVector2d();
+            LastPosition = _position = StartPosition.ToVector2d();
             _heightPos = StartPosition.Height;
             _rotation = StartRotation;
 
@@ -375,8 +381,8 @@ namespace Lockstep
                 _visualPosition = _position.ToVector3(HeightPos.ToFloat());
                 lastVisualPos = _visualPosition;
                 _positionalTransform.position = _visualPosition;
-            }
-            else {
+            } else
+            {
                 CanSetVisualPosition = false;
             }
             if (_rotationalTransform != null)
@@ -385,8 +391,8 @@ namespace Lockstep
                 visualRot = Quaternion.LookRotation(_rotation.ToVector3(0f));
                 lastVisualRot = visualRot;
                 _rotationalTransform.rotation = visualRot;
-            }
-            else {
+            } else
+            {
                 CanSetVisualRotation = false;
             }
         }
@@ -409,7 +415,8 @@ namespace Lockstep
                 for (int i = 0; i < VertLength; i++)
                 {
                     RotatedPoints [i] = Vertices [i];
-                    RotatedPoints [i].Rotate(_rotation.x, _rotation.y);
+                    Debug.Log(_rotation);
+                    RotatedPoints [i].RotateInverse(_rotation.x, _rotation.y);
 					
                     EdgeNorms [i] = RotatedPoints [i];
                     if (i == 0)
@@ -772,7 +779,7 @@ namespace Lockstep
 
         void OnDrawGizmos()
         {
-            return;
+            //return;
             //Don't draw gizmos before initialization
             if (Application.isPlaying == false)
                 return;
@@ -786,16 +793,29 @@ namespace Lockstep
                         this._position.ToVector3(this.HeightPos.ToFloat() + this.Height.ToFloat() / 2),
                         new Vector3(this.HalfWidth.ToFloat() * 2, this.Height.ToFloat(), this.HalfHeight.ToFloat() * 2));
                     break;
+                case ColliderType.Polygon:
+                    if (RealPoints.Length > 1)
+                    {
+                        for (int i = 0; i < this.RealPoints.Length; i++)
+                        {
+                            Gizmos.DrawLine(this.RealPoints [i].ToVector3(), this.RealPoints [i + 1 < RealPoints.Length ? i + 1 : 0].ToVector3());
+                        }
+                    }
+                    break;
             }
         }
 
         FastList<UnityEngine.Coroutine> flashRoutines = new FastList<UnityEngine.Coroutine>();
-        public void TestFlash () {
+
+        public void TestFlash()
+        {
             flashRoutines.Add(base.StartCoroutine(_TestFlash()));
         }
 
-        private System.Collections.IEnumerator _TestFlash () {
-            foreach (UnityEngine.Coroutine co in flashRoutines) {
+        private System.Collections.IEnumerator _TestFlash()
+        {
+            foreach (UnityEngine.Coroutine co in flashRoutines)
+            {
                 base.StopCoroutine(co);
             }
             flashRoutines.Clear();
