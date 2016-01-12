@@ -4,6 +4,9 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
+
+#define HIGH_ACCURACy
+
 using UnityEngine;
 using System.Collections;
 using System;
@@ -13,7 +16,7 @@ namespace Lockstep
     public static class FixedMath
     {
         static FixedMath () {
-            Debug.Log(FixedMath.Trig.Sin(Pi));
+            Debug.Log(FixedMath.Trig.Sin(Pi).ToDouble());
         }
 
         #region Meta
@@ -341,28 +344,32 @@ namespace Lockstep
                 //Note: Max 4 multiplications before overflow
 
                 theta = theta - FixedMath.TwoPi * FixedMath.Floor((theta + FixedMath.Pi) / FixedMath.TwoPi);
+                long thetaSquared = theta.Mul(theta);
 
                 long result = theta;
-
+                const int shift = FixedMath.SHIFT_AMOUNT;
                 //2 shifts for 2 multiplications but there's a division so only 1 shift
-                long x = (theta * theta * theta) >> FixedMath.SHIFT_AMOUNT * 1;
+                long n = (theta * theta * theta) >> (shift * 1);
                 const long Factorial3 = 3 * 2 * FixedMath.One;
-                result -= x / Factorial3;
-                x *= x * x;
-                x >>= 2;
+                result -= n / Factorial3;
+
+                n *= thetaSquared;
+                n >>= shift;
                 const long Factorial5 = Factorial3 * 4 * 5;
-                result += x / Factorial5;
+                result += (n / Factorial5);
 
-                x *= x * x;
-                x >>= 2;
+                n *= thetaSquared;
+                n >>= shift;
                 const long Factorial7 = Factorial5 * 6 * 7;
-                result -=  x / Factorial7;
+                result -=  n / Factorial7;
 
-                x *= x * x;
-                x >>= 2;
+                #if true || HIGH_ACCURACY
+                //Required or there'll be .07 inaccuracy
+                n *= thetaSquared;
+                n >>= shift;
                 const long Factorial9 = Factorial7 * 8 * 9;
-                result +=  x / Factorial9;
-
+                result += n / Factorial9;
+                #endif
                 return result;
             }
             public static long Cos(long theta) {
