@@ -188,14 +188,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _environmentBodies:
-  - Body: {fileID: 1546989394}
+  - Body: {fileID: 0}
     Position:
       _x: 350617
       _y: 24903
       _height: 0
     Rotation:
-      x: 0
-      y: 65536
+      x: 56755
+      y: -32768
   _environmentObjects: []
 --- !u!4 &357143950
 Transform:
@@ -435,19 +435,19 @@ MonoBehaviour:
   _immovable: 0
   _basePriority: 0
   _vertices:
-  - x: 530405
-    y: -147119
+  - x: 527510
+    y: -164889
   - x: 520501
     y: 172473
-  - x: -141904
-    y: 370560
-  - x: -467794
-    y: 362965
-  - x: -474729
-    y: -304649
-  - x: -138255
-    y: -308997
-  _height: 252968
+  - x: -140132
+    y: 376560
+  - x: -476944
+    y: 369640
+  - x: -481425
+    y: -316070
+  - x: -129921
+    y: -313295
+  _height: 65536
   _positionalTransform: {fileID: 1546989395}
   _rotationalTransform: {fileID: 1546989395}
 --- !u!4 &1546989395
@@ -456,8 +456,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1546989393}
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071067}
-  m_LocalPosition: {x: 5.35, y: 0, z: 0.38}
+  m_LocalRotation: {x: 0, y: 0.8660255, z: 0, w: 0.49999988}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 5, y: 1, z: 5}
   m_Children:
   - {fileID: 60617025}

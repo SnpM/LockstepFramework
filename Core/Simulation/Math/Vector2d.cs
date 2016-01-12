@@ -126,6 +126,16 @@ namespace Lockstep
             this.x = (this.x << FixedMath.SHIFT_AMOUNT) / mag;
             this.y = (this.y << FixedMath.SHIFT_AMOUNT) / mag;
         }
+
+        public void FastNormalize () {
+            //Blazing fast normalization when accuracy isn't needed
+            tempMag = x > y ? x + y / 2 : x / 2 + y;
+            const long errorFactor = 1000 * FixedMath.One / 1118;
+
+            this.x = ((this.x << FixedMath.SHIFT_AMOUNT) / tempMag) * errorFactor >> FixedMath.SHIFT_AMOUNT;
+            this.y = ((this.y << FixedMath.SHIFT_AMOUNT) / tempMag) * errorFactor >> FixedMath.SHIFT_AMOUNT;
+        }
+
         public void Lerp (Vector2d target, long amount) {
             Lerp (target.x,target.y,amount);
         }

@@ -35,6 +35,20 @@ namespace Lockstep.Integration
 
         bool MoreThanOne;
 
+        private static GUIStyle _labelStyle;
+        public static GUIStyle LabelStyle {
+            get {
+                if (_labelStyle == null)
+                {
+                    _labelStyle = new GUIStyle(EditorStyles.boldLabel);
+                    _labelStyle.fontSize = 20;
+
+                }
+                return _labelStyle;
+            }
+        }
+        public static float MoveHandleSize {get {return .6f;}}
+
         void OnEnable()
         {
             MoreThanOne = targets.Length > 1;
@@ -150,7 +164,6 @@ namespace Lockstep.Integration
                 Mathf.Abs(targetPos.y) >= ImprecisionLimit ||
                 Mathf.Abs(targetPos.z) >= ImprecisionLimit)
                 return;
-            const float dragHandleSize = .5f;
             const float spread = .02f;
             int spreadMin = -1;
             int spreadMax = 1;
@@ -166,7 +179,7 @@ namespace Lockstep.Integration
                         (Handles.FreeMoveHandle(
                             new Vector3(targetPos.x - Radius.longValue.ToFloat(), targetPos.y, targetPos.z)
                                 , Quaternion.identity,
-                            dragHandleSize,
+                            MoveHandleSize,
                             Vector3.zero,
                             Handles.SphereCap))
                             .x - targetPos.x) 
@@ -198,7 +211,7 @@ namespace Lockstep.Integration
                         Handles.FreeMoveHandle(
                             new Vector3(targetPos.x - (float)HalfWidth.longValue.ToFormattedDouble(), targetPos.y, targetPos.z),
                             Quaternion.identity,
-                            dragHandleSize,
+                            MoveHandleSize,
                             Vector3.zero,
                             dragCap)
                             .x - targetPos.x)
@@ -209,7 +222,7 @@ namespace Lockstep.Integration
                         Handles.FreeMoveHandle(
                             new Vector3(targetPos.x, targetPos.y, targetPos.z - (float)HalfHeight.longValue.ToFormattedDouble()),
                             Quaternion.identity,
-                            dragHandleSize,
+                            MoveHandleSize,
                             Vector3.zero,
                             dragCap)
                             .z - targetPos.z)
@@ -263,13 +276,14 @@ namespace Lockstep.Integration
                 Vector2d rotation = Vector2d.CreateFromAngle(yRot);
                 bool changed = false;
                 Vector3[] draws = new Vector3[Body.Vertices.Length + 1];
+                    
                 for (int i = 0; i < Body.Vertices.Length; i++)
                 {
                     Vector2d vertex = Body.Vertices [i];
                     vertex.RotateInverse(rotation.x, rotation.y);
                     Vector3 drawPos = vertex.ToVector3() + targetPos;
-                    Vector3 newDrawPos = Handles.FreeMoveHandle(drawPos, Quaternion.identity, .4f, new Vector3(0, float.PositiveInfinity, 0), Handles.SphereCap);
-                    if (newDrawPos.V3SqrDistance(drawPos) >= .001f)
+                    Vector3 newDrawPos = Handles.FreeMoveHandle(drawPos, Quaternion.identity, MoveHandleSize, new Vector3(0, float.PositiveInfinity, 0), Handles.SphereCap);
+                    if ((newDrawPos - (drawPos)).magnitude >= .01f)
                     {
                         newDrawPos -= targetPos;
                         vertex = new Vector2d(newDrawPos);
@@ -278,6 +292,7 @@ namespace Lockstep.Integration
                         changed = true;
                     }
                     draws[i] = drawPos;
+                    Handles.Label(drawPos, "V: " + i.ToString(),LabelStyle);
                 }
                 if (Body.Vertices.Length > 0) {
                     draws[draws.Length - 1] = draws[0];
@@ -307,7 +322,7 @@ namespace Lockstep.Integration
                 Handles.FreeMoveHandle(
                 movePos,
                 Quaternion.identity,
-                dragHandleSize,
+                MoveHandleSize,
                 Vector3.zero,
                 dragCap
             );
