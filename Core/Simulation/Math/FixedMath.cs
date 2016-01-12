@@ -331,7 +331,7 @@ namespace Lockstep
                 //TODO: Profiling
                 //Note: Max 4 multiplications before overflow
 
-                radPiAngle %= FixedMath.One * 2;
+                radPiAngle %= FixedMath.Pi * 2;
 
                 long result = radPiAngle;
 
@@ -339,7 +339,6 @@ namespace Lockstep
                 long x = (radPiAngle * radPiAngle * radPiAngle) >> FixedMath.SHIFT_AMOUNT * 1;
                 const long Factorial3 = 3 * 2 * FixedMath.One;
                 result -= x / Factorial3;
-
                 x *= x * x;
                 x >>= 2;
                 const long Factorial5 = Factorial3 * 4 * 5;
@@ -357,6 +356,10 @@ namespace Lockstep
 
                 return result;
             }
+            public static long Cos(long radPiAngle) {
+                return Sin (radPiAngle - FixedMath.Half);
+            }
+
         }
     }
 }
