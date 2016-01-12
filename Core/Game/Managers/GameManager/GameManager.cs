@@ -159,14 +159,16 @@ namespace Lockstep
         {
             //When the game starts (first simulation frame)
         }
-
-        void OnDisable()
+        bool Quited = false;
+        void OnDisable ()
         {
+            if (Quited) return;
             LockstepManager.Deactivate();
         }
 
         void OnApplicationQuit()
         {
+            Quited = true;
             LockstepManager.Quit();
         }
 

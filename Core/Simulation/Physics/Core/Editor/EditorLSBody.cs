@@ -259,6 +259,7 @@ namespace Lockstep.Integration
             } else if (shape == ColliderType.Polygon)
             {
                 float yRot = Body.transform.eulerAngles.y * Mathf.Deg2Rad;
+
                 Vector2d rotation = Vector2d.CreateFromAngle(yRot);
                 bool changed = false;
                 Vector3[] draws = new Vector3[Body.Vertices.Length + 1];
