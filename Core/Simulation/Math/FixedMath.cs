@@ -357,7 +357,7 @@ namespace Lockstep
                 return result;
             }
             public static long Cos(long radPiAngle) {
-                return Sin (radPiAngle - FixedMath.Half);
+                return Sin (radPiAngle - FixedMath.Pi / 2);
             }
 
         }
