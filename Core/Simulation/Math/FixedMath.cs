@@ -4,6 +4,9 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
+
+#define HIGH_ACCURACy
+
 using UnityEngine;
 using System.Collections;
 using System;
@@ -12,6 +15,7 @@ namespace Lockstep
 {
     public static class FixedMath
     {
+
         #region Meta
 
         public const int SHIFT_AMOUNT = 16;
@@ -20,6 +24,7 @@ namespace Lockstep
         public const float OneF = (float)One;
         public const double OneD = (double)One;
         public const long Pi = (355 * One) / 113;
+        public const long TwoPi = Pi * 2;
         public const long MaxFixedNumber = long.MaxValue >> SHIFT_AMOUNT;
         public const long TenDegrees = FixedMath.One * 1736 / 10000;
         public const long Epsilon = 1 << (SHIFT_AMOUNT - 10);
@@ -237,6 +242,10 @@ namespace Lockstep
             return ((f1 + One - 1) >> SHIFT_AMOUNT) << SHIFT_AMOUNT;
         }
 
+        public static long Floor (long f1) {
+            return ((f1) >> SHIFT_AMOUNT) << SHIFT_AMOUNT;
+        }
+
         public static long Lerp(long from, long to, long t)
         {
             if (t >= One)
@@ -325,37 +334,47 @@ namespace Lockstep
 
         public static class Trig
         {
-            public static long Sin(long radPiAngle)
+            public static long Sin(long theta)
             {
                 //Taylor series cuz easy
                 //TODO: Profiling
                 //Note: Max 4 multiplications before overflow
 
-                radPiAngle %= FixedMath.One * 2;
+                theta = theta - FixedMath.TwoPi * FixedMath.Floor((theta + FixedMath.Pi) / FixedMath.TwoPi);
+                long thetaSquared = theta.Mul(theta);
 
-                long result = radPiAngle;
-
+                long result = theta;
+                const int shift = FixedMath.SHIFT_AMOUNT;
                 //2 shifts for 2 multiplications but there's a division so only 1 shift
-                long x = (radPiAngle * radPiAngle * radPiAngle) >> FixedMath.SHIFT_AMOUNT * 1;
+                long n = (theta * theta * theta) >> (shift * 1);
                 const long Factorial3 = 3 * 2 * FixedMath.One;
-                result -= x / Factorial3;
+                result -= n / Factorial3;
 
-                x *= x * x;
-                x >>= 2;
+                n *= thetaSquared;
+                n >>= shift;
                 const long Factorial5 = Factorial3 * 4 * 5;
-                result += x / Factorial5;
+                result += (n / Factorial5);
 
-                x *= x * x;
-                x >>= 2;
+                n *= thetaSquared;
+                n >>= shift;
                 const long Factorial7 = Factorial5 * 6 * 7;
-                result -=  x / Factorial7;
+                result -=  n / Factorial7;
 
-                x *= x * x;
-                x >>= 2;
+                #if true || HIGH_ACCURACY
+                //Required or there'll be .07 inaccuracy
+                n *= thetaSquared;
+                n >>= shift;
                 const long Factorial9 = Factorial7 * 8 * 9;
-                result +=  x / Factorial9;
-
+                result += n / Factorial9;
+                #endif
                 return result;
+            }
+            public static long Cos(long theta) {
+
+                return Sin (theta - FixedMath.Pi / 2);
+            }
+            public static long Tan (long theta) {
+                return Sin(theta).Div(Cos(theta));
             }
         }
     }
