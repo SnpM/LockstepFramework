@@ -333,7 +333,7 @@ namespace Lockstep
 
                 radPiAngle %= FixedMath.One * 2;
 
-                long result = x;
+                long result = radPiAngle;
 
                 //2 shifts for 2 multiplications but there's a division so only 1 shift
                 long x = (radPiAngle * radPiAngle * radPiAngle) >> FixedMath.SHIFT_AMOUNT * 1;
@@ -351,9 +351,11 @@ namespace Lockstep
                 result -=  x / Factorial7;
 
                 x *= x * x;
-                x >> 2;
+                x >>= 2;
                 const long Factorial9 = Factorial7 * 8 * 9;
                 result +=  x / Factorial9;
+
+                return result;
             }
         }
     }
