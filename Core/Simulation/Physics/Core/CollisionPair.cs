@@ -215,6 +215,10 @@ namespace Lockstep
 
         }
 
+        void DistributeCircle_Polygon (LSBody circle, LSBody poly){
+            
+        }
+
         public void CheckAndDistributeCollision()
         {
 
@@ -242,6 +246,9 @@ namespace Lockstep
 
                 }
                 DistributeCollision();
+                if (this.LeCollisionType == CollisionType.Circle_Polygon) {
+                    Debug.Log("a");
+                }
             } else
             {
                 if (IsColliding)
