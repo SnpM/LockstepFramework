@@ -16,7 +16,7 @@ namespace Lockstep
     public static class FixedMath
     {
         static FixedMath () {
-            Debug.Log(FixedMath.Trig.Sin(Pi).ToDouble());
+            Debug.Log(FixedMath.Trig.Cos(Pi).ToDouble());
         }
 
         #region Meta
@@ -376,7 +376,9 @@ namespace Lockstep
 
                 return Sin (theta - FixedMath.Pi / 2);
             }
-
+            public static long Tan (long theta) {
+                return Sin(theta).Div(Cos(theta));
+            }
         }
     }
 }
