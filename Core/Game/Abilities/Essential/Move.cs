@@ -9,13 +9,13 @@ namespace Lockstep
         public const long GroupDirectStop = FixedMath.One / 2;
         public const long DirectStop = FixedMath.One / 8;
         private const int MinimumOtherStopTime = (int)(LockstepManager.FrameRate / 4);
-        private const int repathRate = (int)LockstepManager.FrameRate * 3 / 4;
+        private const int repathRate = (int)LockstepManager.FrameRate * 4 / 4;
         private const int CollisionStopCount = LockstepManager.FrameRate * 2;
         private const long CollisionStopTreshold = FixedMath.One / 2;
 
         public int GridSize {get {return cachedBody.Radius <= FixedMath.One ?
                 (cachedBody.Radius * 2).CeilToInt() :
-                (cachedBody.Radius * 2).CeilToInt ()+ 1;}}
+                (cachedBody.Radius * 2).CeilToInt ();}}
                 
 
         public Vector2d Position { get { return cachedBody._position; } }
@@ -26,7 +26,7 @@ namespace Lockstep
 
         private int RepathRate
         {
-            get { return LSUtility.GetRandom(repathRate); }
+            get { return LSUtility.GetRandom(FixedMath.Create(repathRate).Div(this.Speed).CeilToInt()); }
         }
 
         private const int straightRepathRate = repathRate * 4;

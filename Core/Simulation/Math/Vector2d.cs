@@ -313,7 +313,7 @@ namespace Lockstep
         {
             return new Vector2d(Math.Sin(angle), Math.Cos(angle));
         }
-
+            
         #endregion
 
         #region Convert

@@ -310,7 +310,6 @@ namespace Lockstep
                     break;
             
                 case CollisionType.Circle_Polygon:
-                //Not supported
                     return false;
                     if (CheckCircle())
                     {
