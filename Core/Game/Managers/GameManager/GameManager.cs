@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-using TypeReferences;
 using System;
 using Lockstep.NetworkHelpers;
 

@@ -15,9 +15,6 @@ namespace Lockstep
 {
     public static class FixedMath
     {
-        static FixedMath () {
-            Debug.Log(FixedMath.Trig.Cos(Pi).ToDouble());
-        }
 
         #region Meta
 
