@@ -69,6 +69,18 @@ namespace Lockstep
 			return InfluenceManager.Scan (LocatedNode.ScanX, LocatedNode.ScanY, deltaCount,
 			                              this.Agent,targetAllegiance);
 		}
+
+		public LSAgent ScanCone (long radius, long angle,
+			AllegianceType targetAllegiance = AllAllegiance,
+			PlatformType targetPlatform = AllPlatforms)
+		{
+			InfluenceManager.Source = Agent;
+			InfluenceManager.TargetAllegiance = targetAllegiance;
+			InfluenceManager.TargetPlatform = targetPlatform;
+			return InfluenceManager.ScanCone (LocatedNode.ScanX, LocatedNode.ScanY, radius, angle,
+				this.Agent, targetAllegiance);
+		}
+
         const PlatformType AllPlatforms = (PlatformType)~0;
         const AllegianceType AllAllegiance = (AllegianceType)~0;
 	}

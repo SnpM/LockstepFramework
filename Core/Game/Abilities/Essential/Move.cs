@@ -119,7 +119,7 @@ namespace Lockstep
         private long _acceleration = FixedMath.One;
         public long Acceleration {get {return _acceleration;}}
         [SerializeField, UnityEngine.Serialization.FormerlySerializedAs ("Flying")]
-        private bool _canPathfind;
+        private bool _canPathfind = true;
         public bool CanPathfind {get; private set;}
 
         #endregion
