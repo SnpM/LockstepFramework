@@ -55,13 +55,14 @@ namespace Lockstep
                 {
                     id2 = ContainedObjects [k];
 
-
-                    pair = PhysicsManager.GetCollisionPair(id1, id2);
-                    if (System.Object.ReferenceEquals(null, pair) == false && (pair.PartitionVersion != Partition._Version))
-                    {
-                        pair.CheckAndDistributeCollision();
-                        pair.PartitionVersion = Partition._Version;
-							
+                    if (id1 != id2) {
+                        pair = PhysicsManager.GetCollisionPair(id1, id2);
+                        if (System.Object.ReferenceEquals(null, pair) == false && (pair.PartitionVersion != Partition._Version))
+                        {
+                            pair.CheckAndDistributeCollision();
+                            pair.PartitionVersion = Partition._Version;
+    							
+                        }
                     }
                 }
 				

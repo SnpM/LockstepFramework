@@ -204,8 +204,6 @@ namespace Lockstep
                             b1.SetVisuals();
 
                             b1.Visualize();
-
-
                         }
                     }
                     Simulated = false;
@@ -233,7 +231,6 @@ namespace Lockstep
 
         static int id;
         static LSBody other;
-
         internal static int Assimilate(LSBody body)
         {
             if (CachedIDs.Count > 0)
@@ -247,7 +244,6 @@ namespace Lockstep
             SimObjectExists [id] = true;
             SimObjects [id] = body;
 
-			
             AssimilatedCount++;
             return id;
         }

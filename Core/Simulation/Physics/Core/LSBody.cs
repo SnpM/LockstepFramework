@@ -565,6 +565,7 @@ namespace Lockstep
                 _rotation.Normalize();
                 RotationChangedBuffer = true;
                 RotationChanged = false;
+
                 this.SetVisualRotation = true;
             } else
             {
@@ -588,7 +589,7 @@ namespace Lockstep
 			
             if (this.SetVisualRotation)
             {
-                DoSetVisualRotation(_rotation);
+                this.DoSetVisualRotation(_rotation);
             }
         }
 
@@ -619,6 +620,7 @@ namespace Lockstep
             }
             if (this.SetVisualRotation)
             {
+                this.DoSetVisualRotation(_rotation);
             }
 
         }
@@ -636,31 +638,44 @@ namespace Lockstep
                     //Interpolates between the current position and the interpolation between the last lockstep position and the current lockstep position
                     //LerpTime = time passed since last simulation frame
                     //LerpDamping = special value calculated based on Time.deltaTime for the extra layer of interpolation
-                    _positionalTransform.position = Vector3.Lerp(_positionalTransform.position,
-                        Vector3.Lerp(lastVisualPos, _visualPosition, PhysicsManager.LerpTime),
-                        PhysicsManager.LerpDamping);
+                    _positionalTransform.position = 
+                        Vector3.Lerp(lastVisualPos, _visualPosition, PhysicsManager.LerpTime);
                 
                 }
             }
-            const float rotationLerpDamping = .5f;
+            const float rotationLerpDamping = 1f;
             if (CanSetVisualRotation)
             {
                 if (SetRotationBuffer)
                 {
                     _rotationalTransform.rotation =
-                    Quaternion.Lerp(
-                        _rotationalTransform.rotation,
-                        Quaternion.LerpUnclamped(lastVisualRot, visualRot, PhysicsManager.LerpTime),
-                        rotationLerpDamping
-                    );
+
+                            Quaternion.Lerp(lastVisualRot, visualRot, PhysicsManager.LerpTime);
+                    SetRotationBuffer = PhysicsManager.LerpTime < 1f;
+
                 }
             }
         }
 
         public void LerpOverReset()
         {
-            SetPositionBuffer = false;
-            SetRotationBuffer = false;
+            
+            if (CanSetVisualRotation)
+            {
+                if (SetRotationBuffer)
+                {
+                    _rotationalTransform.rotation = visualRot;
+                    SetRotationBuffer = false;
+                }
+            }
+            if (this.CanSetVisualPosition)
+            {
+                if (this.SetPositionBuffer)
+                {
+                    _positionalTransform.position = this._visualPosition;
+                    SetPositionBuffer = false;
+                }
+            }
         }
 
 	

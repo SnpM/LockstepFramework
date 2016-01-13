@@ -335,8 +335,12 @@ namespace Lockstep.Integration
     {
         public static void Draw(this SerializedProperty prop)
         {
+            if (prop.hasMultipleDifferentValues) {
+                EditorGUILayout.HelpBox("Fields with different values not multi-editable", UnityEditor.MessageType.None);
+                //TODO: Throw something like what default inspectors do
+                return;
+            }
             EditorGUILayout.PropertyField(prop, true);
-
         }
     }
 }
