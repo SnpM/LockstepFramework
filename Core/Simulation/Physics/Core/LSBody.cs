@@ -638,9 +638,8 @@ namespace Lockstep
                     //Interpolates between the current position and the interpolation between the last lockstep position and the current lockstep position
                     //LerpTime = time passed since last simulation frame
                     //LerpDamping = special value calculated based on Time.deltaTime for the extra layer of interpolation
-                    _positionalTransform.position = Vector3.Lerp(_positionalTransform.position,
-                        Vector3.Lerp(lastVisualPos, _visualPosition, PhysicsManager.LerpTime),
-                        PhysicsManager.LerpDamping);
+                    _positionalTransform.position = 
+                        Vector3.Lerp(lastVisualPos, _visualPosition, PhysicsManager.LerpTime);
                 
                 }
             }
@@ -650,11 +649,8 @@ namespace Lockstep
                 if (SetRotationBuffer)
                 {
                     _rotationalTransform.rotation =
-                    Quaternion.Lerp(
-                        _rotationalTransform.rotation,
-                            Quaternion.Lerp(lastVisualRot, visualRot, PhysicsManager.LerpTime),
-                        rotationLerpDamping
-                    );
+
+                            Quaternion.Lerp(lastVisualRot, visualRot, PhysicsManager.LerpTime);
                     SetRotationBuffer = PhysicsManager.LerpTime < 1f;
 
                 }
