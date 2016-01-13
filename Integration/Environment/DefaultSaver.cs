@@ -24,7 +24,6 @@ namespace Lockstep
 
         protected override void OnLateApply()
         {
-            Debug.Log("Applied");
             foreach (EnvironmentBodyInfo info in EnvironmentBodies) {
                 info.Body.Initialize(info.Position,info.Rotation);
             }
