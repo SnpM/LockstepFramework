@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Lockstep;
-
+using System.Collections.Generic;
 namespace Lockstep
 {
     public class DefaultSaver : EnvironmentSaver
@@ -20,13 +20,11 @@ namespace Lockstep
         }
 
         protected override void OnApply () {
-            foreach (EnvironmentObject obj in EnvironmentObjects) {
-                obj.Initialize();
-            }
         }
 
         protected override void OnLateApply()
         {
+            Debug.Log("Applied");
             foreach (EnvironmentBodyInfo info in EnvironmentBodies) {
                 info.Body.Initialize(info.Position,info.Rotation);
             }

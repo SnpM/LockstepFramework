@@ -29,6 +29,11 @@ namespace Lockstep
 
         public void Initialize(LSBody b1, LSBody b2)
         {
+
+            if (b1 == b2)
+            {
+                Debug.Log("boom: " + b1.ID + ", " + b2.ID);
+            }
             IsValid = PhysicsManager.RequireCollisionPair(b1, b2);
 
             PartitionVersion = 0;
@@ -106,8 +111,6 @@ namespace Lockstep
         private void DistributeCollision()
         {
 
-            if (Body1 == Body2)
-                Debug.Log("boom");
             if (Body1.OnContact.IsNotNull())
             {
                 Body1.OnContact(Body2);
