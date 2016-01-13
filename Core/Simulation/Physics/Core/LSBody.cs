@@ -565,6 +565,7 @@ namespace Lockstep
                 _rotation.Normalize();
                 RotationChangedBuffer = true;
                 RotationChanged = false;
+
                 this.SetVisualRotation = true;
             } else
             {
@@ -588,7 +589,7 @@ namespace Lockstep
 			
             if (this.SetVisualRotation)
             {
-                DoSetVisualRotation(_rotation);
+                this.DoSetVisualRotation(_rotation);
             }
         }
 
@@ -619,6 +620,7 @@ namespace Lockstep
             }
             if (this.SetVisualRotation)
             {
+                this.DoSetVisualRotation(_rotation);
             }
 
         }
@@ -642,7 +644,7 @@ namespace Lockstep
                 
                 }
             }
-            const float rotationLerpDamping = .5f;
+            const float rotationLerpDamping = 1f;
             if (CanSetVisualRotation)
             {
                 if (SetRotationBuffer)
@@ -650,17 +652,34 @@ namespace Lockstep
                     _rotationalTransform.rotation =
                     Quaternion.Lerp(
                         _rotationalTransform.rotation,
-                        Quaternion.LerpUnclamped(lastVisualRot, visualRot, PhysicsManager.LerpTime),
+                            Quaternion.Lerp(lastVisualRot, visualRot, PhysicsManager.LerpTime),
                         rotationLerpDamping
                     );
+                    SetRotationBuffer = PhysicsManager.LerpTime < 1f;
+
                 }
             }
         }
 
         public void LerpOverReset()
         {
-            SetPositionBuffer = false;
-            SetRotationBuffer = false;
+            
+            if (CanSetVisualRotation)
+            {
+                if (SetRotationBuffer)
+                {
+                    _rotationalTransform.rotation = visualRot;
+                    SetRotationBuffer = false;
+                }
+            }
+            if (this.CanSetVisualPosition)
+            {
+                if (this.SetPositionBuffer)
+                {
+                    _positionalTransform.position = this._visualPosition;
+                    SetPositionBuffer = false;
+                }
+            }
         }
 
 	

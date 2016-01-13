@@ -204,8 +204,6 @@ namespace Lockstep
                             b1.SetVisuals();
 
                             b1.Visualize();
-
-
                         }
                     }
                     Simulated = false;
