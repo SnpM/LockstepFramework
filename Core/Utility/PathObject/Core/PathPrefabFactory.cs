@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Lockstep.Agents;
+//Lockstep.Agents doesn't currently exist
+//using Lockstep.Agents;
 public static class PathObjectFactory {
     public static UnityEngine.Object Load (PathObject pathObject) {
         return Load(pathObject.Path);

@@ -21,14 +21,15 @@ namespace Lockstep.Example
 		protected override void OnExecute (Command com)
 		{
 			byte conID = com.ControllerID;
-            Vector2d pos = com.GetData<Vector2d>();
+            Vector2d pos = com.GetData<Vector2d>(0);
+            Vector2d rot = com.GetData<Vector2d>(1);
             ushort target = (ushort)com.GetData<DefaultData>(0).Value;
             ushort count = (ushort)com.GetData<DefaultData>(1).Value;
 
 			AgentController ac = AgentController.InstanceManagers [conID];
 			string agentCode = AgentController.GetAgentCode (target);
 			for (int i = 0; i < count; i++) {
-				ac.CreateAgent (agentCode, pos);
+				ac.CreateAgent (agentCode, pos, rot);
 			}
 		}
 	}
