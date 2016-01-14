@@ -108,9 +108,11 @@ namespace Lockstep
                 //Height changes require remapping
                 T[] newArray = new T[newWidth * newHeight];
 
-                for (int i = _width - 1; i >= 0; i--)
+                int minWidth = _width < newWidth ? _width : newWidth;
+                int minHeight = _height < newHeight ? _height : newHeight;
+                for (int i = minWidth - 1; i >= 0; i--)
                 {
-                    Array.Copy(_innerArray, i * _height, newArray, i * newHeight, Math.Min(_height, newHeight));
+                    Array.Copy(_innerArray, i * _height, newArray, i * newHeight, minHeight);
                 }
 
                 _innerArray = newArray;

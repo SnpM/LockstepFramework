@@ -7,11 +7,14 @@ namespace Lockstep.Extra
     public class EditorHeightmapHelper : Editor
     {
         SerializedProperty Size;
+        SerializedProperty BottomLeft;
+
         SerializedProperty HeightBounds;
 
         SerializedProperty Resolution;
         void GenerateProperties (SerializedObject so) {
             Size = so.FindProperty("_size");
+            BottomLeft = so.FindProperty("_bottomLeft");
             Resolution = so.FindProperty("_resolution");
             HeightBounds = so.FindProperty("_heightBounds");
 
@@ -24,8 +27,10 @@ namespace Lockstep.Extra
             SerializedObject so = new SerializedObject(hh);
             GenerateProperties (so);
             Size.Draw();
-            Resolution.Draw();
+            BottomLeft.Draw();
             HeightBounds.Draw();
+
+            Resolution.Draw();
 
             SerializedProperty Maps = so.FindProperty("_maps");
 
@@ -42,7 +47,7 @@ namespace Lockstep.Extra
                 HeightMap hm = hh.Maps[i];
 
                 if (GUILayout.Button("Scan")) {
-                    long[,] Scan = hh.Scan(hh.Maps[i].ScanLayers.value);
+                    short[,] Scan = hh.Scan(hh.Maps[i].ScanLayers.value);
                     hm.Map.LocalClone (Scan);
                 }
             }
