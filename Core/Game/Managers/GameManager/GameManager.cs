@@ -81,14 +81,18 @@ namespace Lockstep
             {
                 for (int i = 0; i < Helpers.Length; i++)
                 {
-                    output.Add(Helpers [i]);
+                    output.Add(Helpers[i]);
                 }
             }
         }
 
-        protected void Start()
+        protected virtual void Awake()
         {
             Instance = this;
+        }
+
+        protected void Start()
+        {
             LockstepManager.Initialize(this);
             this.Startup();
         }
