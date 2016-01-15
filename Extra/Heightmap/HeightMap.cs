@@ -14,7 +14,11 @@ namespace Lockstep
         public LayerMask ScanLayers {get {return _scanLayers;}}
 
         [SerializeField,HideInInspector]
-        private Short2D _map = new Short2D();
+        private Short2D _map;
         public Short2D Map {get {return _map;}}
+
+        public long GetHeight (int gridX, int gridY) {
+            return HeightmapHelper.Uncompress(_map[gridX,gridY]);
+        }
     }
 }

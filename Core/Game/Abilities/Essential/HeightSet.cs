@@ -10,7 +10,8 @@ namespace Lockstep
         protected override void OnSimulate()
         {
             if (Agent.Body.PositionChangedBuffer) {
-                this.Agent.Body.HeightPos = HeightmapHelper.Instance.GetHeight (MapIndex, Agent.Body.Position);
+                long height = HeightmapHelper.Instance.GetHeight (MapIndex, Agent.Body.Position) + FixedMath.One / 10;
+                Agent.Body.HeightPos = height;
             }
         }
     }

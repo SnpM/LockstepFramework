@@ -345,8 +345,8 @@ namespace Lockstep
             PositionChanged = true;
             RotationChanged = true;
             VelocityChanged = true;
-            PositionChangedBuffer = false;
-            RotationChangedBuffer = false;
+            PositionChangedBuffer = true;
+            RotationChangedBuffer = true;
 			
             Priority = _basePriority;
             Velocity = Vector2d.zero;

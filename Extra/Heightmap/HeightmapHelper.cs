@@ -2,11 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+
 namespace Lockstep
 {
     public class HeightmapHelper : BehaviourHelper
     {
-        public static HeightmapHelper Instance {get; private set;}
+        public static HeightmapHelper Instance { get; private set; }
 
         [SerializeField]
         private Vector2d _size = new Vector2d(100, 100);
@@ -82,30 +83,27 @@ namespace Lockstep
             Instance = this;
         }
 
-        public long GetHeight (int mapIndex, Vector2d position) {
-            HeightMap map = Maps[mapIndex];
-            int gridX = FixedMath.ToInt(position.x - this._bottomLeft.x);
-            int gridY = FixedMath.ToInt(position.y - this._bottomLeft.y);
-            long fractionX = position.x - FixedMath.Create(gridX);
-            long fractionY = position.y - FixedMath.Create(gridY);
+        public long GetHeight(int mapIndex, Vector2d position)
+        {
+            HeightMap map = Maps [mapIndex];
+            long normX = (position.x - this._bottomLeft.x).Div(Interval);
+            long normY = (position.y - this._bottomLeft.y).Div(Interval);
+            int gridX = FixedMath.ToInt(normX);
+            int gridY = FixedMath.ToInt(normY);
+            long fractionX = (normX - FixedMath.Create(gridX));
+            long fractionY = (normY - FixedMath.Create(gridY));
+            long baseHeight = map.GetHeight(gridX, gridY);
 
-            long baseHeight = map.Map[gridX,gridY];
-            long xHeight;
-            if (fractionX != 0) {
-                xHeight = map.Map[Mathf.Clamp(gridX + FixedMath.Sign(fractionX),0,map.Map.Width),gridY];
-            }
-            else {
-                xHeight = baseHeight;
-            }
-            long yHeight;
-            if (fractionY != 0) {
-                yHeight = map.Map[gridX,Mathf.Clamp(gridY + fractionY.Sign(),0,map.Map.Height)];
-            }
-            else {
-                yHeight = baseHeight;
-            }
+            int nextX = Mathf.Clamp(gridX + 1, 0, map.Map.Width);
 
-            return (xHeight + yHeight) >> 1;
+            int nextY = Mathf.Clamp(gridY + 1, 0, map.Map.Height);
+
+            //bilinear lerp
+            long h1 = FixedMath.Lerp(baseHeight, map.GetHeight(nextX, gridY), fractionX);
+            long h2 = FixedMath.Lerp(map.GetHeight(gridX, nextY), map.GetHeight(nextX, nextY), fractionX);
+            return FixedMath.Lerp(h1, h2, fractionY);
+
+            return baseHeight;
         }
 
         void OnDrawGizmos()
@@ -125,8 +123,8 @@ namespace Lockstep
                     drawPos.z = startPos.z;
                     for (int y = 0; y < map.Map.Height; y++)
                     {
-                        drawPos.y = Uncompress(map.Map [x, y]).ToFloat();
-                        Gizmos.DrawCube (drawPos,size);
+                        drawPos.y = map.GetHeight(x, y).ToFloat();
+                        Gizmos.DrawCube(drawPos, size);
                         drawPos.z += fRes;
                     }
                     drawPos.x += fRes;
@@ -145,7 +143,7 @@ namespace Lockstep
             terrain.transform.position = _bottomLeft.ToVector3(0);
         }
 */
-        public short Compress(long value)
+        public static short Compress(long value)
         {
             long compressed = value >> CompressionShift;
             if (compressed > short.MaxValue)
@@ -155,7 +153,7 @@ namespace Lockstep
             return (short)compressed;
         }
 
-        public long Uncompress(short compressed)
+        public static long Uncompress(short compressed)
         {
             return (long)(compressed << CompressionShift);
         }
