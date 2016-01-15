@@ -472,6 +472,7 @@ namespace Lockstep {
 		}
         public override bool GetSerializedFieldNames(List<string> output)
         {
+            return false;
             base.GetSerializedFieldNames(output);
             output.Add("_deathTime");
             output.Add("_boxPriority");
@@ -480,7 +481,7 @@ namespace Lockstep {
             output.Add("_statsBarOffset");
             output.Add("_visualCenter");
             output.Add("_globalID");
-			output.Add("_myAgentCode");
+			//output.Add("_myAgentCode");
             return true;
         }
 		/*protected override bool OnSerialize ()

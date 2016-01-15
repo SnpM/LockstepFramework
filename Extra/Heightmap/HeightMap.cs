@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Lockstep;
-namespace Lockstep.Extra
+namespace Lockstep
 {
     [System.Serializable]
     public class HeightMap

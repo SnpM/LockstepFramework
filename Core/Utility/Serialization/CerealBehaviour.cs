@@ -47,8 +47,5 @@ namespace Lockstep
 
 	}
 
-#if UNITY_EDITOR
-	
 
-#endif
 }

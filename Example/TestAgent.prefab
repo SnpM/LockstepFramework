@@ -12,6 +12,7 @@ GameObject:
   - 114: {fileID: 11485440}
   - 114: {fileID: 11439568}
   - 114: {fileID: 11425566}
+  - 114: {fileID: 11406140}
   m_Layer: 0
   m_Name: TestAgent
   m_TagString: Untagged
@@ -171,6 +172,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &11406140
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f42d52091a614957912ec7da50c9027, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapIndex: 0
 --- !u!114 &11425566
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -185,10 +198,11 @@ MonoBehaviour:
   Destination:
     x: 0
     y: 0
-  CanMove: 1
-  Speed: 196608
-  Acceleration: 65536
-  Flying: 0
+  _canMove: 1
+  _canTurn: 1
+  _speed: 262144
+  _acceleration: 65536
+  _canPathfind: 0
   DrawPath: 1
 --- !u!114 &11439568
 MonoBehaviour:
@@ -267,7 +281,6 @@ MonoBehaviour:
   _halfHeight: 0
   _radius: 32112
   _immovable: 0
-  Immovable: 0
   _basePriority: 0
   _vertices: []
   _height: 65536

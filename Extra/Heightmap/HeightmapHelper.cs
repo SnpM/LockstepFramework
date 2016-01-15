@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
-namespace Lockstep.Extra
+using System;
+namespace Lockstep
 {
     public class HeightmapHelper : BehaviourHelper
     {
+        public static HeightmapHelper Instance {get; private set;}
+
         [SerializeField]
         private Vector2d _size = new Vector2d(100, 100);
 
@@ -73,6 +75,37 @@ namespace Lockstep.Extra
             }
 
             return heightMap;
+        }
+
+        protected override void OnInitialize()
+        {
+            Instance = this;
+        }
+
+        public long GetHeight (int mapIndex, Vector2d position) {
+            HeightMap map = Maps[mapIndex];
+            int gridX = FixedMath.ToInt(position.x - this._bottomLeft.x);
+            int gridY = FixedMath.ToInt(position.y - this._bottomLeft.y);
+            long fractionX = position.x - FixedMath.Create(gridX);
+            long fractionY = position.y - FixedMath.Create(gridY);
+
+            long baseHeight = map.Map[gridX,gridY];
+            long xHeight;
+            if (fractionX != 0) {
+                xHeight = map.Map[Mathf.Clamp(gridX + FixedMath.Sign(fractionX),0,map.Map.Width),gridY];
+            }
+            else {
+                xHeight = baseHeight;
+            }
+            long yHeight;
+            if (fractionY != 0) {
+                yHeight = map.Map[gridX,Mathf.Clamp(gridY + fractionY.Sign(),0,map.Map.Height)];
+            }
+            else {
+                yHeight = baseHeight;
+            }
+
+            return (xHeight + yHeight) >> 1;
         }
 
         void OnDrawGizmos()
