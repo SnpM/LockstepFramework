@@ -11,13 +11,13 @@ namespace Lockstep.Extra
 
         SerializedProperty HeightBounds;
 
-        SerializedProperty Resolution;
+        SerializedProperty Interval;
+
         void GenerateProperties (SerializedObject so) {
             Size = so.FindProperty("_size");
             BottomLeft = so.FindProperty("_bottomLeft");
-            Resolution = so.FindProperty("_resolution");
+            Interval = so.FindProperty("_interval");
             HeightBounds = so.FindProperty("_heightBounds");
-
         }
         public override void OnInspectorGUI()
         {
@@ -30,8 +30,10 @@ namespace Lockstep.Extra
             BottomLeft.Draw();
             HeightBounds.Draw();
 
-            Resolution.Draw();
+            Interval.Draw();
 
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Maps",EditorStyles.boldLabel);
             SerializedProperty Maps = so.FindProperty("_maps");
 
             int size = EditorGUILayout.IntField ("Map Count", Maps.arraySize);
@@ -51,6 +53,11 @@ namespace Lockstep.Extra
                     hm.Map.LocalClone (Scan);
                 }
             }
+
+            EditorGUILayout.Space();
+
+            so.ApplyModifiedProperties();
+
             EditorUtility.SetDirty(hh);
         }
     }
