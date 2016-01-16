@@ -5,6 +5,6 @@ namespace Lockstep
     {
         Timed,
         Seeking,
-        Positional
+        Free
     }
 }
