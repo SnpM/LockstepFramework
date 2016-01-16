@@ -600,11 +600,12 @@ namespace Lockstep
                     }
                     break;
                 case TargetingType.Free:
+                    
                     Vector2d nextPosition = this.Position + this.Velocity;
                     HitBodies.FastClear();
-                    foreach (LSBody body in Raycaster.RaycastAll(this.Position,nextPosition,CurrentHeight,this.HeightSpeed)) {
+                    foreach (LSBody body in Raycaster.RaycastAll(this.Position,nextPosition,CurrentHeight,this.Slope)) {
                         if (body.ID != Source.Body.ID)
-                        HitBodies.Add(body);
+                            HitBodies.Add(body);
                     }
                     if (HitBodies.Count > 0)
                         Hit ();
