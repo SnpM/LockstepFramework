@@ -10,7 +10,6 @@ namespace Lockstep
     public abstract class GameManager : MonoBehaviour
     {
 
-        [SerializeField]
         BehaviourHelper[] _helpers;
 
         BehaviourHelper[] Helpers { get { return _helpers; } }

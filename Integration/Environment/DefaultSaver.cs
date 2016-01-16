@@ -20,6 +20,9 @@ namespace Lockstep
         }
 
         protected override void OnApply () {
+            foreach (EnvironmentObject obj in EnvironmentObjects) {
+                obj.Initialize();
+            }
         }
 
         protected override void OnLateApply()
@@ -27,6 +30,7 @@ namespace Lockstep
             foreach (EnvironmentBodyInfo info in EnvironmentBodies) {
                 info.Body.Initialize(info.Position,info.Rotation);
             }
+
             foreach (EnvironmentObject obj in EnvironmentObjects) {
                 obj.LateInitialize();
             }

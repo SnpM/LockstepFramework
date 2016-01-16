@@ -9,7 +9,7 @@ namespace Lockstep
     /// </summary>
     public class Array2D<T>
     {
-        [SerializeField]
+        [SerializeField,HideInInspector]
         private int _width = 0;
 
         public int Width
@@ -20,7 +20,7 @@ namespace Lockstep
             }
         }
 
-        [SerializeField]
+        [SerializeField,HideInInspector]
         public int _height = 0;
 
         public int Height
@@ -31,25 +31,33 @@ namespace Lockstep
             }
         }
 
-        [SerializeField]
+        [SerializeField,HideInInspector]
         private T[] _innerArray = new T[0];
 
         public T[] InnerArray { get { return _innerArray; } }
 
         private T StartVal;
 
+        public Array2D () : this(0,0){
+
+        }
+
         public Array2D(int width, int height, T startVal) : this(width, height)
         {
             StartVal = startVal;
         }
 
-        public Array2D(int width, int height)
+        public Array2D (int width, int height) {
+            this.Initialize (width,height);
+        }
+
+        private void Initialize (int width, int height)
         {
             _innerArray = new T[width * height];
             _width = width;
             _height = height;
         }
-
+            
         public T this [int w, int h]
         {
             get
@@ -74,6 +82,24 @@ namespace Lockstep
             }
         }
 
+        public static Array2D<T> Clone (T[,] source) {
+            Array2D<T> array = new Array2D<T>(source.GetLength(0),source.GetLength(1));
+            for (int i = 0; i < array.Width; i++) {
+                for (int j = 0; j < array.Height; j++) {
+                    array[i,j] = source[i,j];
+                }
+            }
+            return array;
+        }
+
+        public void LocalClone (T[,] source) {
+            this.Resize(source.GetLength(0), source.GetLength(1));
+            for (int i = 0; i < Width; i++) {
+                for (int j = 0; j < Height; j++) {
+                    this[i,j] = source[i,j];
+                }
+            }
+        }
 
         public void Resize(int newWidth, int newHeight)
         {
@@ -82,9 +108,11 @@ namespace Lockstep
                 //Height changes require remapping
                 T[] newArray = new T[newWidth * newHeight];
 
-                for (int i = _width - 1; i >= 0; i--)
+                int minWidth = _width < newWidth ? _width : newWidth;
+                int minHeight = _height < newHeight ? _height : newHeight;
+                for (int i = minWidth - 1; i >= 0; i--)
                 {
-                    Array.Copy(_innerArray, i * _height, newArray, i * newHeight, Math.Min(_height, newHeight));
+                    Array.Copy(_innerArray, i * _height, newArray, i * newHeight, minHeight);
                 }
 
                 _innerArray = newArray;
@@ -155,6 +183,16 @@ namespace Lockstep
         private int GetIndex(int w, int h)
         {
             return w * this._height + h;
+        }
+
+        public T[,] ToArray () {
+            T[,] array = new T[Width,Height];
+            for (int i = 0; i < Width; i++) {
+                for (int j = 0; j < Height; j++) {
+                    array[i,j] = this[i,j];
+                }
+            }
+            return array;
         }
 
     }
