@@ -77,7 +77,7 @@ MonoBehaviour:
   Position:
     x: 0
     y: 0
-  _speed: 327680
+  _speed: 524288
   CurrentHeight: 0
   _delay: 0
   _attachEndEffectToTarget: 0
@@ -100,7 +100,15 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: _speed
+      value: 524288
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _targetingBehavior
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 167620}

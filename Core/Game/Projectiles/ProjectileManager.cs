@@ -80,7 +80,6 @@ namespace Lockstep {
 
         public static LSProjectile Create (string projCode, LSAgent source, Vector2dHeight projectileOffset, Action<LSAgent> hit)
 		{
-
 			FastStack<LSProjectile> pool = ProjectilePool[projCode];
 			if (pool.Count > 0)
 			{

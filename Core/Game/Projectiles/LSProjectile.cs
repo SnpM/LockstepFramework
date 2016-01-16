@@ -44,15 +44,17 @@ namespace Lockstep
 		
         public long CurrentHeight;
 		
-        private Vector2d TargetVelocity {get; set;}
+        private Vector2d Velocity {get; set;}
 		
-		
+        private Vector2d Direction {get; set;}
+        private long Slope {get; set;}
         private Vector2d lastDirection;
 		
         private long speedPerFrame;
 				
         private long HeightSpeed;
 		
+
 				
         [SerializeField]
         private int _delay;
@@ -200,7 +202,7 @@ namespace Lockstep
             get;
             set;
         }
-
+            
         public long Speed
 		{ get; set; }
 
@@ -326,12 +328,10 @@ namespace Lockstep
         private void SetupCachedActions()
         {
             AllButFriendlyAction = AllButFriendly;
-            DealDamageAction = DealDamage;
         }
 
         public Func<LSAgent,bool> AllButFriendlyAction { get; private set; }
 
-        public Action<LSAgent> DealDamageAction { get; private set; }
 
         public bool AllButFriendly(LSAgent other)
         {
@@ -367,14 +367,9 @@ namespace Lockstep
             return IsExclusiveTarget(AgentTag) ? Damage.Mul(this.ExclusiveDamageModifier) : Damage;
         }
 
-        private void DealDamage(LSAgent agent)
-        {
-            agent.Healther.TakeProjectile(this);
-        }
-
         private void Hit()
         {
-            if (this.HitBehavior == HitType.Single && this.Target.SpawnVersion != this.TargetVersion)
+            if (this.TargetingBehavior == TargetingType.Homing && this.HitBehavior == HitType.Single && this.Target.SpawnVersion != this.TargetVersion)
             {
                 ProjectileManager.EndProjectile(this);
                 return;
@@ -410,6 +405,9 @@ namespace Lockstep
         }
 
         internal void Prepare (int id, LSAgent source, Vector2dHeight projectileOffset, Action<LSAgent> hitEffect) {
+            this.IsActive = true;
+            this.cachedGameObject.SetActiveIfNot(true);
+
             this.Source = source;
             this.ResetVariables();
 
@@ -428,11 +426,9 @@ namespace Lockstep
         public void InitializeHoming (LSAgent target)
         {
             this.HeightReached = false;
-            this.IsActive = true;
             this.Target = target;
             this.TargetVersion = this.Target.SpawnVersion;
             this.SourceVersion = this.Source.SpawnVersion;
-            this.cachedGameObject.SetActiveIfNot(true);
 
             this.TargetPosition = this.Target.Body._position;
             this.TargetHeight = this.Target.Body.HeightPos;
@@ -442,8 +438,9 @@ namespace Lockstep
             this.Delay = frameTime;
         }
 
-        public void InitializeFree (Vector2d velocity) {
-            this.TargetVelocity = velocity;
+        public void InitializeFree (Vector2d direction, long slope) {
+            this.Direction = direction;
+            this.Slope = slope;
         }
 
         public void LateInit()
@@ -468,18 +465,15 @@ namespace Lockstep
                         this.CountDown = this.Delay;
                     }
                     break;
-                case TargetingType.Seeking:
+                case TargetingType.Homing:
 
                     break;
                 case TargetingType.Free:
-                    long heightDif = this.TargetHeight - this.CurrentHeight;
-                    this.HeightSpeed = heightDif.Div(timeToHit) / LockstepManager.FrameRate;
-                    this.TargetVelocity = this.TargetPosition - this.Position;
-                    this.TargetVelocity.Normalize();
-                    this.TargetVelocity *= this.speedPerFrame;
+                    this.Velocity = this.Direction * this.speedPerFrame;
+                    this.HeightSpeed = this.Slope.Mul(this.speedPerFrame);
                     if (this.CanRotate)
                     {
-                        this.cachedTransform.LookAt(this.TargetPosition.ToVector3(this.TargetHeight));
+                        //this.cachedTransform.LookAt();
                     }
                     break;
             }
@@ -492,17 +486,24 @@ namespace Lockstep
 
         private void OnHit()
         {
-            switch (this.HitBehavior)
-            {
-                case HitType.Single:
-                    this.DealDamage(Target);
-                    break;
-                case HitType.Area:
-                    ApplyArea(this.TargetPosition, this.Radius, this.DealDamageAction);
-                    break;
-                case HitType.Cone:
-                    ApplyCone(this.Position, this.Source.Body._rotation, this.Radius, this.Angle, DealDamageAction, this.TargetPlatform);
-                    break;
+            if (this.TargetingBehavior == TargetingType.Free) {
+                for (int i = 0; i < this.HitBodies.Count; i++) {
+                    this.HitBodies[i].TestFlash();
+                }
+            }
+            else {
+                switch (this.HitBehavior)
+                {
+                    case HitType.Single:
+                        this.HitEffect(Target);
+                        break;
+                    case HitType.Area:
+                        ApplyArea(this.TargetPosition, this.Radius, this.HitEffect);
+                        break;
+                    case HitType.Cone:
+                        ApplyCone(this.Position, this.Source.Body._rotation, this.Radius, this.Angle, this.HitEffect, this.TargetPlatform);
+                        break;
+                }
             }
         }
 
@@ -521,7 +522,7 @@ namespace Lockstep
         private void ResetHelpers()
         {
             this.lastDirection = Vector2d.zero;
-            this.TargetVelocity = Vector2d.zero;
+            this.Velocity = Vector2d.zero;
         }
 
         private void ResetTargeting()
@@ -548,7 +549,6 @@ namespace Lockstep
 
         public void Setup(ProjectileDataItem dataItem)
         {
-            SetupCachedActions();
             this.SpawnVersion = 1u;
             this.MyData = dataItem;
             this.MyProjCode = dataItem.Name;
@@ -560,7 +560,7 @@ namespace Lockstep
                 this.onSetup.Invoke();
             }
         }
-
+        private FastList<LSBody> HitBodies = new FastList<LSBody>();
         public void Simulate()
         {
             this.AliveTime++;
@@ -578,7 +578,7 @@ namespace Lockstep
                         this.Hit();
                     }
                     break;
-                case TargetingType.Seeking:
+                case TargetingType.Homing:
                     if (this.CheckCollision())
                     {
                         this.TargetPosition = this.Target.Body._position;
@@ -600,16 +600,21 @@ namespace Lockstep
                     }
                     break;
                 case TargetingType.Free:
-                    this.Position += this.TargetVelocity;
-                    this.CurrentHeight += this.CurrentHeight;
-                    LSProjectile.tempDirection = this.TargetPosition - this.Position;
-                    if (this.TargetVelocity.Dot(LSProjectile.tempDirection.x, LSProjectile.tempDirection.y) < 0L)
-                    {
-                        this.Hit();
+                    Vector2d nextPosition = this.Position + this.Velocity;
+                    HitBodies.FastClear();
+                    foreach (LSBody body in Raycaster.RaycastAll(this.Position,nextPosition,CurrentHeight,this.HeightSpeed)) {
+                        if (body.ID != Source.Body.ID)
+                        HitBodies.Add(body);
                     }
+                    if (HitBodies.Count > 0)
+                        Hit ();
+                    this.Position = nextPosition;
+                    this.CurrentHeight += this.HeightSpeed;
+
                     break;
             }
         }
+
 
         public void Visualize()
         {

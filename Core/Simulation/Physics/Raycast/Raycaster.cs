@@ -51,6 +51,7 @@ namespace Lockstep
 
         public static IEnumerable<LSBody> RaycastAll(Vector2d start, Vector2d end, long startHeight, long heightSlope)
         {
+            //TODO: return bodies based on hit order
             foreach (LSBody body in RaycastAll(start,end))
             {
                 if (Conditional == null || Conditional())
