@@ -12,7 +12,7 @@ namespace Lockstep
 {
     public sealed class LSProjectile : CerealBehaviour
     {
-        private const long Gravity = FixedMath.One * 98/10;
+        private const long Gravity = FixedMath.One * 98 / 10;
         //
         // Static Fields
         //
@@ -43,11 +43,13 @@ namespace Lockstep
         private int CountDown;
 		
         public long CurrentHeight;
-		
-        private Vector2d Velocity {get; set;}
-		
-        private Vector2d Direction {get; set;}
-        private long Slope {get; set;}
+
+        private Vector2d Velocity { get; set; }
+
+        private Vector2d Direction { get; set; }
+
+        private long Slope { get; set; }
+
         private Vector2d lastDirection;
 		
         private long speedPerFrame;
@@ -104,7 +106,7 @@ namespace Lockstep
         private HitType _hitBehavior;
 
         public HitType HitBehavior { get { return _hitBehavior; } }
-		
+
         [SerializeField]
         private long _angle = 32768L;
 		
@@ -128,7 +130,7 @@ namespace Lockstep
             get;
             set;
         }
-		
+
         public long Damage{ get; set; }
 
         public int Delay{ get; set; }
@@ -202,7 +204,7 @@ namespace Lockstep
             get;
             set;
         }
-            
+
         public long Speed
 		{ get; set; }
 
@@ -244,7 +246,7 @@ namespace Lockstep
             set;
         }
 
-        private Action<LSAgent> HitEffect {get; set;}
+        private Action<LSAgent> HitEffect { get; set; }
 
         public int GetStateHash()
         {
@@ -404,7 +406,8 @@ namespace Lockstep
             ProjectileManager.EndProjectile(this);
         }
 
-        internal void Prepare (int id, LSAgent source, Vector2dHeight projectileOffset, Action<LSAgent> hitEffect) {
+        internal void Prepare(int id, LSAgent source, Vector2dHeight projectileOffset, Action<LSAgent> hitEffect)
+        {
             this.IsActive = true;
             this.cachedGameObject.SetActiveIfNot(true);
 
@@ -423,7 +426,7 @@ namespace Lockstep
             this.AliveTime = 0;
         }
 
-        public void InitializeHoming (LSAgent target)
+        public void InitializeHoming(LSAgent target)
         {
             this.HeightReached = false;
             this.Target = target;
@@ -434,11 +437,13 @@ namespace Lockstep
             this.TargetHeight = this.Target.Body.HeightPos;
         }
 
-        public void InitializeTimed (int frameTime) {
+        public void InitializeTimed(int frameTime)
+        {
             this.Delay = frameTime;
         }
 
-        public void InitializeFree (Vector2d direction, long slope) {
+        public void InitializeFree(Vector2d direction, long slope)
+        {
             this.Direction = direction;
             this.Slope = slope;
         }
@@ -486,12 +491,16 @@ namespace Lockstep
 
         private void OnHit()
         {
-            if (this.TargetingBehavior == TargetingType.Free) {
-                for (int i = 0; i < this.HitBodies.Count; i++) {
-                    this.HitBodies[i].TestFlash();
+            if (this.TargetingBehavior == TargetingType.Free)
+            {
+                switch (this.HitBehavior)
+                {
+                    case HitType.Single:
+                        this.HitBodies [0].TestFlash();
+                        break;
                 }
-            }
-            else {
+            } else
+            {
                 switch (this.HitBehavior)
                 {
                     case HitType.Single:
@@ -560,7 +569,9 @@ namespace Lockstep
                 this.onSetup.Invoke();
             }
         }
+
         private FastList<LSBody> HitBodies = new FastList<LSBody>();
+
         public void Simulate()
         {
             this.AliveTime++;
@@ -603,12 +614,13 @@ namespace Lockstep
                     
                     Vector2d nextPosition = this.Position + this.Velocity;
                     HitBodies.FastClear();
-                    foreach (LSBody body in Raycaster.RaycastAll(this.Position,nextPosition,CurrentHeight,this.Slope)) {
+                    foreach (LSBody body in Raycaster.RaycastAll(this.Position,nextPosition,CurrentHeight,this.Slope))
+                    {
                         if (body.ID != Source.Body.ID)
                             HitBodies.Add(body);
                     }
                     if (HitBodies.Count > 0)
-                        Hit ();
+                        Hit();
                     this.Position = nextPosition;
                     this.CurrentHeight += this.HeightSpeed;
 
