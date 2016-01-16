@@ -74,7 +74,7 @@ namespace Lockstep
 
 
         private LSBody cachedBody {get; set;}
-        private Turn cachedTurn {get; set;}
+        private Turn CachedTurn {get; set;}
 
         public long timescaledSpeed
         {
@@ -128,8 +128,8 @@ namespace Lockstep
         {
             cachedBody = Agent.Body;
             cachedBody.OnContact += HandleCollision;
-            cachedTurn = Agent.Turner;
-            CanTurn = _canTurn && cachedTurn != null;
+            CachedTurn = Agent.Turner;
+            CanTurn = _canTurn && CachedTurn != null;
             collisionStopTreshold = FixedMath.Mul(timescaledSpeed, CollisionStopTreshold);
             collisionStopTreshold *= collisionStopTreshold;
             timescaledAcceleration = Acceleration * 32 / LockstepManager.FrameRate;
@@ -293,7 +293,7 @@ namespace Lockstep
                     {
                         lastMovementDirection = movementDirection;
                         if (CanTurn)
-                        cachedTurn.StartTurnRaw(movementDirection);
+                        CachedTurn.StartTurnRaw(movementDirection);
                     }
                 } else
                 {
@@ -421,7 +421,7 @@ namespace Lockstep
             } else
             {
                 if (CanTurn)
-                cachedTurn.TurnDirection(destination - cachedBody._position);
+                CachedTurn.TurnDirection(destination - cachedBody._position);
                 Agent.SetState(AnimState.Moving);
                 hasPath = false;
                 straightPath = false;

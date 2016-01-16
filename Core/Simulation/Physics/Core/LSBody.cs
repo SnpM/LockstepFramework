@@ -22,7 +22,6 @@ namespace Lockstep
         internal long _heightPos;
         [SerializeField]
         public Vector2d _velocity;
-
         #endregion
 
         #region Lockstep variables
@@ -104,6 +103,7 @@ namespace Lockstep
 
         public Vector2d LastPosition { get; private set; }
 
+        internal uint RaycastVersion {get; set;}
         #endregion
 
         internal Vector3 _visualPosition;
@@ -231,7 +231,8 @@ namespace Lockstep
         [SerializeField, FixedNumber]
         private long _height = FixedMath.One;
 
-        public long Height { get { return _height; } }
+        [Lockstep (true)]
+        public long Height {get; private set;}
 
         [SerializeField]
         private Transform _positionalTransform;
@@ -290,6 +291,8 @@ namespace Lockstep
             }
             Agent = agent;
             Setted = true;
+
+            Height = _height;
         }
 
         public void GeneratePoints()
@@ -339,8 +342,10 @@ namespace Lockstep
             {
                 this.Setup(null);
             }
-            CheckVariables();
+            this.RaycastVersion = 0;
 
+
+            CheckVariables();
 
             PositionChanged = true;
             RotationChanged = true;
@@ -780,8 +785,30 @@ namespace Lockstep
                     return position.x + FixedMath.Half >= this.XMin && position.x - FixedMath.Half <= this.XMax
                     && position.y + FixedMath.Half >= this.YMin && position.y - FixedMath.Half <= this.YMax;
                     break;
+                case ColliderType.Polygon:
+                    for (int i = this.EdgeNorms.Length - 1; i >= 0; i--) {
+                        Vector2d norm = this.EdgeNorms[i];
+                        long posProj = norm.Dot(position);
+                        long polyMin, polyMax;
+                        CollisionPair.ProjectPolygon(norm.x,norm.y,this,out polyMin, out polyMax);
+                        if (posProj >= polyMin && posProj <= polyMax) {
+
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                    return true;
+                    break;
             }
+
+
             return false;
+        }
+
+        public void SetHeight (long newHeight) {
+            Height = newHeight;
+            this.HeightPosChanged = true;
         }
 
         void Reset()
