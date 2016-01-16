@@ -91,10 +91,28 @@ namespace Lockstep
             Instance = this;
         }
 
-        protected void Start()
+        protected virtual void Start()
         {
             LockstepManager.Initialize(this);
             this.Startup();
+        }
+
+        protected virtual void OnEnable()
+        {
+
+        }
+
+        bool Quited = false;
+        protected virtual void OnDisable()
+        {
+            if (Quited) return;
+            LockstepManager.Deactivate();
+        }
+
+        protected virtual void OnApplicationQuit()
+        {
+            Quited = true;
+            LockstepManager.Quit();
         }
 
         protected virtual void Startup()
@@ -161,18 +179,6 @@ namespace Lockstep
         protected virtual void OnGameStart()
         {
             //When the game starts (first simulation frame)
-        }
-        bool Quited = false;
-        void OnDisable ()
-        {
-            if (Quited) return;
-            LockstepManager.Deactivate();
-        }
-
-        void OnApplicationQuit()
-        {
-            Quited = true;
-            LockstepManager.Quit();
         }
 
     }
