@@ -112,7 +112,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dec4a4a401f4b46549f998a79b200433, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _environmentBodies: []
+  _environmentBodies:
+  - Body: {fileID: 0}
+    Position:
+      _x: -83741
+      _y: -83249
+      _height: 22937
+    Rotation:
+      x: 0
+      y: 65536
   _environmentObjects: []
 --- !u!4 &357143950
 Transform:
@@ -267,8 +275,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1096407068}
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071067}
-  m_LocalPosition: {x: 0, y: 50, z: 0}
+  m_LocalRotation: {x: 0.6427877, y: 0, z: 0, w: 0.7660444}
+  m_LocalPosition: {x: 0, y: 40, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -531,9 +539,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 465e861767b9e445eafba76f21bd0dd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _helpers: []
   _spawnCode: TestAgent
-  _spawnAmount: 1
+  _spawnAmount: 2
 --- !u!4 &1811928844
 Transform:
   m_ObjectHideFlags: 0
@@ -710,7 +717,7 @@ Prefab:
       objectReference: {fileID: 357143949}
     - target: {fileID: 11455526, guid: 4314638711d1a4b3e897b98c105b4ed4, type: 2}
       propertyPath: _spawnAmount
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 11491364, guid: 4314638711d1a4b3e897b98c105b4ed4, type: 2}

@@ -30,6 +30,12 @@ namespace Lockstep
             _height = 0;
         }
 
+        public Vector2dHeight (long x,long y, long height) {
+            this._x = x;
+            this._y = y;
+            this._height = height;
+        }
+
 		public Vector2dHeight (Vector3 vec3) {
 			_x = FixedMath.Create (vec3.x);
 			_y = FixedMath.Create (vec3.z);

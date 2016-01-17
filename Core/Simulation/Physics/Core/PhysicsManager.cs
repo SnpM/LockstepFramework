@@ -88,6 +88,7 @@ namespace Lockstep
 
         public static void Initialize()
         {
+            Raycaster._Version = 0;
             PeakCount = 0;
 
             CachedIDs.FastClear();

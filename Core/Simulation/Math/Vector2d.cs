@@ -245,6 +245,10 @@ namespace Lockstep
             return (this.x * otherY - this.y * otherX) >> FixedMath.SHIFT_AMOUNT;
         }
 
+        public long Cross (Vector2d vec) {
+            return Cross (vec.x,vec.y);
+        }
+
         static long temp1;
         static long temp2;
         static long temp3;

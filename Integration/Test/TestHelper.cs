@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 namespace Lockstep {
     public class TestHelper : BehaviourHelper{  
-        protected override void OnInitialize () {
+        protected override void OnLateInitialize () {
             ClientManager.NetworkHelper.OnTestData += HandleOnTestData;
         }
         Dictionary<int,List<int>> frameHashes = new Dictionary<int, List<int>>();

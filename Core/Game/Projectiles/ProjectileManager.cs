@@ -78,9 +78,8 @@ namespace Lockstep {
 		}
 
 
-        public static LSProjectile Create (string projCode, LSAgent source, LSAgent target, long damage)
+        public static LSProjectile Create (string projCode, LSAgent source, Vector2dHeight projectileOffset, Action<LSAgent> hit)
 		{
-
 			FastStack<LSProjectile> pool = ProjectilePool[projCode];
 			if (pool.Count > 0)
 			{
@@ -92,8 +91,7 @@ namespace Lockstep {
 			int id = GenerateID ();
 			ProjectileBucket[id] = curProj;
 			ProjectileActive[id] = true;
-			curProj.Initialize (id, source,target);
-			curProj.Damage = damage;
+			curProj.Prepare (id, source, projectileOffset, hit);
 			return curProj;
 		}
 		public static void Fire (LSProjectile projectile)

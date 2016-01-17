@@ -5,7 +5,7 @@ namespace Lockstep
 {
     public sealed class GridSettingsSaver : EnvironmentSaver
     {
-        [SerializeField, HideInInspector]
+        [SerializeField]
         private Vector2d _mapCenter;
         public Vector2d Offset {
             get 
@@ -28,7 +28,7 @@ namespace Lockstep
 
         protected override void OnSave()
         {
-            this._mapCenter = new Vector2d(transform.position);
+            //this._mapCenter = new Vector2d(transform.position);
         }
         protected override void OnApply()
         {

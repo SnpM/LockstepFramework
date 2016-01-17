@@ -17,8 +17,8 @@ namespace Lockstep.Integration
             so.PropertyField("_targetingBehavior");
             TargetingType targetingBehavior = (TargetingType) so.FindProperty("_targetingBehavior").enumValueIndex;
             switch (targetingBehavior) {
-                case TargetingType.Positional:
-                case TargetingType.Seeking:
+                case TargetingType.Free:
+                case TargetingType.Homing:
                     so.PropertyField("_speed");
                     break;
                 case TargetingType.Timed:
@@ -29,16 +29,16 @@ namespace Lockstep.Integration
             
             //Damage
             EditorGUILayout.LabelField ("Damage Settings", EditorStyles.boldLabel);
-            so.PropertyField("_damageBehavior");
-            switch ((DamageType)so.FindProperty("_damageBehavior").enumValueIndex) {
-                case DamageType.Cone:
+            so.PropertyField("_hitBehavior");
+            switch ((HitType)so.FindProperty("_hitBehavior").enumValueIndex) {
+                case HitType.Cone:
                     so.PropertyField("_angle");
                     break;
-                case DamageType.Area:
+                case HitType.Area:
                     so.PropertyField("_radius"); 
                     break;
                     
-                case DamageType.Single:
+                case HitType.Single:
                     
                     break;
             }
@@ -46,19 +46,7 @@ namespace Lockstep.Integration
             
             //Trajectory
             EditorGUILayout.LabelField ("Trajectory Settings", EditorStyles.boldLabel);
-            so.PropertyField("_trajectoryBehavior");
-            TrajectoryType trajectoryBehavior = (TrajectoryType)so.FindProperty("_trajectoryBehavior").enumValueIndex;
-            switch (trajectoryBehavior) {
-                case TrajectoryType.Linear:
-                    
-                    break;
-                case TrajectoryType.Interpolated:
-                    so.PropertyField("_interpolationRate");
-                    break;
-                case TrajectoryType.Arc:
-                    so.PropertyField("_arcHeight");
-                    break;
-            }
+
             EditorGUILayout.Space ();
             
             //Visuals

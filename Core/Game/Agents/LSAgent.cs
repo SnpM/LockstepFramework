@@ -114,7 +114,7 @@ namespace Lockstep {
         //TODO: Put all this stuff in an extendible class
         public LSInfluencer Influencer { get; private set; }
 		public Health Healther { get {return abilityManager.Healther;} }
-		public Scan Scanner { get {return abilityManager.Scanner;} }
+		//public Scan Scanner { get {return abilityManager.Scanner;} }
 		public Move Mover { get {return abilityManager.Mover;} }
 		public Turn Turner {get {return abilityManager.Turner;}}
 		public StatsBar StatsBarer{get; private set;}
