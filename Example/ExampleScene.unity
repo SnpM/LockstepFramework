@@ -112,7 +112,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dec4a4a401f4b46549f998a79b200433, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _environmentBodies: []
+  _environmentBodies:
+  - Body: {fileID: 0}
+    Position:
+      _x: -83741
+      _y: -83249
+      _height: 22937
+    Rotation:
+      x: 0
+      y: 65536
   _environmentObjects: []
 --- !u!4 &357143950
 Transform:

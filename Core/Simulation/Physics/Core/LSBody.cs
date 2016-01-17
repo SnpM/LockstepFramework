@@ -150,6 +150,7 @@ namespace Lockstep
 
         private FastBucket<LSBody> Children;
         public Vector2d[] RealPoints;
+        public Vector2d[] Edges;
         public Vector2d[] EdgeNorms;
 
         
@@ -295,6 +296,9 @@ namespace Lockstep
             Height = _height;
         }
 
+        private bool OutMoreThanSet {get; set;}
+        public bool OutMoreThan {get; private set;}
+
         public void GeneratePoints()
         {
             if (Shape != ColliderType.Polygon)
@@ -303,6 +307,7 @@ namespace Lockstep
             }
             RotatedPoints = new Vector2d[Vertices.Length];
             RealPoints = new Vector2d[Vertices.Length];
+            Edges = new Vector2d[Vertices.Length];
             EdgeNorms = new Vector2d[Vertices.Length];
         }
 
@@ -420,20 +425,23 @@ namespace Lockstep
                 {
                     RotatedPoints [i] = Vertices [i];
                     RotatedPoints [i].RotateInverse(_rotation.x, _rotation.y);
-					
-                    EdgeNorms [i] = RotatedPoints [i];
-                    if (i == 0)
-                    {
-                        EdgeNorms [i].Subtract(ref RotatedPoints [VertLength - 1]);
-                    } else
-                    {
-                        EdgeNorms [i].Subtract(ref RotatedPoints [i - 1]);
-                    }
-                    EdgeNorms [i].Normalize();
-                    EdgeNorms [i].RotateRight();
+                }
+                for (int i = VertLength - 1; i >= 0; i--) {
+                    int nextIndex = i + 1 < VertLength ? i + 1 : 0;
+                    Vector2d point = RotatedPoints[nextIndex];
+                    point.Subtract(ref RotatedPoints[i]);
+                    point.Normalize();
+                    Edges[i] = point;
+                    point.RotateRight();
+                    EdgeNorms [i] = point;
+                }
+                if (!OutMoreThanSet) {
+                    OutMoreThanSet = true;
+                    long dot = Edges[0].Cross(Edges[1]);
+                    this.OutMoreThan = dot < 0;
                 }
             }
-            for (int i = 0; i < Vertices.Length; i++)
+            for (int i = 0; i < VertLength; i++)
             {
                 RealPoints [i].x = RotatedPoints [i].x + _position.x;
                 RealPoints [i].y = RotatedPoints [i].y + _position.y;

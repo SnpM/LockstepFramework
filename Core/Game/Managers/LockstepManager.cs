@@ -116,6 +116,9 @@ namespace Lockstep
                 Loaded = true;
             }
 
+            InitializeHelpers();
+
+
             DefaultMessageRaiser.EarlyInitialize();
             SimulationTimer.Stop();
             SimulationTimer.Reset();
@@ -152,11 +155,10 @@ namespace Lockstep
             InfluenceManager.Initialize();
             ProjectileManager.Initialize();
 
-			InitializeHelpers();
-
             DefaultMessageRaiser.LateInitialize();
-            BehaviourHelperManager.LateInitialize();
             MainGameManager.MainInterfacingHelper.LateInitialize();
+
+            BehaviourHelperManager.LateInitialize();
         }
 
         static void InitializeHelpers()
