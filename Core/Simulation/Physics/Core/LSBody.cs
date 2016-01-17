@@ -868,13 +868,16 @@ namespace Lockstep
             }
             flashRoutines.Clear();
 
+
             Renderer ren = this.GetComponentInChildren<Renderer>();
+
+            if (ren != null) {
             Color col = Color.white;
             ren.material.color = Color.red;
             yield return null;
             yield return new WaitForSeconds(.08f);
             ren.material.color = col;
-
+            }
             yield break;
         }
     }
