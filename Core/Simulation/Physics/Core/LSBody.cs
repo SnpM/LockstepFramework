@@ -349,6 +349,7 @@ namespace Lockstep
             }
             this.RaycastVersion = 0;
 
+            this.HeightPosChanged = true;
 
             CheckVariables();
 
@@ -864,6 +865,7 @@ namespace Lockstep
         {
             foreach (UnityEngine.Coroutine co in flashRoutines)
             {
+                if (co != null)
                 base.StopCoroutine(co);
             }
             flashRoutines.Clear();
