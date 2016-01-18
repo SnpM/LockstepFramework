@@ -173,8 +173,8 @@ namespace Lockstep.Integration
             if (shape == ColliderType.Circle)
             {
                 //Minus so the move handle doesn't end up on the same axis as the transform.position move handle
-                Radius.longValue =
-                    FixedMath.Create(
+                float oldRadius = Radius.longValue.ToFloat();
+                float newRadius =
                     Mathf.Abs(
                         (Handles.FreeMoveHandle(
                             new Vector3(targetPos.x - Radius.longValue.ToFloat(), targetPos.y, targetPos.z)
@@ -182,8 +182,11 @@ namespace Lockstep.Integration
                             MoveHandleSize,
                             Vector3.zero,
                             Handles.SphereCap))
-                            .x - targetPos.x) 
-                );
+                    .x - targetPos.x);
+                if (Mathf.Abs(oldRadius - newRadius) >= .02f) {
+                    Radius.longValue = FixedMath.Create(newRadius);
+                }
+                
                 Handles.DrawLine(targetPos, new Vector3(targetPos.x + Radius.longValue.ToFloat(), targetPos.y, targetPos.z));
                 float baseHeight = targetPos.y;
                 for (int i = spreadMin; i <= spreadMax; i++)
@@ -205,28 +208,32 @@ namespace Lockstep.Integration
 
             } else if (shape == ColliderType.AABox)
             {
-                HalfWidth.longValue =
-                    FixedMath.Create(
-                    (double)Mathf.Abs(
+                float oldWidth = HalfWidth.longValue.ToFloat();
+                float newWidth =
+                    Mathf.Abs(
                         Handles.FreeMoveHandle(
                             new Vector3(targetPos.x - (float)HalfWidth.longValue.ToFormattedDouble(), targetPos.y, targetPos.z),
                             Quaternion.identity,
                             MoveHandleSize,
                             Vector3.zero,
                             dragCap)
-                            .x - targetPos.x)
-                );
-                HalfHeight.longValue =
-                    FixedMath.Create(
-                    (double)System.Math.Abs(
+                        .x - targetPos.x);
+                if (Mathf.Abs(newWidth - oldWidth) >= .02f) {
+                    HalfWidth.longValue = FixedMath.Create(newWidth);
+                }
+                float oldHeight = HalfHeight.longValue.ToFloat();
+                float newHeight = 
+                    System.Math.Abs(
                         Handles.FreeMoveHandle(
                             new Vector3(targetPos.x, targetPos.y, targetPos.z - (float)HalfHeight.longValue.ToFormattedDouble()),
                             Quaternion.identity,
                             MoveHandleSize,
                             Vector3.zero,
                             dragCap)
-                            .z - targetPos.z)
-                );
+                        .z - targetPos.z);
+                if (Mathf.Abs(newHeight - oldHeight) >= .02f) {
+                    HalfHeight.longValue = FixedMath.Create(newHeight);
+                }
                 float halfWidth = HalfWidth.longValue.ToFloat();
                 float halfHeight = HalfHeight.longValue.ToFloat();
                 for (int i = 0; i < 1; i++)
@@ -318,6 +325,7 @@ namespace Lockstep.Integration
             Vector3 movePos = targetPos;
             movePos.x += xModifier;
             movePos.y += (float)Height.longValue.ToFormattedDouble();
+            Vector3 lastMovePos = movePos;
             movePos = 
                 Handles.FreeMoveHandle(
                 movePos,
@@ -326,6 +334,7 @@ namespace Lockstep.Integration
                 Vector3.zero,
                 dragCap
             );
+            if ((lastMovePos- movePos).sqrMagnitude >= .1f)
             Height.longValue = FixedMath.Create(Mathf.Max(Mathf.Abs(movePos.y - targetPos.y)));
             so.ApplyModifiedProperties();
         }
