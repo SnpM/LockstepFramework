@@ -13,10 +13,10 @@ namespace Lockstep
 
         public static AbilityInterfacer CurrentInterfacer
         {
-            get { return _currentInterfacer;}
+            get { return _currentInterfacer; }
             set
             {
-                if (value .IsNotNull())
+                if (value.IsNotNull())
                 {
                     IsGathering = true;
                 }
@@ -31,17 +31,18 @@ namespace Lockstep
 
         static void Setup()
         {
-            QuickPos = AbilityInterfacer.FindInterfacer ("Move");
+            QuickPos = AbilityInterfacer.FindInterfacer("Move");
             QuickTarget = AbilityInterfacer.FindInterfacer("Scan");
 
             Setted = true;
         }
+
         static bool Setted = false;
 
         protected override void OnInitialize()
         {
             if (!Setted)
-                Setup ();
+                Setup();
             SelectionManager.Initialize();
 
             RTSInterfacing.Initialize();
@@ -50,6 +51,7 @@ namespace Lockstep
         }
 
         static Command curCom;
+
         protected override void OnVisualize()
         {
             SelectionManager.Update();
@@ -71,20 +73,21 @@ namespace Lockstep
                 }
             } else
             {
-                if (Selector.MainSelectedAgent != null) {
-                    if (Input.GetMouseButtonDown(1))
+                if (Selector.MainSelectedAgent != null)
                 {
-                    LSAgent target;
-                    if (RTSInterfacing.MousedAgent.IsNotNull() &&
-                        PlayerManager.GetAllegiance(RTSInterfacing.MousedAgent) == AllegianceType.Enemy && 
-                        Selector.MainSelectedAgent.Scanner != null)
+                    if (Input.GetMouseButtonDown(1))
                     {
-                        ProcessInterfacer((QuickTarget));
-                    } else
-                    {
-                        ProcessInterfacer((QuickPos));
+                        LSAgent target;
+                        if (RTSInterfacing.MousedAgent.IsNotNull() &&
+                        /*PlayerManager.GetAllegiance(RTSInterfacing.MousedAgent) == AllegianceType.Enemy &&*/ 
+                        Selector.MainSelectedAgent.GetAbility<Scan>() != null)
+                        {
+                            ProcessInterfacer((QuickTarget));
+                        } else
+                        {
+                            ProcessInterfacer((QuickPos));
+                        }
                     }
-                }
                 }
             }
         }
@@ -95,23 +98,23 @@ namespace Lockstep
             {
                 case InformationGatherType.Position:
                     curCom = new Command(facer.ListenInputID);
-                    curCom.Add<Vector2d> ( RTSInterfacing.GetWorldPosD(Input.mousePosition));
+                    curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
                     break;
                 case InformationGatherType.Target:
                     curCom = new Command(facer.ListenInputID);
-                    if (RTSInterfacing.MousedAgent .IsNotNull())
+                    if (RTSInterfacing.MousedAgent.IsNotNull())
                     {
-                        curCom.SetData<DefaultData> (new DefaultData(DataType.UShort,RTSInterfacing.MousedAgent.LocalID));
+                        curCom.SetData<DefaultData>(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.LocalID));
                     }
                     break;
                 case InformationGatherType.PositionOrTarget:
                     curCom = new Command(facer.ListenInputID);
-                    if (RTSInterfacing.MousedAgent .IsNotNull())
+                    if (RTSInterfacing.MousedAgent.IsNotNull())
                     {
-                        curCom.Add<DefaultData> (new DefaultData(DataType.UShort,RTSInterfacing.MousedAgent.GlobalID));
+                        curCom.Add<DefaultData>(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.GlobalID));
                     } else
                     {
-                        curCom.Add<Vector2d> (RTSInterfacing.GetWorldPosD(Input.mousePosition));
+                        curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
                     }
                     break;
                 case InformationGatherType.None:
@@ -122,13 +125,16 @@ namespace Lockstep
             Send(curCom);
         }
 
-        public void DrawGUI () {
+        public void DrawGUI()
+        {
 
         }
-        protected virtual void OnDrawGUI () {
+
+        protected virtual void OnDrawGUI()
+        {
             SelectionManager.DrawBox(GUIStyle.none);
         }
-        
+
         private static void Send(Command com)
         {
             IsGathering = false;

@@ -12,6 +12,9 @@ GameObject:
   - 114: {fileID: 11485440}
   - 114: {fileID: 11439568}
   - 114: {fileID: 11425566}
+  - 114: {fileID: 11406140}
+  - 114: {fileID: 11479720}
+  - 114: {fileID: 11447240}
   m_Layer: 0
   m_Name: TestAgent
   m_TagString: Untagged
@@ -28,7 +31,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 450234}
   - 33: {fileID: 3360344}
-  - 135: {fileID: 13529482}
   - 23: {fileID: 2300012}
   m_Layer: 0
   m_Name: Sphere
@@ -74,7 +76,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 137230}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 422538}
@@ -87,7 +89,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100310}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 17.79, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 450234}
@@ -103,7 +105,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: b30447a543b0c4e6b9494c581702fd8c, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -129,7 +131,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: b30447a543b0c4e6b9494c581702fd8c, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -171,6 +173,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &11406140
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f42d52091a614957912ec7da50c9027, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapIndex: 0
 --- !u!114 &11425566
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -185,10 +199,11 @@ MonoBehaviour:
   Destination:
     x: 0
     y: 0
-  CanMove: 1
-  Speed: 196608
-  Acceleration: 65536
-  Flying: 0
+  _canMove: 1
+  _canTurn: 1
+  _speed: 131072
+  _acceleration: 65536
+  _canPathfind: 0
   DrawPath: 1
 --- !u!114 &11439568
 MonoBehaviour:
@@ -206,6 +221,44 @@ MonoBehaviour:
     _sin: 12785
     _angle: 11.25
     _timescaled: 1
+--- !u!114 &11447240
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc61d323ede6e5c4e934b394d3ec5080, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealth: 65536000
+--- !u!114 &11479720
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4525e3f8c8889d43a4d23626ea32d54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _projectileCode: TestBullet
+  _range: 786432
+  _sight: 655360
+  _damage: 65536
+  _attackRate: 32
+  _targetAllegiance: 4
+  _targetPlatform: 4
+  _trackAttackAngle: 1
+  _attackAngle: 11380
+  _projectileOffset:
+    _x: 0
+    _y: 0
+    _height: 0
+  _energyCost: 0
+  _projectileOrigin: {x: 0, y: 0, z: 0}
 --- !u!114 &11485440
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -255,6 +308,7 @@ MonoBehaviour:
     x: 0
     y: 0
   RealPoints: []
+  Edges: []
   EdgeNorms: []
   PastGridXMin: 0
   PastGridXMax: 0
@@ -267,24 +321,11 @@ MonoBehaviour:
   _halfHeight: 0
   _radius: 32112
   _immovable: 0
-  Immovable: 0
   _basePriority: 0
   _vertices: []
   _height: 65536
   _positionalTransform: {fileID: 465378}
   _rotationalTransform: {fileID: 465378}
---- !u!135 &13529482
-SphereCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 137230}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -412,6 +453,18 @@ Prefab:
       propertyPath: _rotationalTransform
       value: 
       objectReference: {fileID: 465378}
+    - target: {fileID: 0}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _speed
+      value: 32768
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _range
+      value: 786432
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 100310}

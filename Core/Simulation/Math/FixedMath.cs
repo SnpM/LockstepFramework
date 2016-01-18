@@ -191,10 +191,7 @@ namespace Lockstep
             return n << (SHIFT_AMOUNT / 2);
         }
 
-        public static long SinToCos(long sin)
-        {
-            return Sqrt(FixedMath.One - (sin.Mul( sin)).Normalized());
-        }
+
 
         public static long Normalized(this long f1)
         {
@@ -233,6 +230,8 @@ namespace Lockstep
             return ((f1 + FixedMath.Half - 1) >> SHIFT_AMOUNT) << SHIFT_AMOUNT;
         }
 
+
+
         /// <summary>
         /// Ceil the specified fixed point number.
         /// </summary>
@@ -264,7 +263,11 @@ namespace Lockstep
         {
             return f1 >= f2 ? f1 : f2;
         }
-
+        public static long Clamp (this long f1, long min, long max) {
+            if (f1 < min) return min;
+            if (f1 > max) return max;
+            return f1;
+        }
         public static double ToFormattedDouble(this long f1)
         {
             return Math.Round(FixedMath.ToDouble(f1), 2, MidpointRounding.AwayFromZero);
@@ -278,6 +281,14 @@ namespace Lockstep
         #endregion
 
         #region Convert
+        public static int Sign (this long f1) {
+            if (f1 > 0)
+                return 1;
+            else if (f1 == 0)
+                return 0;
+            else
+                return -1;
+        }
 
         public static int ToInt(this long f1)
         {
@@ -372,6 +383,10 @@ namespace Lockstep
             public static long Cos(long theta) {
 
                 return Sin (theta - FixedMath.Pi / 2);
+            }
+            public static long SinToCos(long sin)
+            {
+                return Sqrt(FixedMath.One - (sin.Mul( sin)).Normalized());
             }
             public static long Tan (long theta) {
                 return Sin(theta).Div(Cos(theta));

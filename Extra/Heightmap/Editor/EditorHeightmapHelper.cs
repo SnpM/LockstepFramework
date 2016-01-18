@@ -7,14 +7,17 @@ namespace Lockstep.Extra
     public class EditorHeightmapHelper : Editor
     {
         SerializedProperty Size;
+        SerializedProperty BottomLeft;
+
         SerializedProperty HeightBounds;
 
-        SerializedProperty Resolution;
+        SerializedProperty Interval;
+
         void GenerateProperties (SerializedObject so) {
             Size = so.FindProperty("_size");
-            Resolution = so.FindProperty("_resolution");
+            BottomLeft = so.FindProperty("_bottomLeft");
+            Interval = so.FindProperty("_interval");
             HeightBounds = so.FindProperty("_heightBounds");
-
         }
         public override void OnInspectorGUI()
         {
@@ -24,9 +27,13 @@ namespace Lockstep.Extra
             SerializedObject so = new SerializedObject(hh);
             GenerateProperties (so);
             Size.Draw();
-            Resolution.Draw();
+            BottomLeft.Draw();
             HeightBounds.Draw();
 
+            Interval.Draw();
+
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Maps",EditorStyles.boldLabel);
             SerializedProperty Maps = so.FindProperty("_maps");
 
             int size = EditorGUILayout.IntField ("Map Count", Maps.arraySize);
@@ -42,10 +49,15 @@ namespace Lockstep.Extra
                 HeightMap hm = hh.Maps[i];
 
                 if (GUILayout.Button("Scan")) {
-                    long[,] Scan = hh.Scan(hh.Maps[i].ScanLayers.value);
+                    short[,] Scan = hh.Scan(hh.Maps[i].ScanLayers.value);
                     hm.Map.LocalClone (Scan);
                 }
             }
+
+            EditorGUILayout.Space();
+
+            so.ApplyModifiedProperties();
+
             EditorUtility.SetDirty(hh);
         }
     }

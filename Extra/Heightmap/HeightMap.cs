@@ -1,20 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Lockstep;
-namespace Lockstep.Extra
+namespace Lockstep
 {
     [System.Serializable]
     public class HeightMap
     {
-        public HeightMap (long[,] map) {
-            _map = (Long2D)Long2D.Clone(map);
+        public HeightMap (short[,] map) {
+            _map = (Short2D)Short2D.Clone(map);
         }
         [SerializeField]
         private LayerMask _scanLayers;
         public LayerMask ScanLayers {get {return _scanLayers;}}
 
         [SerializeField,HideInInspector]
-        private Long2D _map = new Long2D();
-        public Long2D Map {get {return _map;}}
+        private Short2D _map;
+        public Short2D Map {get {return _map;}}
+
+        public long GetHeight (int gridX, int gridY) {
+            return HeightmapHelper.Uncompress(_map[gridX,gridY]);
+        }
     }
 }

@@ -6,6 +6,7 @@ namespace Lockstep {
     public class AbilityManager {
 
 		static FastList<ActiveAbility> setupActives = new FastList<ActiveAbility>();
+        //TODO: Get rid of this mess
 		public Health Healther {get; private set;}
 		public Scan Scanner {get; private set;}
 		public Move Mover {get; private set;}
@@ -36,6 +37,9 @@ namespace Lockstep {
 
             for (int i = 0; i < Abilitys.Length; i++) {
                 Abilitys[i].Setup(agent, i);
+            }
+            for (int i = 0; i < Abilitys.Length; i++) {
+                Abilitys[i].LateSetup();
             }
 			for (int i = 0; i < ActiveAbilitys.Length; i++)
 			{
