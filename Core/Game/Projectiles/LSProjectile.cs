@@ -447,7 +447,7 @@ namespace Lockstep
             this.Delay = frameTime;
         }
 
-        public void InitializeFree(Vector2d direction, long slope)
+        public void InitializeFree(Vector2d direction, long slope, bool useGravity = false)
         {
             this.Direction = direction;
             this.Slope = slope;

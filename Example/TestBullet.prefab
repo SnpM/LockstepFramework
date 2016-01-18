@@ -77,7 +77,7 @@ MonoBehaviour:
   Position:
     x: 0
     y: 0
-  _speed: 524288
+  _speed: 1048576
   CurrentHeight: 0
   _visualArc: 1
   _delay: 0
@@ -104,7 +104,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 0}
       propertyPath: _speed
-      value: 524288
+      value: 1048576
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: _targetingBehavior
