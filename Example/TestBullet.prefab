@@ -79,6 +79,7 @@ MonoBehaviour:
     y: 0
   _speed: 524288
   CurrentHeight: 0
+  _visualArc: 1
   _delay: 0
   _attachEndEffectToTarget: 0
   _endEffect: 
@@ -107,6 +108,10 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: _targetingBehavior
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _visualArc
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

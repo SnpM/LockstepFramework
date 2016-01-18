@@ -245,7 +245,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _projectileCode: TestBullet
-  _range: 393216
+  _range: 786432
   _sight: 655360
   _damage: 65536
   _attackRate: 32
@@ -308,6 +308,7 @@ MonoBehaviour:
     x: 0
     y: 0
   RealPoints: []
+  Edges: []
   EdgeNorms: []
   PastGridXMin: 0
   PastGridXMax: 0
@@ -459,6 +460,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: _speed
       value: 32768
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _range
+      value: 786432
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

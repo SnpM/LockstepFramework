@@ -56,12 +56,12 @@ namespace Lockstep
 				
         private long HeightSpeed;
 		
-		private float arcStartVerticalSpeed;
+        private long arcStartVerticalSpeed;
 
-		private float arcStartHeight;
+        private long arcStartHeight;
 
-		[SerializeField]
-		private bool _visualArc;
+        [SerializeField]
+        private bool _visualArc;
 				
         [SerializeField]
         private int _delay;
@@ -94,7 +94,7 @@ namespace Lockstep
         public bool CanVisualize { get { return _canVisualize; } }
 
         [SerializeField]
-        private float _interpolationRate = 8f;
+        private long _interpolationRate = FixedMath.One * 8;
 
         [SerializeField]
         private AgentTag _exclusiveTargetType;
@@ -172,7 +172,7 @@ namespace Lockstep
             private set;
         }
 
-        public float InterpolationRate
+        public long InterpolationRate
         {
             get;
             set;
@@ -476,9 +476,11 @@ namespace Lockstep
                     }
                     break;
                 case TargetingType.Homing:
-					this.arcStartHeight = this.CurrentHeight;
-					float visualTimeToHit = f.ToFloat () / this.Speed.ToFloat ();
-					this.arcStartVerticalSpeed = (this.TargetHeight - this.CurrentHeight) / visualTimeToHit - -9.8f * visualTimeToHit;
+                  
+                    if (this._visualArc) {
+                        this.arcStartHeight = this.CurrentHeight;
+                        this.arcStartVerticalSpeed = (this.TargetHeight - this.CurrentHeight).Div(timeToHit) + timeToHit.Mul(Gravity);
+                    }
                     break;
                 case TargetingType.Free:
                     this.Velocity = this.Direction * this.speedPerFrame;
@@ -597,6 +599,11 @@ namespace Lockstep
                     }
                     break;
                 case TargetingType.Homing:
+                    if (this._visualArc) {
+                        long progress = FixedMath.Create(this.AliveTime) / 32;
+                        long height = this.arcStartHeight + this.arcStartVerticalSpeed.Mul(progress) - Gravity.Mul(progress.Mul(progress));
+                        this.CurrentHeight = height;
+                    }
                     if (this.CheckCollision())
                     {
                         this.TargetPosition = this.Target.Body._position;
@@ -642,17 +649,10 @@ namespace Lockstep
             {
                 if (this.CanVisualize)
                 {
-					if (this.TargetingBehavior == TargetingType.Homing && _visualArc)
-					{
-						float num = (float)this.AliveTime / 32f;
-						float height = this.arcStartHeight + num * this.arcStartVerticalSpeed + -9.8f * num * num;
-						LSProjectile.newPos = this.Position.ToVector3(height);
-						this.cachedTransform.position = LSProjectile.newPos;
-					} else
-					{
-                    	LSProjectile.newPos = this.Position.ToVector3(this.CurrentHeight.ToFloat());
-                    	this.cachedTransform.position = LSProjectile.newPos;
-					}
+
+                    LSProjectile.newPos = this.Position.ToVector3(this.CurrentHeight.ToFloat());
+                    this.cachedTransform.position = LSProjectile.newPos;
+					
                 }
                 if (this.onVisualize.IsNotNull())
                 {
