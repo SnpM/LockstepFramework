@@ -71,6 +71,11 @@ namespace Lockstep {
 			return PlayerManager.GetAllegiance (agent.Controller);
 		}
 
+        /// <summary>
+        /// Sends the command for all AgentControllers under the control of this PlayerManager...
+        /// Mainly for shared control capabilities
+        /// </summary>
+        /// <param name="com">COM.</param>
 		public static void SendCommand (Command com)
 		{
             com.Add<Selection>( new Selection ());

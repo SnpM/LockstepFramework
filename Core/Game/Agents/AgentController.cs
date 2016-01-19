@@ -291,16 +291,10 @@ namespace Lockstep
             }
         }
 
+        //Backward compat.
         public static Command GenerateSpawnCommand(AgentController cont, string agentCode, int count, Vector2d position)
         {
-			Command com = new Command (InputCodeManager.GetCodeID ("Spawn"));
-            com.ControllerID = cont.ControllerID;
-            com.Add<Vector2d>(position);
-
-            com.Add<DefaultData>(new DefaultData(DataType.UShort,(ushort)AgentController.GetAgentCodeIndex(agentCode)));
-            com.Add<DefaultData>(new DefaultData(DataType.UShort,(ushort)count));
-            return com;
-
+            return Lockstep.Example.ExampleSpawner.GenerateSpawnCommand(cont,agentCode,count,position);
         }
 
         public LSAgent CreateAgent(
