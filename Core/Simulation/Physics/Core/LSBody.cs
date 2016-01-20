@@ -22,11 +22,20 @@ namespace Lockstep
         internal long _heightPos;
         [SerializeField]
         public Vector2d _velocity;
-
         #endregion
 
         #region Lockstep variables
-
+        private bool ForwardNeedsSet;
+        private Vector2d _forward;
+        public Vector2d Forward {
+            get {
+                if (ForwardNeedsSet) {
+                    _forward = _rotation.ToDirection();
+                    ForwardNeedsSet = false;
+                }
+                return _forward;
+            }
+        }
         [Lockstep]
         public bool PositionChanged { get; set; }
 
@@ -55,6 +64,8 @@ namespace Lockstep
             }
             set
             {
+                if (value)
+                    ForwardNeedsSet = true;
                 _rotationChanged = value;
             }
         }
@@ -104,6 +115,7 @@ namespace Lockstep
 
         public Vector2d LastPosition { get; private set; }
 
+        internal uint RaycastVersion {get; set;}
         #endregion
 
         internal Vector3 _visualPosition;
@@ -150,6 +162,7 @@ namespace Lockstep
 
         private FastBucket<LSBody> Children;
         public Vector2d[] RealPoints;
+        public Vector2d[] Edges;
         public Vector2d[] EdgeNorms;
 
         
@@ -231,7 +244,8 @@ namespace Lockstep
         [SerializeField, FixedNumber]
         private long _height = FixedMath.One;
 
-        public long Height { get { return _height; } }
+        [Lockstep (true)]
+        public long Height {get; private set;}
 
         [SerializeField]
         private Transform _positionalTransform;
@@ -290,7 +304,12 @@ namespace Lockstep
             }
             Agent = agent;
             Setted = true;
+
+            Height = _height;
         }
+
+        private bool OutMoreThanSet {get; set;}
+        public bool OutMoreThan {get; private set;}
 
         public void GeneratePoints()
         {
@@ -300,6 +319,7 @@ namespace Lockstep
             }
             RotatedPoints = new Vector2d[Vertices.Length];
             RealPoints = new Vector2d[Vertices.Length];
+            Edges = new Vector2d[Vertices.Length];
             EdgeNorms = new Vector2d[Vertices.Length];
         }
 
@@ -339,14 +359,17 @@ namespace Lockstep
             {
                 this.Setup(null);
             }
-            CheckVariables();
+            this.RaycastVersion = 0;
 
+            this.HeightPosChanged = true;
+
+            CheckVariables();
 
             PositionChanged = true;
             RotationChanged = true;
             VelocityChanged = true;
-            PositionChangedBuffer = false;
-            RotationChangedBuffer = false;
+            PositionChangedBuffer = true;
+            RotationChangedBuffer = true;
 			
             Priority = _basePriority;
             Velocity = Vector2d.zero;
@@ -354,6 +377,7 @@ namespace Lockstep
             LastPosition = _position = StartPosition.ToVector2d();
             _heightPos = StartPosition.Height;
             _rotation = StartRotation;
+            ForwardNeedsSet = true;
 
             XMin = 0;
             XMax = 0;
@@ -387,7 +411,7 @@ namespace Lockstep
             if (_rotationalTransform != null)
             {
                 CanSetVisualRotation = true;
-                visualRot = Quaternion.LookRotation(_rotation.ToVector3(0f));
+                visualRot = Quaternion.LookRotation(Forward.ToVector3(0f));
                 lastVisualRot = visualRot;
                 _rotationalTransform.rotation = visualRot;
             } else
@@ -414,21 +438,24 @@ namespace Lockstep
                 for (int i = 0; i < VertLength; i++)
                 {
                     RotatedPoints [i] = Vertices [i];
-                    RotatedPoints [i].RotateInverse(_rotation.x, _rotation.y);
-					
-                    EdgeNorms [i] = RotatedPoints [i];
-                    if (i == 0)
-                    {
-                        EdgeNorms [i].Subtract(ref RotatedPoints [VertLength - 1]);
-                    } else
-                    {
-                        EdgeNorms [i].Subtract(ref RotatedPoints [i - 1]);
-                    }
-                    EdgeNorms [i].Normalize();
-                    EdgeNorms [i].RotateRight();
+                    RotatedPoints [i].Rotate(_rotation.x, _rotation.y);
+                }
+                for (int i = VertLength - 1; i >= 0; i--) {
+                    int nextIndex = i + 1 < VertLength ? i + 1 : 0;
+                    Vector2d point = RotatedPoints[nextIndex];
+                    point.Subtract(ref RotatedPoints[i]);
+                    point.Normalize();
+                    Edges[i] = point;
+                    point.RotateRight();
+                    EdgeNorms [i] = point;
+                }
+                if (!OutMoreThanSet) {
+                    OutMoreThanSet = true;
+                    long dot = Edges[0].Cross(Edges[1]);
+                    this.OutMoreThan = dot < 0;
                 }
             }
-            for (int i = 0; i < Vertices.Length; i++)
+            for (int i = 0; i < VertLength; i++)
             {
                 RealPoints [i].x = RotatedPoints [i].x + _position.x;
                 RealPoints [i].y = RotatedPoints [i].y + _position.y;
@@ -560,12 +587,9 @@ namespace Lockstep
 			
             if (RotationChanged)
             {
-				
-
                 _rotation.Normalize();
                 RotationChangedBuffer = true;
                 RotationChanged = false;
-
                 this.SetVisualRotation = true;
             } else
             {
@@ -603,7 +627,7 @@ namespace Lockstep
         private void DoSetVisualRotation(Vector2d rot)
         {
             lastVisualRot = visualRot;
-            visualRot = Quaternion.LookRotation(rot.ToVector3(0f));
+            visualRot = Quaternion.LookRotation(Forward.ToVector3(0f));
             SetRotationBuffer = true;
         }
 
@@ -692,21 +716,7 @@ namespace Lockstep
             _rotation = new Vector2d(x, y);
             RotationChanged = true;
         }
-
-        public Vector2d TransformDirection(Vector2d worldPos)
-        {
-            worldPos -= _position;
-            worldPos.RotateInverse(_rotation.x, _rotation.y);
-            return worldPos;
-        }
-
-        public Vector2d InverseTransformDirection(Vector2d localPos)
-        {
-            localPos.Rotate(_rotation.x, _rotation.y);
-            localPos += _position;
-            return localPos;
-        }
-
+            
         public override int GetHashCode()
         {
             return ID;
@@ -780,8 +790,30 @@ namespace Lockstep
                     return position.x + FixedMath.Half >= this.XMin && position.x - FixedMath.Half <= this.XMax
                     && position.y + FixedMath.Half >= this.YMin && position.y - FixedMath.Half <= this.YMax;
                     break;
+                case ColliderType.Polygon:
+                    for (int i = this.EdgeNorms.Length - 1; i >= 0; i--) {
+                        Vector2d norm = this.EdgeNorms[i];
+                        long posProj = norm.Dot(position);
+                        long polyMin, polyMax;
+                        CollisionPair.ProjectPolygon(norm.x,norm.y,this,out polyMin, out polyMax);
+                        if (posProj >= polyMin && posProj <= polyMax) {
+
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                    return true;
+                    break;
             }
+
+
             return false;
+        }
+
+        public void SetHeight (long newHeight) {
+            Height = newHeight;
+            this.HeightPosChanged = true;
         }
 
         void Reset()
@@ -829,17 +861,21 @@ namespace Lockstep
         {
             foreach (UnityEngine.Coroutine co in flashRoutines)
             {
+                if (co != null)
                 base.StopCoroutine(co);
             }
             flashRoutines.Clear();
 
+
             Renderer ren = this.GetComponentInChildren<Renderer>();
+
+            if (ren != null) {
             Color col = Color.white;
             ren.material.color = Color.red;
             yield return null;
             yield return new WaitForSeconds(.08f);
             ren.material.color = col;
-
+            }
             yield break;
         }
     }

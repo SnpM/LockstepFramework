@@ -7,8 +7,7 @@ using UnityEngine;
 namespace Lockstep.Data {
     [System.Serializable]
     public sealed class EditorLSDatabaseWindow : EditorWindow {
-        const string databasePathKey = "^(#!*@#^";
-        const string databaseTypeKey = "!)^@#^1";
+
         [SerializeField,ClassImplements (typeof (IDatabase))]
         ClassTypeReference _databaseType;
         Type DatabaseType {get {return _databaseType;}}
@@ -39,10 +38,11 @@ namespace Lockstep.Data {
         
         void OnEnable () {
             Window = this;
-            DatabasePath = EditorPrefs.GetString (databasePathKey, Application.dataPath);
-            LoadDatabaseFromPath (DatabasePath);
-            _databaseType = new ClassTypeReference (EditorPrefs.GetString (databaseTypeKey));
-            if (_databaseType.Type == null) _databaseType = typeof (DefaultLSDatabase);
+            this.LoadDatabase(LSFSettingsManager.GetSettings().Database);
+            if (this.Database != null) {
+                _databaseType = LSFSettingsManager.GetSettings().Database.GetType();
+                if (_databaseType.Type == null) _databaseType = typeof (DefaultLSDatabase);
+            }
         }
         
         Vector2 scrollPos;
@@ -80,14 +80,11 @@ namespace Lockstep.Data {
                 
                 SerializedProperty databaseTypeProp = obj.FindProperty ("_databaseType");
                 EditorGUILayout.PropertyField (databaseTypeProp, new GUIContent ("Database Type"));
-                EditorPrefs.SetString (databaseTypeKey, _databaseType.Type != null ? _databaseType.Type.AssemblyQualifiedName : typeof (DefaultLSDatabase).AssemblyQualifiedName);
-                
                 
                 if (GUILayout.Button ("Load", GUILayout.MaxWidth (50f))) {
                     DatabasePath = EditorUtility.OpenFilePanel ("Database File", Application.dataPath, "asset");
                     if (!string.IsNullOrEmpty (DatabasePath)) {
                         
-                        EditorPrefs.SetString (databasePathKey, DatabasePath);
                         LSFSettingsModifier.Save ();
                         if (LoadDatabaseFromPath (DatabasePath) == false) {
                             Debug.LogFormat ("Database was not found at path of '{0}'.", DatabasePath);
@@ -136,7 +133,7 @@ namespace Lockstep.Data {
         
         void LoadDatabase (LSDatabase database) {
             _database = database;
-            _databaseEditor = (EditorLSDatabase)Activator.CreateInstance (typeof(EditorLSDatabase));
+            _databaseEditor = new EditorLSDatabase();
             bool isValid;
             _databaseEditor.Initialize (this,Database, out isValid);
             if (!isValid) {

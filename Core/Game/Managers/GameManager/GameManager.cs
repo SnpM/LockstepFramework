@@ -7,10 +7,9 @@ using Lockstep.NetworkHelpers;
 
 namespace Lockstep
 {
-    public abstract class GameManager : MonoBehaviour
+    public class GameManager : MonoBehaviour
     {
 
-        [SerializeField]
         BehaviourHelper[] _helpers;
 
         BehaviourHelper[] Helpers { get { return _helpers; } }

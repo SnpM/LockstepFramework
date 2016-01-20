@@ -24,7 +24,6 @@ namespace Lockstep.Data {
             for (int i = 0; i < interfacers.Length; i++) {
                 AbilityInterfacer interfacer = interfacers[i];
                 if (interfacer.Script.Type == null) {
-                    Debug.Log(interfacer.Name);
 
                     //exception or ignore?
                     continue;

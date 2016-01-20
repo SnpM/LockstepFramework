@@ -95,6 +95,14 @@ namespace Lockstep
             this._variableContainer = LSVariableManager.GetContainer(VariableContainerTicket);
         }
 
+        internal void LateSetup () {
+            this.OnLateSetup();
+        }
+        /// <summary>
+        /// Override for communicating with other abilities in the setup phase
+        /// </summary>
+        protected virtual void OnLateSetup () {}
+
         protected virtual void TemplateSetup()
         {
 

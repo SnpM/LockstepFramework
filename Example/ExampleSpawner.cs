@@ -32,5 +32,18 @@ namespace Lockstep.Example
 				ac.CreateAgent (agentCode, pos, rot);
 			}
 		}
+
+        public static Command GenerateSpawnCommand(AgentController cont, string agentCode, int count, Vector2d position, Vector2d? rotation)
+        {
+            Command com = new Command (InputCodeManager.GetCodeID ("Spawn"));
+            com.ControllerID = cont.ControllerID;
+            com.Add<Vector2d>(position);
+            com.Add<Vector2d>(rotation.HasValue ? rotation.Value : Vector2d.radian0);
+
+            com.Add<DefaultData>(new DefaultData(DataType.UShort,(ushort)AgentController.GetAgentCodeIndex(agentCode)));
+            com.Add<DefaultData>(new DefaultData(DataType.UShort,(ushort)count));
+            return com;
+
+        }
 	}
 }

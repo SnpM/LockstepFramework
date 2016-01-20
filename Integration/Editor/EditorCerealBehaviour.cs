@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if true
+using System.Collections.Generic;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -145,3 +146,5 @@ namespace Lockstep
     }
 
 }
+
+#endif

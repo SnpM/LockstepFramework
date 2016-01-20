@@ -78,21 +78,29 @@ namespace Lockstep
             }
         }
 
-        [CustomPropertyDrawer(typeof(VectorRotation))]
-        public class EditorVectorAngle : PropertyDrawer
+        [CustomPropertyDrawer(typeof(VectorRotationAttribute))]
+        public class EditorVectorRotation : PropertyDrawer
         {
             public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
             {
+                VectorRotationAttribute at = this.attribute as VectorRotationAttribute;
+                bool timescaled = at.Timescaled;
+                double scale = LSEditorUtility.Scale(timescaled);
+                SerializedProperty x = property.FindPropertyRelative("x");
+                SerializedProperty y = property.FindPropertyRelative("y");
 
-                SerializedProperty angle = property.FindPropertyRelative("_angle");
-                SerializedProperty timescaled = property.FindPropertyRelative("_timescaled");
-                double scale = LSEditorUtility.Scale(timescaled.boolValue);
-                angle.doubleValue = EditorGUILayout.DoubleField(label, angle.doubleValue * scale) / scale;
-                timescaled.boolValue = EditorGUILayout.Toggle("Timescaled", timescaled.boolValue);
+                double angleInRadians = Math.Atan2(y.longValue.ToDouble(),x.longValue.ToDouble());
 
-                double angleInRadians = angle.doubleValue * Math.PI / 180d;
-                property.FindPropertyRelative("_cos").longValue = FixedMath.Create(Math.Cos(angleInRadians));
-                property.FindPropertyRelative("_sin").longValue = FixedMath.Create(Math.Sin(angleInRadians));
+                double angleInDegrees = (angleInRadians * 180d / Math.PI) * scale;
+                angleInDegrees = (EditorGUILayout.DoubleField("Angle", angleInDegrees)) / scale;
+
+                double newAngleInRadians = angleInDegrees * Math.PI / 180d;
+                if (Math.Abs(newAngleInRadians - angleInRadians) >= .001f) {
+                    long cos = FixedMath.Create(Math.Cos(newAngleInRadians));
+                    long sin = FixedMath.Create(Math.Sin(newAngleInRadians));
+                    x.longValue = cos;
+                    y.longValue = sin;
+                }
             }
         }
 

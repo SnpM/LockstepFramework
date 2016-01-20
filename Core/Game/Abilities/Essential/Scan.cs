@@ -69,11 +69,8 @@ namespace Lockstep
             get { return this._targetPlatform; }
         }
 
-        public Vector2d ProjectileOffset { get { return _projectileOffset.ToOrientedVector2d(); } }
+        public Vector2dHeight ProjectileOffset { get { return _projectileOffset; } }
         //Offset of projectile
-
-        public float ProjectileHeightOffset { get { return _projectileOffset.Height.ToFloat(); } }
-        //Offset of projectile on the Y axis
 
         #region Serialized Values (Further description in properties)
 
@@ -196,6 +193,7 @@ namespace Lockstep
                 BehaveWithNoTarget();
                 return;
             }
+
             Vector2d targetDirection = Target.Body._position - cachedBody._position;
             long fastMag = targetDirection.FastMagnitude();
 
@@ -208,18 +206,20 @@ namespace Lockstep
                 }
                 Agent.SetState(AnimState.Engaging);
                 long mag = FixedMath.Sqrt(fastMag >> FixedMath.SHIFT_AMOUNT);
-                //cachedTurn.StartTurn(targetDirection / mag);
                 bool withinTurn = TrackAttackAngle == false ||
                                   (fastMag != 0 &&
-                                  cachedBody._rotation.Dot(targetDirection.x, targetDirection.y) > 0
-                                  && cachedBody._rotation.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
+                        cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
+                        && cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
                 bool needTurn = mag != 0 && !withinTurn;
                 if (needTurn)
                 {
                     if (CanTurn)
                     {
                         targetDirection /= mag;
-                        cachedTurn.StartTurn(targetDirection);
+                        cachedTurn.StartTurnDirection(targetDirection);
+                    }
+                    else {
+
                     }
                 } else
                 {
@@ -297,24 +297,22 @@ namespace Lockstep
 
         public void Fire()
         {
-            if (Agent.UseEnergy(this.EnergyCost))
-            {
+
                 if (CanMove)
                 {
                     cachedMove.StopMove();
                 }
                 cachedBody.Priority = basePriority + 1;
                 Agent.ApplyImpulse(AnimImpulse.Fire);
-
                 OnFire();
-            }
+
         }
 
         protected virtual void OnFire()
         {
             long appliedDamage = Damage;
-            //appliedDamage = 0;
-            LSProjectile projectile = ProjectileManager.Create(ProjCode, Agent, Target, appliedDamage);
+            LSProjectile projectile = ProjectileManager.Create(ProjCode, Agent, this.ProjectileOffset, (agent) => agent.Healther.TakeRawDamage(appliedDamage));
+            projectile.InitializeHoming(this.Target);
             projectile.TargetPlatform = TargetPlatform;
             ProjectileManager.Fire(projectile);
         }
@@ -382,7 +380,6 @@ namespace Lockstep
             Agent.StopCast(this.ID);
             Vector2d pos;
             DefaultData target;
-
             if (com.TryGetData<Vector2d>(out pos) && CanMove)
             {
 

@@ -29,7 +29,11 @@ MonoBehaviour:
   - _name: Item2
   - _name: Item3
   - _name: Item4
-  _projectileData: []
+  _projectileData:
+  - _name: TestBullet
+    _description: 
+    _icon: {fileID: 0}
+    _prefab: {fileID: 167620, guid: 479c1b29b5d8046428adaddf16b43ce8, type: 2}
   _effectData: []
   _abilityData:
   - _name: Move
@@ -37,19 +41,54 @@ MonoBehaviour:
     _icon: {fileID: 0}
     _script:
       _classRef: Lockstep.Move, Assembly-CSharp
-    _listenInputCode: 
+    _listenInputCode: Core3
     _informationGather: 1
   - _name: Scan
     _description: 
     _icon: {fileID: 0}
     _script:
       _classRef: Lockstep.Scan, Assembly-CSharp
-    _listenInputCode: 
+    _listenInputCode: Core1
     _informationGather: 3
   - _name: Stop
     _description: 
     _icon: {fileID: 0}
     _script:
       _classRef: Lockstep.Stop, Assembly-CSharp
+    _listenInputCode: 
+    _informationGather: 0
+  - _name: CoverMove
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: CoverMove, Assembly-CSharp
+    _listenInputCode: 
+    _informationGather: 0
+  - _name: FPSCrouch
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: FPSCrouch, Assembly-CSharp
+    _listenInputCode: 
+    _informationGather: 0
+  - _name: FPSMove
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: FPSMove, Assembly-CSharp
+    _listenInputCode: 
+    _informationGather: 0
+  - _name: FPSShoot
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: Lockstep.FPSShoot, Assembly-CSharp
+    _listenInputCode: 
+    _informationGather: 0
+  - _name: FPSTurn
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: Lockstep.FPSTurn, Assembly-CSharp
     _listenInputCode: 
     _informationGather: 0

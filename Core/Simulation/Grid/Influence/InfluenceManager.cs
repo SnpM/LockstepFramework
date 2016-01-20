@@ -117,8 +117,6 @@ namespace Lockstep
 			long num = radius * radius;
 			long num2 = angle * angle >> 16;
 
-			long sourceX = sourceAgent.Body._position.x;
-			long sourceY = sourceAgent.Body._position.y;
 			for (int i = 0; i < deltaCount; i++)
 			{
 				ScanNode tempNode = GridManager.GetScanNode(

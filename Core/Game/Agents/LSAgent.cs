@@ -114,7 +114,7 @@ namespace Lockstep {
         //TODO: Put all this stuff in an extendible class
         public LSInfluencer Influencer { get; private set; }
 		public Health Healther { get {return abilityManager.Healther;} }
-		public Scan Scanner { get {return abilityManager.Scanner;} }
+		//public Scan Scanner { get {return abilityManager.Scanner;} }
 		public Move Mover { get {return abilityManager.Mover;} }
 		public Turn Turner {get {return abilityManager.Turner;}}
 		public StatsBar StatsBarer{get; private set;}
@@ -472,6 +472,7 @@ namespace Lockstep {
 		}
         public override bool GetSerializedFieldNames(List<string> output)
         {
+            return false;
             base.GetSerializedFieldNames(output);
             output.Add("_deathTime");
             output.Add("_boxPriority");
@@ -480,7 +481,7 @@ namespace Lockstep {
             output.Add("_statsBarOffset");
             output.Add("_visualCenter");
             output.Add("_globalID");
-			output.Add("_myAgentCode");
+			//output.Add("_myAgentCode");
             return true;
         }
 		/*protected override bool OnSerialize ()

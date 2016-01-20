@@ -20,6 +20,9 @@ namespace Lockstep
         }
 
         protected override void OnApply () {
+            foreach (EnvironmentObject obj in EnvironmentObjects) {
+                obj.Initialize();
+            }
         }
 
         protected override void OnLateApply()
@@ -27,6 +30,7 @@ namespace Lockstep
             foreach (EnvironmentBodyInfo info in EnvironmentBodies) {
                 info.Body.Initialize(info.Position,info.Rotation);
             }
+
             foreach (EnvironmentObject obj in EnvironmentObjects) {
                 obj.LateInitialize();
             }
@@ -38,7 +42,7 @@ namespace Lockstep
             foreach (LSBody body in allBodies) {
                 if (IsAgent(body)) continue;
                 Vector2dHeight pos = new Vector2dHeight(body.transform.position);
-                Vector2d rot = Vector2d.CreateFromAngle(body.transform.eulerAngles.y * Mathf.Deg2Rad);
+                Vector2d rot = Vector2d.CreateRotation(body.transform.eulerAngles.y * Mathf.Deg2Rad);
                 EnvironmentBodyInfo bodyInfo = new EnvironmentBodyInfo(
                     body,
                     pos,

@@ -50,6 +50,14 @@ namespace Lockstep
     {
     }
 
+    public class VectorRotationAttribute : PropertyAttribute {
+
+        public bool Timescaled {get; private set;}
+        public VectorRotationAttribute (bool timescaled) {
+            Timescaled = timescaled;
+        }
+    }
+
     public class LocalVisualizeAttribute : PropertyAttribute
     {
 
