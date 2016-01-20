@@ -13,6 +13,11 @@ namespace Lockstep
         [FixedNumber]
         public long z; //Height
 
+        public Vector3d (long X, long Y, long Z) {
+            x = X;
+            y = Y;
+            z = Z;
+        }
 
         public void Normalize () {
             long magnitude = FixedMath.Sqrt(x * x + y * y + z * z);
