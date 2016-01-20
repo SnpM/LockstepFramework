@@ -96,10 +96,13 @@ namespace Lockstep
             so.Update();
             foreach (SerializedProperty p in properties ())
             {
-                foreach (LSScenePropertyDrawer drawer in GetPropertyDrawers (p))
+                if(p != null)
                 {
-                    if (drawer != null)
-                        drawer.OnSceneGUI(cereal, p, new GUIContent(p.displayName, p.tooltip));
+                    foreach (LSScenePropertyDrawer drawer in GetPropertyDrawers(p))
+                    {
+                        if (drawer != null)
+                            drawer.OnSceneGUI(cereal, p, new GUIContent(p.displayName, p.tooltip));
+                    }
                 }
             }
             so.ApplyModifiedProperties();
@@ -132,7 +135,10 @@ namespace Lockstep
 
         private static void DrawProperty(SerializedProperty property)
         {
-            EditorGUILayout.PropertyField(property,true);
+            if(property != null)
+            {
+                EditorGUILayout.PropertyField(property, true);
+            }
         }
 
 

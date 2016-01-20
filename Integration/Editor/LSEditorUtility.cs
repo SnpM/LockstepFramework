@@ -531,6 +531,10 @@ namespace Lockstep
         static FieldInfo lastPropertyFieldInfo;
         public static object GetPropertyTarget (SerializedProperty prop)
         {
+            if(prop == null || prop.propertyPath == null)
+            {
+                Debug.Log("WTF");
+            }
             var path = prop.propertyPath.Replace(".Array.data[", "[");
             object obj = prop.serializedObject.targetObject;
             var elements = path.Split('.');
