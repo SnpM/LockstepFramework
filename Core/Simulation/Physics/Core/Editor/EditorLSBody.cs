@@ -280,7 +280,7 @@ namespace Lockstep.Integration
             {
                 float yRot = Body.transform.eulerAngles.y * Mathf.Deg2Rad;
 
-                Vector2d rotation = Vector2d.CreateFromAngle(yRot);
+                Vector2d rotation = Vector2d.CreateRotation(yRot);
                 bool changed = false;
                 Vector3[] draws = new Vector3[Body.Vertices.Length + 1];
                     

@@ -206,18 +206,20 @@ namespace Lockstep
                 }
                 Agent.SetState(AnimState.Engaging);
                 long mag = FixedMath.Sqrt(fastMag >> FixedMath.SHIFT_AMOUNT);
-                //cachedTurn.StartTurn(targetDirection / mag);
                 bool withinTurn = TrackAttackAngle == false ||
                                   (fastMag != 0 &&
-                                  cachedBody._rotation.Dot(targetDirection.x, targetDirection.y) > 0
-                                  && cachedBody._rotation.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
+                        cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
+                        && cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
                 bool needTurn = mag != 0 && !withinTurn;
                 if (needTurn)
                 {
                     if (CanTurn)
                     {
                         targetDirection /= mag;
-                        cachedTurn.StartTurn(targetDirection);
+                        cachedTurn.StartTurnDirection(targetDirection);
+                    }
+                    else {
+
                     }
                 } else
                 {

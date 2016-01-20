@@ -304,7 +304,7 @@ namespace Lockstep
         )
         {
             Vector2d pos = position != null ? position.Value : new Vector2d(0,0);
-            Vector2d rot = rotation != null ? rotation.Value : new Vector2d(0,1);
+            Vector2d rot = rotation != null ? rotation.Value : Vector2d.radian0;
 
 
             if (!IsValidAgentCode(agentCode))

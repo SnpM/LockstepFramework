@@ -25,7 +25,17 @@ namespace Lockstep
         #endregion
 
         #region Lockstep variables
-
+        private bool ForwardNeedsSet;
+        private Vector2d _forward;
+        public Vector2d Forward {
+            get {
+                if (ForwardNeedsSet) {
+                    _forward = _rotation.ToDirection();
+                    ForwardNeedsSet = false;
+                }
+                return _forward;
+            }
+        }
         [Lockstep]
         public bool PositionChanged { get; set; }
 
@@ -54,6 +64,8 @@ namespace Lockstep
             }
             set
             {
+                if (value)
+                    ForwardNeedsSet = true;
                 _rotationChanged = value;
             }
         }
@@ -365,6 +377,7 @@ namespace Lockstep
             LastPosition = _position = StartPosition.ToVector2d();
             _heightPos = StartPosition.Height;
             _rotation = StartRotation;
+            ForwardNeedsSet = true;
 
             XMin = 0;
             XMax = 0;
@@ -398,7 +411,7 @@ namespace Lockstep
             if (_rotationalTransform != null)
             {
                 CanSetVisualRotation = true;
-                visualRot = Quaternion.LookRotation(_rotation.ToVector3(0f));
+                visualRot = Quaternion.LookRotation(Forward.ToVector3(0f));
                 lastVisualRot = visualRot;
                 _rotationalTransform.rotation = visualRot;
             } else
@@ -574,12 +587,9 @@ namespace Lockstep
 			
             if (RotationChanged)
             {
-				
-
                 _rotation.Normalize();
                 RotationChangedBuffer = true;
                 RotationChanged = false;
-
                 this.SetVisualRotation = true;
             } else
             {
@@ -617,7 +627,7 @@ namespace Lockstep
         private void DoSetVisualRotation(Vector2d rot)
         {
             lastVisualRot = visualRot;
-            visualRot = Quaternion.LookRotation(rot.ToVector3(0f));
+            visualRot = Quaternion.LookRotation(Forward.ToVector3(0f));
             SetRotationBuffer = true;
         }
 

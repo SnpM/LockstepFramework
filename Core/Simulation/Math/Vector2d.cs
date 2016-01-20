@@ -308,6 +308,11 @@ namespace Lockstep
         public static readonly Vector2d negative = new Vector2d(-1, -1);
         public static readonly Vector2d zero = new Vector2d(0, 0);
 
+        public static readonly Vector2d radian0 = new Vector2d(1,0);
+        public static readonly Vector2d radian1 = new Vector2d(0,1);
+        public static readonly Vector2d radian2 = new Vector2d(-1,0);
+        public static readonly Vector2d radian3 = new Vector2d(0,-1);
+
         public static long Dot(long v1x, long v1y, long v2x, long v2y)
         {
             return (v1x * v2x + v1y * v2y) >> FixedMath.SHIFT_AMOUNT;
@@ -323,9 +328,27 @@ namespace Lockstep
         /// </summary>
         /// <returns>The from angle.</returns>
         /// <param name="angle">Angle.</param>
-        public static Vector2d CreateFromAngle(float angle)
+        public static Vector2d CreateRotation (double angle)
         {
-            return new Vector2d(Math.Sin(angle), Math.Cos(angle));
+            return new Vector2d(Math.Cos(angle), Math.Sin(angle));
+        }
+        public static Vector2d CreateRotation (float angle) {
+            return CreateRotation ((double)angle);
+        }
+
+        /// <summary>
+        /// Deterministic!
+        /// </summary>
+        /// <returns>The rotation.</returns>
+        /// <param name="angle">Angle.</param>
+        public static Vector2d CreateRotation (long angle) {
+            return new Vector2d(FixedMath.Trig.Cos(angle),FixedMath.Trig.Sin(angle));
+        }
+        public Vector2d ToDirection () {
+            return new Vector2d(y,x);
+        }
+        public Vector2d ToRotation () {
+            return new Vector2d(y,x);
         }
             
         #endregion

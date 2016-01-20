@@ -205,7 +205,21 @@ namespace Lockstep
 
         public static bool AbsMoreThan(this long f1, long f2)
         {
-            return f1.Abs() > f2;
+            if (f1 < 0) {
+                return -f1 > f2;
+            }
+            else {
+                return f1 > f2;
+            }
+        }
+
+        public static bool AbsLessThan (this long f1, long f2) {
+            if (f1 < 0) {
+                return -f1 < f2;
+            }
+            else {
+                return f1 < f2;
+            }
         }
 
         #endregion
