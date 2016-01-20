@@ -287,14 +287,14 @@ namespace Lockstep.Integration
                 for (int i = 0; i < Body.Vertices.Length; i++)
                 {
                     Vector2d vertex = Body.Vertices [i];
-                    vertex.RotateInverse(rotation.x, rotation.y);
+                    vertex.Rotate(rotation.x, rotation.y);
                     Vector3 drawPos = vertex.ToVector3() + targetPos;
                     Vector3 newDrawPos = Handles.FreeMoveHandle(drawPos, Quaternion.identity, MoveHandleSize, new Vector3(0, float.PositiveInfinity, 0), Handles.SphereCap);
                     if ((newDrawPos - (drawPos)).magnitude >= .01f)
                     {
                         newDrawPos -= targetPos;
                         vertex = new Vector2d(newDrawPos);
-                        vertex.Rotate(rotation.x, rotation.y);
+                        vertex.RotateInverse(rotation.x, rotation.y);
                         Body.Vertices [i] = vertex;
                         changed = true;
                     }

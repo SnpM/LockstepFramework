@@ -438,7 +438,7 @@ namespace Lockstep
                 for (int i = 0; i < VertLength; i++)
                 {
                     RotatedPoints [i] = Vertices [i];
-                    RotatedPoints [i].RotateInverse(_rotation.x, _rotation.y);
+                    RotatedPoints [i].Rotate(_rotation.x, _rotation.y);
                 }
                 for (int i = VertLength - 1; i >= 0; i--) {
                     int nextIndex = i + 1 < VertLength ? i + 1 : 0;
@@ -716,21 +716,7 @@ namespace Lockstep
             _rotation = new Vector2d(x, y);
             RotationChanged = true;
         }
-
-        public Vector2d TransformDirection(Vector2d worldPos)
-        {
-            worldPos -= _position;
-            worldPos.RotateInverse(_rotation.x, _rotation.y);
-            return worldPos;
-        }
-
-        public Vector2d InverseTransformDirection(Vector2d localPos)
-        {
-            localPos.Rotate(_rotation.x, _rotation.y);
-            localPos += _position;
-            return localPos;
-        }
-
+            
         public override int GetHashCode()
         {
             return ID;
