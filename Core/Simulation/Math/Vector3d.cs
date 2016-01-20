@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Lockstep
 {
-    //TODO: Go on with this venture?
+    //THIS IS HAPPENING!!!!
     public struct Vector3d
     {
         [FixedNumber]
