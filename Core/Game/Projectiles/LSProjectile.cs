@@ -625,15 +625,16 @@ namespace Lockstep
                     }
                     break;
                 case TargetingType.Free:
-                    
-                    Move (this.Velocity);
-
+                    RaycastMove (this.Velocity,this.Slope,this.HeightSpeed);
                     break;
             }
         }
 
-        public void Move (Vector2d delta) {
-            Vector2d nextPosition = this.Position + this.delta;
+        public void RaycastMove (Vector2d delta, long slope) {
+            RaycastMove (delta,slope,slope.Mul(delta.Magnitude()));
+        }
+        public void RaycastMove (Vector2d delta, long slope, long heightDif) {
+            Vector2d nextPosition = this.Position + delta;
             HitBodies.FastClear();
             foreach (LSBody body in Raycaster.RaycastAll(this.Position,nextPosition,CurrentHeight,this.Slope))
             {
