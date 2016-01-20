@@ -1,19 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
-namespace Lockstep {
+[assembly: InternalsVisibleTo("BehaviorHelperManager")]
+
+namespace Lockstep
+{
     public static class BehaviourHelperManager {
-        private static PriorityQueue<IBehaviourHelper> Helpers { get; set; }
+        private static PriorityQueue<BehaviourHelper> Helpers { get; set; }
 
         /// <summary>
         /// The list of helpers that have been modified
         /// </summary>
-        private static List<PriorityQueueNode<IBehaviourHelper>> _modifiedHelpers;
+        private static List<PriorityQueueNode<BehaviourHelper>> _modifiedHelpers;
 
-        public static void Initialize (IBehaviourHelper[] helpers) {
-            Helpers = new PriorityQueue<IBehaviourHelper>(helpers.Length);
-            _modifiedHelpers = new List<PriorityQueueNode<IBehaviourHelper>>(helpers.Length);
+        public static void Initialize (BehaviourHelper[] helpers) {
+            Helpers = new PriorityQueue<BehaviourHelper>(helpers.Length);
+            _modifiedHelpers = new List<PriorityQueueNode<BehaviourHelper>>(helpers.Length);
 
             foreach (var helper in helpers) {
                 Helpers.AddWithPriority(helper, helper.Priority);
@@ -74,7 +78,7 @@ namespace Lockstep {
 
         public static void Execute (Command com) {
             foreach (var helper in Helpers) {
-                if (helper.ManagerShouldExecuteOnCommand(com)) {
+                if (helper.CanExecuteOnCommand(com)) {
                     helper.Execute (com);
                 }
                 helper.RawExecute(com);

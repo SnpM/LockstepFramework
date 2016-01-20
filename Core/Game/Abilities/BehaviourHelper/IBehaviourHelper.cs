@@ -14,7 +14,7 @@ namespace Lockstep
         void Visualize();
         void Deactivate();
 
-        bool ManagerShouldExecuteOnCommand(Command com);
+        bool CanExecuteOnCommand(Command com);
         void Execute(Command com);
         void RawExecute(Command com);
 

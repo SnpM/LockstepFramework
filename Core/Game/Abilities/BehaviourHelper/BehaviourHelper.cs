@@ -89,11 +89,12 @@ public abstract class BehaviourHelper : MonoBehaviour, IBehaviourHelper
     }
 
     /// <summary>
+    /// Validation on whether this behaviour can execute with this command
     /// Used by the BehaviourHelperManager to check if this behaviour should execute
     /// </summary>
     /// <param name="com"></param>
     /// <returns></returns>
-    public virtual bool ManagerShouldExecuteOnCommand(Command com)
+    public virtual bool CanExecuteOnCommand(Command com)
     {
         return ListenInputs.Contains(com.InputCode);
     }
