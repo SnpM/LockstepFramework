@@ -85,6 +85,10 @@ namespace Lockstep
 
         public long GetHeight(int mapIndex, Vector2d position)
         {
+            if (mapIndex >= Maps.Length)
+            {
+                return this.HeightBounds.x;
+            }
             HeightMap map = Maps [mapIndex];
             long normX = (position.x - this._bottomLeft.x).Div(Interval);
             long normY = (position.y - this._bottomLeft.y).Div(Interval);

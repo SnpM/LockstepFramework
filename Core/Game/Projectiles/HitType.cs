@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Lockstep
 {
-    public enum DamageType
+    public enum HitType
     {
         Single,
         Area,

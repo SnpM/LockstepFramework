@@ -4,7 +4,7 @@ namespace Lockstep
     public enum TargetingType
     {
         Timed,
-        Seeking,
-        Positional
+        Homing,
+        Free
     }
 }

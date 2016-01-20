@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Lockstep
 {
@@ -78,6 +79,17 @@ namespace Lockstep
 			InfluenceManager.TargetAllegiance = targetAllegiance;
 			InfluenceManager.TargetPlatform = targetPlatform;
 			return InfluenceManager.ScanCone (LocatedNode.ScanX, LocatedNode.ScanY, radius, angle,
+				this.Agent, targetAllegiance);
+		}
+
+		public IEnumerable<LSAgent> ScanAll (int deltaCount,
+			AllegianceType targetAllegiance = AllAllegiance,
+			PlatformType targetPlatform = AllPlatforms)
+		{
+			InfluenceManager.Source = Agent;
+			InfluenceManager.TargetAllegiance = targetAllegiance;
+			InfluenceManager.TargetPlatform = targetPlatform;
+			return InfluenceManager.ScanAll (LocatedNode.ScanX, LocatedNode.ScanY, deltaCount,
 				this.Agent, targetAllegiance);
 		}
 

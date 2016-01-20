@@ -6,9 +6,9 @@ namespace Lockstep
 	{
 
 		#region Serialized
-		[SerializeField]
-		private VectorRotation
-			_turnRate;
+        [SerializeField,VectorRotation (true)]
+		private Vector2d
+        _turnRate = Vector2d.CreateRotation(FixedMath.One / 8);
 		#endregion
 		private LSBody cachedBody;
 		private bool targetReached;
@@ -25,8 +25,8 @@ namespace Lockstep
 		{
 			cachedBody = Agent.Body;
 
-			turnSin = _turnRate.Sin;
-			turnCos = _turnRate.Cos;
+			turnSin = _turnRate.y;
+			turnCos = _turnRate.x;
             collisionTurnThreshold = cachedBody.Radius / LockstepManager.FrameRate;
             collisionTurnThreshold *= collisionTurnThreshold;
 			cachedBody.OnContact += HandleContact;
@@ -47,7 +47,6 @@ namespace Lockstep
 
 
 			if (targetReached == false) {
-
 				if (cachedBeginCheck != 0) {
 					{
 						if (cachedBeginCheck < 0) {
@@ -88,27 +87,21 @@ namespace Lockstep
             cachedBody.RotationChanged = true;
 			targetReached = true;
 		}
-
-		public void TurnDirection (Vector2d targetDirection)
-		{
-			targetDirection.Normalize ();
-			StartTurn (targetDirection);
-		}
-
-		public void StartTurn (Vector2d targetRot)
+        public void StartTurnVector (Vector2d targetVector) {
+            targetVector.Normalize();
+            StartTurnDirection (targetVector);
+        }
+		public void StartTurnDirection (Vector2d targetDirection)
 		{
             bufferStartTurn = true;
-			bufferTargetRot = targetRot;
+            bufferTargetRot = targetDirection.ToRotation();
+
         }
-		public void StartTurnRaw (Vector2d targetRot) {
-			targetRotation = targetRot;
-			targetReached = false;
-			cachedBeginCheck = cachedBody._rotation.Cross (targetRot.x,targetRot.y);
-		}
+
 		private void _StartTurn (Vector2d targetRot) {
 			long tempCheck;
 			if (targetRot.NotZero () && (tempCheck = cachedBody._rotation.Cross (targetRot.x, targetRot.y)) != 0) {
-				if (tempCheck.AbsMoreThan (turnSin) == false && cachedBody._rotation.Dot (targetRot.x,targetRot.y) > 0)
+                if (tempCheck.AbsLessThan (turnSin) && cachedBody._rotation.Dot (targetRot.x,targetRot.y) > 0)
 				{
 					targetRotation = targetRot;
                     Arrive ();
@@ -142,7 +135,7 @@ namespace Lockstep
                 Vector2d delta = this.cachedBody._position - this.cachedBody.LastPosition;
                 if (delta.FastMagnitude() > collisionTurnThreshold) {
                     delta.Normalize();
-                    this.StartTurn(delta);
+                    this.StartTurnDirection(delta);
                 }
 			}
 		}

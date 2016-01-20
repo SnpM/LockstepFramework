@@ -293,7 +293,7 @@ namespace Lockstep
                     {
                         lastMovementDirection = movementDirection;
                         if (CanTurn)
-                        CachedTurn.StartTurnRaw(movementDirection);
+                            CachedTurn.StartTurnDirection(movementDirection);
                     }
                 } else
                 {
@@ -421,7 +421,7 @@ namespace Lockstep
             } else
             {
                 if (CanTurn)
-                CachedTurn.TurnDirection(destination - cachedBody._position);
+                    CachedTurn.StartTurnVector(destination - cachedBody._position);
                 Agent.SetState(AnimState.Moving);
                 hasPath = false;
                 straightPath = false;
