@@ -58,16 +58,16 @@ namespace Lockstep.Data {
 
         [SerializeField,DataCode ("Input")]
         private string _listenInputCode;
-        bool ListenInputInitialized{get; set;}
+        bool _listenInputInitialized = false;
         private ushort _listenInputID;
         public string ListenInputCode {get {return _listenInputCode;}}
         public ushort ListenInputID {
             get {
-                if (ListenInputInitialized) {
+                if (_listenInputInitialized) {
                     return _listenInputID;
                 }
                 else {
-                    ListenInputInitialized = true;
+                    _listenInputInitialized = true;
                     return _listenInputID = InputCodeManager.GetCodeID (_listenInputCode);
                 }
             }
