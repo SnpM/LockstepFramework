@@ -34,8 +34,7 @@ namespace Lockstep.Data
         #endregion
 
         #region Input
-        [SerializeField]
-        [RegisterData ("Input")]
+        [SerializeField, RegisterData("Input")]
 		protected InputDataItem[] _inputData = new InputDataItem[] {
             new InputDataItem("Special1", KeyCode.Q),
             new InputDataItem("Special2", KeyCode.W),

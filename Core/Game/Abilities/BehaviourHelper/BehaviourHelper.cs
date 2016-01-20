@@ -11,20 +11,38 @@ public abstract class BehaviourHelper : MonoBehaviour, IBehaviourHelper
     {
 
     }
+    
+    [SerializeField]
+    private int priority = 0;
 
     private static FastList<BehaviourHelper> behaviourHelpers = new FastList<BehaviourHelper>();
     private static HashSet<Type> createdTypes = new HashSet<Type>();
-
-    public ushort CachedListenInput {get; private set;}
-
+    private HashSet<ushort> ListenInputs = new HashSet<ushort>();
+    
     public virtual ushort ListenInput
     {
         get { return 0; }
     }
 
+    protected void RegisterListenInput(ushort input)
+    {
+        if(input != 0)
+        {
+            ListenInputs.Add(input);
+        }
+    }
+
+    protected void UnregisterListenInput(ushort input)
+    {
+        if (input != 0)
+        {
+            ListenInputs.Remove(input);
+        }
+    }
+
     public void Initialize()
     {
-        CachedListenInput = ListenInput;
+        RegisterListenInput(ListenInput);
         OnInitialize();
     }
 
@@ -70,6 +88,16 @@ public abstract class BehaviourHelper : MonoBehaviour, IBehaviourHelper
     {
     }
 
+    /// <summary>
+    /// Used by the BehaviourHelperManager to check if this behaviour should execute
+    /// </summary>
+    /// <param name="com"></param>
+    /// <returns></returns>
+    public virtual bool ManagerShouldExecuteOnCommand(Command com)
+    {
+        return ListenInputs.Contains(com.InputCode);
+    }
+
     public void Execute(Command com)
     {
         OnExecute(com);
@@ -101,6 +129,19 @@ public abstract class BehaviourHelper : MonoBehaviour, IBehaviourHelper
 
     protected virtual void OnDeactivate()
     {
-		
+
+    }
+
+    /// <summary>
+    /// Priority allows this behaviour helper to run ahead or behind other helpers in case that's needed.
+    /// It can be set to 0, which is the default priority
+    /// </summary>
+    public int Priority
+    {
+        get { return priority; }
+        set
+        {
+            Priority = value;
+        }
     }
 }

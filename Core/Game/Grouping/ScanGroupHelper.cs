@@ -11,9 +11,9 @@ namespace Lockstep
 			}
 		}
 
-		protected override void OnExecute (Lockstep.Command com)
+		protected override void OnExecute (Command com)
 		{
-			MovementGroupHelper.Execute (com);
+			MovementGroupHelper.Instance.Execute (com);
 		}
 	}
 }

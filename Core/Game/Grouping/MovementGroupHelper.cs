@@ -63,17 +63,12 @@ namespace Lockstep
 
         protected override void OnExecute(Command com)
         {
-            Execute(com);
-        }
-
-        public static void Execute(Command com)
-        {
-            if (com.ContainsData<Vector2d> ())
+            if (com.ContainsData<Vector2d>())
             {
                 CreateGroup(com);
             }
         }
-        
+                
         public static MovementGroup CreateGroup(Command com)
         {
             MovementGroup moveGroup = pooledGroups.Count > 0 ? pooledGroups.Pop() : new MovementGroup();

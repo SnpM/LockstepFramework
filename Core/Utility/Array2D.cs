@@ -50,25 +50,29 @@ namespace Lockstep
             _height = height;
         }
 
-        public T this [int w, int h]
+        public T this[int w, int h]
         {
             get
             {
                 int index = GetIndex(w, h);
-                try {
-                return _innerArray [index];
+                try
+                {
+                    return _innerArray[index];
                 }
-                catch {
+                catch
+                {
                     throw new System.IndexOutOfRangeException(w + ", " + h);
                 }
             }
             set
             {
-                try {
-                int index = GetIndex(w, h);
-                _innerArray [index] = value;
+                try
+                {
+                    int index = GetIndex(w, h);
+                    _innerArray[index] = value;
                 }
-                catch {
+                catch
+                {
                     throw new System.IndexOutOfRangeException(w + ", " + h);
                 }
             }
@@ -99,17 +103,18 @@ namespace Lockstep
             if (yShift != 0)
             {
                 int absShift = Math.Abs(yShift);
-  
+
                 int shiftLength = _height - absShift;
                 if (shiftLength < 0)
                 {
                     //If the shift is more than the array's height, clear all elements
-                    Array.Clear(_innerArray,0,_innerArray.Length);
+                    Array.Clear(_innerArray, 0, _innerArray.Length);
                 }
                 else {
                     T[] newArray = new T[_innerArray.Length];
 
-                    for (int i = _width - 1; i >= 0; i--) {
+                    for (int i = _width - 1; i >= 0; i--)
+                    {
                         int index = i * _height;
                         int newIndex = index + yShift;
                         if (yShift < 0)
@@ -117,18 +122,19 @@ namespace Lockstep
                             index -= yShift;
                             newIndex -= yShift;
                         }
-                        Array.Copy(_innerArray,index,newArray,newIndex,shiftLength);
+                        Array.Copy(_innerArray, index, newArray, newIndex, shiftLength);
                     }
                     _innerArray = newArray;
                 }
             }
-            if (xShift != 0) {
+            if (xShift != 0)
+            {
 
                 int absShift = Math.Abs(xShift);
                 if (absShift >= _width)
                 {
                     //If the shift is more than the array's height, clear all elements
-                    Array.Clear(_innerArray,0,_innerArray.Length);
+                    Array.Clear(_innerArray, 0, _innerArray.Length);
                 }
                 else {
                     T[] newArray = new T[_innerArray.Length];
@@ -138,18 +144,20 @@ namespace Lockstep
                         start -= xShift;
                     else
                         end -= xShift;
-                    for (int i = start; i < end; i++) {
+                    for (int i = start; i < end; i++)
+                    {
                         int index = i * _height;
                         int newIndex = (i + xShift) * _height;
-                        Array.Copy (_innerArray, index, newArray, newIndex, _height);
+                        Array.Copy(_innerArray, index, newArray, newIndex, _height);
                     }
                     _innerArray = newArray;
                 }
             }
         }
 
-        public void Clear () {
-            Array.Clear (_innerArray, 0, _innerArray.Length);
+        public void Clear()
+        {
+            Array.Clear(_innerArray, 0, _innerArray.Length);
         }
 
         private int GetIndex(int w, int h)
