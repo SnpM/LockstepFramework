@@ -26,6 +26,7 @@ namespace Lockstep
             Register<Selection> ();
             Register<Vector2dHeight> ();
             Register<Coordinate> ();
+            Register<Vector3d>();
         }
 
         public static void Register<TData>() where TData : ICommandData

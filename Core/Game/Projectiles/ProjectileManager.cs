@@ -76,9 +76,13 @@ namespace Lockstep {
 			curProj.Setup (projData);
 			return curProj;
 		}
-
-
-        public static LSProjectile Create (string projCode, LSAgent source, Vector2dHeight projectileOffset, Action<LSAgent> hit)
+        public static LSProjectile Create (string projCode, LSAgent source, Vector3d offset, AllegianceType targetAllegiance, Func<LSAgent,bool> agentConditional,Action<LSAgent> hitEffect) {
+            Vector3d pos = offset;
+            pos.SetVector2d(pos.ToVector2d().Rotated(source.Body._rotation.x,source.Body._rotation.y));
+            pos.Add(ref source.Body._position);
+            return Create (projCode,pos,agentConditional,(bite) => ((source.Controller.GetAllegiance(bite) & targetAllegiance) != 0),hitEffect);
+        }
+        public static LSProjectile Create (string projCode, Vector3d position, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional, Action<LSAgent> hitEffect)
 		{
 			FastStack<LSProjectile> pool = ProjectilePool[projCode];
 			if (pool.Count > 0)
@@ -91,7 +95,7 @@ namespace Lockstep {
 			int id = GenerateID ();
 			ProjectileBucket[id] = curProj;
 			ProjectileActive[id] = true;
-			curProj.Prepare (id, source, projectileOffset, hit);
+			curProj.Prepare (id, position,agentConditional,bucketConditional, hitEffect);
 			return curProj;
 		}
 		public static void Fire (LSProjectile projectile)

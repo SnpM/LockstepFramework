@@ -217,10 +217,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _turnRate:
-    _cos: 0
-    _sin: 0
-    _angle: 0
-    _timescaled: 0
+    x: 64276
+    y: 12785
 --- !u!114 &11447240
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -253,10 +251,6 @@ MonoBehaviour:
   _targetPlatform: 4
   _trackAttackAngle: 1
   _attackAngle: 11380
-  _projectileOffset:
-    _x: 0
-    _y: 0
-    _height: 0
   _energyCost: 0
   _projectileOrigin: {x: 0, y: 0, z: 0}
 --- !u!114 &11485440

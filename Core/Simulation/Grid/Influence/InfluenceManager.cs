@@ -29,10 +29,10 @@ namespace Lockstep
 
         const int FoundScanBuffer = 5;
 
-		public static LSAgent FindClosestAgent(LSAgent sourceAgent, IEnumerable<LSAgent> agents)
+		public static LSAgent FindClosestAgent(Vector2d position, IEnumerable<LSAgent> agents)
 		{
-			long sourceX = sourceAgent.Body._position.x;
-			long sourceY = sourceAgent.Body._position.y;
+			long sourceX = position.x;
+            long sourceY = position.y;
 			LSAgent closestAgent = null;
 			long closestDistance = 0;
 			int foundBuffer = FoundScanBuffer;
@@ -61,24 +61,16 @@ namespace Lockstep
 			return closestAgent;
 		}
 
-		public static LSAgent Scan(int gridX, int gridY, int deltaCount,
-			LSAgent sourceAgent, AllegianceType targetAllegiance)
+		public static LSAgent Scan(Vector2d position, int deltaCount, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional)
 		{
-			return FindClosestAgent(sourceAgent, ScanAll (gridX, gridY, deltaCount, sourceAgent, targetAllegiance));
+            int gridX;
+            int gridY;
+            GridManager.GetCoordinates(position.x,position.y, out gridX, out gridY);
+			return FindClosestAgent(position, ScanAll (gridX, gridY, deltaCount, agentConditional, bucketConditional));
 		}
 
-		public static LSAgent ScanCone(int gridX, int gridY, long radius, long angle,
-			LSAgent sourceAgent, AllegianceType targetAllegiance)
-		{
-			return FindClosestAgent(sourceAgent, ScanAllCone (gridX, gridY, radius, angle, sourceAgent, targetAllegiance));
-		}
-
-        public static IEnumerable<LSAgent> ScanAll(int gridX, int gridY, int deltaCount,
-                                                   LSAgent sourceAgent,
-                                                   AllegianceType targetAllegiance)
+        public static IEnumerable<LSAgent> ScanAll(int gridX, int gridY, int deltaCount, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional)
         {
-            long sourceX = sourceAgent.Body._position.x;
-            long sourceY = sourceAgent.Body._position.y;
             for (int i = 0; i < deltaCount; i++)
             {
                 ScanNode tempNode = GridManager.GetScanNode(
@@ -87,7 +79,7 @@ namespace Lockstep
 
                 if (tempNode.IsNotNull())
                 {
-                    foreach (FastBucket<LSInfluencer> tempBucket in tempNode.BucketsWithAllegiance(sourceAgent, targetAllegiance))
+                    foreach (FastBucket<LSInfluencer> tempBucket in tempNode.BucketsWithAllegiance(bucketConditional))
                     {
                         BitArray arrayAllocation = tempBucket.arrayAllocation;
                         for (int j = 0; j < tempBucket.PeakCount; j++)
@@ -95,7 +87,7 @@ namespace Lockstep
                             if (arrayAllocation.Get(j))
                             {
                                 LSAgent tempAgent = tempBucket [j].Agent;
-                                if (true)//conditional(tempAgent))
+                                if (agentConditional(tempAgent))
                                 {
                                     yield return tempAgent;
                                 }
@@ -125,7 +117,9 @@ namespace Lockstep
 
 				if (tempNode.IsNotNull())
 				{
-					foreach (FastBucket<LSInfluencer> tempBucket in tempNode.BucketsWithAllegiance(sourceAgent, targetAllegiance))
+                    foreach (FastBucket<LSInfluencer> tempBucket in tempNode.BucketsWithAllegiance(
+                        (bite) => ((sourceAgent.Controller.GetAllegiance(bite) & targetAllegiance) != 0))
+                    )
 					{
 						BitArray arrayAllocation = tempBucket.arrayAllocation;
 						for (int j = 0; j < tempBucket.PeakCount; j++)
@@ -155,40 +149,6 @@ namespace Lockstep
 				}
 			}
 		}
-
-        public static LSAgent Source;
-        public static PlatformType TargetPlatform;
-        public static AllegianceType TargetAllegiance;
-
-        public static readonly Func<LSAgent,bool> ScanConditionalSourceWithHealthAction = ScanConditionalSourceWithHealth;
-
-        private static bool ScanConditionalSourceWithHealth(LSAgent agent)
-        {
-            if (agent.Healther == null)
-            {
-                return false;
-            }
-            return ScanConditionalSource(agent);
-        }
-
-        public static readonly Func<LSAgent,bool> ScanConditionalSourceAction = ScanConditionalSource;
-
-        private static bool ScanConditionalSource(LSAgent agent)
-        {
-            if (System.Object.ReferenceEquals(agent, Source))
-                return false;
-			
-
-            if ((Source.GetAllegiance(agent) & TargetAllegiance) == 0)
-            {
-                return false;
-            }
-
-            if ((agent.Platform & TargetPlatform) == 0)
-                return false;
-			
-            return true;
-        }
 
         #endregion
     }
