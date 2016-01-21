@@ -253,7 +253,7 @@ namespace Lockstep.Integration
                         new Vector3(targetPos.x - halfWidth, height, targetPos.z + halfHeight),
                         new Vector3(targetPos.x + halfWidth, height, targetPos.z + halfHeight)
                     };
-                    Handles.DrawLines(lines);
+                    Handles.DrawPolyLine(lines);
                 }
                 for (int i = 0; i < 1; i++)
                 {
@@ -272,7 +272,7 @@ namespace Lockstep.Integration
                         new Vector3(targetPos.x - halfWidth, height, targetPos.z + halfHeight),
                         new Vector3(targetPos.x + halfWidth, height, targetPos.z + halfHeight)
                     };
-                    Handles.DrawLines(lines);
+                    Handles.DrawPolyLine(lines);
                 }
 
                 xModifier = 0;//halfWidth;
