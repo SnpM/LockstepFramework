@@ -401,7 +401,8 @@ namespace Lockstep
     {
         Neutral         = 1 << 0,
         Friendly        = 1 << 1,
-        Enemy           = 1 << 2
+        Enemy           = 1 << 2,
+        All = ~0
     }
   
 }

@@ -9,8 +9,16 @@ namespace Lockstep
 
     public static class Raycaster
     {
-        internal static uint _Version {get; set;}
+        internal static uint _Version { get; set; }
+
         public static readonly FastList<Vector2d> bufferIntersectionPoints = new FastList<Vector2d>();
+
+        /// <summary>
+        /// Conditional for raycasting. Reset after every raycast. Access Raycaster.CurBody for the current body being checked.
+        /// </summary>
+        /// <value>The conditional.</value>
+        public static Func<bool> Conditional { get; set; }
+
 
         public static IEnumerable<LSBody> RaycastAll(Vector2d start, Vector2d end)
         {
@@ -29,32 +37,39 @@ namespace Lockstep
                 for (int i = node.ContainedObjects.Count - 1; i >= 0; i--)
                 {
                     LSBody body = PhysicsManager.SimObjects [node.ContainedObjects [i]];
-                    if (body.RaycastVersion != _Version) {
-                        body.RaycastVersion = _Version;
-                        if (body.Overlaps(bufferIntersectionPoints))
+                    if (body.RaycastVersion != _Version)
+                    {
+                        if (Conditional.IsNull() || Conditional())
                         {
-                            yield return body;
+                            body.RaycastVersion = _Version;
+                            if (body.Overlaps(bufferIntersectionPoints))
+                            {
+                                yield return body;
+                            }
                         }
                     }
                 }
             }
+            Conditional = null;
             yield break;
         }
 
-        /// <summary>
-        /// Conditional for raycasting. Reset after every raycast. Access Raycaster.CurBody for the current body being checked.
-        /// </summary>
-        /// <value>The conditional.</value>
-        public static Func<bool> Conditional { get; set; }
 
         public static LSBody CurBody { get; private set; }
 
-        public static IEnumerable<LSBody> RaycastAll(Vector2d start, Vector2d end, long startHeight, long heightSlope)
+        public static IEnumerable<LSBody> RaycastAll(Vector3d start3d, Vector3d end3d)
         {
-            //TODO: return bodies based on hit order
-            foreach (LSBody body in RaycastAll(start,end))
+            long startHeight = start3d.z;
+            long heightSlope = (end3d.z - start3d.z).Div((end3d.ToVector2d() - start3d.ToVector2d()).Magnitude());
+            Vector2d start = start3d.ToVector2d();
+            Vector2d end = end3d.ToVector2d();
+            if (heightSlope == 0)
             {
-                if (Conditional == null || Conditional())
+                
+            } else
+            {
+                //TODO: return bodies based on hit order
+                foreach (LSBody body in RaycastAll(start,end))
                 {
                     bool heightIntersects = false;
                     bool mined = false;
@@ -84,9 +99,9 @@ namespace Lockstep
                     }
                     if (heightIntersects)
                         yield return body;
+                    
                 }
             }
-            Conditional = null;
         }
 
         public static IEnumerable<FractionalLineAlgorithm.Coordinate> GetRelevantNodeCoordinates(Vector2d start, Vector2d end)

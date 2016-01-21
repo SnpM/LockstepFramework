@@ -373,8 +373,8 @@ namespace Lockstep
                 (float)FixedMath.ToDouble(this.y)
             );
         }
-        public Vector3d ToVector3d (long z) {
-            return new Vector3d(x,z,z);
+        public Vector3d ToVector3d (long z = 0) {
+            return new Vector3d(x,y,z);
         }
 
         public Vector3 ToVector3(float z = 0f)
