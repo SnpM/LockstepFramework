@@ -373,17 +373,16 @@ namespace Lockstep
                 (float)FixedMath.ToDouble(this.y)
             );
         }
-
-        public Vector3 ToVector3(float y = 0f)
-        {
-            return new Vector3((float)FixedMath.ToDouble(this.x), y, (float)FixedMath.ToDouble(this.y));
+        public Vector3d ToVector3d (long z = 0) {
+            return new Vector3d(x,y,z);
         }
 
-        public Vector3 ToScaledVector3(float y)
+        public Vector3 ToVector3(float z = 0f)
         {
-            return ToVector3(y);
-            //return new Vector3((float)FixedMath.ToDouble(this.x) * LockstepManager.WorldScale, y, (float)FixedMath.ToDouble(this.y) * LockstepManager.WorldScale);
+            return new Vector3((float)FixedMath.ToDouble(this.x), z, (float)FixedMath.ToDouble(this.y));
         }
+
+
 
         #endregion
 

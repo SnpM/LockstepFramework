@@ -69,7 +69,7 @@ namespace Lockstep
             get { return this._targetPlatform; }
         }
 
-        public Vector2dHeight ProjectileOffset { get { return _projectileOffset; } }
+        public Vector3d ProjectileOffset { get { return _projectileOffset; } }
         //Offset of projectile
 
         #region Serialized Values (Further description in properties)
@@ -93,7 +93,7 @@ namespace Lockstep
         [FixedNumberAngle, SerializeField]
         protected  long _attackAngle = FixedMath.TenDegrees;
         [SerializeField]
-        protected  Vector2dHeight _projectileOffset;
+        protected  Vector3d _projectileOffset;
         [SerializeField, FixedNumber]
         protected long _energyCost;
 
@@ -311,7 +311,13 @@ namespace Lockstep
         protected virtual void OnFire()
         {
             long appliedDamage = Damage;
-            LSProjectile projectile = ProjectileManager.Create(ProjCode, Agent, this.ProjectileOffset, (agent) => agent.Healther.TakeRawDamage(appliedDamage));
+            LSProjectile projectile = ProjectileManager.Create(
+                ProjCode,
+                this.Agent,
+                this.ProjectileOffset,
+                this.TargetAllegiance,
+                (other) => this.Agent.Healther.IsNotNull(),
+                (agent) => agent.Healther.TakeRawDamage(appliedDamage));
             projectile.InitializeHoming(this.Target);
             projectile.TargetPlatform = TargetPlatform;
             ProjectileManager.Fire(projectile);
@@ -424,7 +430,7 @@ namespace Lockstep
 
         private bool ScanAndEngage()
         {
-            LSAgent agent = Agent.Influencer.Scan(deltaCount, TargetAllegiance, TargetPlatform);
+            LSAgent agent = DoScan ();
             if (agent == null || HasTarget && agent == Target)
             {
                 return false;
@@ -435,9 +441,18 @@ namespace Lockstep
             }
         }
 
+        private LSAgent DoScan () {
+            return InfluenceManager.Scan(
+                this.cachedBody.Position,
+                this.rangeDeltaCount,
+                (other) => other.Healther.IsNotNull(),
+                (bite) => ((this.Agent.Controller.GetAllegiance(bite) & this.TargetAllegiance) != 0)
+            );
+        }
+
         public bool ScanWithinRangeAndEngage()
         {
-            LSAgent agent = Agent.Influencer.Scan(rangeDeltaCount, TargetAllegiance, TargetPlatform);
+            LSAgent agent = this.DoScan();
             if (agent == null)
             {
                 return false;
@@ -458,7 +473,7 @@ namespace Lockstep
                 Debug.LogWarning("Visual editting can only be used when transform is at origin.");
                 return;
             }
-            _projectileOffset = new Vector2dHeight(base.transform.InverseTransformPoint(_projectileOrigin));
+            _projectileOffset = new Vector3d(base.transform.InverseTransformPoint(_projectileOrigin));
         }
 
         void OnDrawGizmos()

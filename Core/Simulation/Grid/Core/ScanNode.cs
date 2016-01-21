@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 namespace Lockstep{
 	public class ScanNode {
 
@@ -32,9 +33,11 @@ namespace Lockstep{
             LocatedAgents[influencer.Agent.Controller.ControllerID].RemoveAt(influencer.NodeTicket);
         }
 
-        public IEnumerable<FastBucket<LSInfluencer>> BucketsWithAllegiance (LSAgent source, AllegianceType allegiance) {
+        public IEnumerable<FastBucket<LSInfluencer>> BucketsWithAllegiance (Func<byte,bool> bucketConditional) {
             foreach (KeyValuePair<byte,FastBucket<LSInfluencer>> pair in LocatedAgents) {
-                if ((source.Controller.GetAllegiance(pair.Key) & allegiance) != 0) {
+                if (bucketConditional (pair.Key))
+                //if ((source.Controller.GetAllegiance(pair.Key) & allegiance) != 0)
+                {
                     yield return pair.Value;
                 }
             }

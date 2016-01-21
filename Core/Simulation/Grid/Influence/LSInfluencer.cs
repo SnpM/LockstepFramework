@@ -57,41 +57,7 @@ namespace Lockstep
 			LocatedNode.Remove (this);
 			LocatedNode = null;
 		}
-        
-		static AllegianceType TargetAllegiance;
-		static PlatformType TargetPlatform;
-		public LSAgent Scan (int deltaCount,
-            AllegianceType targetAllegiance = AllAllegiance,
-            PlatformType targetPlatform = AllPlatforms)
-		{
-			InfluenceManager.Source = Agent;
-			InfluenceManager.TargetAllegiance = targetAllegiance;
-			InfluenceManager.TargetPlatform = targetPlatform;
-			return InfluenceManager.Scan (LocatedNode.ScanX, LocatedNode.ScanY, deltaCount,
-			                              this.Agent,targetAllegiance);
-		}
 
-		public LSAgent ScanCone (long radius, long angle,
-			AllegianceType targetAllegiance = AllAllegiance,
-			PlatformType targetPlatform = AllPlatforms)
-		{
-			InfluenceManager.Source = Agent;
-			InfluenceManager.TargetAllegiance = targetAllegiance;
-			InfluenceManager.TargetPlatform = targetPlatform;
-			return InfluenceManager.ScanCone (LocatedNode.ScanX, LocatedNode.ScanY, radius, angle,
-				this.Agent, targetAllegiance);
-		}
-
-		public IEnumerable<LSAgent> ScanAll (int deltaCount,
-			AllegianceType targetAllegiance = AllAllegiance,
-			PlatformType targetPlatform = AllPlatforms)
-		{
-			InfluenceManager.Source = Agent;
-			InfluenceManager.TargetAllegiance = targetAllegiance;
-			InfluenceManager.TargetPlatform = targetPlatform;
-			return InfluenceManager.ScanAll (LocatedNode.ScanX, LocatedNode.ScanY, deltaCount,
-				this.Agent, targetAllegiance);
-		}
 
         const PlatformType AllPlatforms = (PlatformType)~0;
         const AllegianceType AllAllegiance = (AllegianceType)~0;
