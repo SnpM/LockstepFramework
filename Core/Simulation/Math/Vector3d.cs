@@ -6,6 +6,7 @@ namespace Lockstep
     //THIS IS HAPPENING!!!!
     public struct Vector3d : Lockstep.ICommandData
     {
+
         [FixedNumber]
         public long x;
         [FixedNumber]
@@ -22,6 +23,11 @@ namespace Lockstep
             y = Y;
             z = Z;
         }
+        #region Static Math
+        public static readonly Vector3d one = new Vector3d(FixedMath.One, FixedMath.One, FixedMath.One);
+        public static readonly Vector3d negative = new Vector3d(-FixedMath.One, -FixedMath.One, -FixedMath.One);
+        public static readonly Vector3d zero = new Vector3d(0, 0, 0);
+        #endregion
 
         public void Normalize () {
             long magnitude = FixedMath.Sqrt(x.Mul(x) + y.Mul(y) + z.Mul(z));
