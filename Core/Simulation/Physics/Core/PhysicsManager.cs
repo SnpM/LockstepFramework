@@ -281,7 +281,7 @@ namespace Lockstep
             }
 
             AssimilatedCount--;
-            body.Deactivate();
+			// body.Deactivate(); BUG ? body.Deactivate() call PhysicsManager.Dessimilate() !!!
         }
 
         public static CollisionPair GetCollisionPair(int ID1, int ID2)
