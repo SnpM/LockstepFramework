@@ -65,7 +65,7 @@ namespace Lockstep
 		{
             int gridX;
             int gridY;
-            GridManager.GetCoordinates(position.x,position.y, out gridX, out gridY);
+			GridManager.GetScanCoordinates(position.x,position.y, out gridX, out gridY);
 			return FindClosestAgent(position, ScanAll (gridX, gridY, deltaCount, agentConditional, bucketConditional));
 		}
 
