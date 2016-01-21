@@ -69,6 +69,11 @@ namespace Lockstep
             get { return this._targetPlatform; }
         }
 
+        /// <summary>
+        /// Whenever Scan Fires, this event is raised
+        /// </summary>
+        public event System.Action<LSProjectile> onDidFireProjectile;
+
         public Vector3d ProjectileOffset { get { return _projectileOffset; } }
         //Offset of projectile
 
@@ -321,6 +326,7 @@ namespace Lockstep
             projectile.InitializeHoming(this.Target);
             projectile.TargetPlatform = TargetPlatform;
             ProjectileManager.Fire(projectile);
+            onDidFireProjectile(projectile);
         }
 
         public void Engage(LSAgent other)
