@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+namespace Lockstep {
 [System.Serializable]
 public class PathObject {
     [SerializeField]
@@ -13,4 +14,5 @@ public class PathObject {
             return Setted ? _object : (_object = PathObjectFactory.Load (this));
         }
     }
+}
 }

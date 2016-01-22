@@ -2,7 +2,7 @@
 using UnityEngine;
 using Lockstep.Data;
 using System.Collections.Generic;
-
+using System.Linq;
 namespace Lockstep
 {
     public sealed class AgentController
@@ -21,30 +21,32 @@ namespace Lockstep
         public static ushort PeakGlobalID { get; private set; }
 
         public const int MaxAgents = 16384;
-        private static readonly Dictionary<string,AgentInterfacer> CodeInterfacerMap = new Dictionary<string, AgentInterfacer>();
+        private static readonly Dictionary<string,IAgentDataItem> CodeInterfacerMap = new Dictionary<string, IAgentDataItem>();
 
         public static void Setup()
         {
-            
-            AgentInterfacer[] agentInters = (LSDatabaseManager.CurrentDatabase as DefaultLSDatabase).AgentData;
+            Array agentData = LSDatabaseManager.GetData("Agents") as Array;
+            IAgentDataItem[] agentInters = agentData.Cast<IAgentDataItem>().ToArray();
+
+            //AgentInterfacer[] agentInters = (LSDatabaseManager.CurrentDatabase as DefaultLSDatabase).AgentData;
             AgentCodes = new string[agentInters.Length];
             
             CachedAgents = new Dictionary<string,FastStack<LSAgent>>(agentInters.Length);
             
             for (int i = 0; i < agentInters.Length; i++)
             {
-                AgentInterfacer interfacer = agentInters [i];
+                IAgentDataItem interfacer = agentInters [i];
                 string agentCode = interfacer.Name;
                 AgentCodes [i] = agentCode;
                 
                 CachedAgents.Add(agentCode, new FastStack<LSAgent>(2));
-                CodeInterfacerMap.Add(agentCode, interfacer);
+                 CodeInterfacerMap.Add(agentCode, interfacer);
                 CodeIndexMap.Add(agentCode, (ushort)i);
             }
         }
 
         
-        public static AgentInterfacer GetAgentInterfacer(string agentCode)
+        public static IAgentDataItem GetAgentInterfacer(string agentCode)
         {
             return AgentController.CodeInterfacerMap [agentCode];
         }
@@ -320,8 +322,8 @@ namespace Lockstep
                 curAgent = cache.Pop();
             } else
             {
-                AgentInterfacer interfacer = AgentController.CodeInterfacerMap [agentCode];
-                curAgent = GameObject.Instantiate(AgentController.CodeInterfacerMap [agentCode].Prefab).GetComponent<LSAgent>();
+                IAgentDataItem interfacer = AgentController.CodeInterfacerMap [agentCode];
+                curAgent = GameObject.Instantiate(interfacer.GetAgent().gameObject).GetComponent<LSAgent>();
                 curAgent.Setup(interfacer);
             }
             InitializeAgent(curAgent, pos, rot);

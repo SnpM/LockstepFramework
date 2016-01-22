@@ -218,13 +218,13 @@ namespace Lockstep {
 		public Transform VisualCenter {get {return _visualCenter;}}
 		public float SelectionRadiusSquared {get; private set;}
 
-        public AgentInterfacer Interfacer {get; private set;}
+        public IAgentDataItem Data {get; private set;}
         private readonly FastList<int> TrackedLockstepTickets = new FastList<int>();
         void Awake () {
             gameObject.SetActive(false);
 
         }
-        public void Setup(AgentInterfacer interfacer) {
+        public void Setup(IAgentDataItem interfacer) {
             gameObject.SetActive(true);
             LoadComponents ();
 
@@ -233,7 +233,7 @@ namespace Lockstep {
 			setupAbilitys.FastClear();
             
             MyAgentCode = interfacer.Name;
-            Interfacer = interfacer;
+            Data = interfacer;
             SpawnVersion = 1;
             CheckCasting = true;
 
