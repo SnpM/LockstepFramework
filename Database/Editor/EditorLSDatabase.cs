@@ -57,7 +57,7 @@ namespace Lockstep.Data
 
                             DataItemInfo dataInfo = new DataItemInfo(
                                                         field.FieldType.GetElementType(),
-                                                        registerDataAttribute.DisplayName,
+                                                        registerDataAttribute.DataName,
                                                         field.Name,
                                                         sortInfos.ToArray()
                                                     );

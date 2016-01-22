@@ -7,7 +7,7 @@ using Lockstep.Data;
 namespace Lockstep.Data
 {
 	[Serializable]
-	public class AgentInterfacer : ObjectDataItem
+	public class AgentInterfacer : ObjectDataItem, IAgentDataItem
 	{
         public AgentInterfacer (string name, string description) : this(){
             base._name = name;
@@ -15,7 +15,7 @@ namespace Lockstep.Data
         }
         public AgentInterfacer(){}
 
-        public virtual LSAgent GetAgent () {
+        public LSAgent GetAgent () {
             if (this.Prefab != null)
             {
                 LSAgent agent = this.Prefab.GetComponent<LSAgent> ();
