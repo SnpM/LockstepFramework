@@ -8,13 +8,16 @@ namespace Lockstep
         private static BiDictionary<string,ushort> InputMap = new BiDictionary<string, ushort>();
         private static bool Setted {get; set;}
         public static void Setup () {
-            InputDataItem[] inputData = (LSDatabaseManager.CurrentDatabase as DefaultLSDatabase).InputData;
-            for (int i = inputData.Length - 1; i >= 0; i--) {
-                ushort id = (ushort)(i + 1);
-                string code = inputData[i].Name;
-                InputMap.Add(code,id);
+            IInputDataProvider provider;
+            if (LSDatabaseManager.TryGetDatabase<IInputDataProvider> (out provider)) {
+                InputDataItem[] inputData = provider.InputData;
+                for (int i = inputData.Length - 1; i >= 0; i--) {
+                    ushort id = (ushort)(i + 1);
+                    string code = inputData[i].Name;
+                    InputMap.Add(code,id);
+                }
+                Setted = true;
             }
-            Setted = true;
         }
         public static ushort GetCodeID (string code) {
             if (!Setted)

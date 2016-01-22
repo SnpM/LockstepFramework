@@ -29,7 +29,7 @@ namespace Lockstep
 
         public string MyAbilityCode { get; private set; }
 
-        public AbilityInterfacer Interfacer { get; private set; }
+        public AbilityDataItem Data { get; private set; }
 
         public int ID { get; private set; }
 
@@ -76,13 +76,13 @@ namespace Lockstep
                 {
                     mainType = mainType.BaseType;
                 }
-                Interfacer = AbilityInterfacer.FindInterfacer(mainType);
+                Data = AbilityDataItem.FindInterfacer(mainType);
 
-                if (Interfacer == null)
+                if (Data == null)
                 {
                     throw new System.ArgumentException("The Ability of type " + mainType + " has not been registered in database");
                 }
-                this.MyAbilityCode = Interfacer.Name;
+                this.MyAbilityCode = Data.Name;
             } else
             {
                 this.MyAbilityCode = mainType.Name;

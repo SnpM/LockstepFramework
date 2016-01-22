@@ -542,9 +542,9 @@ namespace Lockstep
             this.ResetHelpers();
         }
 
-        public ProjectileDataItem MyData { get; private set; }
+        public IProjectileData MyData { get; private set; }
 
-        public void Setup(ProjectileDataItem dataItem)
+        public void Setup(IProjectileData dataItem)
         {
             this.SpawnVersion = 1u;
             this.MyData = dataItem;

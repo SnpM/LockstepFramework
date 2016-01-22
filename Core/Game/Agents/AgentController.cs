@@ -3,6 +3,7 @@ using UnityEngine;
 using Lockstep.Data;
 using System.Collections.Generic;
 using System.Linq;
+
 namespace Lockstep
 {
     public sealed class AgentController
@@ -21,32 +22,38 @@ namespace Lockstep
         public static ushort PeakGlobalID { get; private set; }
 
         public const int MaxAgents = 16384;
-        private static readonly Dictionary<string,IAgentDataItem> CodeInterfacerMap = new Dictionary<string, IAgentDataItem>();
+        private static readonly Dictionary<string,IAgentData> CodeInterfacerMap = new Dictionary<string, IAgentData>();
 
         public static void Setup()
         {
-            Array agentData = LSDatabaseManager.GetData("Agents") as Array;
-            IAgentDataItem[] agentInters = agentData.Cast<IAgentDataItem>().ToArray();
-
-            //AgentInterfacer[] agentInters = (LSDatabaseManager.CurrentDatabase as DefaultLSDatabase).AgentData;
-            AgentCodes = new string[agentInters.Length];
-            
-            CachedAgents = new Dictionary<string,FastStack<LSAgent>>(agentInters.Length);
-            
-            for (int i = 0; i < agentInters.Length; i++)
+            IAgentDataProvider database;
+            if (LSDatabaseManager.TryGetDatabase<IAgentDataProvider>(out database))
             {
-                IAgentDataItem interfacer = agentInters [i];
-                string agentCode = interfacer.Name;
-                AgentCodes [i] = agentCode;
+                IAgentData[] agentInters = database.AgentData;
+
+                //AgentInterfacer[] agentInters = (LSDatabaseManager.CurrentDatabase as DefaultLSDatabase).AgentData;
+                AgentCodes = new string[agentInters.Length];
+            
+                CachedAgents = new Dictionary<string,FastStack<LSAgent>>(agentInters.Length);
+            
+                for (int i = 0; i < agentInters.Length; i++)
+                {
+                    IAgentData interfacer = agentInters [i];
+                    string agentCode = interfacer.Name;
+                    AgentCodes [i] = agentCode;
                 
-                CachedAgents.Add(agentCode, new FastStack<LSAgent>(2));
-                 CodeInterfacerMap.Add(agentCode, interfacer);
-                CodeIndexMap.Add(agentCode, (ushort)i);
+                    CachedAgents.Add(agentCode, new FastStack<LSAgent>(2));
+                    CodeInterfacerMap.Add(agentCode, interfacer);
+                    CodeIndexMap.Add(agentCode, (ushort)i);
+                }
+            } else
+            {
+                Debug.Log("Database does no provide AgentData. Make sure it implements IAgentDataProvider.");
             }
         }
 
         
-        public static IAgentDataItem GetAgentInterfacer(string agentCode)
+        public static IAgentData GetAgentInterfacer(string agentCode)
         {
             return AgentController.CodeInterfacerMap [agentCode];
         }
@@ -235,13 +242,15 @@ namespace Lockstep
         private readonly FastList<AllegianceType> DiplomacyFlags = new FastList<AllegianceType>();
         private readonly FastStack<ushort> OpenLocalIDs = new FastStack<ushort>();
 
-        public static AgentController Create () {
+        public static AgentController Create()
+        {
             return new AgentController();
         }
 
         private AgentController()
         {
-            if (InstanceManagers.Count > byte.MaxValue) {
+            if (InstanceManagers.Count > byte.MaxValue)
+            {
                 throw new System.Exception("Cannot have more than 256 AgentControllers");
             }
             OpenLocalIDs.FastClear();
@@ -250,14 +259,14 @@ namespace Lockstep
             
             for (int i = 0; i < InstanceManagers.Count; i++)
             {
-                this.SetAllegiance(InstanceManagers[i], AllegianceType.Neutral);
+                this.SetAllegiance(InstanceManagers [i], AllegianceType.Neutral);
             }
             UpdateDiplomacy(this);
 
             InstanceManagers.Add(this);
-            this.SetAllegiance(this,AllegianceType.Friendly);
+            this.SetAllegiance(this, AllegianceType.Friendly);
         }
-            
+
         public void AddToSelection(LSAgent agent)
         {
             SelectedAgents.Add(agent);
@@ -277,7 +286,7 @@ namespace Lockstep
            
             {
                 if (com.ContainsData<Selection>() == false)
-                    com.Add<Selection>( previousSelection);
+                    com.Add<Selection>(previousSelection);
                 previousSelection = com.GetData<Selection>();
             }
 
@@ -296,7 +305,7 @@ namespace Lockstep
         //Backward compat.
         public static Command GenerateSpawnCommand(AgentController cont, string agentCode, int count, Vector2d position)
         {
-            return Lockstep.Example.ExampleSpawner.GenerateSpawnCommand(cont,agentCode,count,position);
+            return Lockstep.Example.ExampleSpawner.GenerateSpawnCommand(cont, agentCode, count, position);
         }
 
         public LSAgent CreateAgent(
@@ -305,7 +314,7 @@ namespace Lockstep
             Vector2d? rotation = null  //Nullable rotation for default parametrz
         )
         {
-            Vector2d pos = position != null ? position.Value : new Vector2d(0,0);
+            Vector2d pos = position != null ? position.Value : new Vector2d(0, 0);
             Vector2d rot = rotation != null ? rotation.Value : Vector2d.radian0;
 
 
@@ -322,7 +331,7 @@ namespace Lockstep
                 curAgent = cache.Pop();
             } else
             {
-                IAgentDataItem interfacer = AgentController.CodeInterfacerMap [agentCode];
+                IAgentData interfacer = AgentController.CodeInterfacerMap [agentCode];
                 curAgent = GameObject.Instantiate(interfacer.GetAgent().gameObject).GetComponent<LSAgent>();
                 curAgent.Setup(interfacer);
             }
@@ -341,8 +350,8 @@ namespace Lockstep
         }*/
         
         private void InitializeAgent(LSAgent agent,
-                                      Vector2d position,
-        Vector2d rotation)
+                                     Vector2d position,
+                                     Vector2d rotation)
         {
             ushort localID = GenerateLocalID();
             LocalAgents [localID] = agent;
@@ -367,7 +376,8 @@ namespace Lockstep
 
         public void SetAllegiance(AgentController otherController, AllegianceType allegianceType)
         {
-            while (DiplomacyFlags.Count <= otherController.ControllerID) {
+            while (DiplomacyFlags.Count <= otherController.ControllerID)
+            {
                 DiplomacyFlags.Add(AllegianceType.Neutral);
             }
             DiplomacyFlags [otherController.ControllerID] = allegianceType;
@@ -378,8 +388,10 @@ namespace Lockstep
             return HasTeam && otherController.HasTeam ? MyTeam.GetAllegiance(otherController) : DiplomacyFlags [otherController.ControllerID];
         }
 
-        public AllegianceType GetAllegiance (byte controllerID) {
-            if (HasTeam) {
+        public AllegianceType GetAllegiance(byte controllerID)
+        {
+            if (HasTeam)
+            {
                 //TODO: Team allegiance
             }
 
@@ -401,9 +413,9 @@ namespace Lockstep
     [System.Flags]
     public enum AllegianceType : int
     {
-        Neutral         = 1 << 0,
-        Friendly        = 1 << 1,
-        Enemy           = 1 << 2,
+        Neutral = 1 << 0,
+        Friendly = 1 << 1,
+        Enemy = 1 << 2,
         All = ~0
     }
   

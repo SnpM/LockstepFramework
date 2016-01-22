@@ -15,7 +15,7 @@ namespace Lockstep {
 
         public Ability[] Abilitys {get; private set;}
         public ActiveAbility[] ActiveAbilitys {get; private set;}
-		public readonly FastList<AbilityInterfacer> Interfacers = new FastList<AbilityInterfacer>();
+		public readonly FastList<AbilityDataItem> Interfacers = new FastList<AbilityDataItem>();
 
         public void Setup(LSAgent agent) {
 			setupActives.FastClear ();
@@ -43,9 +43,9 @@ namespace Lockstep {
             }
 			for (int i = 0; i < ActiveAbilitys.Length; i++)
 			{
-				if (ActiveAbilitys[i].Interfacer.IsNotNull ())
+				if (ActiveAbilitys[i].Data.IsNotNull ())
 
-				Interfacers.Add (ActiveAbilitys[i].Interfacer);
+				Interfacers.Add (ActiveAbilitys[i].Data);
 			}
         }
 

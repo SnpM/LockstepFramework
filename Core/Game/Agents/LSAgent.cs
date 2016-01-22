@@ -88,7 +88,7 @@ namespace Lockstep {
 
 
 		public Vector2 Position2 {get{return new Vector2(CachedTransform.position.x, CachedTransform.position.z);}}
-		public FastList<AbilityInterfacer> Interfacers {get {return abilityManager.Interfacers;}}
+		public FastList<AbilityDataItem> Interfacers {get {return abilityManager.Interfacers;}}
 
 		#region Pre-runtime generated
 		[SerializeField]
@@ -218,13 +218,13 @@ namespace Lockstep {
 		public Transform VisualCenter {get {return _visualCenter;}}
 		public float SelectionRadiusSquared {get; private set;}
 
-        public IAgentDataItem Data {get; private set;}
+        public IAgentData Data {get; private set;}
         private readonly FastList<int> TrackedLockstepTickets = new FastList<int>();
         void Awake () {
             gameObject.SetActive(false);
 
         }
-        public void Setup(IAgentDataItem interfacer) {
+        public void Setup(IAgentData interfacer) {
             gameObject.SetActive(true);
             LoadComponents ();
 

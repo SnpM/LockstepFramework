@@ -85,7 +85,7 @@ namespace Lockstep
             GameObject.DontDestroyOnLoad(UnityInstance.gameObject);
 
             GridManager.Setup();
-            AbilityInterfacer.Setup();
+            AbilityDataItem.Setup();
          
             AgentController.Setup();
             TeamManager.Setup();

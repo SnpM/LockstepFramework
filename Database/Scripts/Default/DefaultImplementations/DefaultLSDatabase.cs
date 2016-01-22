@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using System.Linq;
 namespace Lockstep.Data
 {
 	//PROTECTED NOT PRIVATE... private dun serialize in derived class
     [System.Serializable]
 
-    public class DefaultLSDatabase : LSDatabase
+    public class DefaultLSDatabase : LSDatabase, IEssentialDataProvider
+    ,IAgentDataProvider
     {
         #region Agents
 
@@ -25,11 +26,11 @@ namespace Lockstep.Data
         )]
             
         
-        protected AgentInterfacer[]
+        protected AgentDataItem[]
             _agentData;
 
         //Using IDE reference finding, you can see how the stored _agentData gets passed on to the simulation
-        public AgentInterfacer[] AgentData { get { return _agentData; } }
+        public IAgentData[] AgentData { get { return _agentData.Cast<IAgentData>().ToArray(); } }
 
         #endregion
 
@@ -59,7 +60,7 @@ namespace Lockstep.Data
         [SerializeField,RegisterData("Projectiles")]
         protected ProjectileDataItem[] _projectileData;
 
-        public ProjectileDataItem[] ProjectileData { get { return _projectileData; } }
+        public IProjectileData[] ProjectileData { get { return _projectileData.Cast<IProjectileData>().ToArray(); } }
 
         #endregion
 
@@ -69,17 +70,17 @@ namespace Lockstep.Data
         protected EffectDataItem[]
             _effectData;
 
-        public EffectDataItem[] EffectData { get { return _effectData; } }
+        public IEffectData[] EffectData { get { return _effectData.Cast<IEffectData>().ToArray(); } }
 
         #endregion
 
         #region Ability
 
         [SerializeField,RegisterData("Abilities")]
-        protected AbilityInterfacer[]
+        protected AbilityDataItem[]
             _abilityData;
 
-        public AbilityInterfacer[] AbilityData { get { return _abilityData; } }
+        public AbilityDataItem[] AbilityData { get { return _abilityData; } }
 
         #endregion
     }

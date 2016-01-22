@@ -7,13 +7,13 @@ using Lockstep.Data;
 namespace Lockstep.Data
 {
 	[Serializable]
-	public class AgentInterfacer : ObjectDataItem, IAgentDataItem
+	public class AgentDataItem : ObjectDataItem, IAgentData
 	{
-        public AgentInterfacer (string name, string description) : this(){
+        public AgentDataItem (string name, string description) : this(){
             base._name = name;
             base._description = description;
         }
-        public AgentInterfacer(){}
+        public AgentDataItem(){}
 
         public LSAgent GetAgent () {
             if (this.Prefab != null)

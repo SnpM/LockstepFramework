@@ -3,9 +3,8 @@ using System.Collections;
 using Lockstep;
 namespace Lockstep.Data
 {
-    public interface IAgentDataItem
+    public interface IAgentData : INamedData
     {
         LSAgent GetAgent ();
-        string Name {get;}
     }
 }

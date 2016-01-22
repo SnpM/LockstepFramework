@@ -9,8 +9,10 @@ using Lockstep.Integration;
 namespace Lockstep.Data
 {
 	[Serializable]
-	public class ProjectileDataItem : ObjectDataItem
+	public class ProjectileDataItem : ObjectDataItem, IProjectileData
 	{
-
+        public LSProjectile GetProjectile () {
+            return base.Prefab.GetComponent<LSProjectile>();
+        }
     }
 }
