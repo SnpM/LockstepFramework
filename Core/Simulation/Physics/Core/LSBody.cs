@@ -724,6 +724,7 @@ namespace Lockstep
 
         public void Deactivate()
         {
+            Partition.UpdateObject (this, false);
             PhysicsManager.Dessimilate(this);
         }
 
