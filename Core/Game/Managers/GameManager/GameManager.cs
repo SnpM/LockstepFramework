@@ -56,12 +56,19 @@ namespace Lockstep
         }
 
 
-        private static RTSInterfacingHelper _defaultHelper = new RTSInterfacingHelper();
+        private static InterfacingHelper _defaultHelper;
 
-        public virtual InterfacingHelper MainInterfacingHelper
+        public InterfacingHelper MainInterfacingHelper
         {
             get
             {
+                if (_defaultHelper.IsNull()) {
+                    _defaultHelper = this.GetComponent<InterfacingHelper> ();
+                    if (_defaultHelper == null) {
+                        Debug.Log("InterfacingHelper not found. Defaulting to RTSInterfacingHelper.");
+                        _defaultHelper = new RTSInterfacingHelper();
+                    }
+                }
                 return _defaultHelper;
             }
         }
