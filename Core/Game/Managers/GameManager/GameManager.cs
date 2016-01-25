@@ -29,13 +29,6 @@ namespace Lockstep
             }
         }
 
-
-        string replayLoadScene;
-        static int hashFrame;
-        static long prevHash;
-        static long stateHash;
-        static bool hashChecked;
-
         private NetworkHelper _mainNetworkHelper;
 
         public virtual NetworkHelper MainNetworkHelper
@@ -105,36 +98,14 @@ namespace Lockstep
         }
 
 
-        protected void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
-            LockstepManager.Simulate();
-            /*
-            if (ReplayManager.IsPlayingBack) {
-                if (hashChecked == false) {
-                    if (LockstepManager.FrameCount == hashFrame) {
-                        hashChecked = true;
-                        long newHash = AgentController.GetStateHash ();
-                        if (newHash != prevHash) {
-                            Debug.Log ("Desynced!");
-                        } else {
-                            Debug.Log ("Synced!");
-                        }
-                    }
-                }
-            } else 
-
-            {
-                hashFrame = LockstepManager.FrameCount - 1;
-                prevHash = stateHash;
-                stateHash = AgentController.GetStateHash ();
-                hashChecked = false;
-            }
-        */
+			LockstepManager.Simulate();
         }
 
         private float timeToNextSimulate;
 
-        protected void Update()
+		protected virtual void Update()
         {
             timeToNextSimulate -= Time.smoothDeltaTime * Time.timeScale;
             if (timeToNextSimulate <= float.Epsilon)
@@ -150,7 +121,7 @@ namespace Lockstep
         
         }
 
-        void LateUpdate()
+		protected virtual void LateUpdate()
         {
             LockstepManager.LateVisualize();
         }
