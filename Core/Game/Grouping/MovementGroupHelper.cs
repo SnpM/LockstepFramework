@@ -9,7 +9,7 @@ namespace Lockstep
         {
             get
             {
-                return AbilityInterfacer.FindInterfacer(typeof (Move)).ListenInputID;
+                return AbilityDataItem.FindInterfacer(typeof (Move)).ListenInputID;
             }
         }
 

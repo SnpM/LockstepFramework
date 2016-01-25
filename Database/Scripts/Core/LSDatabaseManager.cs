@@ -4,21 +4,27 @@ using System;
 using Lockstep;
 using System.Collections;
 
-#if UNITY_EDITOR
-using UnityEditor;
-using Lockstep.Integration;
-#endif
+using System.Collections.Generic;
+using System.Reflection;
 namespace Lockstep.Data {
     public static class LSDatabaseManager {
-
         public const string DatabaseFileName = "Lockstep_Database.asset";
 
         private static LSDatabase _currentDatabase;
 
-        public static LSDatabase CurrentDatabase {
+        private static LSDatabase CurrentDatabase {
             get {
                 return _currentDatabase/* ?? (_currentDatabase = (LSDatabase)Resources.Load<LSDatabase> (LSDatabaseManager.DATABASE_NAME))*/;
             }
+        }
+
+        public static bool TryGetDatabase <TDatabase> (out TDatabase database) where TDatabase : class
+        {
+            database = CurrentDatabase as TDatabase;
+            if (database.IsNull()) {
+                return false;
+            }
+            return true;
         }
 
         public static void Setup () {
@@ -29,9 +35,11 @@ namespace Lockstep.Data {
             _currentDatabase = database;
         }
 
+
         public static void Initialize () {
 
         }
+
 
 #if UNITY_EDITOR
 

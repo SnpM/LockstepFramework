@@ -7,7 +7,7 @@ namespace Lockstep
 	{
 		public override ushort ListenInput {
 			get {
-                return AbilityInterfacer.FindInterfacer(typeof (Scan)).ListenInputID;
+                return AbilityDataItem.FindInterfacer(typeof (Scan)).ListenInputID;
 			}
 		}
 

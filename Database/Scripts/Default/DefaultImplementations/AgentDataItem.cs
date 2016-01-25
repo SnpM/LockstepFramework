@@ -4,21 +4,16 @@ using System;
 using System.Collections.Generic;
 
 using Lockstep.Data;
-#if UNITY_EDITOR
-using UnityEditor;
-using prop = UnityEditor.SerializedProperty;
-using Lockstep.Integration;
-#endif
 namespace Lockstep.Data
 {
 	[Serializable]
-	public class AgentInterfacer : ObjectDataItem
+	public class AgentDataItem : ObjectDataItem, IAgentData
 	{
-        public AgentInterfacer (string name, string description) : base(){
+        public AgentDataItem (string name, string description) : this(){
             base._name = name;
             base._description = description;
         }
-        public AgentInterfacer(){}
+        public AgentDataItem(){}
 
         public LSAgent GetAgent () {
             if (this.Prefab != null)

@@ -4,103 +4,111 @@ using Lockstep;
 using System.Collections.Generic;
 using System;
 
-public abstract class BehaviourHelper : MonoBehaviour, IBehaviourHelper
+namespace Lockstep
 {
-
-    public BehaviourHelper()
+    public abstract class BehaviourHelper : MonoBehaviour, IBehaviourHelper
     {
 
-    }
+        public BehaviourHelper()
+        {
 
-    private static FastList<BehaviourHelper> behaviourHelpers = new FastList<BehaviourHelper>();
-    private static HashSet<Type> createdTypes = new HashSet<Type>();
+        }
 
-    public ushort CachedListenInput {get; private set;}
+        private static FastList<BehaviourHelper> behaviourHelpers = new FastList<BehaviourHelper>();
+        private static HashSet<Type> createdTypes = new HashSet<Type>();
 
-    public virtual ushort ListenInput
-    {
-        get { return 0; }
-    }
+        public ushort CachedListenInput { get; private set; }
 
-    public void Initialize()
-    {
-        CachedListenInput = ListenInput;
-        OnInitialize();
-    }
+        public virtual ushort ListenInput
+        {
+            get { return 0; }
+        }
 
-    protected virtual void OnInitialize()
-    {
-    }
+        public void Initialize()
+        {
+            CachedListenInput = ListenInput;
+            OnInitialize();
+        }
 
-    public void LateInitialize()
-    {
-        this.OnLateInitialize();
-    }
+        protected virtual void OnInitialize()
+        {
+        }
 
-    protected virtual void OnLateInitialize()
-    {
+        public void LateInitialize()
+        {
+            this.OnLateInitialize();
+        }
 
-    }
+        protected virtual void OnLateInitialize()
+        {
 
-    public void Simulate()
-    {
-        OnSimulate();
-    }
+        }
 
-    protected virtual void OnSimulate()
-    {
-    }
+        public void Simulate()
+        {
+            OnSimulate();
+        }
 
-    public void LateSimulate()
-    {
-        OnLateSimulate();
-    }
+        protected virtual void OnSimulate()
+        {
+        }
 
-    protected virtual void OnLateSimulate()
-    {
+        public void LateSimulate()
+        {
+            OnLateSimulate();
+        }
 
-    }
+        protected virtual void OnLateSimulate()
+        {
 
-    public void Visualize()
-    {
-        OnVisualize();
-    }
+        }
 
-    protected virtual void OnVisualize()
-    {
-    }
+        public void Visualize()
+        {
+            OnVisualize();
+        }
 
-    public void Execute(Command com)
-    {
-        OnExecute(com);
-    }
+        protected virtual void OnVisualize()
+        {
+        }
 
-    protected virtual void OnExecute(Command com)
-    {
-    }
+        public void Execute(Command com)
+        {
+            OnExecute(com);
+        }
 
-    public void RawExecute (Command com) {
-        OnRawExecute (com);
-    }
-    protected virtual void OnRawExecute (Command com) {
+        protected virtual void OnExecute(Command com)
+        {
+        }
 
-    }
+        public void RawExecute(Command com)
+        {
+            OnRawExecute(com);
+        }
 
-    public void GameStart () {
-        OnGameStart ();
-    }
+        protected virtual void OnRawExecute(Command com)
+        {
 
-    protected virtual void OnGameStart () {
+        }
 
-    }
+        public void GameStart()
+        {
+            OnGameStart();
+        }
 
-    public void Deactivate()
-    {
-        OnDeactivate();
-    }
+        protected virtual void OnGameStart()
+        {
 
-    protected virtual void OnDeactivate()
-    {
+        }
+
+        public void Deactivate()
+        {
+            OnDeactivate();
+        }
+
+        protected virtual void OnDeactivate()
+        {
 		
+        }
     }
 }

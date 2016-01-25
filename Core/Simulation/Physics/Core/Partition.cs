@@ -54,7 +54,7 @@ namespace Lockstep
 
 		static int GridXMin, GridXMax, GridYMin, GridYMax;
 
-        public static void UpdateObject (LSBody Body) {
+        public static void UpdateObject (LSBody Body, bool repartition = true) {
 
             GetGridBounds (Body);
 			if (Body.PastGridXMin != GridXMin ||
@@ -67,6 +67,7 @@ namespace Lockstep
 						node.Remove (Body.ID);
 					}
 				}
+                if (repartition)
                 PartitionObject (Body, true);
 			}
 		}

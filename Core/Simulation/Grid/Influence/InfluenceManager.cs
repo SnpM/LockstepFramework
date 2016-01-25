@@ -65,7 +65,7 @@ namespace Lockstep
 		{
             int gridX;
             int gridY;
-            GridManager.GetCoordinates(position.x,position.y, out gridX, out gridY);
+			GridManager.GetScanCoordinates(position.x,position.y, out gridX, out gridY);
 			return FindClosestAgent(position, ScanAll (gridX, gridY, deltaCount, agentConditional, bucketConditional));
 		}
 
@@ -97,58 +97,6 @@ namespace Lockstep
                 }
             }
         }
-
-		public static IEnumerable<LSAgent> ScanAllCone(int gridX, int gridY, long radius, long angle,
-			LSAgent sourceAgent,
-			AllegianceType targetAllegiance)
-		{
-			Vector2d center = sourceAgent.Body._position;
-			Vector2d rotation = sourceAgent.Body._rotation;
-
-			int deltaCount = InfluenceManager.GenerateDeltaCount (radius);
-			long num = radius * radius;
-			long num2 = angle * angle >> 16;
-
-			for (int i = 0; i < deltaCount; i++)
-			{
-				ScanNode tempNode = GridManager.GetScanNode(
-					gridX + DeltaCache.CacheX [i],
-					gridY + DeltaCache.CacheY [i]);
-
-				if (tempNode.IsNotNull())
-				{
-                    foreach (FastBucket<LSInfluencer> tempBucket in tempNode.BucketsWithAllegiance(
-                        (bite) => ((sourceAgent.Controller.GetAllegiance(bite) & targetAllegiance) != 0))
-                    )
-					{
-						BitArray arrayAllocation = tempBucket.arrayAllocation;
-						for (int j = 0; j < tempBucket.PeakCount; j++)
-						{
-							if (arrayAllocation.Get(j))
-							{
-								LSAgent tempAgent = tempBucket [j].Agent;
-
-								Vector2d agentPos = tempAgent.Body._position;
-								Vector2d difference = agentPos - center;
-
-								long num3 = difference.FastMagnitude ();
-								if (num3 <= num && difference.Dot (rotation.x, rotation.y) > 0L)
-								{
-									num3 >>= 16;
-									long num4 = rotation.Cross (difference.x, difference.y);
-									num4 *= num4;
-									num4 >>= 16;
-									if (num4 < num2 * num3 >> 16)
-									{
-										yield return tempAgent;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 
         #endregion
     }

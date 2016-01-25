@@ -29,13 +29,6 @@ namespace Lockstep
             }
         }
 
-
-        string replayLoadScene;
-        static int hashFrame;
-        static long prevHash;
-        static long stateHash;
-        static bool hashChecked;
-
         private NetworkHelper _mainNetworkHelper;
 
         public virtual NetworkHelper MainNetworkHelper
@@ -56,12 +49,19 @@ namespace Lockstep
         }
 
 
-        private static RTSInterfacingHelper _defaultHelper = new RTSInterfacingHelper();
+        private static InterfacingHelper _defaultHelper;
 
-        public virtual InterfacingHelper MainInterfacingHelper
+        public InterfacingHelper MainInterfacingHelper
         {
             get
             {
+                if (_defaultHelper.IsNull()) {
+                    _defaultHelper = this.GetComponent<InterfacingHelper> ();
+                    if (_defaultHelper == null) {
+                        Debug.Log("InterfacingHelper not found. Defaulting to RTSInterfacingHelper.");
+                        _defaultHelper = new RTSInterfacingHelper();
+                    }
+                }
                 return _defaultHelper;
             }
         }
@@ -98,36 +98,14 @@ namespace Lockstep
         }
 
 
-        protected void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
-            LockstepManager.Simulate();
-            /*
-            if (ReplayManager.IsPlayingBack) {
-                if (hashChecked == false) {
-                    if (LockstepManager.FrameCount == hashFrame) {
-                        hashChecked = true;
-                        long newHash = AgentController.GetStateHash ();
-                        if (newHash != prevHash) {
-                            Debug.Log ("Desynced!");
-                        } else {
-                            Debug.Log ("Synced!");
-                        }
-                    }
-                }
-            } else 
-
-            {
-                hashFrame = LockstepManager.FrameCount - 1;
-                prevHash = stateHash;
-                stateHash = AgentController.GetStateHash ();
-                hashChecked = false;
-            }
-        */
+			LockstepManager.Simulate();
         }
 
         private float timeToNextSimulate;
 
-        protected void Update()
+		protected virtual void Update()
         {
             timeToNextSimulate -= Time.smoothDeltaTime * Time.timeScale;
             if (timeToNextSimulate <= float.Epsilon)
@@ -143,7 +121,7 @@ namespace Lockstep
         
         }
 
-        void LateUpdate()
+		protected virtual void LateUpdate()
         {
             LockstepManager.LateVisualize();
         }

@@ -7,17 +7,20 @@ namespace Lockstep {
     public static class ProjectileManager {
 		public const int MaxProjectiles = 1 << 13;
         private static string[] AllProjCodes;
-        private static readonly Dictionary<string,ProjectileDataItem> CodeDataMap = new Dictionary<string, ProjectileDataItem>();
+        private static readonly Dictionary<string,IProjectileData> CodeDataMap = new Dictionary<string, IProjectileData>();
 
 
 		public static void Setup ()
         {
-            ProjectileDataItem[] projectileData = (LSDatabaseManager.CurrentDatabase as DefaultLSDatabase).ProjectileData;
-            for (int i = 0; i < projectileData.Length; i++)
-            {
-                ProjectileDataItem item = projectileData[i];
-                CodeDataMap.Add(item.Name, item);
-                ProjectilePool.Add(item.Name, new FastStack<LSProjectile> ());
+           IProjectileDataProvider prov;
+            if (LSDatabaseManager.TryGetDatabase<IProjectileDataProvider> (out prov)) {
+                IProjectileData[] projectileData = prov.ProjectileData;
+                for (int i = 0; i < projectileData.Length; i++)
+                {
+                    IProjectileData item = projectileData[i];
+                    CodeDataMap.Add(item.Name, item);
+                    ProjectilePool.Add(item.Name, new FastStack<LSProjectile> ());
+                }
             }
         }
         public static void Initialize ()
@@ -71,8 +74,8 @@ namespace Lockstep {
 
         private static LSProjectile NewProjectile (string projCode)
 		{
-            ProjectileDataItem projData = CodeDataMap[projCode];
-			curProj = ((GameObject)GameObject.Instantiate<GameObject> (projData.Prefab)).GetComponent<LSProjectile> ();
+            IProjectileData projData = CodeDataMap[projCode];
+            curProj = ((GameObject)GameObject.Instantiate<GameObject> (projData.GetProjectile().gameObject)).GetComponent<LSProjectile> ();
 			curProj.Setup (projData);
 			return curProj;
 		}

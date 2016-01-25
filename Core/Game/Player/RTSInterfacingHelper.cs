@@ -9,9 +9,9 @@ namespace Lockstep
     {
         public static GUIManager GUIManager;
 
-        private static AbilityInterfacer _currentInterfacer;
+        private static AbilityDataItem _currentInterfacer;
 
-        public static AbilityInterfacer CurrentInterfacer
+        public static AbilityDataItem CurrentInterfacer
         {
             get { return _currentInterfacer; }
             set
@@ -24,15 +24,15 @@ namespace Lockstep
             }
         }
 
-        private static AbilityInterfacer QuickPos;
-        private static AbilityInterfacer QuickTarget;
+        private static AbilityDataItem QuickPos;
+        private static AbilityDataItem QuickTarget;
 
         public static bool IsGathering { get; private set; }
 
         static void Setup()
         {
-            QuickPos = AbilityInterfacer.FindInterfacer("Move");
-            QuickTarget = AbilityInterfacer.FindInterfacer("Scan");
+            QuickPos = AbilityDataItem.FindInterfacer("Move");
+            QuickTarget = AbilityDataItem.FindInterfacer("Scan");
 
             Setted = true;
         }
@@ -92,7 +92,7 @@ namespace Lockstep
             }
         }
 
-        private static void ProcessInterfacer(AbilityInterfacer facer)
+        private static void ProcessInterfacer(AbilityDataItem facer)
         {
             switch (facer.InformationGather)
             {

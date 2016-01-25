@@ -8,7 +8,7 @@ public static class AgentDataSorter {
         return SortByType (item, AgentType.Building);
     }
     static int SortByType (DataItem item, AgentType agentType) {
-        AgentInterfacer agentInterfacer = item as AgentInterfacer;
+        AgentDataItem agentInterfacer = item as AgentDataItem;
         if (agentInterfacer == null) return -1;
         return agentInterfacer.SortDegreeFromAgentType(agentType);
     }

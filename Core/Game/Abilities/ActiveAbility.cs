@@ -7,7 +7,7 @@ namespace Lockstep {
 
 		protected sealed override void TemplateSetup ()
 		{
-            ListenInput = Interfacer.ListenInputID;
+            ListenInput = Data.ListenInputID;
 		}
 
         public void Execute(Command com) {

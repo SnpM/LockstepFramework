@@ -205,7 +205,8 @@ namespace Lockstep
                         cachedMove.StopMove();
                 }
                 Agent.SetState(AnimState.Engaging);
-                long mag = FixedMath.Sqrt(fastMag >> FixedMath.SHIFT_AMOUNT);
+                long mag;
+                targetDirection.Normalize (out mag);
                 bool withinTurn = TrackAttackAngle == false ||
                                   (fastMag != 0 &&
                         cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
