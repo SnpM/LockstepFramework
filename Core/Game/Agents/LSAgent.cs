@@ -208,7 +208,7 @@ namespace Lockstep {
 
         private bool isHighlighted;
         private bool isSelected;
-		private readonly AbilityManager abilityManager = new AbilityManager();
+		public readonly AbilityManager abilityManager = new AbilityManager();
 
 		[SerializeField]
 		private float _selectionRadius = 1f;
@@ -441,9 +441,10 @@ namespace Lockstep {
             }
         }
 
-        public T GetAbility<T>() where T : Ability {
+        public T GetAbility<T>() where T : Ability{
             return abilityManager.GetAbility<T>();
         }
+
         public long GetStateHash () {
             long hash = 3;
             hash ^= this.GlobalID;
