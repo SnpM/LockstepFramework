@@ -101,6 +101,14 @@ namespace Lockstep
             Count--;
         }
 
+        public bool SafeRemoveAt (int index, T item) {
+            if (ContainsAt (index, item)) {
+                this.RemoveAt(index);
+                return true;
+            }
+            return false;
+        }
+
         public bool ContainsAt(int index, T item)
         {
             return index >= 0 && index < PeakCount && this.arrayAllocation [index] && innerArray [index].Equals(item);
