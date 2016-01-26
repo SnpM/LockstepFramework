@@ -51,7 +51,7 @@ namespace Lockstep
 
         private static InterfacingHelper _defaultHelper;
 
-        public InterfacingHelper MainInterfacingHelper
+        public virtual InterfacingHelper MainInterfacingHelper
         {
             get
             {
