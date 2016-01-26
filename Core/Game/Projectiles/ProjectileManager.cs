@@ -35,6 +35,12 @@ namespace Lockstep {
 					ProjectileBucket[i].Simulate ();
 				}
 			}
+
+            for (int i = NDProjectileBucket.PeakCount - 1; i >= 0; i--) {
+                if (NDProjectileBucket.arrayAllocation[i]) {
+                    NDProjectileBucket[i].Simulate();
+                }
+            }
         }
         public static void Visualize ()
 	    {
@@ -45,6 +51,14 @@ namespace Lockstep {
 					ProjectileBucket[i].Visualize ();
 				}
 			}
+            VisualizeBucket (NDProjectileBucket);
+        }
+        private static void VisualizeBucket (FastBucket<LSProjectile> bucket) {
+            for (int i = bucket.PeakCount - 1; i >= 0; i--) {
+                if (bucket.arrayAllocation[i]) {
+                    bucket[i].Visualize();
+                }
+            }
         }
 
 		public static void Deactivate ()
@@ -56,6 +70,11 @@ namespace Lockstep {
 					EndProjectile (ProjectileBucket[i]);
 				}
 			}
+            for (int i = NDProjectileBucket.PeakCount - 1; i>= 0; i--) {
+                if (NDProjectileBucket.arrayAllocation[i]) {
+                    EndProjectile(NDProjectileBucket[i]);
+                }
+            }
 		}
 
         public static int GetStateHash () {
@@ -107,10 +126,13 @@ namespace Lockstep {
 		}
 
         private static FastBucket<LSProjectile> NDProjectileBucket = new FastBucket<LSProjectile>();
-        public static void NDCreateAndFire (string projCode, Vector3d position, Vector3d direction, bool gravity = false) {
+        public static LSProjectile NDCreateAndFire (string projCode, Vector3d position, Vector3d direction, bool gravity = false) {
             curProj = RawCreate (projCode);
             int id = NDProjectileBucket.Add (curProj);
             curProj.Prepare(id,position,(a)=>false,(a)=>false,(a)=>{}, false);
+            curProj.InitializeFree(direction,(a)=>false,gravity);
+            ProjectileManager.Fire (curProj);
+            return curProj;
         }
 
 		public static void EndProjectile (LSProjectile projectile)

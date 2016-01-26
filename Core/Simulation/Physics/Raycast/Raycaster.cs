@@ -60,46 +60,51 @@ namespace Lockstep
         public static IEnumerable<LSBody> RaycastAll(Vector3d start3d, Vector3d end3d)
         {
             long startHeight = start3d.z;
-            long heightSlope = (end3d.z - start3d.z).Div((end3d.ToVector2d() - start3d.ToVector2d()).Magnitude());
-            Vector2d start = start3d.ToVector2d();
-            Vector2d end = end3d.ToVector2d();
-            if (heightSlope == 0)
-            {
-                
-            } else
-            {
-                //TODO: return bodies based on hit order
-                foreach (LSBody body in RaycastAll(start,end))
-                {
-                    bool heightIntersects = false;
-                    bool mined = false;
-                    bool maxed = false;
-                    for (int i = bufferIntersectionPoints.Count - 1; i >= 0; i--)
-                    {
-                        long dist = bufferIntersectionPoints [i].Distance(start);
-                        long heightAtBodyPosition = startHeight + (dist.Mul(heightSlope));
+            long dist2d = (end3d.ToVector2d() - start3d.ToVector2d()).Magnitude();
 
-                        //TODO: Make this more accurate
-                        if (heightAtBodyPosition < body.HeightMin)
+            if (dist2d != 0)
+            {
+                long heightSlope = (end3d.z - start3d.z).Div(dist2d);
+                Vector2d start = start3d.ToVector2d();
+                Vector2d end = end3d.ToVector2d();
+                if (heightSlope == 0)
+                {
+                
+                } else
+                {
+                    //TODO: return bodies based on hit order
+                    foreach (LSBody body in RaycastAll(start,end))
+                    {
+                        bool heightIntersects = false;
+                        bool mined = false;
+                        bool maxed = false;
+                        for (int i = bufferIntersectionPoints.Count - 1; i >= 0; i--)
                         {
-                            mined = true;
-                        } else if (heightAtBodyPosition > body.HeightMax)
-                        {
-                            maxed = true;
-                        } else
-                        {
-                            heightIntersects = true;
-                            break;
+                            long dist = bufferIntersectionPoints [i].Distance(start);
+                            long heightAtBodyPosition = startHeight + (dist.Mul(heightSlope));
+
+                            //TODO: Make this more accurate
+                            if (heightAtBodyPosition < body.HeightMin)
+                            {
+                                mined = true;
+                            } else if (heightAtBodyPosition > body.HeightMax)
+                            {
+                                maxed = true;
+                            } else
+                            {
+                                heightIntersects = true;
+                                break;
+                            }
+                            if (mined && maxed)
+                            {
+                                heightIntersects = true;
+                                break;
+                            }
                         }
-                        if (mined && maxed)
-                        {
-                            heightIntersects = true;
-                            break;
-                        }
-                    }
-                    if (heightIntersects)
-                        yield return body;
+                        if (heightIntersects)
+                            yield return body;
                     
+                    }
                 }
             }
         }
