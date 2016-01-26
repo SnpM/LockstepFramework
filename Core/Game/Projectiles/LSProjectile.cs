@@ -42,7 +42,7 @@ namespace Lockstep
 		
         private int CountDown;
 		
-        private Vector3d Velocity { get; set; }
+        public Vector3d Velocity { get; private set; }
 
         private Vector3d Direction { get; set; }
 
