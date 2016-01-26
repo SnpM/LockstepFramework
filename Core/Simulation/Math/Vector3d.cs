@@ -62,6 +62,11 @@ namespace Lockstep
             z *= f1;
             z >>= FixedMath.SHIFT_AMOUNT;
         }
+        public void Mul (int i) {
+            x *= i;
+            y *= i;
+            z *= i;
+        }
         public long Distance (Vector3d other) {
             long tX = other.x - x;
             tX *= tX;
