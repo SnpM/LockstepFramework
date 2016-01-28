@@ -43,6 +43,17 @@ namespace Lockstep
             }
         }
 
+		public static void Deactivate()
+		{
+			for (int i = 0; i < PeakCount; i++)
+			{
+				if (EffectActive [i])
+				{
+					EndEffect(Effects [i]);
+				}
+			}
+		}
+
         public static bool IsValid(string effectCode)
         {
             return !string.IsNullOrEmpty(effectCode) && effectCode != "None";

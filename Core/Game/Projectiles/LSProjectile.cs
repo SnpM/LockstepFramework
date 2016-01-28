@@ -42,7 +42,7 @@ namespace Lockstep
 		
         private int CountDown;
 		
-        private Vector3d Velocity { get; set; }
+        public Vector3d Velocity { get; private set; }
 
         private Vector3d Direction { get; set; }
 
@@ -318,7 +318,7 @@ namespace Lockstep
         {
         }
             
-        public void Deactivate()
+        internal void Deactivate()
         {
             SpawnVersion = 0;
             this.TargetVersion = 0u;
@@ -384,9 +384,11 @@ namespace Lockstep
 
         public Func<byte,bool> BucketConditional {get; private set;}
         public Func<LSAgent,bool> AgentConditional {get; private set;}
-
-        internal void Prepare(int id, Vector3d projectilePosition, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional, Action<LSAgent> hitEffect)
+        public bool Deterministic {get; private set;}
+        internal void Prepare(int id, Vector3d projectilePosition, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional, Action<LSAgent> hitEffect, bool deterministic)
         {
+            this.Deterministic = deterministic;
+
             this.IsActive = true;
             this.cachedGameObject.SetActiveIfNot(true);
 

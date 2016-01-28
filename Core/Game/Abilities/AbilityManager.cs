@@ -106,7 +106,6 @@ namespace Lockstep {
                 Abilitys[k].Deactivate();
             }
         }
-
         public T GetAbility<T>() where T : Ability {
             for (var k = 0; k < Abilitys.Length; k++) {
                 var ability = Abilitys[k] as T;
@@ -116,7 +115,25 @@ namespace Lockstep {
             }
             return null;
         }
+        public Ability GetAbilityAny<T>()
+        {
+            for (var k = 0; k < Abilitys.Length; k++) {
+                Ability abil = Abilitys[k];
+                if (abil is T)
+                {
+                    return abil;
+                }
+            }
+            return null;
+        }
 
+        public IEnumerable<Ability> GetAbilitiesAny<T> () {
+            for (var k = 0; k < Abilitys.Length; k++) {
+                var abil = this.Abilitys[k];
+                if (abil is T)
+                    yield return abil;
+            }
+        }
 
     }
 }

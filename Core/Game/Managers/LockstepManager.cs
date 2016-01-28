@@ -291,6 +291,7 @@ namespace Lockstep
             MainGameManager.MainInterfacingHelper.Deactivate();
             BehaviourHelperManager.Deactivate();
             ProjectileManager.Deactivate();
+			EffectManager.Deactivate();
             ClientManager.Deactivate();
 
             TeamManager.Deactivate();

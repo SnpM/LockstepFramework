@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Lockstep
 {
-    public abstract class InterfacingHelper
+	public abstract class InterfacingHelper : MonoBehaviour
     {
         public void Initialize()
         {
