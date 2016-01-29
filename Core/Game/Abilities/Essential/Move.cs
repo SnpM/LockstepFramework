@@ -335,6 +335,7 @@ namespace Lockstep
             if (com.ContainsData<Vector2d> ())
             {
                 Agent.StopCast(ID);
+                IsCasting = true;
                 RegisterGroup();
                 if (straightPath)
                 {

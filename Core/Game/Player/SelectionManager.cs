@@ -9,6 +9,7 @@ namespace Lockstep
 	{
 		public const int MaximumSelection = 512;
 
+        public static bool IsGathering {get; set;}
 		public static LSAgent MousedAgent { get; private set; }
 
 		public static Vector2 MousePosition;
@@ -40,6 +41,7 @@ namespace Lockstep
 
 		public static void Update ()
 		{
+
 
 			MousePosition = Input.mousePosition;
 			MouseWorldPosition = RTSInterfacing.GetWorldPos (MousePosition);
@@ -83,7 +85,6 @@ namespace Lockstep
 					Box_BottomLeft = RTSInterfacing.GetWorldPos (RaycastBotLeft);
 					Box_BottomRight = RTSInterfacing.GetWorldPos (RaycastBotRight);
 				}
-
 				ClearBox ();
 				int lecount = 0;
 				if ((BoxEnd - BoxStart).sqrMagnitude >= MinBoxSqrDist) {
@@ -142,7 +143,7 @@ namespace Lockstep
 					if (CanClearSelection) {
 						ClearSelection ();
 					}
-                    if (RTSInterfacingHelper.IsGathering == false) {
+                    if (IsGathering == false) {
 						SelectBoxedAgents ();
 					}
 
@@ -151,7 +152,7 @@ namespace Lockstep
 
 			} else {
 
-                if (RTSInterfacingHelper.IsGathering == false && Input.GetMouseButtonDown (0)) {
+                if (IsGathering == false && Input.GetMouseButtonDown (0)) {
 					CheckBoxDistance = true;
 					Boxing = true;
 					BoxingTime = 0f;
@@ -237,7 +238,7 @@ namespace Lockstep
 		{
 			if (Boxing) {
 				Vector2 Size = BoxEnd - BoxStart;
-				GUI.Box (new Rect (BoxStart.x, Screen.height - BoxStart.y, Size.x, -Size.y), "", style);
+      				GUI.Box (new Rect (BoxStart.x, Screen.height - BoxStart.y, Size.x, -Size.y), "", style);
 			}
 		}
 

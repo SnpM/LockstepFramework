@@ -216,7 +216,6 @@ namespace Lockstep
                 {
                     if (CanTurn)
                     {
-                        targetDirection /= mag;
                         cachedTurn.StartTurnDirection(targetDirection);
                     }
                     else {

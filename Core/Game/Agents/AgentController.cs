@@ -332,6 +332,7 @@ namespace Lockstep
             } else
             {
                 IAgentData interfacer = AgentController.CodeInterfacerMap [agentCode];
+
                 curAgent = GameObject.Instantiate(interfacer.GetAgent().gameObject).GetComponent<LSAgent>();
                 curAgent.Setup(interfacer);
             }
