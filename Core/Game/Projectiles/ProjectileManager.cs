@@ -25,46 +25,62 @@ namespace Lockstep {
         }
         public static void Initialize ()
         {
-			Array.Clear(ProjectileActive,0,ProjectileActive.Length);
-			OpenSlots.FastClear ();
-			PeakCount = 0;
         }
         public static void Simulate ()
         {
-			for (int i = 0; i < PeakCount; i++)
+            for (int i = ProjectileBucket.PeakCount - 1; i >= 0; i--)
 			{
-				if (ProjectileActive[i])
+                if (ProjectileBucket.arrayAllocation[i])
 				{
 					ProjectileBucket[i].Simulate ();
 				}
 			}
+
+            for (int i = NDProjectileBucket.PeakCount - 1; i >= 0; i--) {
+                if (NDProjectileBucket.arrayAllocation[i]) {
+                    NDProjectileBucket[i].Simulate();
+                }
+            }
         }
         public static void Visualize ()
 	    {
-			for (int i = 0; i < PeakCount; i++)
+            for (int i = ProjectileBucket.PeakCount - 1; i >= 0; i--)
 			{
-				if (ProjectileActive[i])
+                if (ProjectileBucket.arrayAllocation[i])
 				{
 					ProjectileBucket[i].Visualize ();
 				}
 			}
+            VisualizeBucket (NDProjectileBucket);
+        }
+        private static void VisualizeBucket (FastBucket<LSProjectile> bucket) {
+            for (int i = bucket.PeakCount - 1; i >= 0; i--) {
+                if (bucket.arrayAllocation[i]) {
+                    bucket[i].Visualize();
+                }
+            }
         }
 
 		public static void Deactivate ()
 		{
-			for (int i = 0; i < PeakCount; i++)
+            for (int i = ProjectileBucket.PeakCount - 1; i >= 0; i--)
 			{
-				if (ProjectileActive[i])
+                if (ProjectileBucket.arrayAllocation[i])
 				{
 					EndProjectile (ProjectileBucket[i]);
 				}
 			}
+            for (int i = NDProjectileBucket.PeakCount - 1; i>= 0; i--) {
+                if (NDProjectileBucket.arrayAllocation[i]) {
+                    EndProjectile(NDProjectileBucket[i]);
+                }
+            }
 		}
 
         public static int GetStateHash () {
             int hash = 23;
-            for (int i = 0; i < PeakCount; i++) {
-                if (ProjectileActive[i]) {
+            for (int i = ProjectileBucket.PeakCount - 1; i>= 0; i--) {
+                if (ProjectileBucket.arrayAllocation[i]) {
                     LSProjectile proj = ProjectileManager.ProjectileBucket[i];
                     hash ^= proj.GetStateHash ();
                 }
@@ -87,58 +103,59 @@ namespace Lockstep {
         }
         public static LSProjectile Create (string projCode, Vector3d position, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional, Action<LSAgent> hitEffect)
 		{
-			FastStack<LSProjectile> pool = ProjectilePool[projCode];
-			if (pool.Count > 0)
-			{
-				curProj = pool.Pop ();
-			}
-			else {
-				curProj = NewProjectile (projCode);
-			}
-			int id = GenerateID ();
-			ProjectileBucket[id] = curProj;
-			ProjectileActive[id] = true;
-			curProj.Prepare (id, position,agentConditional,bucketConditional, hitEffect);
+            curProj = RawCreate (projCode);
+
+            int id = ProjectileBucket.Add(curProj);
+			curProj.Prepare (id, position,agentConditional,bucketConditional, hitEffect, true);
 			return curProj;
 		}
+        private static LSProjectile RawCreate (string projCode) {
+            FastStack<LSProjectile> pool = ProjectilePool[projCode];
+            if (pool.Count > 0)
+            {
+                curProj = pool.Pop ();
+            }
+            else {
+                curProj = NewProjectile (projCode);
+            } 
+            return curProj;
+        }
 		public static void Fire (LSProjectile projectile)
 		{
 			projectile.LateInit ();
 		}
 
+        private static FastBucket<LSProjectile> NDProjectileBucket = new FastBucket<LSProjectile>();
+        public static LSProjectile NDCreateAndFire (string projCode, Vector3d position, Vector3d direction, bool gravity = false) {
+            curProj = RawCreate (projCode);
+            int id = NDProjectileBucket.Add (curProj);
+            curProj.Prepare(id,position,(a)=>false,(a)=>false,(a)=>{}, false);
+            curProj.InitializeFree(direction,(a)=>false,gravity);
+            ProjectileManager.Fire (curProj);
+            return curProj;
+        }
+
 		public static void EndProjectile (LSProjectile projectile)
 		{
-			int id = projectile.ID;
-			if (ProjectileActive[id] == false) {
-				return;
-			}
-			if (ProjectileBucket[id] != projectile)
-			{
-				return;
-			}
-			ProjectileActive[id] = false;
-			ProjectileBucket[id] = null;
-			OpenSlots.Add (id);
-
+            if (projectile.Deterministic) {
+    			int id = projectile.ID;
+                if(!ProjectileBucket.SafeRemoveAt(id,projectile)) {
+                    Debug.Log("BOO! This is a terrible bug.");
+                }
+            }
+            else {
+                if (!NDProjectileBucket.SafeRemoveAt(projectile.ID,projectile)) {
+                    Debug.Log("BOO! This is a terrible bug.");
+                }
+            }
 			CacheProjectile (projectile);
 			projectile.Deactivate ();
 		}
 
 		#region ID and allocation management
         private static readonly Dictionary<string, FastStack<LSProjectile>> ProjectilePool = new Dictionary<string, FastStack<LSProjectile>>();
-		private static bool[] ProjectileActive = new bool[MaxProjectiles];
-		private static LSProjectile[] ProjectileBucket = new LSProjectile[MaxProjectiles];
+        private static FastBucket<LSProjectile> ProjectileBucket = new FastBucket<LSProjectile>();
 
-		private static FastStack<int> OpenSlots = new FastStack<int>(MaxProjectiles / 4);
-		private static int PeakCount;
-		private static int GenerateID ()
-		{
-			if (OpenSlots.Count > 0)
-			{
-				return OpenSlots.Pop ();
-			}
-			return PeakCount++;
-		}
 		private static void CacheProjectile (LSProjectile projectile)
 		{
 			ProjectilePool[projectile.MyProjCode].Add (projectile);

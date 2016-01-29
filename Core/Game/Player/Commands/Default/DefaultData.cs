@@ -7,7 +7,10 @@ namespace Lockstep
 {
     public class DefaultData : ICommandData
     {
-        public DefaultData () {}
+        public DefaultData()
+        {
+        }
+
         public DefaultData(DataType dataType, object value)
         {
             Value = value;
@@ -33,6 +36,8 @@ namespace Lockstep
         {
             if (type == typeof(int))
                 return DataType.Int;
+            if (type == typeof(uint))
+                return DataType.UInt;
             if (type == typeof(ushort))
                 return DataType.UShort;
             if (type == typeof(long))
@@ -45,6 +50,7 @@ namespace Lockstep
                 return DataType.String;
             if (type == typeof(byte[]))
                 return DataType.ByteArray;
+
             throw new System.Exception(string.Format("Type '{0}' is not a valid DefaultData Type.", type));
         }
 
@@ -55,6 +61,9 @@ namespace Lockstep
             {
                 case DataType.Int:
                     writer.Write((int)Value);
+                    break;
+                case DataType.UInt:
+                    writer.Write((uint)Value);
                     break;
                 case DataType.UShort:
                     writer.Write((ushort)Value);
@@ -86,6 +95,9 @@ namespace Lockstep
                 case DataType.Int:
                     Value = reader.ReadInt();
                     break;
+                case DataType.UInt:
+                    Value = reader.ReadUInt();
+                    break;
                 case DataType.UShort:
                     Value = reader.ReadUShort();
                     break;
@@ -111,6 +123,7 @@ namespace Lockstep
     public enum DataType : byte
     {
         Int,
+        UInt,
         UShort,
         Long,
         Byte,

@@ -59,7 +59,7 @@ namespace Lockstep
                     _defaultHelper = this.GetComponent<InterfacingHelper> ();
                     if (_defaultHelper == null) {
                         Debug.Log("InterfacingHelper not found. Defaulting to RTSInterfacingHelper.");
-                        _defaultHelper = new RTSInterfacingHelper();
+						_defaultHelper = base.gameObject.AddComponent<RTSInterfacingHelper>();
                     }
                 }
                 return _defaultHelper;
