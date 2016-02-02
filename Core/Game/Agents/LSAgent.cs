@@ -101,8 +101,8 @@ namespace Lockstep {
         private LSTrigger[] _triggers;
         public LSTrigger[] Triggers {get {return _triggers;}}
 		[SerializeField]
-		private LSAnimator _animator;
-		public LSAnimator Animator { get {return _animator;} }
+		private LSAnimatorBase _animator;
+		public LSAnimatorBase Animator { get {return _animator;} }
 		[SerializeField]
 		private Transform _cachedTransform;
 		public Transform CachedTransform {get{return _cachedTransform;}}
@@ -460,7 +460,7 @@ namespace Lockstep {
             _cachedTransform = base.transform;
             _cachedGameObject = base.gameObject;
             _body = GetComponent<LSBody> ();
-            _animator = GetComponent<LSAnimator> ();
+			_animator = GetComponent<LSAnimatorBase> ();
             _attachedAbilities = GetComponents<Ability> ();
             _triggers = GetComponents<LSTrigger> ();
         }
