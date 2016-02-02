@@ -23,22 +23,23 @@ namespace Lockstep
 
         public const int MaxAgents = 16384;
         private static readonly Dictionary<string,IAgentData> CodeInterfacerMap = new Dictionary<string, IAgentData>();
+        public static IAgentData[] AgentData;
 
         public static void Setup()
         {
             IAgentDataProvider database;
             if (LSDatabaseManager.TryGetDatabase<IAgentDataProvider>(out database))
             {
-                IAgentData[] agentInters = database.AgentData;
+                AgentData = database.AgentData;
 
                 //AgentInterfacer[] agentInters = (LSDatabaseManager.CurrentDatabase as DefaultLSDatabase).AgentData;
-                AgentCodes = new string[agentInters.Length];
+                AgentCodes = new string[AgentData.Length];
             
-                CachedAgents = new Dictionary<string,FastStack<LSAgent>>(agentInters.Length);
+                CachedAgents = new Dictionary<string,FastStack<LSAgent>>(AgentData.Length);
             
-                for (int i = 0; i < agentInters.Length; i++)
+                for (int i = 0; i < AgentData.Length; i++)
                 {
-                    IAgentData interfacer = agentInters [i];
+                    IAgentData interfacer = AgentData [i];
                     string agentCode = interfacer.Name;
                     AgentCodes [i] = agentCode;
                 
