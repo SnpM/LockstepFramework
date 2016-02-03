@@ -50,7 +50,7 @@ namespace Lockstep.Data {
                                 GUIContent content = new GUIContent (name);
                                 dataContents [i] = content;
                             }
-                            label.tooltip += dca.TargetDataName;
+                            //label.tooltip += dca.TargetDataName;
                             int newIndex = EditorGUI.Popup (drawPos, label, index, dataContents);
                             if (newIndex >= 0 && newIndex < dataContents.Length) {
                                 element.stringValue = dataContents [newIndex].text;
@@ -70,7 +70,7 @@ namespace Lockstep.Data {
                             GUIContent content = new GUIContent (name);
                             dataContents [i] = content;
                         }
-                        label.tooltip += dca.TargetDataName;
+                        //label.tooltip += dca.TargetDataName;
                         int newIndex = EditorGUI.Popup (drawPos, label, index, dataContents);
                         if (newIndex >= 0 && newIndex < dataContents.Length) {
                             property.stringValue = dataContents [newIndex].text;

@@ -72,7 +72,7 @@ namespace Lockstep
         {
         }
 
-        public void Execute(Command com)
+        public void GlobalExecute(Command com)
         {
             OnExecute(com);
         }

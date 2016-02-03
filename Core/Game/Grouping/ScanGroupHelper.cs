@@ -13,7 +13,7 @@ namespace Lockstep
 
 		protected override void OnExecute (Lockstep.Command com)
 		{
-			MovementGroupHelper.Execute (com);
+            MovementGroupHelper.StaticExecute (com);
 		}
 	}
 }

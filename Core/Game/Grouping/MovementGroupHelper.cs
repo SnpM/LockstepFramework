@@ -63,10 +63,10 @@ namespace Lockstep
 
         protected override void OnExecute(Command com)
         {
-            Execute(com);
+            StaticExecute(com);
         }
 
-        public static void Execute(Command com)
+        public static void StaticExecute(Command com)
         {
             if (com.ContainsData<Vector2d> ())
             {
