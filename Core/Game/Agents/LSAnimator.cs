@@ -66,9 +66,9 @@ namespace Lockstep
 			}
 		}
 
-		public override void Play(AnimImpulse impulse)
+		public override void Play(AnimImpulse impulse, int rate = 0)
 		{
-			base.Play(impulse);
+			base.Play(impulse, rate);
 
 			if (CanAnimate)
 			{ 

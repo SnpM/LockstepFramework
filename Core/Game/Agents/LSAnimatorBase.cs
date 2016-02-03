@@ -8,7 +8,7 @@ namespace Lockstep
 	public class LSAnimatorBase : MonoBehaviour
 	{
 		public event Action<AnimState> OnStatePlay;
-		public event Action<AnimImpulse> OnImpulsePlay;
+		public event Action<AnimImpulse, int> OnImpulsePlay;
 
 		public bool CanAnimate { get; protected set; }
 
@@ -22,9 +22,9 @@ namespace Lockstep
 		{
 		}
 
-		public virtual void ApplyImpulse(AnimImpulse animImpulse)
+		public virtual void ApplyImpulse(AnimImpulse animImpulse, int rate = 0)
 		{
-			Play (animImpulse);
+			Play (animImpulse, rate);
 		}
 			
 		public virtual void Play(AnimState state)
@@ -33,10 +33,10 @@ namespace Lockstep
 				OnStatePlay(state);
 		}
 
-		public virtual void Play(AnimImpulse impulse)
+		public virtual void Play(AnimImpulse impulse, int rate = 0)
 		{
 			if (OnImpulsePlay.IsNotNull())
-				OnImpulsePlay(impulse);
+				OnImpulsePlay(impulse, rate);
 		}
 
 		[SerializeField]
