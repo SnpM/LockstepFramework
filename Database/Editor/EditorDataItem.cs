@@ -75,7 +75,9 @@ namespace Lockstep.Data {
                     if (iterationProperty.depth != beginningDepth) {
                         break;
                     }
+
                     serializedProperties.Add (iterationProperty.Copy ());
+
                 }
                 pos.x += defaultPropertyHeight;
                 pos.width -= defaultPropertyHeight;
