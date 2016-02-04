@@ -435,9 +435,9 @@ namespace Lockstep {
             }
         }
 
-        public void ApplyImpulse(AnimImpulse animImpulse) {
+		public void ApplyImpulse(AnimImpulse animImpulse, int rate = 0) {
             if (Animator .IsNotNull ()) {
-                Animator.ApplyImpulse(animImpulse);
+                Animator.ApplyImpulse(animImpulse, rate);
             }
         }
 

@@ -14,7 +14,7 @@ namespace Lockstep
 			animator.OnImpulsePlay += HandleOnImpulsePlay;
 		}
 
-		void HandleOnImpulsePlay (AnimImpulse obj)
+		void HandleOnImpulsePlay (AnimImpulse obj, int rate)
 		{
 		}
 
