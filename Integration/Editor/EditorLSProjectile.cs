@@ -36,9 +36,10 @@ namespace Lockstep.Integration
             switch ((HitType)so.FindProperty("_hitBehavior").enumValueIndex) {
                 case HitType.Cone:
                     so.PropertyField("_angle");
+					so.PropertyField("_radius");
                     break;
                 case HitType.Area:
-                    so.PropertyField("_radius"); 
+					so.PropertyField("_radius");
                     break;
                     
                 case HitType.Single:
@@ -54,10 +55,19 @@ namespace Lockstep.Integration
             
             //Visuals
             EditorGUILayout.LabelField ("Visuals Settings", EditorStyles.boldLabel);
-            so.PropertyField("_startEffect");
-            so.PropertyField("_endEffect");
-            so.PropertyField("_attachEndEffectToTarget");
-            
+
+			SerializedProperty useEffectProp = so.FindProperty("UseEffects");
+
+			EditorGUILayout.PropertyField(useEffectProp);
+
+
+			if (useEffectProp.boolValue)
+			{
+				so.PropertyField("_startEffect");
+				so.PropertyField("_endEffect");
+				so.PropertyField("_attachEndEffectToTarget");
+			}
+
             if (EditorGUI.EndChangeCheck ()) {
                 serializedObject.ApplyModifiedProperties ();
                 EditorUtility.SetDirty (target);
