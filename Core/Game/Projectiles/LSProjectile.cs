@@ -561,7 +561,6 @@ namespace Lockstep
         public void Simulate()
         {
             this.AliveTime++;
-			//Debug.Break();
 
             if (this.AliveTime > this.MaxDuration)
             {
@@ -636,11 +635,8 @@ namespace Lockstep
             {
                 if (this.CanVisualize)
                 {
-					Vector3 shift = Vector3.SmoothDamp(bindPositionShift, Vector3.zero, ref shiftVelocity, 0.3f);
-
-					LSProjectile.newPos = this.Position.ToVector3() + shift;
+					LSProjectile.newPos = this.Position.ToVector3();
                     this.cachedTransform.position = LSProjectile.newPos;
-					
                 }
                 if (this.onVisualize.IsNotNull())
                 {
