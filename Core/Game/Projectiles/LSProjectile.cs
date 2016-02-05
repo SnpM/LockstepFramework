@@ -16,8 +16,6 @@ namespace Lockstep
         //
         // Static Fields
         //
-        private static FastList<LSAgent> outputAgents = new FastList<LSAgent>();
-		
         private static Vector2d agentPos;
 		
         private static Vector3 newPos;
@@ -82,7 +80,6 @@ namespace Lockstep
 
         public bool IsActive;
 		
-        [Header("Circumstantial Settings")]
         public bool UseEffects;
 		
         [SerializeField]
@@ -109,11 +106,11 @@ namespace Lockstep
 
         public HitType HitBehavior { get { return _hitBehavior; } }
 
-        [SerializeField]
-        private long _angle = 32768L;
+		[FixedNumberAngle, SerializeField]
+		private long _angle = FixedMath.TenDegrees;
 		
-        [SerializeField]
-        private long _radius = 131072L;
+		[FixedNumber, SerializeField]
+		private long _radius = FixedMath.Create(1);
 		
         //
         // Properties
@@ -127,11 +124,11 @@ namespace Lockstep
             private set;
         }
 
-        public long Angle
-        {
-            get;
-            set;
-        }
+		public long Angle
+		{
+			get { return _angle; }
+			set { _angle = value; }
+		}
 
         public long Damage{ get; set; }
 
@@ -189,11 +186,11 @@ namespace Lockstep
             private set;
         }
 
-        public long Radius
-        {
-            get;
-            set;
-        }
+		public long Radius
+		{
+			get { return _radius; }
+			set { _radius = value; }
+		}
 
         public long Speed
 		{ get; set; }
@@ -242,45 +239,42 @@ namespace Lockstep
         //
         // Static Methods
         //
-        private void ApplyArea(Vector2d center, long radius)
-        {
-            Scan(center, radius);
-            long num = radius * radius;
-            for (int i = 0; i < LSProjectile.outputAgents.Count; i++)
-            {
-                LSAgent lSAgent = LSProjectile.outputAgents [i];
-                if (lSAgent.Body._position.FastDistance(center.x, center.y) < num)
-                {   
-                    this.HitEffect(lSAgent);
-                }
-            }
-        }
+		private void ApplyArea(Vector2d center, long radius)
+		{
+			long num = radius * radius;
+			foreach (LSAgent agent in Scan(center, radius))
+			{
+				if (agent.Body._position.FastDistance(center.x, center.y) < num)
+				{
+					this.HitEffect(agent);
+				}
+			}
+		}
 
-        private void ApplyCone(Vector3d center3d, Vector2d rotation, long radius, long angle, Action<LSAgent> apply, PlatformType targetPlatform)
-        {
-            Vector2d center = center3d.ToVector2d();
-            Scan(center, radius);
-            long num = radius * radius;
-            long num2 = angle * angle >> 16;
-            for (int i = 0; i < LSProjectile.outputAgents.Count; i++)
-            {
-                LSAgent lSAgent = LSProjectile.outputAgents [i];
-                LSProjectile.agentPos = lSAgent.Body._position;
-                LSProjectile.difference = LSProjectile.agentPos - center;
-                long num3 = LSProjectile.difference.FastMagnitude();
-                if (num3 <= num && LSProjectile.difference.Dot(rotation.x, rotation.y) > 0L)
-                {
-                    num3 >>= 16;
-                    long num4 = rotation.Cross(LSProjectile.difference.x, LSProjectile.difference.y);
-                    num4 *= num4;
-                    num4 >>= 16;
-                    if (num4 < num2 * num3 >> 16)
-                    {
-                        apply(lSAgent);
-                    }
-                }
-            }
-        }
+		private void ApplyCone(Vector3d center3d, Vector2d forward, long radius, long angle, Action<LSAgent> apply, PlatformType targetPlatform)
+		{
+			Vector2d center = center3d.ToVector2d();
+			long fastRange = radius * radius;
+
+			foreach (LSAgent agent in Scan(center, radius))
+			{
+				LSProjectile.agentPos = agent.Body._position;
+				LSProjectile.difference = LSProjectile.agentPos - center;
+
+				if (LSProjectile.difference.FastMagnitude() > fastRange)
+					continue;
+
+				if (forward.Dot(difference) <= 0)
+					continue;
+				
+				LSProjectile.difference.Normalize();
+
+				if (forward.Cross(difference).Abs() > angle)
+					continue;
+				
+				apply(agent);
+			}
+		}
 
         private bool CheckCollision()
         {
@@ -297,7 +291,7 @@ namespace Lockstep
         }
 
 
-        private IEnumerable<LSAgent> Scan(Vector2d center, long radius)
+		private IEnumerable<LSAgent> Scan(Vector2d center, long radius)
         {
             int gridX;
             int gridY;
@@ -407,6 +401,8 @@ namespace Lockstep
             Forward = Vector2d.up;
         }
 
+		Vector3 bindPositionShift = new Vector3(0, 2, 0);
+
         public void InitializeHoming(LSAgent target)
         {
             this.HeightReached = false;
@@ -476,7 +472,9 @@ namespace Lockstep
             {
                 this.onInitialize.Invoke();
             }
-            EffectManager.LazyCreateEffect(this.StartEffect, this.Position.ToVector3());
+
+			if (UseEffects)
+            	EffectManager.LazyCreateEffect(this.StartEffect, this.Position.ToVector3());
         }
 
         private void OnHit()
@@ -508,8 +506,6 @@ namespace Lockstep
 
         private void ResetHit()
         {
-            this.Radius = this._radius;
-            this.Angle = this._angle;
             this.ExclusiveTargetType = this._exclusiveTargetType;
             this.TargetPlatform = this._targetPlatform;
         }
@@ -565,6 +561,7 @@ namespace Lockstep
         public void Simulate()
         {
             this.AliveTime++;
+
             if (this.AliveTime > this.MaxDuration)
             {
                 ProjectileManager.EndProjectile(this);
@@ -630,6 +627,7 @@ namespace Lockstep
             #endif
         }
 
+		Vector3 shiftVelocity;
 
         public void Visualize()
         {
@@ -637,10 +635,8 @@ namespace Lockstep
             {
                 if (this.CanVisualize)
                 {
-
-                    LSProjectile.newPos = this.Position.ToVector3();
+					LSProjectile.newPos = this.Position.ToVector3();
                     this.cachedTransform.position = LSProjectile.newPos;
-					
                 }
                 if (this.onVisualize.IsNotNull())
                 {
