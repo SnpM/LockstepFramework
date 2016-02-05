@@ -39,6 +39,11 @@ namespace Lockstep {
             }
         }
 
+        public long DPS {
+            get {
+                return cachedScan.Damage * cachedScan.AttackRate / LockstepManager.FrameRate;
+            }
+        }
 
     }
 }

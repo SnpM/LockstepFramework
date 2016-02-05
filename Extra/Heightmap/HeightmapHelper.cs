@@ -34,7 +34,6 @@ namespace Lockstep
 
         const int CompressionShift = FixedMath.SHIFT_AMOUNT / 2;
 
-
         [SerializeField]
         private HeightMap[] _maps = new HeightMap[1];
 
@@ -44,7 +43,7 @@ namespace Lockstep
         {
 
             int widthPeriods = Size.x.Div(Interval).CeilToInt();
-            ;
+
             int heightPeriods = Size.y.Div(Interval).CeilToInt();
             short[,] heightMap = new short[widthPeriods, heightPeriods];
 
