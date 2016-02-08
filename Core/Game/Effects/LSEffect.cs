@@ -27,11 +27,11 @@ namespace Lockstep
 		public GameObject CachedGameObject {get; private set;}
 
 		public ParticleSystem CachedShuriken {get; private set;}
-        private int StartSpeed {
+        private float StartSpeed {
             get; set;
         }
-        private int StartSize {get; set;}
-        public int Speed {
+        private float StartSize {get; set;}
+        public float Speed {
             set {
                 CachedShuriken.startSpeed = value;
             }
