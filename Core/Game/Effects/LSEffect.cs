@@ -9,8 +9,6 @@ namespace Lockstep
 
 		public float Duration {get; set;}
 
-
-
 		#region For external use
 		//TODO: Add needed variables for external mechanisms (I.e. Sinus).
 		#endregion
@@ -111,7 +109,7 @@ namespace Lockstep
 		}
 			
 		/// <summary>
-		/// Called when this effect is deactivated.
+		/// Called when this effect is deactivated. Perform resets here.
 		/// </summary>
         internal void Deactivate ()
 		{
