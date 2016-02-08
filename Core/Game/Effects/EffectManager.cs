@@ -65,7 +65,7 @@ namespace Lockstep
                 return;
             LSEffect effect = CreateEffect(effectCode);
             effect.CachedTransform.position = position;
-            effect.Initialize();
+            Fire (effect);
         }
 
         public static void LazyCreateEffect(string effectCode, Vector3 position, Quaternion rotation)
@@ -74,16 +74,16 @@ namespace Lockstep
                 return;
             LSEffect effect = CreateEffect(effectCode);
             effect.CachedTransform.position = position;
-            effect.Initialize();
+            Fire (effect);
         }
 
-        public static void LazyCreateEffect(string effectCode, Transform SpawnPoint)
+        public static void LazyCreateEffect(string effectCode, Transform spawnParent)
         {
             if (!IsValid(effectCode))
                 return;
             LSEffect effect = CreateEffect(effectCode);
-            effect.CachedTransform.position = SpawnPoint.position;
-            effect.Initialize();
+            effect.CachedTransform.parent = spawnParent;
+            Fire (effect);
         }
 
         public static LSEffect CreateEffect(string effectCode)
@@ -97,7 +97,9 @@ namespace Lockstep
             return effect;
         }
 
-
+        public static void Fire (LSEffect effect) {
+            effect.Initialize();
+        }
         #region Allocation
 
         private static bool[] EffectActive = new bool[MaxEffects];

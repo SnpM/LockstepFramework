@@ -27,7 +27,15 @@ namespace Lockstep
 		public GameObject CachedGameObject {get; private set;}
 
 		public ParticleSystem CachedShuriken {get; private set;}
-		float[] CachedShurikenVals = new float[2];
+        private int StartSpeed {
+            get; set;
+        }
+        private int StartSize {get; set;}
+        public int Speed {
+            set {
+                CachedShuriken.startSpeed = value;
+            }
+        }
 
 		public int ID { get; private set; }
 
@@ -39,15 +47,15 @@ namespace Lockstep
 		/// Called when this effect is first created.
 		/// </summary>
 		/// <param name="myEffectCode">My effect code.</param>
-		public void Setup (string myEffectCode)
+        internal void Setup (string myEffectCode)
 		{
 			MyEffectCode = myEffectCode;
 			CachedTransform = base.transform;
 			CachedGameObject = base.gameObject;
 			CachedShuriken = base.gameObject.GetComponent<ParticleSystem>();
 			if(CachedShuriken){
-				CachedShurikenVals[0] = CachedShuriken.startSpeed;
-				CachedShurikenVals[1] = CachedShuriken.startSize;
+                StartSpeed = CachedShuriken.startSpeed;
+                StartSize = CachedShuriken.startSize;
 			}
 			if (OnSetup .IsNotNull ())
 				OnSetup ();
@@ -60,7 +68,7 @@ namespace Lockstep
 		/// For internal use.
 		/// </summary>
 		/// <param name="id">Identifier.</param>
-		public bool Create (int id)
+        internal bool Create (int id)
 		{
 			if (CachedGameObject == null)
 			{
@@ -79,19 +87,24 @@ namespace Lockstep
 		/// <summary>
 		/// Call this when all parameters are supplied as desired.
 		/// </summary>
-		public void Initialize ()
+		internal void Initialize ()
 		{
 
 			CachedGameObject.SetActive (true);
 			StartCoroutine (LifeTimer ());
 			if (OnInitialize .IsNotNull ())
 				OnInitialize ();
+
+            if (CachedShuriken != null) {
+                CachedShuriken.startSpeed = StartSpeed;
+                CachedShuriken.startSize = StartSize;
+            }
 		}
 
 		/// <summary>
 		/// Called every Update frame.
 		/// </summary>
-		public void Visualize ()
+        internal void Visualize ()
 		{
 			if (OnVisualize .IsNotNull ()) 
 				OnVisualize ();
@@ -100,7 +113,7 @@ namespace Lockstep
 		/// <summary>
 		/// Called when this effect is deactivated.
 		/// </summary>
-		public void Deactivate ()
+        internal void Deactivate ()
 		{
 			CachedTransform.SetParent (null);
 			CachedGameObject.SetActive (false);
