@@ -28,12 +28,18 @@ namespace Lockstep
         private float StartSpeed {
             get; set;
         }
-        private float StartSize {get; set;}
         public float Speed {
             set {
                 CachedShuriken.startSpeed = value;
             }
         }
+        private float StartSize {get; set;}
+        public float Size {
+            set {
+                CachedShuriken.startSize = value;
+            }
+        }
+
 
 		public int ID { get; private set; }
 
@@ -96,6 +102,7 @@ namespace Lockstep
             if (CachedShuriken != null) {
                 CachedShuriken.startSpeed = StartSpeed;
                 CachedShuriken.startSize = StartSize;
+                CachedShuriken.Play();
             }
 		}
 
@@ -113,6 +120,9 @@ namespace Lockstep
 		/// </summary>
         internal void Deactivate ()
 		{
+            if (CachedShuriken != null) {
+                CachedShuriken.Stop();
+            }
 			CachedTransform.SetParent (null);
 			CachedGameObject.SetActive (false);
 			if (OnDeactivate .IsNotNull ())
