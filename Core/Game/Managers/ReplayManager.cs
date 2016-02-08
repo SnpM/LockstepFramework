@@ -25,13 +25,6 @@ namespace Lockstep
 		}
 
 		#region public methods
-		const string DemoName = "Demo";
-
-		public static void Play ()
-		{
-			CurrentReplay = FileManager.RetrieveReplay (DemoName);
-			Play (CurrentReplay);
-		}
 
 		public static void Play (Replay replay)
 		{
@@ -47,28 +40,33 @@ namespace Lockstep
 				IsPlayingBack = false;
 				StopStreaming ();
 			}
-		}
+        }
+        public static IEnumerator SerializeCurrent (Replay outputReplay) {
+            IEnumerator enumerator =  Serialize (FrameManager.Frames,outputReplay);
+            while (enumerator.MoveNext())
+                yield return enumerator.Current;
+            outputReplay.hash = LockstepManager.GetStateHash();
+        }
+        public static IEnumerator Serialize (Frame[] frames, Replay outputReplay) {
+            bufferBytes.FastClear();
 
-		public static Replay Save ()
-		{
-			return Save (DateTime.UtcNow.ToString ());
-		}
-
-		public static Replay Save (string name)
-		{
-			byte[] saveBytes = CommandManager.RecordedBytes.ToArray ();
-			CurrentReplay = new Replay ();
-			CurrentReplay.Content = saveBytes;
-			CurrentReplay.Name = name;
-			CurrentReplay.Date = DateTime.UtcNow;
-			CurrentReplay.FrameCount = LockstepManager.FrameCount;
-			CurrentReplay.LastCommandedFrameCount = CommandManager.LastCommandedFrameCount;
-			CurrentReplay.hash = LockstepManager.GetStateHash();
-
-			FileManager.SaveReplay (DemoName, CurrentReplay);
-
-			return CurrentReplay;
-		}
+            int length = frames.Length;
+            int lastCommandedFrame = 0;
+            for (int i = 0; i < length; i++) {
+                Frame frame = frames[i];
+                if (frame.Commands.Count > 0) {
+                    bufferBytes.AddRange(BitConverter.GetBytes(i));
+                    for (int j = 0; j < frame.Commands.Count; j++) {
+                        bufferBytes.AddRange(frame.Commands[j].Serialized);
+                    }
+                    lastCommandedFrame = i;
+                    yield return 0;
+                }
+            }
+            outputReplay.FrameCount = length;
+            outputReplay.LastCommandedFrameCount = lastCommandedFrame;
+            outputReplay.Frames = bufferBytes.ToArray();
+        }
 
 		static FastList<byte> bufferBytes = new FastList<byte> ();
 
@@ -76,7 +74,7 @@ namespace Lockstep
 		{
 			int lastFrameByteCount = 0;
 			int playbackPosition = 0;
-			byte[] playbackBytes = playbackReplay.Content;
+            byte[] playbackBytes = playbackReplay.Frames;
 
 			bool getNextStream = true;
 			int frameCount = 0;
