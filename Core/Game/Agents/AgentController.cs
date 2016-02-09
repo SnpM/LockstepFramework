@@ -281,20 +281,25 @@ namespace Lockstep
 
         private Selection previousSelection = new Selection();
 
+        public Selection GetSelection (Command com) {
+            if (com.ContainsData<Selection>() == false) {
+                return previousSelection;
+            }
+            return com.GetData<Selection>();
+        }
         public void Execute(Command com)
         {
-           
+            if (com.ContainsData<Selection>())
             {
-                if (com.ContainsData<Selection>() == false)
-                    com.Add<Selection>(previousSelection);
                 previousSelection = com.GetData<Selection>();
             }
 
 
             BehaviourHelperManager.Execute(com);
-            for (int i = 0; i < com.GetData<Selection>().selectedAgentLocalIDs.Count; i++)
+            Selection selection = GetSelection(com);
+            for (int i = 0; i < selection.selectedAgentLocalIDs.Count; i++)
             {
-                ushort selectedAgentID = com.GetData<Selection>().selectedAgentLocalIDs [i];
+                ushort selectedAgentID = selection.selectedAgentLocalIDs [i];
                 if (LocalAgentActive [selectedAgentID])
                 {
                     LocalAgents [selectedAgentID].Execute(com);

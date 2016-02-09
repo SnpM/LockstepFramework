@@ -81,11 +81,12 @@ namespace Lockstep
                 for (int i = 0; i < frame.Commands.Count; i++)
                 {
                     Command com = frame.Commands [i];
+
                     LockstepManager.Execute (com);
 
                 }
             }
-            frames[LockstepManager.InfluenceFrameCount] = null;
+            //frames[LockstepManager.InfluenceFrameCount] = null;
 
         }
 
@@ -93,6 +94,7 @@ namespace Lockstep
         {
             EnsureCapacity(frameCount + 1);
             frames [frameCount] = frame;
+
             hasFrame [frameCount] = true;
 
             while (HasFrame (nextFrame))

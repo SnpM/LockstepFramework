@@ -729,7 +729,7 @@ MonoBehaviour:
   _maps:
   - _scanLayers:
       serializedVersion: 2
-      m_Bits: 0
+      m_Bits: 256
     _map:
       _width: 200
       _height: 200
@@ -744,7 +744,7 @@ GameObject:
   - 4: {fileID: 2073655914}
   - 218: {fileID: 2073655913}
   - 154: {fileID: 2073655912}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Terrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}

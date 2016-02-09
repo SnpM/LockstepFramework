@@ -6,7 +6,6 @@ using Stopwatch = System.Diagnostics.Stopwatch;
 namespace Lockstep {
     public class Selection : ICommandData{
         private static readonly FastList<byte> bufferBites = new FastList<byte>();
-        static readonly FastList<LSAgent> bufferAgents = new FastList<LSAgent>();
 
         private static int bigIndex, smallIndex;
         private static ulong castedBigIndex;
@@ -18,18 +17,18 @@ namespace Lockstep {
         private  BitArray Header;
         private readonly FastList<byte> Data = new FastList<byte>();
        
-        private AgentController leAgentController;
-
         public Selection() {}
 
 
+        static readonly FastList<LSAgent> bufferAgents = new FastList<LSAgent>();
         public Selection(FastEnumerable<LSAgent> selectedAgents) {
-            
-            Serialize(selectedAgents);
+            bufferAgents.FastClear();
+            selectedAgents.Enumerate(bufferAgents);
+            this.AddAgents(bufferAgents.ToArray());
         }
 
         public byte[] GetBytes () {
-
+            this.Serialize();
 
             bufferBites.FastClear();
             //Serialize header
@@ -52,38 +51,36 @@ namespace Lockstep {
             return bufferBites.ToArray();
         }
 
-        public void Serialize(FastEnumerable<LSAgent> selectedAgents) {
+        public void AddAgents (params LSAgent[] agents) {
+            for (int i = 0; i < agents.Length; i++) {
+                selectedAgentLocalIDs.Add(agents[i].LocalID);
+            }
+        }
+
+        private void Serialize() {
 
             Data.FastClear();
-            selectedAgentLocalIDs.FastClear ();
-			bufferAgents.FastClear ();
-			selectedAgents.Enumerate (bufferAgents);
             ushort highestID = 0;
-            for (int i = 0; i < bufferAgents.Count; i++) {
-                ushort id = bufferAgents[i].LocalID;
+            for (int i = 0; i < selectedAgentLocalIDs.Count; i++) {
+                ushort id = selectedAgentLocalIDs[i];
                 if (id > highestID) highestID = id;
             }
             int headerLength = (highestID + 1 - 1) / 8 + 1;
             Header = new BitArray(headerLength, false);
-			for (int i = 0; i < bufferAgents.Count; i++) {
-                SerializeAgent(bufferAgents[i]);
+			for (int i = 0; i < selectedAgentLocalIDs.Count; i++) {
+                SerializeID(selectedAgentLocalIDs[i]);
             }
 
         }
 
-        private void SerializeAgent(LSAgent agent) {
-            if (leAgentController == null) {
-                leAgentController = agent.Controller;
-            }
+        private void SerializeID(ushort id) {
 
-            bigIndex = (agent.LocalID / 8);
-            smallIndex = (agent.LocalID % 8);
+            bigIndex = (id / 8);
+            smallIndex = (id % 8);
 
             Header.Set(bigIndex, true);
             Data.EnsureCapacity(bigIndex + 1);
             Data[bigIndex] |= (byte)(1 << smallIndex);
-
-			selectedAgentLocalIDs.Add (agent.LocalID);
         }
 
         public int Reconstruct(byte[] source, int startIndex) {
@@ -99,18 +96,16 @@ namespace Lockstep {
             selectedAgentLocalIDs.FastClear();
             for (int i = 0; i < Header.Length; i++) {
                 if (Header.Get(i)) {
-
                     cullGroup = source[curIndex++];
-
 					for (int j = 0; j < 8; j++) {
                         castedSmallIndex = (byte)(1 << j);
                         if ((cullGroup & (castedSmallIndex)) == castedSmallIndex) {
                             selectedAgentLocalIDs.Add((ushort)(i * 8 + j));
+
                         }
                     }
                 }
             }
-
             return curIndex - startIndex;
         }
 
