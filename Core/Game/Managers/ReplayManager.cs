@@ -110,12 +110,13 @@ namespace Lockstep
 
 		public static IEnumerator StreamPlayback (Replay playbackReplay)
 		{
-            FrameManager.AdjustFramerate = false;
             CurrentReplay = playbackReplay;
 
             byte[] playbackBytes = playbackReplay.Content;
 
             yield return null;
+            FrameManager.AdjustFramerate = false;
+
             Reader reader = new Reader();
             reader.Initialize(playbackBytes,0);
             Frame[] frames = Deserialize (reader);

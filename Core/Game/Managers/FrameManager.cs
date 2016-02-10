@@ -42,7 +42,7 @@ namespace Lockstep
                 Time.timeScale = 1 + scaler;
             } else
             {
-                Time.timeScale = 1f;
+                //Time.timeScale = 1f;
             }
         }
 
