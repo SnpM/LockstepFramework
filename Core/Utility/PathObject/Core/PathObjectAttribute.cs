@@ -11,9 +11,9 @@ namespace Lockstep
         public PathObjectAttribute(Type requiredType)
         {
             this.ObjectType = requiredType;
-            if (requiredType.IsSubclassOf(typeof(UnityEngine.Component)) == false)
+            if (requiredType.IsSubclassOf(typeof(UnityEngine.Object)) == false)
             {
-                throw new ArgumentException(string.Format("Type '{0}' is not a UnityEngine.Component.", requiredType));
+                throw new ArgumentException(string.Format("Type '{0}' is not a UnityEngine.Object.", requiredType));
             }
         }
     }

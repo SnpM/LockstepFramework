@@ -464,7 +464,7 @@ namespace Lockstep
         }
         #if UNITY_EDITOR
         [SerializeField, Visualize]
-        private Vector3 _projectileOrigin;
+        private Vector3 _projectileOrigin = Vector3.forward;
 
         protected override void OnAfterSerialize()
         {

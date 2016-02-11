@@ -24,11 +24,13 @@ namespace Lockstep
             get { return 0; }
         }
 
+
         public void Initialize()
         {
             CachedListenInput = ListenInput;
             OnInitialize();
         }
+
 
         protected virtual void OnInitialize()
         {
