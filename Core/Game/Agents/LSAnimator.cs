@@ -33,8 +33,10 @@ namespace Lockstep
 		public override void Setup()
 		{
 			base.Setup();
-			animator = GetComponentInChildren<Animation>();
-			if (CanAnimate = (animator.IsNotNull()))
+            animator = GetComponent<Animation>();
+            if (animator == null)
+                animator = this.GetComponentInChildren<Animation>();
+			if (CanAnimate = (animator != null))
 			{
 				//States
 				idlingClip = animator.GetClip(idling);
