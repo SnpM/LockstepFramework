@@ -74,19 +74,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14e14365092354525b827ca9117ed940, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Position:
-    x: 0
-    y: 0
   _speed: 1048576
-  CurrentHeight: 0
   _visualArc: 1
   _delay: 0
   _attachEndEffectToTarget: 0
   _endEffect: 
   CanRotate: 1
-  _startEffect: 
+  _startEffect: Muzzle Ball
   IsActive: 0
-  UseEffects: 0
+  UseEffects: 1
   _canVisualize: 1
   _interpolationRate: 8
   _exclusiveTargetType: 0
@@ -113,6 +109,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: _visualArc
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: UseEffects
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _startEffect
+      value: Muzzle Ball
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

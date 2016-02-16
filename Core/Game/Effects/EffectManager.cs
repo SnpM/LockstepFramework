@@ -125,7 +125,6 @@ namespace Lockstep
                 effect = pool.Pop();
             } else
             {
-                Debug.Log(effectCode);
                 IEffectData dataItem = CodeDataMap [effectCode];
                 effect = GameObject.Instantiate<GameObject>(dataItem.GetEffect().gameObject).GetComponent<LSEffect>();
                 effect.Setup(effectCode);
