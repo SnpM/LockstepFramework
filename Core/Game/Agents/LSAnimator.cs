@@ -33,24 +33,26 @@ namespace Lockstep
 		public override void Setup()
 		{
 			base.Setup();
-            animator = GetComponent<Animation>();
-            if (animator == null)
-                animator = this.GetComponentInChildren<Animation>();
-			if (CanAnimate = (animator != null))
-			{
-				//States
-				idlingClip = animator.GetClip(idling);
-				movingClip = animator.GetClip(moving);
-				engagingClip = animator.GetClip(engaging);
-				dyingClip = animator.GetClip(dying);
-				//Impulses
-				fireClip = animator.GetClip(fire);
-			}
+
 		}
 
 		public override void Initialize()
 		{
 			base.Initialize();
+            animator = GetComponent<Animation>();
+            if (animator == null)
+                animator = this.GetComponentInChildren<Animation>();
+            Debug.Log(animator);
+            if (CanAnimate = (animator != null))
+            {
+                //States
+                idlingClip = animator.GetClip(idling);
+                movingClip = animator.GetClip(moving);
+                engagingClip = animator.GetClip(engaging);
+                dyingClip = animator.GetClip(dying);
+                //Impulses
+                fireClip = animator.GetClip(fire);
+            }
 			Play(AnimState.Idling);
 		}
 
