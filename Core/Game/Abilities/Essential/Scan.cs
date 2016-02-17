@@ -96,8 +96,12 @@ namespace Lockstep
         protected  Vector3d _projectileOffset;
         [SerializeField, FixedNumber]
         protected long _energyCost;
+        [SerializeField,FrameCount]
+        protected int _windup;
 
         #endregion
+
+        public int Windup {get {return _windup;}}
 
         public long EnergyCost { get { return _energyCost; } }
 
@@ -184,6 +188,13 @@ namespace Lockstep
                 BehaveWithNoTarget();
             }
         }
+        [Lockstep (true)]
+        bool IsWindingUp {get; set;}
+        int windupCount;
+        void StartWindup () {
+            windupCount = this.Windup;
+            IsWindingUp = true;
+        }
 
         void BehaveWithTarget()
         {
@@ -193,7 +204,15 @@ namespace Lockstep
                 BehaveWithNoTarget();
                 return;
             }
-
+            if (IsWindingUp) {
+                windupCount--;
+                if (windupCount < 0) {
+                    Fire ();
+                    this.attackCount = this.attackFrameCount - this.Windup;
+                    IsWindingUp = false;
+                }
+            }
+            else {
             Vector2d targetDirection = Target.Body._position - cachedBody._position;
             long fastMag = targetDirection.FastMagnitude();
 
@@ -225,8 +244,7 @@ namespace Lockstep
                 {
                     if (attackCount <= 0)
                     {
-                        attackCount = attackFrameCount;
-                        Fire();
+                        StartWindup ();
                     }
                 }
 
@@ -269,6 +287,7 @@ namespace Lockstep
                     inRange = false;
                 }
                 
+            }
             }
         }
 
