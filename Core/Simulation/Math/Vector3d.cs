@@ -4,6 +4,7 @@ using System.Collections;
 namespace Lockstep
 {
     //THIS IS HAPPENING!!!!
+    [System.Serializable]
     public struct Vector3d : Lockstep.ICommandData
     {
         [FixedNumber]

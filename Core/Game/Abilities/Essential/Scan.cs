@@ -127,7 +127,6 @@ namespace Lockstep
         private bool _hasTarget;
         private bool isAttackMoving;
         private bool isFocused;
-        private Vector2d projectileOffset;
 
         protected override void OnSetup()
         {
@@ -330,6 +329,7 @@ namespace Lockstep
         protected virtual void OnFire()
         {
             long appliedDamage = Damage;
+            Debug.Log(this.ProjectileOffset);
             LSProjectile projectile = ProjectileManager.Create(
                 ProjCode,
                 this.Agent,

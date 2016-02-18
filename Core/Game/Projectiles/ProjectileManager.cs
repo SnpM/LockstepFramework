@@ -96,8 +96,9 @@ namespace Lockstep {
 			return curProj;
 		}
         public static LSProjectile Create (string projCode, LSAgent source, Vector3d offset, AllegianceType targetAllegiance, Func<LSAgent,bool> agentConditional,Action<LSAgent> hitEffect) {
-            Vector3d pos = offset;
-            pos.SetVector2d(pos.ToVector2d().Rotated(source.Body._rotation.x,source.Body._rotation.y));
+            Vector2d relativePos = offset.ToVector2d();
+            Vector2d worldPos = relativePos.Rotated(source.Body.Rotation);
+            Vector3d pos = new Vector3d(worldPos.x,worldPos.y,offset.z + source.Body.HeightPos);
             pos.Add(ref source.Body._position);
             return Create (projCode,pos,agentConditional,(bite) => ((source.Controller.GetAllegiance(bite) & targetAllegiance) != 0),hitEffect);
         }

@@ -174,6 +174,9 @@ namespace Lockstep
             vec.Rotate(cos,sin);
             return vec;
         }
+        public Vector2d Rotated (Vector2d rotation) {
+            return Rotated (rotation.x,rotation.y);
+        }
         public void RotateInverse(long cos, long sin)
         {
             Rotate(cos, -sin);

@@ -389,7 +389,6 @@ namespace Lockstep
             this.ResetVariables();
 
             this.Position = projectilePosition;
-
             this.HitEffect = hitEffect;
             this.ID = id;
 
