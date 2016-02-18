@@ -42,7 +42,6 @@ namespace Lockstep
             animator = GetComponent<Animation>();
             if (animator == null)
                 animator = this.GetComponentInChildren<Animation>();
-            Debug.Log(animator);
             if (CanAnimate = (animator != null))
             {
                 //States
