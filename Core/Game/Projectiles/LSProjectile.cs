@@ -625,17 +625,20 @@ namespace Lockstep
             this.Position = nextPosition;
             #endif
         }
-
-		Vector3 shiftVelocity;
-
+            
         public void Visualize()
         {
             if (this.IsActive)
             {
                 if (this.CanVisualize)
                 {
+                    
 					LSProjectile.newPos = this.Position.ToVector3();
+                    Vector3 shiftVelocity = LSProjectile.newPos - this.cachedTransform.position;
                     this.cachedTransform.position = LSProjectile.newPos;
+                    if (shiftVelocity.sqrMagnitude > 0) {
+                        this.cachedTransform.rotation = Quaternion.LookRotation(shiftVelocity);
+                    }
                 }
                 if (this.onVisualize.IsNotNull())
                 {

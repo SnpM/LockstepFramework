@@ -329,7 +329,6 @@ namespace Lockstep
         protected virtual void OnFire()
         {
             long appliedDamage = Damage;
-            Debug.Log(this.ProjectileOffset);
             LSProjectile projectile = ProjectileManager.Create(
                 ProjCode,
                 this.Agent,
