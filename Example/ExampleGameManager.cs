@@ -30,6 +30,7 @@ namespace Lockstep.Example {
             }
         }
 
+        Replay LastSave = new Replay();
 		void OnGUI ()
 		{
 			GUI.matrix = Matrix4x4.TRS (new Vector3(0, 0, 0), Quaternion.identity, new Vector3 (2.5f, 2.5f, 1)); 
@@ -43,7 +44,7 @@ namespace Lockstep.Example {
 				}
 
 				if (GUILayout.Button ("Rewind")) {
-					ReplayManager.Play ();
+					ReplayManager.Play (LastSave);
 					Application.LoadLevel (Application.loadedLevel);
 				}
 			}
@@ -55,9 +56,10 @@ namespace Lockstep.Example {
 				}
 
 				if (GUILayout.Button ("Save")) {
-					ReplayManager.Save ();
-					ReplayManager.Play ();
+                    LastSave = ReplayManager.SerializeCurrent();
 					Application.LoadLevel (Application.loadedLevel);
+                    ReplayManager.Play (LastSave);
+
 				}
 			}
 		}

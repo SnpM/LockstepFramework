@@ -9,11 +9,15 @@ namespace Lockstep.Data
 	[Serializable]
 	public class AgentDataItem : ObjectDataItem, IAgentData
 	{
+
+
         public AgentDataItem (string name, string description) : this(){
             base._name = name;
             base._description = description;
         }
-        public AgentDataItem(){}
+        public AgentDataItem(){
+            
+        }
 
         public LSAgent GetAgent () {
             if (this.Prefab != null)
@@ -31,5 +35,7 @@ namespace Lockstep.Data
             if (agentType == agent.MyAgentType) return 1;
             return 0;
         }
+
+
 	}
 }

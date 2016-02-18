@@ -57,38 +57,10 @@ MonoBehaviour:
       _classRef: Lockstep.Stop, Assembly-CSharp
     _listenInputCode: 
     _informationGather: 0
-  - _name: CoverMove
+  - _name: Trap
     _description: 
     _icon: {fileID: 0}
     _script:
-      _classRef: CoverMove, Assembly-CSharp
-    _listenInputCode: 
-    _informationGather: 0
-  - _name: FPSCrouch
-    _description: 
-    _icon: {fileID: 0}
-    _script:
-      _classRef: FPSCrouch, Assembly-CSharp
-    _listenInputCode: 
-    _informationGather: 0
-  - _name: FPSMove
-    _description: 
-    _icon: {fileID: 0}
-    _script:
-      _classRef: FPSMove, Assembly-CSharp
-    _listenInputCode: 
-    _informationGather: 0
-  - _name: FPSShoot
-    _description: 
-    _icon: {fileID: 0}
-    _script:
-      _classRef: Lockstep.FPSShoot, Assembly-CSharp
-    _listenInputCode: 
-    _informationGather: 0
-  - _name: FPSTurn
-    _description: 
-    _icon: {fileID: 0}
-    _script:
-      _classRef: Lockstep.FPSTurn, Assembly-CSharp
+      _classRef: InvasionDay.Trap, Assembly-CSharp
     _listenInputCode: 
     _informationGather: 0

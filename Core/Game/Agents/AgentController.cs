@@ -3,7 +3,6 @@ using UnityEngine;
 using Lockstep.Data;
 using System.Collections.Generic;
 using System.Linq;
-
 namespace Lockstep
 {
     public sealed class AgentController
@@ -23,22 +22,23 @@ namespace Lockstep
 
         public const int MaxAgents = 16384;
         private static readonly Dictionary<string,IAgentData> CodeInterfacerMap = new Dictionary<string, IAgentData>();
+        public static IAgentData[] AgentData;
 
         public static void Setup()
         {
             IAgentDataProvider database;
             if (LSDatabaseManager.TryGetDatabase<IAgentDataProvider>(out database))
             {
-                IAgentData[] agentInters = database.AgentData;
+                AgentData = database.AgentData;
 
                 //AgentInterfacer[] agentInters = (LSDatabaseManager.CurrentDatabase as DefaultLSDatabase).AgentData;
-                AgentCodes = new string[agentInters.Length];
+                AgentCodes = new string[AgentData.Length];
             
-                CachedAgents = new Dictionary<string,FastStack<LSAgent>>(agentInters.Length);
+                CachedAgents = new Dictionary<string,FastStack<LSAgent>>(AgentData.Length);
             
-                for (int i = 0; i < agentInters.Length; i++)
+                for (int i = 0; i < AgentData.Length; i++)
                 {
-                    IAgentData interfacer = agentInters [i];
+                    IAgentData interfacer = AgentData [i];
                     string agentCode = interfacer.Name;
                     AgentCodes [i] = agentCode;
                 
@@ -281,20 +281,25 @@ namespace Lockstep
 
         private Selection previousSelection = new Selection();
 
+        public Selection GetSelection (Command com) {
+            if (com.ContainsData<Selection>() == false) {
+                return previousSelection;
+            }
+            return com.GetData<Selection>();
+        }
         public void Execute(Command com)
         {
-           
+            if (com.ContainsData<Selection>())
             {
-                if (com.ContainsData<Selection>() == false)
-                    com.Add<Selection>(previousSelection);
                 previousSelection = com.GetData<Selection>();
             }
 
 
             BehaviourHelperManager.Execute(com);
-            for (int i = 0; i < com.GetData<Selection>().selectedAgentLocalIDs.Count; i++)
+            Selection selection = GetSelection(com);
+            for (int i = 0; i < selection.selectedAgentLocalIDs.Count; i++)
             {
-                ushort selectedAgentID = com.GetData<Selection>().selectedAgentLocalIDs [i];
+                ushort selectedAgentID = selection.selectedAgentLocalIDs [i];
                 if (LocalAgentActive [selectedAgentID])
                 {
                     LocalAgents [selectedAgentID].Execute(com);
@@ -332,6 +337,7 @@ namespace Lockstep
             } else
             {
                 IAgentData interfacer = AgentController.CodeInterfacerMap [agentCode];
+
                 curAgent = GameObject.Instantiate(interfacer.GetAgent().gameObject).GetComponent<LSAgent>();
                 curAgent.Setup(interfacer);
             }

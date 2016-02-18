@@ -39,17 +39,20 @@ namespace Lockstep
             this._AddAt(item, index);
             return index;
         }
-
         public void InsertAt (T item, int index)
         {
             //Public API for adding at a specific index.
             //Note: Has linear performance
-            if (arrayAllocation.Get(index)) {
-                this.innerArray[index] = item; //If something's already there, just replace it
+            if (index < arrayAllocation.Length && arrayAllocation.Get(index)) {
+                //this.innerArray[index] = item; //If something's already there, just replace it
             }
             else {
-                int indexIndex = Array.BinarySearch<int> (OpenSlots.innerArray, index);
-                if (index >= PeakCount)
+                CheckCapacity (index + 1);
+                if (index < PeakCount) {
+                    int indexIndex = Array.BinarySearch<int> (OpenSlots.innerArray, index);
+                    OpenSlots.innerArray.Shift(indexIndex,OpenSlots.innerArray.Length, -1);
+                }
+                else if (index >= PeakCount)
                 {
                     for (; PeakCount < index; PeakCount++)
                     {
@@ -57,7 +60,11 @@ namespace Lockstep
                     }
                     PeakCount++;
                 }
+
+                Count++;
             }
+            this.innerArray[index] = item;
+            arrayAllocation[index] = true;
         }
 
         public void _AddAt(T item, int index)

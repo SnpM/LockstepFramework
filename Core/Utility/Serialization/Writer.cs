@@ -7,72 +7,82 @@ namespace Lockstep
 	public class Writer
 	{
 		static int i, length;
-		public FastList<byte> canvas;
-		public Writer (FastList<byte> Canvas)
+        public FastList<byte> Canvas {get; private set;}
+		public Writer ()
 		{
-			canvas = Canvas;
 		}
+        public Writer (FastList<byte> canvas) {
+            this.Initialize(canvas);
+        }
+        /// <summary>
+        /// For re-useability
+        /// </summary>
+        /// <param name="canvas">Canvas.</param>
+        public void Initialize (FastList<byte> canvas) {
+            canvas.FastClear();
+            Canvas = canvas;
+        }
 	
 		public void Write (byte value)
 		{
-			canvas.Add (value);
+			Canvas.Add (value);
 		}
 
 		public void Write (byte[] values)
 		{
-			canvas.AddRange (values);
+			Canvas.AddRange (values);
 		}
 
 		public void Write (short value)
 		{
-			canvas.AddRange (BitConverter.GetBytes(value));
+			Canvas.AddRange (BitConverter.GetBytes(value));
 		}
 
 		public void Write (ushort value)
 		{
-			canvas.AddRange (BitConverter.GetBytes (value));
+			Canvas.AddRange (BitConverter.GetBytes (value));
 		}
 
 		public void Write (int value)
 		{
-			canvas.AddRange (BitConverter.GetBytes (value));
+			Canvas.AddRange (BitConverter.GetBytes (value));
 		}
 
 		public void Write (uint value)
 		{
-			canvas.AddRange (BitConverter.GetBytes (value));
+			Canvas.AddRange (BitConverter.GetBytes (value));
 		}
 
 		public void Write (long value)
 		{
-			canvas.AddRange (BitConverter.GetBytes (value));
+			Canvas.AddRange (BitConverter.GetBytes (value));
 		}
 
 		public void Write (ulong value)
 		{
-			canvas.AddRange (BitConverter.GetBytes (value));
+			Canvas.AddRange (BitConverter.GetBytes (value));
 		}
 
 		public void Write (bool value)
 		{
-			canvas.AddRange (BitConverter.GetBytes (value));
+			Canvas.AddRange (BitConverter.GetBytes (value));
 		}
 
         public void Write (string value) {
             byte[] stringBytes = System.Text.Encoding.Unicode.GetBytes (value);
             ushort byteLength = (ushort)stringBytes.Length;
-            canvas.AddRange(BitConverter.GetBytes(byteLength));
-            canvas.AddRange(stringBytes);
+            Canvas.AddRange(BitConverter.GetBytes(byteLength));
+            Canvas.AddRange(stringBytes);
         }
 
         public void WriteByteArray (byte[] byteArray) {
             ushort byteLength = (ushort)byteArray.Length;
-            canvas.AddRange(BitConverter.GetBytes(byteLength));
-            canvas.AddRange(byteArray);
+            Canvas.AddRange(BitConverter.GetBytes(byteLength));
+            Canvas.AddRange(byteArray);
         }
 
         public void Reset () {
-            this.canvas.FastClear();
+            this.Canvas.FastClear();
         }
 	}
 }

@@ -7,13 +7,19 @@ namespace Lockstep
 {
     public class Reader
     {
+        public Reader () {}
+        public Reader (byte[] source, int startIndex) {
+            this.Initialize (source,startIndex);
+        }
+
         public int Position {get; private set;}
+        public int Length {get {return Source.Length;}}
         public byte[] Source {get; private set;}
 
-        public void Initialize(byte[] Source, int StartIndex)
+        public void Initialize(byte[] source, int startIndex)
         {
-            this.Source = Source;
-            Position = StartIndex;
+            this.Source = source;
+            Position = startIndex;
         }
 
         public void MovePosition (int amount) {
@@ -40,21 +46,21 @@ namespace Lockstep
         public bool ReadBool()
         {
             bool ret = BitConverter.ToBoolean(Source, Position);
-            Position += 1;
+            Position += sizeof(bool);
             return ret;
         }
 
         public short ReadShort()
         {
             short ret = BitConverter.ToInt16(Source, Position);
-            Position += 2;
+            Position += sizeof(short);
             return ret;
         }
 
         public ushort ReadUShort()
         {
             ushort ret = BitConverter.ToUInt16(Source, Position);
-            Position += 2;
+            Position += sizeof(ushort);
             return ret;
         }
 

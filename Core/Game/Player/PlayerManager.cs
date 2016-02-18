@@ -34,6 +34,7 @@ namespace Lockstep {
         }
 
 		public static void AddController(AgentController agentController) {
+            if (PlayerManager.ContainsController(agentController)) return;
 			agentController.PlayerIndex = AgentControllers.Add(agentController);
 			if (MainController == null) MainController = agentController;
 		}

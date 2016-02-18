@@ -1,7 +1,19 @@
 ﻿using UnityEngine;
+using System;
 namespace Lockstep {
     public static class Selector {
+        public static event Action onChange;
+        public static event Action onAdd;
+        public static event Action onRemove;
 		private static LSAgent _mainAgent;
+        static Selector () {
+            onAdd += Change;
+            onRemove += Change;
+        }
+        private static void Change () {
+            if (onChange != null)
+                onChange();
+        }
 		public static LSAgent MainSelectedAgent {get {return _mainAgent;}
 			private set{
 				_mainAgent = value;
@@ -17,6 +29,7 @@ namespace Lockstep {
 			agent.Controller.AddToSelection (agent);
             agent.IsSelected = true;
 			if (MainSelectedAgent == null) MainSelectedAgent = agent;
+            onAdd ();
         }
 
         public static void Remove(LSAgent agent) {
@@ -25,6 +38,7 @@ namespace Lockstep {
 			if (agent == MainSelectedAgent) {
 				agent = SelectedAgents.Count > 0 ? SelectedAgents.PopMax () : null;
 			}
+            onRemove ();
         }
 
         public static void Clear() {

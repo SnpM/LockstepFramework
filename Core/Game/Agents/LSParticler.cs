@@ -5,16 +5,16 @@ namespace Lockstep
 {
 	public class LSParticler : MonoBehaviour
 	{
-		LSAnimator animator;
+		LSAnimatorBase animator;
 
 		void Awake ()
 		{
-			animator = GetComponent<LSAnimator> ();
+			animator = GetComponent<LSAnimatorBase> ();
 			animator.OnStatePlay += HandleOnStatePlay;
 			animator.OnImpulsePlay += HandleOnImpulsePlay;
 		}
 
-		void HandleOnImpulsePlay (AnimImpulse obj)
+		void HandleOnImpulsePlay (AnimImpulse obj, int rate)
 		{
 		}
 

@@ -72,10 +72,16 @@ namespace Lockstep.Data {
 
                 int beginningDepth = iterationProperty.depth;
                 while (iterationProperty.NextVisible(true)) {
-                    if (iterationProperty.depth != beginningDepth) {
+
+                    if (iterationProperty.depth == beginningDepth - 1) {
+                        serializedProperties.RemoveAt(serializedProperties.Count - 1);
                         break;
                     }
+                    if (iterationProperty.depth > beginningDepth) {
+                        continue;
+                    }
                     serializedProperties.Add (iterationProperty.Copy ());
+
                 }
                 pos.x += defaultPropertyHeight;
                 pos.width -= defaultPropertyHeight;

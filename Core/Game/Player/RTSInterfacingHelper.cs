@@ -27,7 +27,18 @@ namespace Lockstep
         private static AbilityDataItem QuickPos;
         private static AbilityDataItem QuickTarget;
 
-        public static bool IsGathering { get; private set; }
+
+        private static bool _isGathering;
+        public static bool IsGathering {
+            get {return _isGathering;}
+            private set {
+                SelectionManager.IsGathering = value;
+                _isGathering = value;
+            }
+        }
+
+        [SerializeField]
+        private GUIStyle _boxStyle;
 
         static void Setup()
         {
@@ -125,14 +136,15 @@ namespace Lockstep
             Send(curCom);
         }
 
-        public void DrawGUI()
+        protected virtual void OnGUI()
         {
-
+            if (_boxStyle == null) return;
+            this.DrawBox(_boxStyle);
         }
 
-        protected virtual void OnDrawGUI()
+        protected virtual void DrawBox (GUIStyle style)
         {
-            SelectionManager.DrawBox(GUIStyle.none);
+            SelectionManager.DrawBox(style);
         }
 
         private static void Send(Command com)

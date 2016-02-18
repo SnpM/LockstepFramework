@@ -89,7 +89,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100310}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.778}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 450234}
@@ -252,7 +252,7 @@ MonoBehaviour:
   _trackAttackAngle: 1
   _attackAngle: 11380
   _energyCost: 0
-  _projectileOrigin: {x: 0, y: 0, z: 0}
+  _projectileOrigin: {x: 0, y: 0, z: 1.273089}
 --- !u!114 &11485440
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -313,7 +313,7 @@ MonoBehaviour:
   _layer: 0
   _halfWidth: 0
   _halfHeight: 0
-  _radius: 32112
+  _radius: 32768
   _immovable: 0
   _basePriority: 0
   _vertices: []

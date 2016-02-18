@@ -21,7 +21,8 @@ public class MovementGroup
     {
         Destination = com.GetData<Vector2d> ();;
         calculatedBehaviors = false;
-        movers = new FastList<Move>(com.GetData<Selection>().selectedAgentLocalIDs.Count);
+            Selection selection = AgentController.InstanceManagers[com.ControllerID].GetSelection(com);
+            movers = new FastList<Move>(selection.selectedAgentLocalIDs.Count);
     }
 
     public void Add(Move mover)

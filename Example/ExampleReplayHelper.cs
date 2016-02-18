@@ -8,7 +8,7 @@ public class ExampleReplayHelper : BehaviourHelper
 	{
 		if (ReplayManager.IsPlayingBack)
 		{
-			if (LockstepManager.FrameCount == ReplayManager.CurrentReplay.FrameCount-1)
+            if (!FrameManager.CanAdvanceFrame)
 			{
 				long newHash = LockstepManager.GetStateHash ();
 				if (newHash != ReplayManager.CurrentReplay.hash)

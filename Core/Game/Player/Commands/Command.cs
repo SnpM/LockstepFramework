@@ -166,11 +166,11 @@ namespace Lockstep
             ControllerID = reader.ReadByte();
             InputCode = reader.ReadUShort();
             this.ContainedTypesCount = reader.ReadUShort();
-
             for (int i = 0; i < this.ContainedTypesCount; i++)
             {
                 ushort dataID = reader.ReadUShort();
                 ushort dataCount = reader.ReadUShort();
+
                 FastList<ICommandData> items = GetItemsList(dataID);
                 Type dataType = RegisteredData.GetReversed(dataID);
                 for (int j = 0; j < dataCount; j++)
@@ -193,9 +193,9 @@ namespace Lockstep
                 
 
                 //Essential Information
-                writer.Write(ControllerID);
-                writer.Write(InputCode);
-                writer.Write(ContainedTypesCount);
+                writer.Write((byte)ControllerID);
+                writer.Write((ushort)InputCode);
+                writer.Write((ushort)ContainedTypesCount);
                 foreach (KeyValuePair<ushort,FastList<ICommandData>> pair in ContainedData)
                 {
                     writer.Write(pair.Key);

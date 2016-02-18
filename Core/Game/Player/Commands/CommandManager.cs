@@ -7,11 +7,8 @@ namespace Lockstep
     {
         const int defaultSize = 1000;
 
-        public static int LastCommandedFrameCount { get; private set; }
-
         #region Recording
 
-        public static FastList<byte> RecordedBytes = new FastList<byte>(defaultSize);
 
         #endregion
 
@@ -20,14 +17,12 @@ namespace Lockstep
 
         public static void Initialize()
         {
-            RecordedBytes.FastClear();
             outCommands.FastClear();
-            LastCommandedFrameCount = -1;
         }
 
         public static void Simulate()
         {
-            SendOut ();
+            SendOut();
         }
 
         public static void ProcessPacket(byte[] packet)
@@ -49,38 +44,37 @@ namespace Lockstep
             int frameCount = BitConverter.ToInt32(packet.innerArray, 0);
             int index = 4;
 
+            Frame frame = new Frame();
+
+            if (packet.Count > 4)
+            {
+                while (index < packet.Count)
+                {
+                    Command com = new Command();
+                    index += com.Reconstruct(packet.innerArray, index);
+                    frame.AddCommand(com);
+                }
+            }
+            ProcessFrame(frameCount, frame);
+
+        }
+
+        public static void ProcessFrame(int frameCount, Frame frame)
+        {
             if (FrameManager.HasFrame(frameCount) == false)
             {
-                Frame frame = new Frame();
-
-                if (packet.Count > 4)
-                {
-                    RecordedBytes.AddRange(BitConverter.GetBytes((ushort)packet.Count));
-                    RecordedBytes.AddRange(packet);
-                    while (index < packet.Count)
-                    {
-                        Command com = new Command();
-                        index += com.Reconstruct(packet.innerArray, index);
-                        frame.AddCommand(com);
-                    }
-                    if (frameCount > LastCommandedFrameCount)
-                    {
-                        LastCommandedFrameCount = frameCount;
-                    }
-                }
                 FrameManager.AddFrame(frameCount, frame);
-
-            } else
-            {
-
             }
+
         }
 
         /// <summary>
         /// Sends out all Commands
         /// </summary>
-        public static void SendOut () {
-            if (outCommands.Count > 0) {
+        public static void SendOut()
+        {
+            if (outCommands.Count > 0)
+            {
                 bufferedBytes.FastClear();
 
                 for (int i = 0; i < outCommands.Count; i++)
@@ -96,13 +90,14 @@ namespace Lockstep
 
         public static void SendCommand(Command com, bool immediate = false)
         {
-            if (com == null) {
+            if (com == null)
+            {
                 return;
             }
             outCommands.Add(com);
             if (immediate)
             {
-                SendOut ();
+                SendOut();
             }
         }
     }

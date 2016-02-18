@@ -42,19 +42,17 @@ namespace Lockstep
                 Time.timeScale = 1 + scaler;
             } else
             {
-                Time.timeScale = 1f;
+                //Time.timeScale = 1f;
             }
         }
 
         private static int nextFrame;
 
-        public static bool FreeSimulate { get; private set; }
-
         public static  int EndFrame { get; set; }
 
         public static bool CanAdvanceFrame
         {
-            get { return (FreeSimulate || ForeSight > 0 && (ClientManager.GameStarted));}
+            get { return (ForeSight > 0 && (ClientManager.GameStarted));}
         }
 
         public static bool HasFrame(int frame)
@@ -64,7 +62,7 @@ namespace Lockstep
 
         public static void Initialize()
         {
-            FreeSimulate = false;
+            AdjustFramerate = true;
             EndFrame = -1;
 
             ForeSight = 0;
@@ -74,8 +72,7 @@ namespace Lockstep
 
         public static void Simulate()
         {
-            if (FreeSimulate)
-                return;
+
             TweakFramerate();
             ForeSight--;
             Frame frame = frames [LockstepManager.InfluenceFrameCount];
@@ -84,21 +81,20 @@ namespace Lockstep
                 for (int i = 0; i < frame.Commands.Count; i++)
                 {
                     Command com = frame.Commands [i];
+
                     LockstepManager.Execute (com);
 
                 }
             }
-            frames[LockstepManager.InfluenceFrameCount] = null;
-            if (LockstepManager.InfluenceFrameCount == EndFrame)
-            {
-                FreeSimulate = true;
-            }
+            //frames[LockstepManager.InfluenceFrameCount] = null;
+
         }
 
         public static void AddFrame(int frameCount, Frame frame)
         {
             EnsureCapacity(frameCount + 1);
             frames [frameCount] = frame;
+
             hasFrame [frameCount] = true;
 
             while (HasFrame (nextFrame))

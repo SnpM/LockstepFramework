@@ -9,8 +9,6 @@ namespace Lockstep
 
 		public float Duration {get; set;}
 
-
-
 		#region For external use
 		//TODO: Add needed variables for external mechanisms (I.e. Sinus).
 		#endregion
@@ -27,7 +25,21 @@ namespace Lockstep
 		public GameObject CachedGameObject {get; private set;}
 
 		public ParticleSystem CachedShuriken {get; private set;}
-		float[] CachedShurikenVals = new float[2];
+        private float StartSpeed {
+            get; set;
+        }
+        public float Speed {
+            set {
+                CachedShuriken.startSpeed = value;
+            }
+        }
+        private float StartSize {get; set;}
+        public float Size {
+            set {
+                CachedShuriken.startSize = value;
+            }
+        }
+
 
 		public int ID { get; private set; }
 
@@ -39,15 +51,15 @@ namespace Lockstep
 		/// Called when this effect is first created.
 		/// </summary>
 		/// <param name="myEffectCode">My effect code.</param>
-		public void Setup (string myEffectCode)
+        internal void Setup (string myEffectCode)
 		{
 			MyEffectCode = myEffectCode;
 			CachedTransform = base.transform;
 			CachedGameObject = base.gameObject;
 			CachedShuriken = base.gameObject.GetComponent<ParticleSystem>();
 			if(CachedShuriken){
-				CachedShurikenVals[0] = CachedShuriken.startSpeed;
-				CachedShurikenVals[1] = CachedShuriken.startSize;
+                StartSpeed = CachedShuriken.startSpeed;
+                StartSize = CachedShuriken.startSize;
 			}
 			if (OnSetup .IsNotNull ())
 				OnSetup ();
@@ -60,7 +72,7 @@ namespace Lockstep
 		/// For internal use.
 		/// </summary>
 		/// <param name="id">Identifier.</param>
-		public bool Create (int id)
+        internal bool Create (int id)
 		{
 			if (CachedGameObject == null)
 			{
@@ -79,29 +91,38 @@ namespace Lockstep
 		/// <summary>
 		/// Call this when all parameters are supplied as desired.
 		/// </summary>
-		public void Initialize ()
+		internal void Initialize ()
 		{
 
 			CachedGameObject.SetActive (true);
 			StartCoroutine (LifeTimer ());
 			if (OnInitialize .IsNotNull ())
 				OnInitialize ();
+
+            if (CachedShuriken != null) {
+                CachedShuriken.startSpeed = StartSpeed;
+                CachedShuriken.startSize = StartSize;
+                CachedShuriken.Play();
+            }
 		}
 
 		/// <summary>
 		/// Called every Update frame.
 		/// </summary>
-		public void Visualize ()
+        internal void Visualize ()
 		{
 			if (OnVisualize .IsNotNull ()) 
 				OnVisualize ();
 		}
 			
 		/// <summary>
-		/// Called when this effect is deactivated.
+		/// Called when this effect is deactivated. Perform resets here.
 		/// </summary>
-		public void Deactivate ()
+        internal void Deactivate ()
 		{
+            if (CachedShuriken != null) {
+                CachedShuriken.Stop();
+            }
 			CachedTransform.SetParent (null);
 			CachedGameObject.SetActive (false);
 			if (OnDeactivate .IsNotNull ())

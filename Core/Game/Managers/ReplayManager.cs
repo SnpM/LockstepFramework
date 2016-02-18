@@ -25,13 +25,6 @@ namespace Lockstep
 		}
 
 		#region public methods
-		const string DemoName = "Demo";
-
-		public static void Play ()
-		{
-			CurrentReplay = FileManager.RetrieveReplay (DemoName);
-			Play (CurrentReplay);
-		}
 
 		public static void Play (Replay replay)
 		{
@@ -47,71 +40,98 @@ namespace Lockstep
 				IsPlayingBack = false;
 				StopStreaming ();
 			}
-		}
+        }
 
-		public static Replay Save ()
-		{
-			return Save (DateTime.UtcNow.ToString ());
-		}
+        static Writer cachedWriter = new Writer();
+        public static Replay SerializeCurrent () {
+            Replay replay = new Replay();
+            Frame[] validFrames = new Frame[LockstepManager.InfluenceFrameCount];
+            Array.Copy(FrameManager.Frames,0,validFrames,0,LockstepManager.InfluenceFrameCount);
 
-		public static Replay Save (string name)
-		{
-			byte[] saveBytes = CommandManager.RecordedBytes.ToArray ();
-			CurrentReplay = new Replay ();
-			CurrentReplay.Content = saveBytes;
-			CurrentReplay.Name = name;
-			CurrentReplay.Date = DateTime.UtcNow;
-			CurrentReplay.FrameCount = LockstepManager.FrameCount;
-			CurrentReplay.LastCommandedFrameCount = CommandManager.LastCommandedFrameCount;
-			CurrentReplay.hash = LockstepManager.GetStateHash();
+            bufferBytes.FastClear();
+            cachedWriter.Initialize(bufferBytes);
+            Serialize (validFrames,cachedWriter);
+            replay.Content = cachedWriter.Canvas.ToArray();
+            replay.hash = LockstepManager.GetStateHash();
+            return replay;
+        }
+        public static void Serialize (Frame[] frames, Writer writer) {
+            int length = frames.Length;
+            writer.Write(length);
+            for (int i = 0; i < length; i++) {
+                Frame frame = frames[i];
+                if (frame.Commands.IsNotNull() && frame.Commands.Count > 0) {
+                    writer.Write((int)i);
+                    writer.Write((ushort)frame.Commands.Count);
+                    for (int j = 0; j < frame.Commands.Count; j++) {
 
-			FileManager.SaveReplay (DemoName, CurrentReplay);
+                        writer.Write(frame.Commands[j].Serialized);
 
-			return CurrentReplay;
-		}
+                    }
+
+                }
+            }
+        }
+
+        static FastList<Frame> bufferFrames = new FastList<Frame>();
+        public static Frame[] Deserialize (Reader reader) {
+            bufferFrames.Clear();
+
+            int length = reader.ReadInt();
+            int lastSavedFrame = 0;
+            while (reader.Position < reader.Length) {
+
+                int frameCount = reader.ReadInt();
+                ushort commandCount = reader.ReadUShort();
+                Frame frame = new Frame();
+                for (int i = 0; i < commandCount; i++) {
+
+                    Command com = new Command();
+                    int reconstructionCount = (com.Reconstruct(reader.Source,reader.Position));
+                    reader.MovePosition(reconstructionCount);
+                    frame.AddCommand(com);
+
+                }
+                for (int i = lastSavedFrame + 1; i < frameCount; i++) {
+                    bufferFrames.Add(new Frame());
+                }
+                bufferFrames.Add(frame);
+                lastSavedFrame = frameCount;
+
+            }
+            for (int i = lastSavedFrame + 1; i < length; i++) {
+                bufferFrames.Add(new Frame());
+            }
+            return bufferFrames.ToArray();
+        }
+
 
 		static FastList<byte> bufferBytes = new FastList<byte> ();
 
 		public static IEnumerator StreamPlayback (Replay playbackReplay)
 		{
-			int lastFrameByteCount = 0;
-			int playbackPosition = 0;
-			byte[] playbackBytes = playbackReplay.Content;
+            CurrentReplay = playbackReplay;
 
-			bool getNextStream = true;
-			int frameCount = 0;
-			int nextFrame = -1;
+            byte[] playbackBytes = playbackReplay.Content;
 
+            yield return null;
+            FrameManager.AdjustFramerate = false;
 
-			yield return null;
-			FrameManager.EndFrame = playbackReplay.LastCommandedFrameCount;
+            Reader reader = new Reader();
+            reader.Initialize(playbackBytes,0);
+            Frame[] frames = Deserialize (reader);
 
-			while (playbackPosition < playbackBytes.Length || frameCount <= nextFrame)
-			{
-				if (getNextStream == true)
-				{
-					bufferBytes.FastClear ();
-					lastFrameByteCount = (int)BitConverter.ToUInt16 (playbackBytes, playbackPosition);
-					playbackPosition += 2;
-					nextFrame = BitConverter.ToInt32 (playbackBytes, playbackPosition);
-					bufferBytes.AddRange (playbackBytes, playbackPosition, lastFrameByteCount);
-					playbackPosition += lastFrameByteCount;
-					getNextStream = false;
-				}
-
-				if (nextFrame == frameCount)
-				{
-					getNextStream = true;
-					CommandManager.ProcessPacket (bufferBytes);
-				}
-				else {
-					CommandManager.ProcessPacket (BitConverter.GetBytes (frameCount));
-				}
-				frameCount++;
-			}
+            for (int i = 0; i < frames.Length; i++) {
+                Frame frame = frames[i];
+  
+                CommandManager.ProcessFrame(i,frame);
+            }
 			yield break;
 		}
 
+        public static void ChangeTimescale (float newScale) {
+            Time.timeScale = newScale;
+        }
 
 		private static void StartStreaming (Replay replay)
 		{
