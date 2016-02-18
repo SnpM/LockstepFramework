@@ -250,7 +250,7 @@ namespace Lockstep
         [SerializeField]
         private Transform _positionalTransform;
 
-        public Transform PositionalTransform { get { return _positionalTransform; } }
+        public Transform PositionalTransform { get ; set;}
 
         private bool _canSetVisualPosition;
 
@@ -269,7 +269,7 @@ namespace Lockstep
         [SerializeField]
         private Transform _rotationalTransform;
 
-        public Transform RotationalTransform { get { return _rotationalTransform; } }
+        public Transform RotationalTransform { get; set;}
 
         private bool _canSetVisualRotation;
 
@@ -355,6 +355,8 @@ namespace Lockstep
 
         public void Initialize(Vector2dHeight StartPosition, Vector2d StartRotation)
         {
+            PositionalTransform = _positionalTransform;
+            RotationalTransform = _rotationalTransform;
             if (!Setted)
             {
                 this.Setup(null);
