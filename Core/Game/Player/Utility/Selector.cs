@@ -53,6 +53,7 @@ namespace Lockstep {
 				selectedAgents.FastClear ();
 			}
 			MainSelectedAgent = null;
+            onRemove ();
         }
     }
 
