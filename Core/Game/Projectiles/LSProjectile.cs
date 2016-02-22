@@ -361,15 +361,9 @@ namespace Lockstep
                     lSEffect.Initialize();
                 } else
                 {
-                    if (this.HitBehavior != HitType.Single)
+
                     {
-                        if (this.HitBehavior == HitType.Area)
-                        {
-                            EffectManager.LazyCreateEffect(this.EndEffect, base.transform.position, this.cachedTransform.rotation);
-                        }
-                    } else
-                    {
-                        EffectManager.LazyCreateEffect(this.EndEffect, this.Target.CachedTransform.position, this.cachedTransform.rotation);
+                        EffectManager.LazyCreateEffect(this.EndEffect, this.cachedTransform.position, this.cachedTransform.rotation);
                     }
                 }
             }
