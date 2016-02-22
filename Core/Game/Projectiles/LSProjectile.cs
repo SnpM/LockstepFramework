@@ -410,6 +410,8 @@ namespace Lockstep
 
             this.TargetPosition = this.Target.Body._position;
             this.TargetHeight = this.Target.Body.HeightPos;
+
+            this.cachedTransform.rotation = Quaternion.LookRotation(target.CachedTransform.position - this.Position.ToVector3());
         }
 
         public void InitializeTimed(int frameTime)
@@ -422,6 +424,8 @@ namespace Lockstep
             this.BodyConditional = bodyConditional;
             this.Direction = direction;
             this.Forward = Direction.ToVector2d();
+
+            this.cachedTransform.rotation = Quaternion.LookRotation(direction.ToVector3());
         }
 
         public void LateInit()
@@ -473,7 +477,7 @@ namespace Lockstep
             }
 
 			if (UseEffects)
-            	EffectManager.LazyCreateEffect(this.StartEffect, this.Position.ToVector3());
+                EffectManager.LazyCreateEffect(this.StartEffect, this.Position.ToVector3(), this.cachedTransform.rotation);
         }
 
         private void OnHit()
