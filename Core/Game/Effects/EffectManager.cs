@@ -74,6 +74,7 @@ namespace Lockstep
                 return;
             LSEffect effect = CreateEffect(effectCode);
             effect.CachedTransform.position = position;
+            effect.CachedTransform.rotation = rotation;
             Fire (effect);
         }
 
