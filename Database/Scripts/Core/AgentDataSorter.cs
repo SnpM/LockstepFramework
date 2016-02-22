@@ -12,4 +12,5 @@ public static class AgentDataSorter {
         if (agentInterfacer == null) return -1;
         return agentInterfacer.SortDegreeFromAgentType(agentType);
     }
+
 }
