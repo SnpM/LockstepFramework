@@ -193,6 +193,7 @@ namespace Lockstep
         void StartWindup () {
             windupCount = this.Windup;
             IsWindingUp = true;
+            Agent.ApplyImpulse(AnimImpulse.Fire);
         }
 
         void BehaveWithTarget()
@@ -321,7 +322,6 @@ namespace Lockstep
                     cachedMove.StopMove();
                 }
                 cachedBody.Priority = basePriority + 1;
-                Agent.ApplyImpulse(AnimImpulse.Fire);
                 OnFire();
 
         }
