@@ -579,6 +579,10 @@ namespace Lockstep
                         long height = this.arcStartHeight + this.arcStartVerticalSpeed.Mul(progress) - Gravity.Mul(progress.Mul(progress));
                         this.Position.z = height;
                     }
+                    else {
+                        this.TargetHeight = this.Target.Body.HeightPos + Target.Body.Height / 2;
+                        this.Position.z = FixedMath.Lerp(this.Position.z, TargetHeight, FixedMath.Half);
+                    }
                     if (this.CheckCollision())
                     {
                         this.TargetPosition = this.Target.Body._position;
