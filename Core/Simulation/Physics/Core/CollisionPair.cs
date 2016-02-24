@@ -120,6 +120,9 @@ namespace Lockstep
                 Body2.OnContact(Body1);
             }
 
+			if (Body1.IsTrigger || Body2.IsTrigger)
+				return;
+			
             switch (LeCollisionType)
             {
                 case CollisionType.Circle_Circle:

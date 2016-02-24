@@ -1,39 +1,43 @@
 ﻿using System;
 using Lockstep.UI;
 using UnityEngine;
-namespace Lockstep {
-    public class Health : Ability {
 
-		public long MaxHealth {
-			get {return _maxHealth;}
-			set {_maxHealth = value;}
-		}
+namespace Lockstep
+{
+	public class Health : Ability
+	{
 		[SerializeField, FixedNumber]
 		private long _maxHealth = FixedMath.One * 100;
-		//[SerializeField, FixedNumber]
-		public long HealthAmount { get; private set;}
 
-
-
-        protected override void OnSetup() {
-
+		public long MaxHealth
+		{
+			get { return _maxHealth; }
+			set { _maxHealth = value; }
 		}
 
-        protected override void OnInitialize() {
-            HealthAmount = MaxHealth;
+		public long HealthAmount { get; set; }
 
+		protected override void OnSetup()
+		{
+		}
+
+		protected override void OnInitialize()
+		{
+			HealthAmount = MaxHealth;
 			OnTakeProjectile = null;
 		}
 
-        public void TakeProjectile(LSProjectile projectile) {
-            if (Agent.IsActive && HealthAmount >= 0) {
+		public void TakeProjectile(LSProjectile projectile)
+		{
+			if (Agent.IsActive && HealthAmount >= 0) {
 				if (OnTakeProjectile .IsNotNull ()) 
 				{
 					OnTakeProjectile (projectile);
 				}
 				TakeRawDamage (projectile.CheckExclusiveDamage (Agent.Tag));               
-            }
-        }
+			}
+		}
+
 		public void TakeRawDamage (long damage) {
 			HealthAmount -= damage;
 			// don't let the health go below zero
