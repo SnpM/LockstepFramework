@@ -105,6 +105,8 @@ namespace Lockstep
 
         private static void ProcessInterfacer(AbilityDataItem facer)
         {
+            if (facer == null)
+                return;
             switch (facer.InformationGather)
             {
                 case InformationGatherType.Position:
