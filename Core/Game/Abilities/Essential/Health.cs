@@ -23,6 +23,7 @@ namespace Lockstep
             }
             set {
                 _healthAmount = value;
+                if (onHealthChange != null)
                 onHealthChange ();
             }
         }
