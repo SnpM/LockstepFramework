@@ -18,6 +18,8 @@ namespace Lockstep
         public Short2D Map {get {return _map;}}
 
         public long GetHeight (int gridX, int gridY) {
+            if (!_map.IsValid(gridX,gridY))
+                return 0;
             return HeightmapHelper.Uncompress(_map[gridX,gridY]);
         }
     }
