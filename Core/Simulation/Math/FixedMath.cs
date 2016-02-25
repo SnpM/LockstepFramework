@@ -292,6 +292,21 @@ namespace Lockstep
             return f1 > Epsilon || f1 < Epsilon;
         }
 
+        public static long MoveTowards (long from, long to, long maxAmount) {
+            if (from < to)
+            {
+                from += maxAmount;
+                if (from > to)
+                    from = to;
+            }
+            else if (from > to) {
+                from -= maxAmount;
+                if (from < to)
+                    from = to;
+            }
+            return from;
+        }
+
         #endregion
 
         #region Convert
@@ -354,6 +369,8 @@ namespace Lockstep
         {
             return (System.Math.Round((f1) / OneD, 4, System.MidpointRounding.AwayFromZero)).ToString();
         }
+
+      
 
         #endregion
 
