@@ -26,6 +26,7 @@ namespace Lockstep
                 if (onHealthChange != null)
                 onHealthChange ();
             }
+
         }
 
 		protected override void OnSetup()
