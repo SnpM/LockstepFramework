@@ -491,7 +491,9 @@ namespace Lockstep
                 Debug.LogWarning("Visual editting can only be used when transform is at origin.");
                 return;
             }
-            _projectileOffset = new Vector3d(base.transform.InverseTransformPoint(_projectileOrigin));
+            Vector3 temp = (base.transform.InverseTransformPoint(_projectileOrigin));
+            temp *= base.transform.localScale.x;
+            _projectileOffset = new Vector3d(temp);
         }
 
         void OnDrawGizmos()
