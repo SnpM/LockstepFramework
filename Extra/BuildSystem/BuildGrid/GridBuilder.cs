@@ -32,7 +32,7 @@ public static class GridBuilder {
 		return EndPlace();
     }
     private static void StartPlace () {
-
+        Target.IsMoving = true;
     }
     private static bool UpdatePlace (Vector2d newPos) {
         Coordinate coor = BuildGridAPI.ToGridPos (newPos);
@@ -45,6 +45,7 @@ public static class GridBuilder {
         Coordinate coor = Target.GridPosition;
         bool canBuild = (BuildGridAPI.Build(coor,Target));
         Target.IsValidOnGrid = (canBuild);
+        Target.IsMoving = false;
         return canBuild;
     }
     #endregion

@@ -575,7 +575,7 @@ namespace Lockstep
                 BuildPoints();
                 BuildBounds();
             }
-            if (PositionChanged)
+            if (PositionChanged || this.HeightPosChanged)
             {
                 LastPosition = _position;
                 PositionChangedBuffer = true;

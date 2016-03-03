@@ -15,6 +15,6 @@ public interface IBuildable {
     /// Function that relays to the buildable whether or not it's on a valid building spot.
     /// </summary>
     bool IsValidOnGrid {get;set;}
-
+    bool IsMoving {get; set;}
 
 }
