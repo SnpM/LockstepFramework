@@ -3,12 +3,14 @@ using System;
 namespace Lockstep {
     public static class Selector {
         public static event Action onChange;
-        public static event Action onAdd;
-        public static event Action onRemove;
+        public static event Action<LSAgent> onAdd;
+        public static event Action<LSAgent> onRemove;
+        public static event Action onClear;
 		private static LSAgent _mainAgent;
         static Selector () {
-            onAdd += Change;
-            onRemove += Change;
+            onAdd += (a) => Change();
+            onRemove += (a) => Change();
+            onClear += () => Change();
         }
         private static void Change () {
             if (onChange != null)
@@ -29,7 +31,7 @@ namespace Lockstep {
 			agent.Controller.AddToSelection (agent);
             agent.IsSelected = true;
 			if (MainSelectedAgent == null) MainSelectedAgent = agent;
-            onAdd ();
+            onAdd (agent);
         }
 
         public static void Remove(LSAgent agent) {
@@ -38,7 +40,7 @@ namespace Lockstep {
 			if (agent == MainSelectedAgent) {
 				agent = SelectedAgents.Count > 0 ? SelectedAgents.PopMax () : null;
 			}
-            onRemove ();
+            onRemove (agent);
         }
 
         public static void Clear() {
@@ -53,7 +55,7 @@ namespace Lockstep {
 				selectedAgents.FastClear ();
 			}
 			MainSelectedAgent = null;
-            onRemove ();
+            onClear ();
         }
     }
 
