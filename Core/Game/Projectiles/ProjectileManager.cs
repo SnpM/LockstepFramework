@@ -111,6 +111,10 @@ namespace Lockstep {
 			return curProj;
 		}
         private static LSProjectile RawCreate (string projCode) {
+            if (ProjectilePool.ContainsKey (projCode) == false) {
+                Debug.Log(projCode + " Caused boom");
+                return null;
+            }
             FastStack<LSProjectile> pool = ProjectilePool[projCode];
             if (pool.Count > 0)
             {

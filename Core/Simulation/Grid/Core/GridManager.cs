@@ -160,54 +160,71 @@ namespace Lockstep
 
 		public static GridNode GetNode (long xPos, long yPos)
 		{
-			indexX = (int)((xPos + FixedMath.Half - 1 - OffsetX) >> FixedMath.SHIFT_AMOUNT);
-			indexY = (int)((yPos + FixedMath.Half - 1 - OffsetY) >> FixedMath.SHIFT_AMOUNT);
-            if (!ValidateCoordinates (indexX, indexY)) return null;
-
+			GetCoordinates (xPos, yPos, out indexX, out indexY);
+			if (!ValidateCoordinates (indexX, indexY))
+				return null;
 			return (GetNode (indexX, indexY));
 		}
 
-        public static bool ValidateCoordinates (int xGrid, int yGrid) {
-            return xGrid >= 0 && xGrid < Width && yGrid >= 0 && yGrid < Height;
-        }
-        public static bool ValidateIndex (int index) {
-            return index >= 0 && index < GridSize;
-        }
+		public static bool ValidateCoordinates (int xGrid, int yGrid)
+		{
+			return xGrid >= 0 && xGrid < Width && yGrid >= 0 && yGrid < Height;
+		}
+
+		public static bool ValidateIndex (int index)
+		{
+			return index >= 0 && index < GridSize;
+		}
+
 		public static void GetCoordinates (long xPos, long yPos, out int xGrid, out int yGrid)
 		{
 			xGrid = (int)((xPos + FixedMath.Half - 1 - OffsetX) >> FixedMath.SHIFT_AMOUNT);
 			yGrid = (int)((yPos + FixedMath.Half - 1 - OffsetY) >> FixedMath.SHIFT_AMOUNT);
 		}
 
-		public static void GetScanCoordinates (long xPos, long yPos, out int xGrid, out int yGrid)
+		public static bool GetScanCoordinates (long xPos, long yPos, out int xGrid, out int yGrid)
 		{
 			//xGrid = (int)((((xPos + FixedMath.Half - 1 - OffsetX) >> FixedMath.SHIFT_AMOUNT) + ScanResolution / 2) / ScanResolution);
 			//yGrid = (int)((((yPos + FixedMath.Half - 1 - OffsetY) >> FixedMath.SHIFT_AMOUNT) + ScanResolution / 2) / ScanResolution);
-			ScanNode scanNode =  GetNode (xPos, yPos).LinkedScanNode;
+
+			GridNode gridNode = GetNode (xPos, yPos);
+			if (gridNode.IsNull())
+			{
+				xGrid = 0;
+				yGrid = 0;
+				return false;
+			}
+
+			ScanNode scanNode =  gridNode.LinkedScanNode;
 			xGrid = scanNode.X;
 			yGrid = scanNode.Y;
+
+			return true;
 		}
 
 		public static ScanNode GetScanNode (int xGrid, int yGrid)
 		{
 			//if (xGrid < 0 || xGrid >= NodeCount || yGrid < 0 || yGrid >= NodeCount) return null;
-            if (!ValidateScanCoordinates (xGrid, yGrid)) return null;
+			if (!ValidateScanCoordinates (xGrid, yGrid))
+				return null;
 			return ScanGrid [GetScanIndex (xGrid, yGrid)];
 		}
 
 		public static int GetGridIndex (int xGrid, int yGrid)
 		{
-            
 			return xGrid * Height + yGrid;
 		}
-        public static bool ValidateScanCoordinates (int scanX, int scanY) {
-            return scanX >= 0 && scanX < ScanWidth && scanY >= 0 && scanY < ScanHeight;
-        }
+
+		public static bool ValidateScanCoordinates (int scanX, int scanY)
+		{
+			return scanX >= 0 && scanX < ScanWidth && scanY >= 0 && scanY < ScanHeight;
+		}
+
 		public static int GetScanIndex (int xGrid, int yGrid)
 		{
 			return xGrid * ScanHeight + yGrid;
 		}
-            
+
 		public static int ToGridX (this long xPos)
 		{
 			return (xPos - OffsetX).RoundToInt ();

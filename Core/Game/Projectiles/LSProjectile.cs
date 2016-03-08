@@ -54,6 +54,7 @@ namespace Lockstep
         private long arcStartVerticalSpeed;
 
         private long arcStartHeight;
+        private long linearHeightSpeed;
 
         [SerializeField]
         private bool _visualArc;
@@ -403,7 +404,7 @@ namespace Lockstep
             this.TargetVersion = this.Target.SpawnVersion;
 
             this.TargetPosition = this.Target.Body._position;
-            this.TargetHeight = this.Target.Body.HeightPos;
+            this.TargetHeight = this.Target.Body.HeightPos + this.Target.Body.Height / 2;
 
             this.cachedTransform.rotation = Quaternion.LookRotation(target.CachedTransform.position - this.Position.ToVector3());
         }
@@ -451,6 +452,9 @@ namespace Lockstep
                     if (this._visualArc) {
                         this.arcStartHeight = this.Position.z;
                         this.arcStartVerticalSpeed = (this.TargetHeight - this.Position.z).Div(timeToHit) + timeToHit.Mul(Gravity);
+                    }
+                    else {
+                        this.linearHeightSpeed = (this.TargetHeight - Position.z).Div(timeToHit).Abs();
                     }
 
                     break;
@@ -578,6 +582,10 @@ namespace Lockstep
                         long progress = FixedMath.Create(this.AliveTime) / 32;
                         long height = this.arcStartHeight + this.arcStartVerticalSpeed.Mul(progress) - Gravity.Mul(progress.Mul(progress));
                         this.Position.z = height;
+                    }
+                    else {
+                        this.TargetHeight = this.Target.Body.HeightPos + Target.Body.Height / 2;
+                        this.Position.z = FixedMath.MoveTowards(this.Position.z,TargetHeight,this.linearHeightSpeed);
                     }
                     if (this.CheckCollision())
                     {

@@ -15,7 +15,19 @@ namespace Lockstep
 			set { _maxHealth = value; }
 		}
 
-		public long HealthAmount { get; set; }
+        public event Action onHealthChange;
+        private long _healthAmount;
+		public long HealthAmount {
+            get {
+                return _healthAmount;
+            }
+            set {
+                _healthAmount = value;
+                if (onHealthChange != null)
+                onHealthChange ();
+            }
+
+        }
 
 		protected override void OnSetup()
 		{

@@ -131,7 +131,7 @@ namespace Lockstep
 
 		private void HandleContact (LSBody other)
 		{
-            if (targetReached == true && Agent.IsCasting == false) {
+            if (targetReached == true && Agent.IsCasting == false && !(Agent.Body.Immovable || Agent.Body.IsTrigger)) {
                 Vector2d delta = this.cachedBody._position - this.cachedBody.LastPosition;
                 if (delta.FastMagnitude() > collisionTurnThreshold) {
                     delta.Normalize();

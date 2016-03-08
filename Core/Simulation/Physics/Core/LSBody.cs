@@ -18,7 +18,7 @@ namespace Lockstep
         internal Vector2d _position;
         [SerializeField]
         internal Vector2d _rotation = Vector2d.up;
-        [SerializeField]
+        [SerializeField, FixedNumber]
         internal long _heightPos;
         [SerializeField]
         public Vector2d _velocity;
@@ -575,7 +575,7 @@ namespace Lockstep
                 BuildPoints();
                 BuildBounds();
             }
-            if (PositionChanged)
+            if (PositionChanged || this.HeightPosChanged)
             {
                 LastPosition = _position;
                 PositionChangedBuffer = true;

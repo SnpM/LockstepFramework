@@ -108,9 +108,11 @@ namespace Lockstep
 
             return baseHeight;
         }
-
+        [SerializeField]
+        private bool _show;
         void OnDrawGizmos()
         {
+            if (_show == false) return;
             float fRes = Interval.ToFloat();
             Vector3 size = Vector3.one * (fRes * .95f);
             size.y = .1f;
