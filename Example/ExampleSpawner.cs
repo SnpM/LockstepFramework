@@ -18,6 +18,8 @@ namespace Lockstep.Example
             com.Count = count;
             return com; 
 		 */
+
+        protected FastList<LSAgent> bufferSpawnedAgents = new FastList<LSAgent>();
 		protected override void OnExecute (Command com)
 		{
 			byte conID = com.ControllerID;
@@ -28,7 +30,8 @@ namespace Lockstep.Example
 			AgentController ac = AgentController.InstanceManagers [conID];
 			string agentCode = AgentController.GetAgentCode (target);
 			for (int i = 0; i < count; i++) {
-				ac.CreateAgent (agentCode, pos);
+				LSAgent agent = ac.CreateAgent (agentCode, pos);
+                bufferSpawnedAgents.Add(agent);
 			}
 		}
 
