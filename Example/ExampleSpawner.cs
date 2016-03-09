@@ -29,6 +29,7 @@ namespace Lockstep.Example
 
 			AgentController ac = AgentController.InstanceManagers [conID];
 			string agentCode = AgentController.GetAgentCode (target);
+            bufferSpawnedAgents.FastClear();
 			for (int i = 0; i < count; i++) {
 				LSAgent agent = ac.CreateAgent (agentCode, pos);
                 bufferSpawnedAgents.Add(agent);

@@ -45,7 +45,6 @@ namespace Lockstep
         /// Backward compatability for InputCode
         /// </summary>
         /// <value>The le input.</value>
-        public ushort LeInput {get {return InputCode;} set {InputCode = value;}}
         private Dictionary<ushort,FastList<ICommandData>> ContainedData = new Dictionary<ushort,FastList<ICommandData>>();
         private ushort ContainedTypesCount;
 

@@ -76,7 +76,7 @@ namespace Lockstep
 
 		public static Vector2d GetWorldPosD (Vector2 screenPos)
 		{
-			Ray ray = mainCamera.ScreenPointToRay (screenPos);
+            Ray ray = Camera.main.ScreenPointToRay (screenPos);
 			RaycastHit hit;
 			if (NDRaycast.Raycast (ray, out hit)) {
 				//return new Vector2d(hit.point.x * LockstepManager.InverseWorldScale, hit.point.z * LockstepManager.InverseWorldScale);
