@@ -22,20 +22,27 @@ namespace Lockstep
         internal long _heightPos;
         [SerializeField]
         public Vector2d _velocity;
+
         #endregion
 
         #region Lockstep variables
+
         private bool ForwardNeedsSet;
         private Vector2d _forward;
-        public Vector2d Forward {
-            get {
-                if (ForwardNeedsSet) {
+
+        public Vector2d Forward
+        {
+            get
+            {
+                if (ForwardNeedsSet)
+                {
                     _forward = _rotation.ToDirection();
                     ForwardNeedsSet = false;
                 }
                 return _forward;
             }
         }
+
         [Lockstep]
         public bool PositionChanged { get; set; }
 
@@ -115,7 +122,8 @@ namespace Lockstep
 
         public Vector2d LastPosition { get; private set; }
 
-        internal uint RaycastVersion {get; set;}
+        internal uint RaycastVersion { get; set; }
+
         #endregion
 
         internal Vector3 _visualPosition;
@@ -244,13 +252,13 @@ namespace Lockstep
         [SerializeField, FixedNumber]
         private long _height = FixedMath.One;
 
-        [Lockstep (true)]
-        public long Height {get; private set;}
+        [Lockstep(true)]
+        public long Height { get; private set; }
 
         [SerializeField]
         private Transform _positionalTransform;
 
-        public Transform PositionalTransform { get ; set;}
+        public Transform PositionalTransform { get ; set; }
 
         private bool _canSetVisualPosition;
 
@@ -269,7 +277,7 @@ namespace Lockstep
         [SerializeField]
         private Transform _rotationalTransform;
 
-        public Transform RotationalTransform { get; set;}
+        public Transform RotationalTransform { get; set; }
 
         private bool _canSetVisualRotation;
 
@@ -308,8 +316,9 @@ namespace Lockstep
             Height = _height;
         }
 
-        private bool OutMoreThanSet {get; set;}
-        public bool OutMoreThan {get; private set;}
+        private bool OutMoreThanSet { get; set; }
+
+        public bool OutMoreThan { get; private set; }
 
         public void GeneratePoints()
         {
@@ -442,18 +451,20 @@ namespace Lockstep
                     RotatedPoints [i] = Vertices [i];
                     RotatedPoints [i].Rotate(_rotation.x, _rotation.y);
                 }
-                for (int i = VertLength - 1; i >= 0; i--) {
+                for (int i = VertLength - 1; i >= 0; i--)
+                {
                     int nextIndex = i + 1 < VertLength ? i + 1 : 0;
-                    Vector2d point = RotatedPoints[nextIndex];
-                    point.Subtract(ref RotatedPoints[i]);
+                    Vector2d point = RotatedPoints [nextIndex];
+                    point.Subtract(ref RotatedPoints [i]);
                     point.Normalize();
-                    Edges[i] = point;
+                    Edges [i] = point;
                     point.RotateRight();
                     EdgeNorms [i] = point;
                 }
-                if (!OutMoreThanSet) {
+                if (!OutMoreThanSet)
+                {
                     OutMoreThanSet = true;
-                    long dot = Edges[0].Cross(Edges[1]);
+                    long dot = Edges [0].Cross(Edges [1]);
                     this.OutMoreThan = dot < 0;
                 }
             }
@@ -718,7 +729,7 @@ namespace Lockstep
             _rotation = new Vector2d(x, y);
             RotationChanged = true;
         }
-            
+
         public override int GetHashCode()
         {
             return ID;
@@ -726,7 +737,7 @@ namespace Lockstep
 
         public void Deactivate()
         {
-            Partition.UpdateObject (this, false);
+            Partition.UpdateObject(this, false);
             PhysicsManager.Dessimilate(this);
         }
 
@@ -794,15 +805,17 @@ namespace Lockstep
                     && position.y + FixedMath.Half >= this.YMin && position.y - FixedMath.Half <= this.YMax;
                     break;
                 case ColliderType.Polygon:
-                    for (int i = this.EdgeNorms.Length - 1; i >= 0; i--) {
-                        Vector2d norm = this.EdgeNorms[i];
+                    for (int i = this.EdgeNorms.Length - 1; i >= 0; i--)
+                    {
+                        Vector2d norm = this.EdgeNorms [i];
                         long posProj = norm.Dot(position);
                         long polyMin, polyMax;
-                        CollisionPair.ProjectPolygon(norm.x,norm.y,this,out polyMin, out polyMax);
-                        if (posProj >= polyMin && posProj <= polyMax) {
+                        CollisionPair.ProjectPolygon(norm.x, norm.y, this, out polyMin, out polyMax);
+                        if (posProj >= polyMin && posProj <= polyMax)
+                        {
 
-                        }
-                        else {
+                        } else
+                        {
                             return false;
                         }
                     }
@@ -814,7 +827,8 @@ namespace Lockstep
             return false;
         }
 
-        public void SetHeight (long newHeight) {
+        public void SetHeight(long newHeight)
+        {
             Height = newHeight;
             this.HeightPosChanged = true;
         }
@@ -853,6 +867,28 @@ namespace Lockstep
             }
         }
 
+        /// <summary>
+        /// Returns 0 if not implemented or invalid.
+        /// </summary>
+        /// <value>The size of the grid square.</value>
+        public long SquareSize
+        {
+            get
+            {
+                switch (this.Shape)
+                {
+                    case ColliderType.Circle:
+                        return this.Radius;
+                        break;
+                    case ColliderType.AABox:
+                        if (this.HalfWidth == HalfHeight)
+                            return HalfWidth;
+                        break;
+                }
+                return 0;
+            }
+        }
+
         FastList<UnityEngine.Coroutine> flashRoutines = new FastList<UnityEngine.Coroutine>();
 
         public void TestFlash()
@@ -865,19 +901,20 @@ namespace Lockstep
             foreach (UnityEngine.Coroutine co in flashRoutines)
             {
                 if (co != null)
-                base.StopCoroutine(co);
+                    base.StopCoroutine(co);
             }
             flashRoutines.Clear();
 
 
             Renderer ren = this.GetComponentInChildren<Renderer>();
 
-            if (ren != null) {
-            Color col = Color.white;
-            ren.material.color = Color.red;
-            yield return null;
-            yield return new WaitForSeconds(.08f);
-            ren.material.color = col;
+            if (ren != null)
+            {
+                Color col = Color.white;
+                ren.material.color = Color.red;
+                yield return null;
+                yield return new WaitForSeconds(.08f);
+                ren.material.color = col;
             }
             yield break;
         }
