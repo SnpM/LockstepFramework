@@ -108,7 +108,10 @@ namespace Lockstep
 
         [SerializeField]
         private bool _canMove = true;
-        public bool CanMove {get {return _canMove;}}
+		public bool CanMove {
+			get { return _canMove; }
+		}
+
         [SerializeField]
         private bool _canTurn = true;
         public bool CanTurn {get; private set;}
