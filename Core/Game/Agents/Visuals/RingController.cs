@@ -1,62 +1,63 @@
 ﻿using UnityEngine;
-
 namespace Lockstep {
-    public class RingController : MonoBehaviour {
+	public class RingController : MonoBehaviour {
+		public bool IsBuilding = false;
 		static RingController () {
-			ringTemplate = LSUtility.ResourceLoadGO ("SelectionRing");
 		}
-		private static GameObject ringTemplate;
-		public static RingController Create () {
-			GameObject go = GameObject.Instantiate <GameObject> (ringTemplate);
-			RingController ringer = go.GetComponent<RingController> ();
+		private static GameObject ringTemplateBuilding;
+		private static GameObject ringTemplateUnit;
+		public static RingController Create (int type) {
+			GameObject go;
+			// CREATE RINGCONTROLLER EITHER BUILDING OR UNIT
+			if (type == 0) {
+				ringTemplateUnit = LSUtility.ResourceLoadGO("UnitSelectionRing");
+				go = GameObject.Instantiate<GameObject>(ringTemplateUnit);
+			}
+			else {
+				ringTemplateBuilding = LSUtility.ResourceLoadGO("BuildingSelectionRing");
+				go = GameObject.Instantiate<GameObject>(ringTemplateBuilding);
+			}
+			//=========
+			RingController ringer = go.GetComponent<RingController>();
 			return ringer;
 		}
-
-        [SerializeField]
-        private readonly Color SelectColor = new Color(1, 1, 1, .35f);
-        [SerializeField]
-        private readonly Color HighlightColor = new Color(1, 1, 1, .2f);
-        [SerializeField]
-        private readonly Color UnselectColor = new Color(1, 1, 1, .1f);
-
-        private Renderer cachedRenderer;
-        private Material cachedMaterial;
-
-		public void Setup(LSAgent agent) {
-			cachedRenderer = GetComponent<Renderer>();
-			cachedMaterial = cachedRenderer.material;
+		public Color[] colors = new Color[3];
+		private Projector cachedProjector;
+		private Material cachedMaterial;
+		public Transform ProjectorComponent;
+		public void Setup (LSAgent agent) {
+			cachedProjector = ProjectorComponent.GetComponent<Projector>();
+			cachedMaterial = cachedProjector.material;
 			transform.parent = agent.VisualCenter;
 			transform.localPosition = Vector3.zero;
-			float size = agent.SelectionRadius * 2;
-			transform.localScale = new Vector3(size,size,1);
+			//          float size = agent.SelectionRadius * 2;
+			float size = agent.Body.HalfWidth.ToFloat() * 2f;
+			cachedProjector.orthographicSize = size + 1;
+			transform.localScale = new Vector3(size, size, 1);
 		}
-
-        public void Initialize() {
-			Unselect ();
-        }
-
-        public void Select() {
-            cachedRenderer.enabled = true;
-            cachedMaterial.color = SelectColor;
-        }
-
-        public void Highlight() {
-            cachedRenderer.enabled = true;
-            cachedMaterial.color = HighlightColor;
-        }
-
-        public void Unselect() {
-            if (cachedRenderer == null) return;
-            cachedRenderer.enabled = false;
-            cachedMaterial.color = UnselectColor;
-        }
-
-        public void Deactivate() {
-			Unselect ();
-        }
-
-        public bool IsEnabled {
-            get { return cachedRenderer.enabled; }
-        }
-    }
+		public void Initialize () {
+			Unselect();
+		}
+		public void Select () {
+			if (cachedProjector == null) return;
+			cachedProjector.enabled = true;
+			cachedMaterial.color = colors[0];
+		}
+		public void Highlight () {
+			if (cachedProjector == null) return;
+			cachedProjector.enabled = true;
+			cachedMaterial.color = colors[1];
+		}
+		public void Unselect () {
+			if (cachedProjector == null) return;
+			cachedProjector.enabled = false;
+			cachedMaterial.color = colors[2];
+		}
+		public void Deactivate () {
+			Unselect();
+		}
+		public bool IsEnabled {
+			get { return cachedProjector.enabled; }
+		}
+	}
 }

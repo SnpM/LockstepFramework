@@ -247,7 +247,12 @@ namespace Lockstep {
 
 
 			abilityManager.Setup(this);
-			Ringer = RingController.Create ();
+
+			if (GetAbility<InvasionDay.Buildable>() != null) {
+				Ringer = RingController.Create(1);
+			}
+			else Ringer = RingController.Create(0);
+			
 			if (Ringer .IsNotNull ())
 			Ringer.Setup (this);
 
