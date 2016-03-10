@@ -65,11 +65,13 @@ namespace Lockstep
 		}
 		void HandleonBuildChild (LSAgent obj)
 		{
-			if (obj.Healther .IsNotNull ())
-				CoverHealth (obj.Healther);
+            Health healther = obj.GetAbility<Health> ();
+            if (healther.IsNotNull ())
+				CoverHealth (healther);
 		}
 		private void OnCoveredDie (LSAgent agent) {
-			RemoveHealth (agent.Healther);
+            Health healther = agent.GetAbility<Health> ();
+			RemoveHealth (healther);
 			shieldedHealths.Enumerate (LSUtility.bufferHealths);
 			bool hasAlive = false;
 			for (int i = 0; i < LSUtility.bufferHealths.Count; i++) {
@@ -111,7 +113,6 @@ namespace Lockstep
 			}
 			IsShielding = ShieldAmount > 0;
 
-			Agent.StatsBarer.SetFill (StatBarType.Shield,(float)(ShieldAmount / (double)MaxShield));
         }
 	}
 }

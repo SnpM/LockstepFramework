@@ -279,10 +279,6 @@ namespace Lockstep
 
         private bool CheckCollision()
         {
-            if (Target.Healther.Protected)
-            {
-                return CheckCollision(Target.Healther.CoveringShield.Agent.Body);
-            }
             return CheckCollision(Target.Body);
         }
 
