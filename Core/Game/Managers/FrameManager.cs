@@ -83,7 +83,6 @@ namespace Lockstep
                     Command com = frame.Commands [i];
 
                     LockstepManager.Execute (com);
-
                 }
             }
             //frames[LockstepManager.InfluenceFrameCount] = null;

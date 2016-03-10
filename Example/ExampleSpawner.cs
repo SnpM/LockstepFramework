@@ -10,14 +10,7 @@ namespace Lockstep.Example
 				return InputCodeManager.GetCodeID("Spawn");
 			}
 		}
-		/*
-		 *			Command com = new Command (InputCodeManager.GetCodeID ("Spawn"));
-            com.ControllerID = cont.ControllerID;
-            com.Position = position;
-            com.Target = (ushort)AgentController.GetAgentCodeIndex(agentCode);
-            com.Count = count;
-            return com; 
-		 */
+
 
         protected FastList<LSAgent> bufferSpawnedAgents = new FastList<LSAgent>();
 		protected override void OnExecute (Command com)

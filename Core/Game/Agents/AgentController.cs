@@ -294,7 +294,6 @@ namespace Lockstep
                 previousSelection = com.GetData<Selection>();
             }
 
-
             BehaviourHelperManager.Execute(com);
             Selection selection = GetSelection(com);
             for (int i = 0; i < selection.selectedAgentLocalIDs.Count; i++)
