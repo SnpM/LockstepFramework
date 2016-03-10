@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-
+using UnityEngine.EventSystems;
 namespace Lockstep
 {
 	public static class RTSInterfacing
@@ -56,6 +56,9 @@ namespace Lockstep
 
 		public static void Visualize ()
 		{
+			if (EventSystem.current.IsPointerOverGameObject()) {
+				return;
+			}
 			if (mainCamera .IsNotNull ()) {
 				CachedRay = mainCamera.ScreenPointToRay (Input.mousePosition);
 				CachedDidHit = NDRaycast.Raycast (CachedRay, out CachedHit);
