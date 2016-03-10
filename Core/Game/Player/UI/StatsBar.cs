@@ -29,7 +29,6 @@ namespace Lockstep.UI
 		{
 			TrackedAgent = agent;
 			GameObject.DontDestroyOnLoad (gameObject);
-			Offset = agent.StatsBarOffset;
 			this.gameObject.name = agent.ToString ();
 		}
 
