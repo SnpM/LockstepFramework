@@ -335,7 +335,7 @@ namespace Lockstep
                 this.Agent,
                 this.ProjectileOffset,
                 this.TargetAllegiance,
-                (other) => healther.IsNotNull(),
+                (other) => healther.IsNotNull() && healther.HealthAmount > 0,
                 (agent) => healther.TakeRawDamage(appliedDamage));
             projectile.InitializeHoming(this.Target);
             projectile.TargetPlatform = TargetPlatform;
