@@ -329,14 +329,22 @@ namespace Lockstep
         protected virtual void OnFire()
         {
             long appliedDamage = Damage;
-            Health healther = Agent.GetAbility<Health>();
             LSProjectile projectile = ProjectileManager.Create(
                 ProjCode,
                 this.Agent,
                 this.ProjectileOffset,
                 this.TargetAllegiance,
-                (other) => healther.IsNotNull(),
-                (agent) => healther.TakeRawDamage(appliedDamage));
+				(other) =>
+				{
+					Health healther = other.GetAbility<Health>();
+					return healther.IsNotNull() && healther.HealthAmount > 0;
+				},
+				(other) =>
+				{
+					Health healther = other.GetAbility<Health>();
+					healther.TakeRawDamage(appliedDamage);
+				}
+			);
             projectile.InitializeHoming(this.Target);
             projectile.TargetPlatform = TargetPlatform;
             ProjectileManager.Fire(projectile);
