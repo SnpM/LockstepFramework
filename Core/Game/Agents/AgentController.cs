@@ -256,7 +256,7 @@ namespace Lockstep
             OpenLocalIDs.FastClear();
             PeakLocalID = 0;
             ControllerID = (byte)InstanceManagers.Count;
-            
+
             for (int i = 0; i < InstanceManagers.Count; i++)
             {
                 this.SetAllegiance(InstanceManagers [i], AllegianceType.Neutral);

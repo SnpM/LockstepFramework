@@ -57,11 +57,7 @@ namespace Lockstep {
         public LSBusStop BusStop {
             get {return _busStop ?? (_busStop = new LSBusStop());}
         }
-
-        public event Action<LSAgent> onDeactivation;
-        public event Action<bool, bool> onInteraction;
-		public event Action<LSAgent> onBuildChild;
-        public event Action<LSAgent> onInitialized;
+            
 
         [SerializeField]
         private int _globalID;
@@ -137,28 +133,26 @@ namespace Lockstep {
 			}
 		}
 
+        public event Action onSelectedChange;
         public bool IsSelected {
             get { return isSelected; }
             set {
                 if (isSelected != value) {
                     isSelected = value;
-                    if (onInteraction .IsNotNull ()) {
-                        onInteraction(isSelected, isHighlighted);
-                    }
-					
+                    if (onSelectedChange != null)
+                        onSelectedChange();
                 }
             }
         }
 
+        public event Action onHighlightedChange;
         public bool IsHighlighted {
             get { return isHighlighted; }
             set {
                 if (IsHighlighted != value) {
                     isHighlighted = value;
-                    if (onInteraction .IsNotNull ()) {
-                        onInteraction(isSelected, isHighlighted);
-                    }
-
+                    if (onHighlightedChange != null)
+                        onHighlightedChange ();
                 }
             }
         }
@@ -289,10 +283,6 @@ namespace Lockstep {
 
             abilityManager.Initialize();
 
-            if(onInitialized != null)
-            {
-                onInitialized(this);
-            }
         }
 
         public void Simulate() {
@@ -358,9 +348,6 @@ namespace Lockstep {
 
             IsSelected = false;
 			SpawnVersion++;
-			if (onDeactivation .IsNotNull ()) {
-				onDeactivation(this);
-			}
 			
 			abilityManager.Deactivate();
 			
