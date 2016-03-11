@@ -290,13 +290,10 @@ namespace Lockstep
 
 		private IEnumerable<LSAgent> Scan(Vector2d center, long radius)
         {
-            int gridX;
-            int gridY;
-            GridManager.GetScanCoordinates(center.x, center.y, out gridX, out gridY);
+
             foreach (LSAgent agent in InfluenceManager.ScanAll (
-                gridX, 
-                gridY, 
-                InfluenceManager.GenerateDeltaCount (radius),
+                center,
+                radius,
                 this.AgentConditional,
                 this.BucketConditional)
             )

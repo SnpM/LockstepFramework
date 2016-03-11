@@ -116,12 +116,9 @@ namespace Lockstep
 
         private LSBody cachedBody { get { return Agent.Body; } }
 
-        private int rangeDeltaCount;
-        private int baseDeltaCount;
         private int basePriority;
         private Health cachedTargetHealth;
         private uint targetVersion;
-        private int deltaCount;
         private int searchCount;
         private int attackCount;
         private bool _hasTarget;
@@ -134,8 +131,6 @@ namespace Lockstep
             cachedMove = Agent.GetAbility<Move>();
             if (Sight < Range)
                 _sight = Range;
-            baseDeltaCount = InfluenceManager.GenerateDeltaCount(Sight);
-            rangeDeltaCount = InfluenceManager.GenerateDeltaCount(Range);
 
             fastRange = (Range * Range);
             attackFrameCount = AttackRate;
@@ -163,7 +158,6 @@ namespace Lockstep
 
         protected override void OnInitialize()
         {
-            deltaCount = baseDeltaCount;
             cachedBody.Priority = basePriority;
             searchCount = LSUtility.GetRandom(SearchRate) + 1;
             attackCount = 0;
@@ -463,7 +457,7 @@ namespace Lockstep
         private LSAgent DoScan () {
             return InfluenceManager.Scan(
                 this.cachedBody.Position,
-                this.rangeDeltaCount,
+                this.Sight,
                 (other) => other.GetAbility<Health>().IsNotNull(),
                 (bite) => ((this.Agent.Controller.GetAllegiance(bite) & this.TargetAllegiance) != 0)
             );
