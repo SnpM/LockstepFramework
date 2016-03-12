@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Lockstep.UI;
+using UnityEngine.EventSystems;
 
 namespace Lockstep
 {
@@ -294,7 +295,11 @@ namespace Lockstep
         static Vector2 dif;
 
         private static void GetMousedAgent()
-        {            
+        {
+			if (EventSystem.current.IsPointerOverGameObject()) {
+				return;
+			}
+
             MouseOver(RTSInterfacing.GetScreenAgent(Input.mousePosition, (agent) =>
             {
                 return agent.CanSelect && PlayerManager.ContainsController(agent.Controller);

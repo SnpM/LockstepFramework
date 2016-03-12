@@ -116,12 +116,9 @@ namespace Lockstep
 
         private LSBody cachedBody { get { return Agent.Body; } }
 
-        private int rangeDeltaCount;
-        private int baseDeltaCount;
         private int basePriority;
         private Health cachedTargetHealth;
         private uint targetVersion;
-        private int deltaCount;
         private int searchCount;
         private int attackCount;
         private bool _hasTarget;
@@ -130,12 +127,10 @@ namespace Lockstep
 
         protected override void OnSetup()
         {
-            cachedTurn = Agent.Turner;
-            cachedMove = Agent.Mover;
+            cachedTurn = Agent.GetAbility<Turn>();
+            cachedMove = Agent.GetAbility<Move>();
             if (Sight < Range)
                 _sight = Range;
-            baseDeltaCount = InfluenceManager.GenerateDeltaCount(Sight);
-            rangeDeltaCount = InfluenceManager.GenerateDeltaCount(Range);
 
             fastRange = (Range * Range);
             attackFrameCount = AttackRate;
@@ -163,7 +158,6 @@ namespace Lockstep
 
         protected override void OnInitialize()
         {
-            deltaCount = baseDeltaCount;
             cachedBody.Priority = basePriority;
             searchCount = LSUtility.GetRandom(SearchRate) + 1;
             attackCount = 0;
@@ -329,13 +323,14 @@ namespace Lockstep
         protected virtual void OnFire()
         {
             long appliedDamage = Damage;
+            Health healther = Agent.GetAbility<Health>();
             LSProjectile projectile = ProjectileManager.Create(
                 ProjCode,
                 this.Agent,
                 this.ProjectileOffset,
                 this.TargetAllegiance,
-                (other) => this.Agent.Healther.IsNotNull(),
-                (agent) => agent.Healther.TakeRawDamage(appliedDamage));
+                (other) => healther.IsNotNull() && healther.HealthAmount > 0,
+                (agent) => healther.TakeRawDamage(appliedDamage));
             projectile.InitializeHoming(this.Target);
             projectile.TargetPlatform = TargetPlatform;
             ProjectileManager.Fire(projectile);
@@ -345,7 +340,7 @@ namespace Lockstep
         {
             if (other != Agent)
             {
-                cachedTargetHealth = other.Healther;
+                cachedTargetHealth = other.GetAbility<Health>();
                 if (cachedTargetHealth.IsNotNull())
                 {
                     Target = other;
@@ -462,8 +457,8 @@ namespace Lockstep
         private LSAgent DoScan () {
             return InfluenceManager.Scan(
                 this.cachedBody.Position,
-                this.rangeDeltaCount,
-                (other) => other.Healther.IsNotNull(),
+                this.Sight,
+                (other) => other.GetAbility<Health>().IsNotNull(),
                 (bite) => ((this.Agent.Controller.GetAllegiance(bite) & this.TargetAllegiance) != 0)
             );
         }

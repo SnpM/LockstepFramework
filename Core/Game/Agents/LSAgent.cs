@@ -57,11 +57,7 @@ namespace Lockstep {
         public LSBusStop BusStop {
             get {return _busStop ?? (_busStop = new LSBusStop());}
         }
-
-        public event Action<LSAgent> onDeactivation;
-        public event Action<bool, bool> onInteraction;
-		public event Action<LSAgent> onBuildChild;
-        public event Action<LSAgent> onInitialized;
+            
 
         [SerializeField]
         private int _globalID;
@@ -69,10 +65,6 @@ namespace Lockstep {
 
         public ushort LocalID { get; private set;}
         public uint BoxVersion { get; set; }
-
-		[SerializeField]
-		private Vector3 _statsBarOffset = Vector3.up;
-		public Vector3 StatsBarOffset {get {return _statsBarOffset;}}
 
 		[SerializeField]
 		private int _boxPriority = 0;
@@ -113,13 +105,7 @@ namespace Lockstep {
 
         //TODO: Put all this stuff in an extendible class
         public LSInfluencer Influencer { get; private set; }
-		public Health Healther { get {return abilityManager.Healther;} }
-		//public Scan Scanner { get {return abilityManager.Scanner;} }
-		public Move Mover { get {return abilityManager.Mover;} }
-		public Turn Turner {get {return abilityManager.Turner;}}
-		public StatsBar StatsBarer{get; private set;}
-		public EnergyStore EnergyStorer {get {return abilityManager.EnergyStorer;}}
-		public RingController Ringer {get; private set;}
+
 		public bool IsActive { get; private set;}
 
 
@@ -131,9 +117,7 @@ namespace Lockstep {
                 return abilityManager.CheckCasting();
             }
         }
-		public bool UseEnergy (long energyCost) {
-			return EnergyStorer == null || EnergyStorer.Use (energyCost);
-		}
+
 
 		public PlatformType Platform {
 			get { return CachedGameObject.layer == LayerMask.NameToLayer("Air") ? PlatformType.Air : PlatformType.Ground; }
@@ -149,46 +133,26 @@ namespace Lockstep {
 			}
 		}
 
+        public event Action onSelectedChange;
         public bool IsSelected {
             get { return isSelected; }
             set {
                 if (isSelected != value) {
                     isSelected = value;
-                    if (onInteraction .IsNotNull ()) {
-                        onInteraction(isSelected, isHighlighted);
-                    }
-					if (Ringer .IsNotNull ())
-					if (isSelected) {
-						Ringer.Select ();
-
-					}
-					else {
-						if (IsHighlighted)
-							Ringer.Highlight ();
-						else
-							Ringer.Unselect ();
-					}
+                    if (onSelectedChange != null)
+                        onSelectedChange();
                 }
             }
         }
 
+        public event Action onHighlightedChange;
         public bool IsHighlighted {
             get { return isHighlighted; }
             set {
                 if (IsHighlighted != value) {
                     isHighlighted = value;
-                    if (onInteraction .IsNotNull ()) {
-                        onInteraction(isSelected, isHighlighted);
-                    }
-					if (Ringer .IsNotNull ())
-					if (IsSelected == false) {
-						if (IsHighlighted) {
-							Ringer.Highlight ();
-						}
-						else {
-							Ringer.Unselect();
-						}
-					}
+                    if (onHighlightedChange != null)
+                        onHighlightedChange ();
                 }
             }
         }
@@ -202,9 +166,6 @@ namespace Lockstep {
             return Controller.GetAllegiance(other.Controller);
         }
 
-        public bool IsInjured {
-            get { return Healther.HealthAmount < Healther.MaxHealth; }
-        }
 
         private bool isHighlighted;
         private bool isSelected;
@@ -247,16 +208,12 @@ namespace Lockstep {
 
 
 			abilityManager.Setup(this);
-			Ringer = RingController.Create ();
-			if (Ringer .IsNotNull ())
-			Ringer.Setup (this);
+			
 
             Influencer.Setup(this);
             Body.Setup(this);
 
 			SelectionRadiusSquared = _selectionRadius * _selectionRadius;
-            if (StatsBarer != null)
-			StatsBarer.Setup (this);
 
             this.RegisterLockstep();
 
@@ -325,17 +282,7 @@ namespace Lockstep {
             }
 
             abilityManager.Initialize();
-            if (StatsBarer != null)
-			StatsBarer.Initialize ();
-			if (Ringer .IsNotNull ()) {
-				Ringer.Initialize ();
-				IsSelected = false;
-				IsHighlighted = false;
-			}
-            if(onInitialized != null)
-            {
-                onInitialized(this);
-            }
+
         }
 
         public void Simulate() {
@@ -367,8 +314,6 @@ namespace Lockstep {
             if (Animator .IsNotNull ()) {
                 Animator.Visualize();
             }
-            if (StatsBarer != null)
-			StatsBarer.Visualize ();
 
         }
 
@@ -403,9 +348,6 @@ namespace Lockstep {
 
             IsSelected = false;
 			SpawnVersion++;
-			if (onDeactivation .IsNotNull ()) {
-				onDeactivation(this);
-			}
 			
 			abilityManager.Deactivate();
 			
@@ -414,9 +356,6 @@ namespace Lockstep {
 				Influencer.Deactivate();
 			}
 
-            if (StatsBarer != null)
-			StatsBarer.Deactivate ();
-			if (Ringer .IsNotNull ()) Ringer.Deactivate ();
 		}
         private IEnumerator<int> PoolDelayer() {
             yield return _deathTime;

@@ -24,8 +24,8 @@ namespace Lockstep
             }
         }
 
-        private static AbilityDataItem QuickPos;
-        private static AbilityDataItem QuickTarget;
+        public static AbilityDataItem QuickPos;
+        public static AbilityDataItem QuickTarget;
 
 
         private static bool _isGathering;
@@ -103,10 +103,13 @@ namespace Lockstep
             }
         }
 
-        private static void ProcessInterfacer(AbilityDataItem facer)
+        public static void ProcessInterfacer(AbilityDataItem facer)
         {
             if (facer == null)
+            {
+                Debug.LogError("Boom");
                 return;
+            }
             switch (facer.InformationGather)
             {
                 case InformationGatherType.Position:

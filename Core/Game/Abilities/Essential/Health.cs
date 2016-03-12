@@ -62,8 +62,7 @@ namespace Lockstep
 				}
 			}
 
-            if (Agent.StatsBarer != null)
-			Agent.StatsBarer.SetFill (StatBarType.Health, (float)(HealthAmount / (double)MaxHealth));
+           
 		}
 
         public void Die () {
@@ -82,15 +81,5 @@ namespace Lockstep
 		public int shieldIndex {get; set;}
 
 
-		public bool Protected {
-			get {return CoveringShield .IsNotNull () && CoveringShield.IsShielding;}
-		}
-		public Shield CoveringShield {get; private set;}
-		public void Protect (Shield shield) {
-			CoveringShield = shield;
-		}
-		public void Unprotect (Shield shield) {
-			CoveringShield = null;
-		}
     }
 }

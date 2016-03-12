@@ -6,12 +6,6 @@ namespace Lockstep {
     public class AbilityManager {
 
 		static FastList<ActiveAbility> setupActives = new FastList<ActiveAbility>();
-        //TODO: Get rid of this mess
-		public Health Healther {get; private set;}
-		public Scan Scanner {get; private set;}
-		public Move Mover {get; private set;}
-		public Turn Turner {get; private set;}
-		public EnergyStore EnergyStorer {get; private set;}
 
         public Ability[] Abilitys {get; private set;}
         public ActiveAbility[] ActiveAbilitys {get; private set;}
@@ -22,11 +16,6 @@ namespace Lockstep {
 			Abilitys = agent.AttachedAbilities;
 			for (int i = 0; i < Abilitys.Length; i++) {
 				Ability abil = Abilitys[i];
-				if (Healther == null) Healther = abil as Health;
-				if (Scanner == null) Scanner = abil as Scan;
-				if (Mover == null) Mover = abil as Move;
-				if (Turner == null) Turner = abil as Turn;
-				if (EnergyStorer == null) EnergyStorer = abil as EnergyStore;
 
 				ActiveAbility activeAbil = abil as ActiveAbility;
 				if (activeAbil.IsNotNull ())

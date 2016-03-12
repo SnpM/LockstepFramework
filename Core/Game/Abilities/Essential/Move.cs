@@ -108,7 +108,10 @@ namespace Lockstep
 
         [SerializeField]
         private bool _canMove = true;
-        public bool CanMove {get {return _canMove;}}
+		public bool CanMove {
+			get { return _canMove; }
+		}
+
         [SerializeField]
         private bool _canTurn = true;
         public bool CanTurn {get; private set;}
@@ -128,7 +131,7 @@ namespace Lockstep
         {
             cachedBody = Agent.Body;
             cachedBody.OnContact += HandleCollision;
-            CachedTurn = Agent.Turner;
+            CachedTurn = Agent.GetAbility<Turn>();
             CanTurn = _canTurn && CachedTurn != null;
             collisionStopTreshold = FixedMath.Mul(timescaledSpeed, CollisionStopTreshold);
             collisionStopTreshold *= collisionStopTreshold;
@@ -462,7 +465,7 @@ namespace Lockstep
                 return;
             }
 
-            Move otherMover = tempAgent.Mover;
+            Move otherMover = tempAgent.GetAbility<Move>();
             if (ReferenceEquals(otherMover, null) == false)
             {
                 if (IsMoving && CanCollisionStop)
