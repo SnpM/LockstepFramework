@@ -64,9 +64,7 @@ namespace Lockstep
                 }
             }
         }
-
-
-
+            
         internal void Setup(LSAgent agent, int id)
         {
             System.Type mainType = this.GetType();

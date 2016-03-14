@@ -103,12 +103,12 @@ namespace Lockstep
             }
         }
 
-        public static void ProcessInterfacer(AbilityDataItem facer)
+        public static Command GetProcessInterfacer(AbilityDataItem facer)
         {
             if (facer == null)
             {
                 Debug.LogError("Boom");
-                return;
+                return null;
             }
             switch (facer.InformationGather)
             {
@@ -138,8 +138,13 @@ namespace Lockstep
                     break;
             }
 
-            Send(curCom);
+            return curCom;
         }
+        public static void ProcessInterfacer (AbilityDataItem facer) {
+            Command com = GetProcessInterfacer (facer);
+            Send(com);
+        }
+
 
         protected virtual void OnGUI()
         {

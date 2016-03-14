@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using System.Reflection;
 namespace Lockstep
 {
     public partial class Command
@@ -21,22 +23,33 @@ namespace Lockstep
         private static BiDictionary<Type, ushort> RegisteredData = new BiDictionary<Type, ushort>();
 
         static void RegisterDefaults () {
-            Register<DefaultData> ();
+            /*Register<DefaultData> ();
             Register<Vector2d> ();
             Register<Selection> ();
             Register<Vector2dHeight> ();
             Register<Coordinate> ();
             Register<Vector3d>();
+            Register<EmptyData> ();*/
+            foreach (Type t in Assembly.GetCallingAssembly().GetTypes())
+            {
+                if (t.GetInterface("ICommandData") != null)
+                {
+                    Register (t);
+                } 
+            }
         }
 
-        public static void Register<TData>() where TData : ICommandData
+        private static void Register<TData>() where TData : ICommandData
         {
+            Register (typeof(TData));
+        }
+        private static void Register (Type t) {
             if (RegisterCount > ushort.MaxValue)
             {
                 throw new System.Exception(string.Format("Cannot register more than {0} types of data.", ushort.MaxValue + 1));
             }
-            if (RegisteredData.ContainsKey(typeof(TData))) return;
-            RegisteredData.Add(typeof(TData), RegisterCount++);
+            if (RegisteredData.ContainsKey(t)) return;
+            RegisteredData.Add(t, RegisterCount++);
         }
 
         public byte ControllerID;
