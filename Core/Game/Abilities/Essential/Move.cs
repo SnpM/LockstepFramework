@@ -69,6 +69,8 @@ namespace Lockstep
         //Called when unit arrives at destination
         public event Action onArrive;
 
+        public event Action onStartMove;
+
         //Called whenever movement is stopped... i.e. to attack
         public event Action OnStopMove;
 
@@ -440,6 +442,8 @@ namespace Lockstep
                 IsCasting = true;
                 stuckTick = 0;
                 forcePathfind = false;
+                if (onStartMove != null)
+                    onStartMove ();
             }
         }
 
