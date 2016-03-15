@@ -6,7 +6,7 @@ namespace Lockstep
     public class Move : ActiveAbility
     {
         public const long FormationStop = FixedMath.One / 8;
-        public const long GroupDirectStop = FixedMath.One / 2;
+        public const long GroupDirectStop = FixedMath.One;
         public const long DirectStop = FixedMath.One / 8;
         private const int MinimumOtherStopTime = (int)(LockstepManager.FrameRate / 4);
         private const int repathRate = (int)LockstepManager.FrameRate * 4 / 4;
