@@ -106,6 +106,12 @@ namespace Lockstep
         private long closingDistance;
         private long stuckTolerance;
 
+        [Lockstep (true)]
+        public bool SlowArrival {
+            get;
+            set;
+        }
+
         #region Serialized
 
         [SerializeField]
@@ -144,6 +150,7 @@ namespace Lockstep
             stuckTolerance = ((Agent.Body.Radius * Speed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
             stuckTolerance *= stuckTolerance;
             CanPathfind = _canPathfind;
+            this.SlowArrival = true;
         }
 
         protected override void OnInitialize()
@@ -307,7 +314,12 @@ namespace Lockstep
                         Arrive();
                         return;
                     }
-                    desiredVelocity = (movementDirection * (distance) / (closingDistance));
+                    if (this.SlowArrival) {
+                        desiredVelocity = (movementDirection * (distance) / (closingDistance));
+                    }
+                    else {
+                        desiredVelocity = (movementDirection);
+                    }
                 }
 
 
