@@ -44,6 +44,9 @@ namespace Lockstep
 			if (Body.PositionChangedBuffer) {
 				tempNode = GridManager.GetNode (Body._position.x, Body._position.y);
 
+				if (tempNode.IsNull())
+					return;
+				
 				if (System.Object.ReferenceEquals (tempNode, LocatedNode) == false) {
                     LocatedNode.Remove (this);
 					 tempNode.Add (this);

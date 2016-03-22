@@ -66,6 +66,7 @@ namespace Lockstep
                         if (selectedAgents.arrayAllocation [j])
                         {
                             selectedAgents [j].IsSelected = false;
+                            onRemove (selectedAgents[j]);
                         }
                     }
                     selectedAgents.FastClear();

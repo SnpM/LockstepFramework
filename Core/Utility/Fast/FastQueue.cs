@@ -41,6 +41,14 @@ namespace Lockstep {
             Count--;
             return ret;
         }
+        public T Peek () {
+            return innerArray[head];
+        }
+        public T PeekTail () {
+            int tailIndex = tail - 1;
+            if (tailIndex < 0) tailIndex = this.Capacity - 1;
+            return innerArray[tailIndex];
+        }
 
         public void SetCapacity(int min) {
             if (Capacity < min) {
@@ -80,5 +88,6 @@ namespace Lockstep {
             }
             return result;
         }
+
     }
 }

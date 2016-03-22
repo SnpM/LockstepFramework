@@ -296,7 +296,7 @@ namespace Lockstep
 
         private static void GetMousedAgent()
         {
-			if (EventSystem.current.IsPointerOverGameObject()) {
+			if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) {
 				return;
 			}
 
