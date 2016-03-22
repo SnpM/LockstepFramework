@@ -299,7 +299,6 @@ namespace Lockstep
 
         public void Setup(LSAgent agent)
         {
-            FastRadius = Radius * Radius;
 
             if (Shape == ColliderType.Polygon)
             {
@@ -308,7 +307,6 @@ namespace Lockstep
             {
                 GeneratePoints();
                 GenerateBounds();
-
             }
             Agent = agent;
             Setted = true;
@@ -359,6 +357,7 @@ namespace Lockstep
                     }
                 }
                 _radius = FixedMath.Sqrt(BiggestSqrRadius);
+                FastRadius = this.Radius * this.Radius;
             }
         }
 

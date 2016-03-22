@@ -294,7 +294,7 @@ namespace Lockstep
 
         public bool CheckCollision()
         {
-            if ((Body1.PositionChanged || Body2.PositionChanged /*|| Body1.PositionChangedBuffer || Body2.PositionChangedBuffer*/) == false)
+            if ((Body1.PositionChanged || Body2.PositionChanged || Body1.PositionChangedBuffer || Body2.PositionChangedBuffer) == false)
             {
                 return IsColliding;
             }
