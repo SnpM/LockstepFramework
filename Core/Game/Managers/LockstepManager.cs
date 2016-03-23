@@ -26,6 +26,7 @@ using UnityEngine;
 
 //using Lockstep.Integration;
 using Lockstep.Data;
+using System;
 
 namespace Lockstep
 {
@@ -57,6 +58,9 @@ namespace Lockstep
         public static bool Loaded { get; private set; }
 
         private static GameManager _mainGameManager;
+
+        public static event Action onSetup;
+        public static event Action onInitialize;
 
         public static GameManager MainGameManager
         {
@@ -103,6 +107,8 @@ namespace Lockstep
 
 
             DefaultMessageRaiser.LateSetup();
+            if (onSetup != null)
+                onSetup ();
         }
 
         internal static void Initialize(GameManager gameManager)
@@ -159,6 +165,8 @@ namespace Lockstep
             MainGameManager.MainInterfacingHelper.LateInitialize();
 
             BehaviourHelperManager.LateInitialize();
+            if (onInitialize != null)
+                onInitialize ();
         }
 
         static void InitializeHelpers()
