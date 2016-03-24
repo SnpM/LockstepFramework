@@ -154,7 +154,7 @@ namespace Lockstep
 
                     const bool applyVelocity = false;
                     //Resolving collision
-                    if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority))
+                    if (Body1.Immovable && Body1.Agent.IsActive || (Body2.Immovable == false && Body1.Priority > Body2.Priority))
                     {
                         Body2._position.x -= DistX;
                         Body2._position.y -= DistY;
