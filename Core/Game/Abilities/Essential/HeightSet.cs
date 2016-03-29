@@ -10,7 +10,7 @@ namespace Lockstep
 
         public int MapIndex { get { return _mapIndex; } }
 
-        [SerializeField]
+        [SerializeField, FixedNumber]
         private long _bonusHeight;
 
         private long _offset;
