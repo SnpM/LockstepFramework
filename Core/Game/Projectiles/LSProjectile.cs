@@ -39,7 +39,7 @@ namespace Lockstep
         public long _speed;
 		
         private int CountDown;
-		
+
         public Vector3d Velocity { get; private set; }
 
         private Vector3d Direction { get; set; }
@@ -107,11 +107,11 @@ namespace Lockstep
 
         public HitType HitBehavior { get { return _hitBehavior; } }
 
-		[FixedNumberAngle, SerializeField]
-		private long _angle = FixedMath.TenDegrees;
+        [FixedNumberAngle, SerializeField]
+        private long _angle = FixedMath.TenDegrees;
 		
-		[FixedNumber, SerializeField]
-		private long _radius = FixedMath.Create(1);
+        [FixedNumber, SerializeField]
+        private long _radius = FixedMath.Create(1);
 		
         //
         // Properties
@@ -125,11 +125,11 @@ namespace Lockstep
             private set;
         }
 
-		public long Angle
-		{
-			get { return _angle; }
-			set { _angle = value; }
-		}
+        public long Angle
+        {
+            get { return _angle; }
+            set { _angle = value; }
+        }
 
         public long Damage{ get; set; }
 
@@ -187,11 +187,11 @@ namespace Lockstep
             private set;
         }
 
-		public long Radius
-		{
-			get { return _radius; }
-			set { _radius = value; }
-		}
+        public long Radius
+        {
+            get { return _radius; }
+            set { _radius = value; }
+        }
 
         public long Speed
 		{ get; set; }
@@ -226,7 +226,7 @@ namespace Lockstep
             set;
         }
 
-        public Vector2d Forward {get; set;}
+        public Vector2d Forward { get; set; }
 
         private Action<LSAgent> HitEffect { get; set; }
 
@@ -240,42 +240,42 @@ namespace Lockstep
         //
         // Static Methods
         //
-		private void ApplyArea(Vector2d center, long radius)
-		{
-			long num = radius * radius;
-			foreach (LSAgent agent in Scan(center, radius))
-			{
-				if (agent.Body._position.FastDistance(center.x, center.y) < num)
-				{
-					this.HitEffect(agent);
-				}
-			}
-		}
+        private void ApplyArea(Vector2d center, long radius)
+        {
+            long num = radius * radius;
+            foreach (LSAgent agent in Scan(center, radius))
+            {
+                if (agent.Body._position.FastDistance(center.x, center.y) < num)
+                {
+                    this.HitEffect(agent);
+                }
+            }
+        }
 
-		private void ApplyCone(Vector3d center3d, Vector2d forward, long radius, long angle, Action<LSAgent> apply, PlatformType targetPlatform)
-		{
-			Vector2d center = center3d.ToVector2d();
-			long fastRange = radius * radius;
+        private void ApplyCone(Vector3d center3d, Vector2d forward, long radius, long angle, Action<LSAgent> apply, PlatformType targetPlatform)
+        {
+            Vector2d center = center3d.ToVector2d();
+            long fastRange = radius * radius;
 
-			foreach (LSAgent agent in Scan(center, radius))
-			{
-				LSProjectile.agentPos = agent.Body._position;
-				LSProjectile.difference = LSProjectile.agentPos - center;
+            foreach (LSAgent agent in Scan(center, radius))
+            {
+                LSProjectile.agentPos = agent.Body._position;
+                LSProjectile.difference = LSProjectile.agentPos - center;
 
-				if (LSProjectile.difference.FastMagnitude() > fastRange)
-					continue;
+                if (LSProjectile.difference.FastMagnitude() > fastRange)
+                    continue;
 
-				if (forward.Dot(difference) <= 0)
-					continue;
+                if (forward.Dot(difference) <= 0)
+                    continue;
 				
-				LSProjectile.difference.Normalize();
+                LSProjectile.difference.Normalize();
 
-				if (forward.Cross(difference).Abs() > angle)
-					continue;
+                if (forward.Cross(difference).Abs() > angle)
+                    continue;
 				
-				apply(agent);
-			}
-		}
+                apply(agent);
+            }
+        }
 
         private bool CheckCollision()
         {
@@ -288,24 +288,23 @@ namespace Lockstep
         }
 
 
-		private IEnumerable<LSAgent> Scan(Vector2d center, long radius)
+        private IEnumerable<LSAgent> Scan(Vector2d center, long radius)
         {
 
             foreach (LSAgent agent in InfluenceManager.ScanAll (
                 center,
                 radius,
                 this.AgentConditional,
-                this.BucketConditional)
-            )
+                this.BucketConditional))
             {
                 yield return agent;
             }
         }
-		
+
         private void SetupCachedActions()
         {
         }
-            
+
         internal void Deactivate()
         {
             SpawnVersion = 0;
@@ -364,9 +363,12 @@ namespace Lockstep
             ProjectileManager.EndProjectile(this);
         }
 
-        public Func<byte,bool> BucketConditional {get; private set;}
-        public Func<LSAgent,bool> AgentConditional {get; private set;}
-        public bool Deterministic {get; private set;}
+        public Func<byte,bool> BucketConditional { get; private set; }
+
+        public Func<LSAgent,bool> AgentConditional { get; private set; }
+
+        public bool Deterministic { get; private set; }
+
         internal void Prepare(int id, Vector3d projectilePosition, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional, Action<LSAgent> hitEffect, bool deterministic)
         {
             this.Deterministic = deterministic;
@@ -388,7 +390,7 @@ namespace Lockstep
             Forward = Vector2d.up;
         }
 
-		Vector3 bindPositionShift = new Vector3(0, 2, 0);
+        Vector3 bindPositionShift = new Vector3(0, 2, 0);
 
         public void InitializeHoming(LSAgent target)
         {
@@ -406,7 +408,9 @@ namespace Lockstep
         {
             this.Delay = frameTime;
         }
+
         Func<LSBody,bool> BodyConditional;
+
         public void InitializeFree(Vector3d direction, Func<LSBody,bool> bodyConditional, bool useGravity = false)
         {
             this.BodyConditional = bodyConditional;
@@ -414,6 +418,12 @@ namespace Lockstep
             this.Forward = Direction.ToVector2d();
 
             this.cachedTransform.rotation = Quaternion.LookRotation(direction.ToVector3());
+        }
+
+        public void InitializePositional(Vector3d position)
+        {
+            this.TargetPosition = position.ToVector2d();
+            this.TargetHeight = position.z;
         }
 
         public void LateInit()
@@ -439,14 +449,16 @@ namespace Lockstep
                         this.CountDown = this.Delay;
                     }
                     break;
+                case TargetingType.Positional:
                 case TargetingType.Homing:
                     long f = this.Position.ToVector2d().Distance(this.TargetPosition);
                     long timeToHit = f.Div(this.Speed);
-                    if (this._visualArc) {
+                    if (this._visualArc)
+                    {
                         this.arcStartHeight = this.Position.z;
                         this.arcStartVerticalSpeed = (this.TargetHeight - this.Position.z).Div(timeToHit) + timeToHit.Mul(Gravity);
-                    }
-                    else {
+                    } else
+                    {
                         this.linearHeightSpeed = (this.TargetHeight - Position.z).Div(timeToHit).Abs();
                     }
 
@@ -467,7 +479,7 @@ namespace Lockstep
                 this.onInitialize.Invoke();
             }
 
-			if (UseEffects)
+            if (UseEffects)
                 EffectManager.LazyCreateEffect(this.StartEffect, this.Position.ToVector3(), this.cachedTransform.rotation);
         }
 
@@ -486,6 +498,10 @@ namespace Lockstep
                 switch (this.HitBehavior)
                 {
                     case HitType.Single:
+                        if (Target == null)
+                        {
+                            throw new System.Exception("Cannot use single hit effect without target");
+                        }
                         this.HitEffect(Target);
                         break;
                     case HitType.Area:
@@ -571,43 +587,55 @@ namespace Lockstep
                     }
                     break;
                 case TargetingType.Homing:
-                    if (this._visualArc) {
-                        long progress = FixedMath.Create(this.AliveTime) / 32;
-                        long height = this.arcStartHeight + this.arcStartVerticalSpeed.Mul(progress) - Gravity.Mul(progress.Mul(progress));
-                        this.Position.z = height;
-                    }
-                    else {
-                        this.TargetHeight = this.Target.Body.HeightPos + Target.Body.Height / 2;
-                        this.Position.z = FixedMath.MoveTowards(this.Position.z,TargetHeight,this.linearHeightSpeed);
-                    }
                     if (this.CheckCollision())
                     {
                         this.TargetPosition = this.Target.Body._position;
                         this.Hit();
                     } else
                     {
-                        LSProjectile.tempDirection = this.Target.Body._position - this.Position.ToVector2d();
-                        if (LSProjectile.tempDirection.Dot(this.lastDirection.x, this.lastDirection.y) < 0L)
-                        {
-                            this.TargetPosition = this.Target.Body._position;
-                            this.Hit();
-                        } else
-                        {
-                            LSProjectile.tempDirection.Normalize();
-                            Forward = tempDirection;
-                            this.lastDirection = LSProjectile.tempDirection;
-                            LSProjectile.tempDirection *= this.speedPerFrame;
-                            this.Position.Add(LSProjectile.tempDirection.ToVector3d());
-                        }
+                        TargetPosition = Target.Body.Position;
+                        this.TargetHeight = this.Target.Body.HeightPos + Target.Body.Height / 2;
+
+                        MoveToTargetPosition();
                     }
                     break;
                 case TargetingType.Free:
-                    RaycastMove (this.Velocity);
+                    RaycastMove(this.Velocity);
+                    break;
+                case TargetingType.Positional:
+                    MoveToTargetPosition ();
                     break;
             }
         }
-            
-        public void RaycastMove (Vector3d delta) {
+
+        void MoveToTargetPosition()
+        {
+            if (this._visualArc)
+            {
+                long progress = FixedMath.Create(this.AliveTime) / 32;
+                long height = this.arcStartHeight + this.arcStartVerticalSpeed.Mul(progress) - Gravity.Mul(progress.Mul(progress));
+                this.Position.z = height;
+            } else
+            {
+                this.Position.z = FixedMath.MoveTowards(this.Position.z, TargetHeight, this.linearHeightSpeed);
+            }
+
+            LSProjectile.tempDirection = TargetPosition - this.Position.ToVector2d();
+            if (LSProjectile.tempDirection.Dot(this.lastDirection.x, this.lastDirection.y) < 0L)
+            {
+                this.Hit();
+            } else
+            {
+                LSProjectile.tempDirection.Normalize();
+                Forward = tempDirection;
+                this.lastDirection = LSProjectile.tempDirection;
+                LSProjectile.tempDirection *= this.speedPerFrame;
+                this.Position.Add(LSProjectile.tempDirection.ToVector3d());
+            }
+        }
+
+        public void RaycastMove(Vector3d delta)
+        {
             #if true
             Vector3d nextPosition = this.Position;
             nextPosition.Add(ref delta);
@@ -624,7 +652,7 @@ namespace Lockstep
             this.Position = nextPosition;
             #endif
         }
-            
+
         public void Visualize()
         {
             if (this.IsActive)
@@ -632,10 +660,11 @@ namespace Lockstep
                 if (this.CanVisualize)
                 {
                     
-					LSProjectile.newPos = this.Position.ToVector3();
+                    LSProjectile.newPos = this.Position.ToVector3();
                     Vector3 shiftVelocity = LSProjectile.newPos - this.cachedTransform.position;
                     this.cachedTransform.position = LSProjectile.newPos;
-                    if (shiftVelocity.sqrMagnitude > 0) {
+                    if (shiftVelocity.sqrMagnitude > 0)
+                    {
                         this.cachedTransform.rotation = Quaternion.LookRotation(shiftVelocity);
                     }
                 }
