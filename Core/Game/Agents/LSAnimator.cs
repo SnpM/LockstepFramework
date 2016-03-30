@@ -22,11 +22,16 @@ namespace Lockstep
 		[Space(10f), SerializeField]
 		private string fire = "fire";
 
+        [SerializeField]
+        private string specialAttack = "specialAttack";
+
 		private AnimationClip idlingClip;
 		private  AnimationClip movingClip;
 		private  AnimationClip engagingClip;
 		private  AnimationClip dyingClip;
+
 		private  AnimationClip fireClip;
+        private AnimationClip specialAttackClip;
 
 		private Animation animator;
 
@@ -51,6 +56,7 @@ namespace Lockstep
                 dyingClip = animator.GetClip(dying);
                 //Impulses
                 fireClip = animator.GetClip(fire);
+                specialAttackClip = animator.GetClip(specialAttack);
             }
 			Play(AnimState.Idling);
 		}
@@ -121,7 +127,8 @@ namespace Lockstep
 			{
 				case AnimImpulse.Fire:
 					return fire;
-
+                case AnimImpulse.SpecialAttack:
+                    return specialAttack;
 			}
 			return idling;
 		}
@@ -132,7 +139,8 @@ namespace Lockstep
 			{
 				case AnimImpulse.Fire:
 					return fireClip;
-
+                case AnimImpulse.SpecialAttack:
+                    return specialAttackClip;
 			}
 			return idlingClip;
 		}
