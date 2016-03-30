@@ -20,6 +20,7 @@ namespace Lockstep.Integration
                 case TargetingType.Free:
 					so.PropertyField("_speed");
 					break;
+                case TargetingType.Positional:
                 case TargetingType.Homing:
                     so.PropertyField("_speed");
 					so.PropertyField("_visualArc");
