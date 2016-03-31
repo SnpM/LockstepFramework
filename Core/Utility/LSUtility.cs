@@ -38,7 +38,7 @@ namespace Lockstep
 			return ((0xFFFFFFFF & (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)))) % Count);
 		}*/
 
-		public static int GetRandom (int Count)
+        public static int GetRandom (int Count = int.MaxValue)
 		{
 			uint t = (Seed ^ (Seed << 11));
 			Seed = y;
@@ -47,7 +47,7 @@ namespace Lockstep
 			return (int)((0x7FFFFFFF & (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)))) % Count);
 		}
 
-		public static int PeekRandom (int Count)
+        public static int PeekRandom (int Count = int.MaxValue)
 		{
 			uint cSeed = Seed;
 			uint cY = y;
