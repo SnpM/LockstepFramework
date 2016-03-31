@@ -3,7 +3,14 @@ using Lockstep.Data;
 namespace Lockstep {
     public abstract class ActiveAbility : Ability {
 
+        [SerializeField,FrameCount]
+        private int _cooldown;
+        public int Cooldown {get {return _cooldown;}}
+
 		public ushort ListenInput {get; private set;}
+
+        private int _heat;
+        public int Heat {get {return _heat;}private set {_heat = value;}}
 
 		protected sealed override void TemplateSetup ()
 		{
@@ -11,7 +18,16 @@ namespace Lockstep {
 		}
 
         public void Execute(Command com) {
-            OnExecute(com);
+
+            if (Heat <= 0) {
+                OnExecute(com);
+                Heat = Cooldown;
+            }
+        }
+
+        protected override void TemplateSimulate()
+        {
+            Heat--;
         }
             
         protected virtual void OnExecute(Command com) {}

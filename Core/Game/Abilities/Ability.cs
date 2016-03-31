@@ -123,11 +123,17 @@ namespace Lockstep
 
         internal void Simulate()
         {
+            TemplateSimulate ();
+
             OnSimulate();
             if (isCasting)
             {
                 OnCast();
             }
+        }
+
+        protected virtual void TemplateSimulate () {
+
         }
 
         protected virtual void OnSimulate()
