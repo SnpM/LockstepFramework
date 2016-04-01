@@ -77,7 +77,7 @@ namespace Lockstep {
 		public bool Selectable {get; set;}
 		public bool CanSelect {get {return Selectable && IsVisible;}}
 
-
+        public ushort TypeIndex;
 
 		public Vector2 Position2 {get{return new Vector2(CachedTransform.position.x, CachedTransform.position.z);}}
 		public FastList<AbilityDataItem> Interfacers {get {return abilityManager.Interfacers;}}
