@@ -570,8 +570,14 @@ namespace Lockstep
             yAbs = PenetrationY < 0 ? -PenetrationY : PenetrationY;
             if (xAbs <= circle.Radius && yAbs <= circle.Radius)
             {
+                if (xAbs > yAbs)
+                {
+                    PenetrationX = 0;//FixedMath.Mul (PenetrationX, FixedMath.One * 1 / 4);
+                } else
+                {
 
-            } else
+                    PenetrationY = 0;//FixedMath.Mul (PenetrationX, FixedMath.One * 1 / 4);
+                }            } else
             {
                 if (xAbs > yAbs)
                 {
