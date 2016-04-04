@@ -101,7 +101,7 @@ namespace Lockstep
 
         #endregion
 
-        public int Windup {get {return _windup;}}
+        public int Windup { get { return _windup; } }
 
         public long EnergyCost { get { return _energyCost; } }
 
@@ -181,10 +181,14 @@ namespace Lockstep
                 BehaveWithNoTarget();
             }
         }
-        [Lockstep (true)]
-        bool IsWindingUp {get; set;}
+
+        [Lockstep(true)]
+        bool IsWindingUp { get; set; }
+
         int windupCount;
-        void StartWindup () {
+
+        void StartWindup()
+        {
             windupCount = this.Windup;
             IsWindingUp = true;
             Agent.ApplyImpulse(AnimImpulse.Fire);
@@ -198,90 +202,92 @@ namespace Lockstep
                 BehaveWithNoTarget();
                 return;
             }
-            if (IsWindingUp) {
+            if (IsWindingUp)
+            {
                 windupCount--;
-                if (windupCount < 0) {
-                    Fire ();
+                if (windupCount < 0)
+                {
+                    Fire();
                     this.attackCount = this.attackFrameCount - this.Windup;
                     IsWindingUp = false;
                 }
-            }
-            else {
-            Vector2d targetDirection = Target.Body._position - cachedBody._position;
-            long fastMag = targetDirection.FastMagnitude();
-
-            if (fastMag <= fastRangeToTarget)
+            } else
             {
-                if (!inRange)
-                {
-                    if (CanMove)
-                        cachedMove.StopMove();
-                }
-                Agent.SetState(AnimState.Engaging);
-                long mag;
-                targetDirection.Normalize (out mag);
-                bool withinTurn = TrackAttackAngle == false ||
-                                  (fastMag != 0 &&
-                        cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
-                        && cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
-                bool needTurn = mag != 0 && !withinTurn;
-                if (needTurn)
-                {
-                    if (CanTurn)
-                    {
-                        cachedTurn.StartTurnDirection(targetDirection);
-                    }
-                    else {
+                Vector2d targetDirection = Target.Body._position - cachedBody._position;
+                long fastMag = targetDirection.FastMagnitude();
 
+                if (fastMag <= fastRangeToTarget)
+                {
+                    if (!inRange)
+                    {
+                        if (CanMove)
+                            cachedMove.StopMove();
+                    }
+                    Agent.SetState(AnimState.Engaging);
+                    long mag;
+                    targetDirection.Normalize(out mag);
+                    bool withinTurn = TrackAttackAngle == false ||
+                                  (fastMag != 0 &&
+                                  cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
+                                  && cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
+                    bool needTurn = mag != 0 && !withinTurn;
+                    if (needTurn)
+                    {
+                        if (CanTurn)
+                        {
+                            cachedTurn.StartTurnDirection(targetDirection);
+                        } else
+                        {
+
+                        }
+                    } else
+                    {
+                        if (attackCount <= 0)
+                        {
+                            StartWindup();
+                        }
+                    }
+
+                    if (inRange == false)
+                    {
+                        inRange = true;
                     }
                 } else
                 {
-                    if (attackCount <= 0)
+                    if (CanMove)
                     {
-                        StartWindup ();
-                    }
-                }
-
-                if (inRange == false)
-                {
-                    inRange = true;
-                }
-            } else
-            {
-                if (CanMove)
-                {
-                    if (cachedMove.IsMoving == false)
-                    {
-                        cachedMove.StartMove(Target.Body._position);
-                        cachedBody.Priority = basePriority;
-                    } else
-                    {
-                        if (Target.Body.PositionChanged || inRange)
+                        if (cachedMove.IsMoving == false)
                         {
-                            cachedMove.Destination = Target.Body._position;
-                        }
-                    }
-                }
-                
-                if (isAttackMoving || isFocused == false)
-                {
-                    searchCount -= 1;
-                    if (searchCount <= 0)
-                    {
-                        searchCount = SearchRate;
-                        if (ScanAndEngage())
-                        {
+                            cachedMove.StartMove(Target.Body._position);
+                            cachedBody.Priority = basePriority;
                         } else
                         {
+                            if (Target.Body.PositionChanged || inRange)
+                            {
+                                cachedMove.Destination = Target.Body._position;
+                            }
                         }
                     }
-                }
-                if (inRange == true)
-                {
-                    inRange = false;
-                }
                 
-            }
+                    if (isAttackMoving || isFocused == false)
+                    {
+                        searchCount -= 1;
+                        if (searchCount <= 0)
+                        {
+                            searchCount = SearchRate;
+                            if (ScanAndEngage())
+                            {
+                            } else
+                            {
+                            }
+                        }
+                    }
+                    if (inRange == true)
+                    {
+                        inRange = false;
+                    }
+                
+                }
             }
         }
 
@@ -311,12 +317,12 @@ namespace Lockstep
         public void Fire()
         {
 
-                if (CanMove)
-                {
-                    cachedMove.StopMove();
-                }
-                cachedBody.Priority = basePriority + 1;
-                OnFire();
+            if (CanMove)
+            {
+                cachedMove.StopMove();
+            }
+            cachedBody.Priority = basePriority + 1;
+            OnFire();
 
         }
 
@@ -325,12 +331,12 @@ namespace Lockstep
             long appliedDamage = Damage;
             Health healther = Agent.GetAbility<Health>();
             LSProjectile projectile = ProjectileManager.Create(
-                ProjCode,
-                this.Agent,
-                this.ProjectileOffset,
-                this.TargetAllegiance,
-                (other) => healther.IsNotNull() && healther.HealthAmount > 0,
-                (agent) => healther.TakeRawDamage(appliedDamage));
+                                          ProjCode,
+                                          this.Agent,
+                                          this.ProjectileOffset,
+                                          this.TargetAllegiance,
+                                          (other) => healther.IsNotNull() && healther.HealthAmount > 0,
+                                          (agent) => healther.TakeRawDamage(appliedDamage));
             projectile.InitializeHoming(this.Target);
             projectile.TargetPlatform = TargetPlatform;
             ProjectileManager.Fire(projectile);
@@ -413,7 +419,7 @@ namespace Lockstep
                 isAttackMoving = true;
                 isFocused = false;
 
-            } else if (com.TryGetData<DefaultData> (out target) && target.Is(DataType.UShort))
+            } else if (com.TryGetData<DefaultData>(out target) && target.Is(DataType.UShort))
             {
                 isFocused = true;
                 isAttackMoving = false;
@@ -443,7 +449,7 @@ namespace Lockstep
 
         private bool ScanAndEngage()
         {
-            LSAgent agent = DoScan ();
+            LSAgent agent = DoScan();
             if (agent == null || HasTarget && agent == Target)
             {
                 return false;
@@ -454,7 +460,8 @@ namespace Lockstep
             }
         }
 
-        private LSAgent DoScan () {
+        private LSAgent DoScan()
+        {
             return InfluenceManager.Scan(
                 this.cachedBody.Position,
                 this.Sight,
