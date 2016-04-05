@@ -19,7 +19,7 @@ namespace Lockstep {
     /// <summary>
     /// LSAgents manage abilities and interpret commands.
     /// </summary>
-    public class LSAgent : CerealBehaviour, IMousable {
+    public class LSAgent : MonoBehaviour, IMousable {
 
         Vector3 IMousable.WorldPosition {
             get {return this.Body._visualPosition;}
@@ -82,23 +82,23 @@ namespace Lockstep {
 		public Vector2 Position2 {get{return new Vector2(CachedTransform.position.x, CachedTransform.position.z);}}
 		public FastList<AbilityDataItem> Interfacers {get {return abilityManager.Interfacers;}}
 
-		#region Pre-runtime generated
-		[SerializeField]
+        #region Pre-runtime generated (maybe not)
+		//[SerializeField]
 		private Ability[] _attachedAbilities;
 		public Ability[] AttachedAbilities {get {return _attachedAbilities;}}
-		[SerializeField]
+		//[SerializeField]
 		private LSBody _body;
 		public LSBody Body { get {return _body;} }
-        [SerializeField]
+        //[SerializeField]
         private LSTrigger[] _triggers;
         public LSTrigger[] Triggers {get {return _triggers;}}
-		[SerializeField]
+		//[SerializeField]
 		private LSAnimatorBase _animator;
 		public LSAnimatorBase Animator { get {return _animator;} }
-		[SerializeField]
+		//[SerializeField]
 		private Transform _cachedTransform;
 		public Transform CachedTransform {get{return _cachedTransform;}}
-		[SerializeField]
+		//[SerializeField]
 		private GameObject _cachedGameObject;
 		public GameObject CachedGameObject {get {return _cachedGameObject;}}
 		#endregion
@@ -173,7 +173,7 @@ namespace Lockstep {
 
 		[SerializeField]
         private float _selectionRadius = -1f;
-        public float SelectionRadius {get {return _selectionRadius < 0 ? this.Body.Radius + .5f : _selectionRadius;}}
+        public float SelectionRadius {get {return _selectionRadius <= 0 ? this.Body.Radius + .5f : _selectionRadius;}}
 		[SerializeField]
 		private Transform _visualCenter;
 		public Transform VisualCenter {get {return _visualCenter;}}
@@ -410,7 +410,8 @@ namespace Lockstep {
             so.Update ();
             so.ApplyModifiedProperties ();
 		}
-        public override bool GetSerializedFieldNames(List<string> output)
+
+        /*public override bool GetSerializedFieldNames(List<string> output)
         {
             return false;
             base.GetSerializedFieldNames(output);
@@ -423,7 +424,7 @@ namespace Lockstep {
             output.Add("_globalID");
 			//output.Add("_myAgentCode");
             return true;
-        }
+        }*/
 		/*protected override bool OnSerialize ()
 		{
 			LSEditorUtility.FrameCountField ("Death Time", ref _deathTime);
