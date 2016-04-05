@@ -120,12 +120,19 @@ namespace Lockstep
 			get { return _canMove; }
 		}
 
-        [SerializeField]
-        private bool _canTurn = true;
-        public bool CanTurn {get; private set;}
-        [SerializeField, FixedNumber]
-        private long _speed = FixedMath.One * 4;
-        public long Speed {get {return _speed;}}
+		[SerializeField]
+		private bool _canTurn = true;
+		public bool CanTurn {get; private set;}
+		
+		[SerializeField, FixedNumber]
+		private long _speed = FixedMath.One * 4;
+		
+		public long Speed
+		{
+			get { return _speed; }
+			set { _speed = value; }
+		}
+
         [SerializeField, FixedNumber]
         private long _acceleration = FixedMath.One;
         public long Acceleration {get {return _acceleration;}}
