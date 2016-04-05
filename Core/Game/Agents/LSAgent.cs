@@ -173,7 +173,7 @@ namespace Lockstep {
 
 		[SerializeField]
         private float _selectionRadius = -1f;
-        public float SelectionRadius {get {return _selectionRadius <= 0 ? this.Body.Radius + .5f : _selectionRadius;}}
+        public float SelectionRadius {get {return _selectionRadius <= 0 ? this.Body.Radius.ToFloat() + 2f : _selectionRadius;}}
 		[SerializeField]
 		private Transform _visualCenter;
 		public Transform VisualCenter {get {return _visualCenter;}}
@@ -213,7 +213,7 @@ namespace Lockstep {
             Influencer.Setup(this);
             Body.Setup(this);
 
-			SelectionRadiusSquared = _selectionRadius * _selectionRadius;
+			SelectionRadiusSquared = SelectionRadius * SelectionRadius;
 
             this.RegisterLockstep();
 
@@ -437,7 +437,7 @@ namespace Lockstep {
 			return true;
 		}*/
 		void Reset () {
-			_selectionRadius = 1f;
+			_selectionRadius = -1f;
 			_visualCenter = transform;
 		}
 
