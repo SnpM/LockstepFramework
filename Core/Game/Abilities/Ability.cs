@@ -9,7 +9,7 @@ using Lockstep.Data;
 
 namespace Lockstep
 {
-    public abstract class Ability : CerealBehaviour
+    public abstract class Ability : MonoBehaviour//CerealBehaviour
     {
         private bool isCasting;
         

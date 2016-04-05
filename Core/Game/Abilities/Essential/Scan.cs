@@ -486,6 +486,7 @@ namespace Lockstep
         [SerializeField, Visualize]
         private Vector3 _projectileOrigin = Vector3.forward;
 
+        /*
         protected override void OnAfterSerialize()
         {
             if (transform.position != Vector3.zero)
@@ -496,7 +497,7 @@ namespace Lockstep
             Vector3 temp = (base.transform.InverseTransformPoint(_projectileOrigin));
             temp *= base.transform.localScale.x;
             _projectileOffset = new Vector3d(temp);
-        }
+        }*/
 
         void OnDrawGizmos()
         {
