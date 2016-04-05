@@ -172,8 +172,8 @@ namespace Lockstep {
 		public readonly AbilityManager abilityManager = new AbilityManager();
 
 		[SerializeField]
-		private float _selectionRadius = 1f;
-		public float SelectionRadius {get {return _selectionRadius;}}
+        private float _selectionRadius = -1f;
+        public float SelectionRadius {get {return _selectionRadius < 0 ? this.Body.Radius + .5f : _selectionRadius;}}
 		[SerializeField]
 		private Transform _visualCenter;
 		public Transform VisualCenter {get {return _visualCenter;}}
