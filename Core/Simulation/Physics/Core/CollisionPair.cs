@@ -120,8 +120,8 @@ namespace Lockstep
                 Body2.OnContact(Body1);
             }
 
-			if (Body1.IsTrigger || Body2.IsTrigger)
-				return;
+            if (Body1.IsTrigger || Body2.IsTrigger)
+                return;
 			
             switch (LeCollisionType)
             {
@@ -214,11 +214,12 @@ namespace Lockstep
                     break;
                             
                 case CollisionType.Circle_Polygon:
-                    if (Body1.Shape == ColliderType.Circle) {
-                        this.DistributeCircle_Poly(Body1,Body2);
-                    }
-                    else {
-                        this.DistributeCircle_Poly(Body2,Body1);
+                    if (Body1.Shape == ColliderType.Circle)
+                    {
+                        this.DistributeCircle_Poly(Body1, Body2);
+                    } else
+                    {
+                        this.DistributeCircle_Poly(Body2, Body1);
                     }
                     break;
             }
@@ -229,7 +230,7 @@ namespace Lockstep
         void DistributeCircle_Poly(LSBody circle, LSBody poly)
         {
             Vector2d edgeAxis = ClosestAxis.rotatedRight;
-            long horProjection = circle._position.Dot(edgeAxis.x,edgeAxis.y);
+            long horProjection = circle._position.Dot(edgeAxis.x, edgeAxis.y);
             long verProjection = ClosestAxisProjection + ClosestDist;
             Vector2d newPos = ClosestAxis * verProjection + edgeAxis * horProjection;
             circle._position = newPos; 
@@ -494,9 +495,11 @@ namespace Lockstep
             }
             return false;
         }
+
         private static Vector2d ClosestAxis;
         private static long ClosestDist;
         private static long ClosestAxisProjection;
+
         public static bool CheckCircle_Poly(LSBody circle, LSBody poly)
         {
             int EdgeCount = poly.EdgeNorms.Length;
@@ -512,24 +515,26 @@ namespace Lockstep
                 long PolyMax;
                 ProjectPolygon(axis.x, axis.y, poly, out PolyMin, out PolyMax);
                 //TODO: Cache PolyMin and PolyMax?
-                if (CheckOverlap (CircleMin, CircleMax, PolyMin, PolyMax))
+                if (CheckOverlap(CircleMin, CircleMax, PolyMin, PolyMax))
                 {
                     long dist1 = PolyMax - CircleMin;
                     long dist2 = CircleMax - PolyMin;
                     long localCloseDist = 0;
-                    if (dist1 <= dist2) {
+                    if (dist1 <= dist2)
+                    {
                         localCloseDist = dist1;
-                    }
-                    else {
+                    } else
+                    {
                         localCloseDist = -dist2;
                     }
-                    if (localCloseDist.Abs() < ClosestDist.Abs()) {
+                    if (localCloseDist.Abs() < ClosestDist.Abs())
+                    {
                         ClosestDist = localCloseDist;
                         ClosestAxis = axis;
                         ClosestAxisProjection = CircleProjection;
                     }
-                }
-                else {
+                } else
+                {
                     return false;
                 }
             }
@@ -565,32 +570,42 @@ namespace Lockstep
                 PenetrationY = (circle.YMax - box.YMin);
             }
 
-
+            //PenetrationX = PenetrationX + circle.Velocity.x;
+            //PenetrationY = PenetrationY + circle.Velocity.y;
             xAbs = PenetrationX < 0 ? -PenetrationX : PenetrationX;
             yAbs = PenetrationY < 0 ? -PenetrationY : PenetrationY;
-            if (xAbs <= circle.Radius && yAbs <= circle.Radius)
+
+            if ((xAbs <= circle.Radius && yAbs <= circle.Radius))
+            {
+                Vector2d corner;
+                corner.x = xMore ? box.Position.x + box.HalfWidth : box.Position.x - box.HalfWidth;
+                corner.y = yMore ? box.Position.y + box.HalfHeight : box.Position.y - box.HalfHeight;
+                Vector2d dir = circle.Position - corner;
+                dir.Normalize();
+
+                circle.Position = corner + dir * circle.Radius;
+            } else
             {
                 if (xAbs > yAbs)
                 {
-                    PenetrationX = 0;//FixedMath.Mul (PenetrationX, FixedMath.One * 1 / 4);
+                    PenetrationX = 0;
+                    if (yAbs < circle.Radius)
+                        PenetrationY = PenetrationY * yAbs / circle.Radius;
+
                 } else
                 {
+                    PenetrationY = 0;
+                    if (xAbs < circle.Radius)
+                        PenetrationX = PenetrationX * xAbs / circle.Radius;
 
-                    PenetrationY = 0;//FixedMath.Mul (PenetrationX, FixedMath.One * 1 / 4);
-                }            } else
-            {
-                if (xAbs > yAbs)
-                {
-                    PenetrationX = 0;//FixedMath.Mul (PenetrationX, FixedMath.One * 1 / 4);
-                } else
-                {
-
-                    PenetrationY = 0;//FixedMath.Mul (PenetrationX, FixedMath.One * 1 / 4);
                 }
+                //Resolving
+                circle._position.x -= PenetrationX;
+                circle._position.y -= PenetrationY;
             }
-            //Resolving
-            circle._position.x -= PenetrationX;//(PenetrationX * Multiplier) >> FixedMath.SHIFT_AMOUNT;
-            circle._position.y -= PenetrationY;//(PenetrationY * Multiplier) >> FixedMath.SHIFT_AMOUNT;
+            
+
+
 
             circle.PositionChanged = true;
             circle.BuildBounds();

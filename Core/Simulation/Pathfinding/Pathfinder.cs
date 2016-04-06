@@ -63,7 +63,6 @@ namespace Lockstep
 		public static bool FindPath (Vector2d End, GridNode startNode, GridNode endNode, FastList<Vector2d> outputVectorPath, int unitSize = 1)
 		{
 
-			if (startNode.Unwalkable || endNode.Unwalkable) return false;
 			if (FindPath (startNode, endNode, OutputPath, unitSize)) {
 				outputVectorPath.FastClear ();
 				length = OutputPath.Count - 1;
@@ -178,6 +177,7 @@ namespace Lockstep
 				}
 			}
 			#endregion
+            Debug.Log("asdf");
 			return false;
 		}
 
@@ -322,13 +322,13 @@ namespace Lockstep
 				xSign = X > returnNode.WorldPos.x ? 1 : -1;
 				ySign = Y > returnNode.WorldPos.y ? 1 : -1;
 
-				currentNode = GridManager.GetNode (returnNode.gridX + xSign, returnNode.gridY + ySign);
+				currentNode = GridManager.GetNode (returnNode.gridX + xSign, returnNode.gridY);
 				if (currentNode == null || currentNode.Unwalkable)
 				{
-					currentNode = GridManager.GetNode (returnNode.gridX + xSign, returnNode.gridY);
+					currentNode = GridManager.GetNode (returnNode.gridX, returnNode.gridY + ySign);
 					if (currentNode == null || currentNode.Unwalkable)
 					{
-						currentNode = GridManager.GetNode (returnNode.gridX, returnNode.gridY + ySign);
+						currentNode = GridManager.GetNode (returnNode.gridX + xSign, returnNode.gridY + ySign);
 						if (currentNode == null || currentNode.Unwalkable)
 						{
 							return false;

@@ -169,7 +169,7 @@ namespace Lockstep
         {
             if (this._unwalkable)
                 return true;
-            if (CachedSize == 1)
+            if (CachedSize <= 2)
             {
                 return false;
             }

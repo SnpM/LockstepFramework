@@ -9,7 +9,7 @@ namespace Lockstep
         public const long GroupDirectStop = FixedMath.One;
         public const long DirectStop = FixedMath.One / 8;
         private const int MinimumOtherStopTime = (int)(LockstepManager.FrameRate / 4);
-        private const int repathRate = (int)LockstepManager.FrameRate * 4 / 4;
+        private const int repathRate = (int)LockstepManager.FrameRate;
         private const int CollisionStopCount = LockstepManager.FrameRate * 2;
         private const long CollisionStopTreshold = FixedMath.One / 2;
 
@@ -26,7 +26,7 @@ namespace Lockstep
 
         private int RepathRate
         {
-            get { return LSUtility.GetRandom(FixedMath.Create(repathRate).Div(this.Speed).CeilToInt()); }
+            get { return FixedMath.Create(repathRate).Div(this.Speed).CeilToInt(); }
         }
 
         private const int straightRepathRate = repathRate * 4;
@@ -201,11 +201,10 @@ namespace Lockstep
             {
                 if (CanPathfind)
                 {
-                    if (repathCount <= 0)
+                   if (repathCount <= 0)
                     {
                         if (viableDestination)
                         {
-                            Debug.Log("asdf");
                             if (Pathfinder.GetPathNode(cachedBody._position.x, cachedBody._position.y, out currentNode))
                             {
                                 if (straightPath)
@@ -257,6 +256,7 @@ namespace Lockstep
                                 }
                             } else
                             {
+
                             }
                         } else
                         {
@@ -275,7 +275,7 @@ namespace Lockstep
                             repathCount--;
                         } else
                         {
-                            repathCount--;
+                            repathCount-= 2;
                         }
                     }
 
