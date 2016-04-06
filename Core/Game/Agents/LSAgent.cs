@@ -108,6 +108,8 @@ namespace Lockstep {
 
 		public bool IsActive { get; private set;}
 
+        public event Action<LSAgent> onDeactivate;
+
 
 		public AgentTag Tag;
 
