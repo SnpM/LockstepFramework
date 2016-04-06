@@ -3,6 +3,8 @@ using System.Collections;
 
 namespace Lockstep
 {
+    [DisallowMultipleComponent]
+
     public class DynamicBlocker : Ability
     {
         static readonly FastList<Vector2d> bufferCoordinates = new FastList<Vector2d>();
