@@ -237,7 +237,7 @@ namespace Lockstep
         [SerializeField]
         private bool _immovable;
 
-        public bool Immovable { get { return _immovable; } }
+        public bool Immovable { get { return _immovable || this.Shape != ColliderType.Circle; } }
 
         [SerializeField, FormerlySerializedAs("_priority")]
         private int _basePriority;

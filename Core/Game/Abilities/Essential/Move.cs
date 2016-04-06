@@ -205,6 +205,7 @@ namespace Lockstep
                     {
                         if (viableDestination)
                         {
+                            Debug.Log("asdf");
                             if (Pathfinder.GetPathNode(cachedBody._position.x, cachedBody._position.y, out currentNode))
                             {
                                 if (straightPath)
