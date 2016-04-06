@@ -589,14 +589,12 @@ namespace Lockstep
                 if (xAbs > yAbs)
                 {
                     PenetrationX = 0;
-                    if (yAbs < circle.Radius)
-                        PenetrationY = PenetrationY * yAbs / circle.Radius;
+                    //if (yAbs < circle.Radius) PenetrationY = PenetrationY * yAbs / circle.Radius;
 
                 } else
                 {
                     PenetrationY = 0;
-                    if (xAbs < circle.Radius)
-                        PenetrationX = PenetrationX * xAbs / circle.Radius;
+                    //if (xAbs < circle.Radius) PenetrationX = PenetrationX * xAbs / circle.Radius;
 
                 }
                 //Resolving
