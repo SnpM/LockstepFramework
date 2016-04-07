@@ -15,14 +15,15 @@ namespace Lockstep
 
         SelectionRing RingObject;
 
-
+        public float Size {get; private set;}
 
         protected override void OnSetup()
         {
             Agent.onSelectedChange += HandleSelectedChange;
             Agent.onHighlightedChange += HandleHighlightedChange;
             RingObject = GameObject.Instantiate(_ringTemplate.gameObject).GetComponent<SelectionRing>();
-            RingObject.Setup((Agent.SelectionRadius + _ringRadiusOffset) * 2);
+            Size = (Agent.SelectionRadius + _ringRadiusOffset) * 2;
+            RingObject.Setup(Size);
 
             RingObject.transform.parent = this.transform;
             RingObject.transform.localPosition = Vector3.zero;
