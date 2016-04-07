@@ -338,6 +338,8 @@ namespace Lockstep {
 		}
 
         public void Deactivate(bool Immediate = false) {
+            if (onDeactivate != null)
+                this.onDeactivate(this);
 			_Deactivate ();
             if (Immediate == false) {
                 CoroutineManager.StartCoroutine(PoolDelayer());
