@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Lockstep
 {
+    [UnityEngine.DisallowMultipleComponent]
     public class HeightSet : Ability
     {
         [SerializeField]
