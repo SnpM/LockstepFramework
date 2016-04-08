@@ -40,6 +40,8 @@ namespace Lockstep
 
         public static int GetRandom (int Count = int.MaxValue)
 		{
+            if (Count == 0)
+                return 0;
 			uint t = (Seed ^ (Seed << 11));
 			Seed = y;
 			y = z;
