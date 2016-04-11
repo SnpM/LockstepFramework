@@ -103,7 +103,9 @@ namespace Lockstep
 
         public int Windup { get { return _windup; } }
 
-        public long EnergyCost { get { return _energyCost; } }
+        [SerializeField]
+        protected int _priorityIncrease;
+        public virtual int PriorityIncrease {get {return _priorityIncrease;}}
 
         //Stuff for the logic
         private bool inRange;
@@ -117,6 +119,7 @@ namespace Lockstep
         private LSBody cachedBody { get { return Agent.Body; } }
 
         private int basePriority;
+        private int firingPriority;
         private Health cachedTargetHealth;
         private uint targetVersion;
         private int searchCount;
@@ -135,7 +138,7 @@ namespace Lockstep
             fastRange = (Range * Range);
             attackFrameCount = AttackRate;
             basePriority = cachedBody.Priority;
-
+            firingPriority = basePriority + PriorityIncrease;
             CanMove = cachedMove.IsNotNull();
             if (CanMove)
             {
@@ -321,7 +324,7 @@ namespace Lockstep
             {
                 cachedMove.StopMove();
             }
-            cachedBody.Priority = basePriority + 1;
+            cachedBody.Priority = firingPriority;
             OnFire();
 
         }
