@@ -104,7 +104,7 @@ namespace Lockstep
         public int Windup { get { return _windup; } }
 
         [SerializeField]
-        protected bool _increasePriority;
+        protected bool _increasePriority = true;
         public virtual bool IncreasePriority {get {return _increasePriority;}}
 
         //Stuff for the logic
