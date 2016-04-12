@@ -100,7 +100,6 @@ namespace Lockstep
             PhysicsManager.Setup();
             ClientManager.Setup();
 
-            Application.targetFrameRate = 60;
             Time.fixedDeltaTime = BaseDeltaTime;
             Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
             InputCodeManager.Setup();
@@ -113,7 +112,6 @@ namespace Lockstep
 
         internal static void Initialize(GameManager gameManager)
         {
-            Application.targetFrameRate = 30;
             MainGameManager = gameManager;
 
             if (!Loaded)
