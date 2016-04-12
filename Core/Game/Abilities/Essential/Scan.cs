@@ -117,7 +117,7 @@ namespace Lockstep
         private Move cachedMove;
         private Turn cachedTurn;
 
-        private LSBody cachedBody { get { return Agent.Body; } }
+        protected LSBody cachedBody { get { return Agent.Body; } }
 
         private int basePriority;
         private Health cachedTargetHealth;
@@ -462,7 +462,7 @@ namespace Lockstep
             }
         }
 
-        private LSAgent DoScan()
+        protected virtual LSAgent DoScan()
         {
             return InfluenceManager.Scan(
                 this.cachedBody.Position,
