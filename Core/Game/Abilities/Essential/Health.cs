@@ -16,13 +16,14 @@ namespace Lockstep
 		}
 
         public event Action onHealthChange;
-        private long _healthAmount;
+        [SerializeField, FixedNumber]
+        private long _currentHealth;
 		public long HealthAmount {
             get {
-                return _healthAmount;
+                return _currentHealth;
             }
             set {
-                _healthAmount = value;
+                _currentHealth = value;
                 if (onHealthChange != null)
                 onHealthChange ();
             }

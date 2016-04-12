@@ -256,24 +256,29 @@ namespace Lockstep
         {
             Vector2d center = center3d.ToVector2d();
             long fastRange = radius * radius;
-
             foreach (LSAgent agent in Scan(center, radius))
             {
-                LSProjectile.agentPos = agent.Body._position;
-                LSProjectile.difference = LSProjectile.agentPos - center;
+                Vector2d agentPos = agent.Body._position;
+                Vector2d difference = agentPos - center;
 
-                if (LSProjectile.difference.FastMagnitude() > fastRange)
+                if (difference.FastMagnitude() > fastRange)
+                {
                     continue;
-
-                if (forward.Dot(difference) <= 0)
-                    continue;
-				
-                LSProjectile.difference.Normalize();
-
-                if (forward.Cross(difference).Abs() > angle)
+                }
+                if (forward.Dot(difference) < 0)
+                {
                     continue;
 				
+                }
+                difference.Normalize();
+
+                long cross = forward.Cross(difference).Abs();
+                if (cross > angle)
+                {
+                    continue;
+                }
                 apply(agent);
+
             }
         }
 
@@ -406,6 +411,7 @@ namespace Lockstep
 
         public void InitializeTimed(int frameTime)
         {
+            
             this.Delay = frameTime;
         }
 
@@ -426,8 +432,14 @@ namespace Lockstep
             this.TargetHeight = position.z;
         }
 
+        public void UpdatePosition () {
+            cachedTransform.rotation = Quaternion.LookRotation(Forward.ToVector3());
+            cachedTransform.position = this.Position.ToVector3();
+        }
+
         public void LateInit()
         {
+            this.UpdatePosition();
 
             if (this.TargetingBehavior != TargetingType.Timed)
             {
