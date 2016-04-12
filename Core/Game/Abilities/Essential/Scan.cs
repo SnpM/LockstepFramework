@@ -105,7 +105,8 @@ namespace Lockstep
 
         [SerializeField]
         protected bool _increasePriority = true;
-        public virtual bool IncreasePriority {get {return _increasePriority;}}
+
+        public virtual bool IncreasePriority { get { return _increasePriority; } }
 
 
         //Stuff for the logic
@@ -229,9 +230,9 @@ namespace Lockstep
                     long mag;
                     targetDirection.Normalize(out mag);
                     bool withinTurn = TrackAttackAngle == false ||
-                                  (fastMag != 0 &&
-                                  cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
-                                  && cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
+                                      (fastMag != 0 &&
+                                      cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
+                                      && cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
                     bool needTurn = mag != 0 && !withinTurn;
                     if (needTurn)
                     {
@@ -323,7 +324,8 @@ namespace Lockstep
             {
                 cachedMove.StopMove();
             }
-            cachedBody.Priority = IncreasePriority ? basePriority + 1 : basePriority;;
+            cachedBody.Priority = IncreasePriority ? basePriority + 1 : basePriority;
+            ;
             OnFire();
 
         }
@@ -339,7 +341,24 @@ namespace Lockstep
                                           this.TargetAllegiance,
                                           (other) => healther.IsNotNull() && healther.HealthAmount > 0,
                                           (other) => healther.TakeRawDamage(appliedDamage));
-            projectile.InitializeHoming(this.Target);
+
+
+            switch (projectile.TargetingBehavior)
+            {
+                case TargetingType.Homing:
+                    projectile.InitializeHoming(this.Target);
+                    break;
+                case TargetingType.Timed:
+                    projectile.InitializeTimed();
+                    break;
+                case TargetingType.Positional:
+                    projectile.InitializePositional(Target.Body.Position.ToVector3d(Target.Body.HeightPos));
+                    break;
+                case TargetingType.Free:
+                    //TODO
+                    throw new System.Exception("Not implemented yet.");
+                    break;
+            }
             projectile.TargetPlatform = TargetPlatform;
             ProjectileManager.Fire(projectile);
         }

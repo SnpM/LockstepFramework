@@ -409,10 +409,9 @@ namespace Lockstep
             this.cachedTransform.rotation = Quaternion.LookRotation(target.CachedTransform.position - this.Position.ToVector3());
         }
 
-        public void InitializeTimed(int frameTime)
+        public void InitializeTimed()
         {
             
-            this.Delay = frameTime;
         }
 
         Func<LSBody,bool> BodyConditional;
