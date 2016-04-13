@@ -13,7 +13,7 @@ namespace Lockstep
 
         SelectionRing RingTemplate { get { return _ringTemplate; } }
 
-        SelectionRing RingObject;
+        public SelectionRing RingObject {get; private set;}
 
         public float Size {get; private set;}
 
