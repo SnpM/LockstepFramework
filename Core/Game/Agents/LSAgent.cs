@@ -279,12 +279,12 @@ namespace Lockstep {
                 Influencer.Initialize();
             }
 
+
+
+            abilityManager.Initialize();
             if (Animator .IsNotNull ()) {
                 Animator.Initialize();
             }
-
-            abilityManager.Initialize();
-
         }
 
         public void Simulate() {
