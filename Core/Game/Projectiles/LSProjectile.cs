@@ -356,6 +356,7 @@ namespace Lockstep
                     LSEffect lSEffect = EffectManager.CreateEffect(this.EndEffect);
                     lSEffect.CachedTransform.parent = this.Target.VisualCenter;
                     lSEffect.CachedTransform.localPosition = Vector3.up;
+                    lSEffect.CachedTransform.rotation = this.cachedTransform.rotation;
                     lSEffect.Initialize();
                 } else
                 {
@@ -392,7 +393,6 @@ namespace Lockstep
             this.BucketConditional = bucketConditional;
             this.AgentConditional = agentConditional;
 
-            Forward = Vector2d.up;
         }
 
         Vector3 bindPositionShift = new Vector3(0, 2, 0);
@@ -407,6 +407,8 @@ namespace Lockstep
             this.TargetHeight = this.Target.Body.HeightPos + this.Target.Body.Height / 2;
 
             this.cachedTransform.rotation = Quaternion.LookRotation(target.CachedTransform.position - this.Position.ToVector3());
+        
+        
         }
 
         public void InitializeTimed()
@@ -429,6 +431,7 @@ namespace Lockstep
         {
             this.TargetPosition = position.ToVector2d();
             this.TargetHeight = position.z;
+
         }
 
         public void UpdatePosition () {
@@ -472,7 +475,8 @@ namespace Lockstep
                     {
                         this.linearHeightSpeed = (this.TargetHeight - Position.z).Div(timeToHit).Abs();
                     }
-
+                    Forward = TargetPosition - this.Position;
+                    Forward.Normalize();
                     break;
                 case TargetingType.Free:
 
@@ -483,6 +487,7 @@ namespace Lockstep
                     {
                         this.cachedTransform.LookAt(this.Forward.ToVector3());
                     }
+
                     break;
             }
             if (this.onInitialize.IsNotNull())
