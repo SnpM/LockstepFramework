@@ -14,6 +14,7 @@ public static class GridBuilder {
         BuildGridAPI.Initialize();
         Reset ();
     }
+
     public static void Reset () {
         ClearTarget ();
         IsMovingBuilding = false;

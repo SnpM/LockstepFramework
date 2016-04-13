@@ -880,8 +880,10 @@ namespace Lockstep
                         return this.Radius;
                         break;
                     case ColliderType.AABox:
-                        if (this.HalfWidth == HalfHeight)
+                        if (this.HalfWidth > this.HalfHeight)
                             return HalfWidth;
+                        else
+                            return HalfHeight;
                         break;
                 }
                 return 0;

@@ -9,7 +9,7 @@ namespace Lockstep.Abilities{}
 namespace Lockstep.Agents {}
 public static class BuildGridAPI {
     const int defaultGridLength = 256;
-    const int defaultBuildSpacing = 1;
+    const int defaultBuildSpacing = 3;
     const int defaultGridOffset = -128;
     public static BuildGridManager MainBuildGrid {get; private set;}
     public static int GridOffset {get; private set;}
