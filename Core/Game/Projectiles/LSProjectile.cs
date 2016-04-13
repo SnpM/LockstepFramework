@@ -434,14 +434,13 @@ namespace Lockstep
 
         }
 
-        public void UpdatePosition () {
+        public void UpdateVisuals () {
             cachedTransform.rotation = Quaternion.LookRotation(Forward.ToVector3());
             cachedTransform.position = this.Position.ToVector3();
         }
 
         public void LateInit()
         {
-            this.UpdatePosition();
 
             if (this.TargetingBehavior != TargetingType.Timed)
             {
@@ -475,7 +474,7 @@ namespace Lockstep
                     {
                         this.linearHeightSpeed = (this.TargetHeight - Position.z).Div(timeToHit).Abs();
                     }
-                    Forward = TargetPosition - this.Position;
+                    Forward = TargetPosition - this.Position.ToVector2d();
                     Forward.Normalize();
                     break;
                 case TargetingType.Free:
@@ -490,6 +489,8 @@ namespace Lockstep
 
                     break;
             }
+            this.UpdateVisuals();
+
             if (this.onInitialize.IsNotNull())
             {
                 this.onInitialize.Invoke();
