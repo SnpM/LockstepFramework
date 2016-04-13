@@ -28,8 +28,10 @@ namespace Lockstep.Data {
                 }
             } else {
                 DataHelper helper;
-                EditorLSDatabaseWindow.Window.DatabaseEditor.DataHelpers.TryGetValue (dca.TargetDataName, out helper);
-                if (helper != null) {
+                if (!EditorLSDatabaseWindow.Window.DatabaseEditor.DataHelpers.TryGetValue (dca.TargetDataName, out helper)) {
+                    Debug.LogError("Data code '" + dca.TargetDataName + "' was not found in the current database");
+                }
+                else {
                     DataItem[] data = helper.Data;
                     GUIContent[] dataContents = new GUIContent[data.Length];
                     if (property.isArray && property.type != "string") {
