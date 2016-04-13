@@ -175,6 +175,7 @@ namespace Lockstep
 
         protected override void OnSimulate()
         {
+
             attackCount--;
             if (HasTarget)
             {
@@ -333,6 +334,7 @@ namespace Lockstep
         protected virtual void OnFire()
         {
             long appliedDamage = Damage;
+
             Health healther = Target.GetAbility<Health>();
             LSProjectile projectile = ProjectileManager.Create(
                                           ProjCode,
@@ -341,7 +343,6 @@ namespace Lockstep
                                           this.TargetAllegiance,
                                           (other) => healther.IsNotNull() && healther.HealthAmount > 0,
                                           (other) => healther.TakeRawDamage(appliedDamage));
-
 
             switch (projectile.TargetingBehavior)
             {

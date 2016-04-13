@@ -497,7 +497,9 @@ namespace Lockstep
             }
 
             if (UseEffects)
+            {
                 EffectManager.LazyCreateEffect(this.StartEffect, this.Position.ToVector3(), this.cachedTransform.rotation);
+            }
         }
 
         private void OnHit()
