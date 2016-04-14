@@ -4,6 +4,7 @@ using Lockstep.Data;
 
 namespace Lockstep
 {
+    [UnityEngine.DisallowMultipleComponent]
     public class Scan : ActiveAbility
     {
         private const int SearchRate = (int)(LockstepManager.FrameRate / 2);

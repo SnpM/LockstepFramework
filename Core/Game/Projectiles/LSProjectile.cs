@@ -392,7 +392,6 @@ namespace Lockstep
 
             this.BucketConditional = bucketConditional;
             this.AgentConditional = agentConditional;
-
         }
 
         Vector3 bindPositionShift = new Vector3(0, 2, 0);
@@ -472,7 +471,8 @@ namespace Lockstep
                         this.arcStartVerticalSpeed = (this.TargetHeight - this.Position.z).Div(timeToHit) + timeToHit.Mul(Gravity);
                     } else
                     {
-                        this.linearHeightSpeed = (this.TargetHeight - Position.z).Div(timeToHit).Abs();
+                        this.linearHeightSpeed = (this.TargetHeight - Position.z).Div(timeToHit).Abs() / LockstepManager.FrameRate;
+
                     }
                     Forward = TargetPosition - this.Position.ToVector2d();
                     Forward.Normalize();
