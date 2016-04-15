@@ -13,6 +13,7 @@ namespace Lockstep
     public sealed class LSProjectile : CerealBehaviour
     {
         private const long Gravity = FixedMath.One * 98 / 10;
+        public const int TickRate = LockstepManager.FrameRate / 4;
         //
         // Static Fields
         //
@@ -88,8 +89,6 @@ namespace Lockstep
 
         public bool CanVisualize { get { return _canVisualize; } }
 
-        [SerializeField]
-        private long _interpolationRate = FixedMath.One * 8;
 
         [SerializeField]
         private AgentTag _exclusiveTargetType;
@@ -113,6 +112,10 @@ namespace Lockstep
         [FixedNumber, SerializeField]
         private long _radius = FixedMath.Create(1);
 		
+
+        [SerializeField, FrameCount]
+        private int _lastingDuration;
+
         //
         // Properties
         //
@@ -134,6 +137,8 @@ namespace Lockstep
         public long Damage{ get; set; }
 
         public int Delay{ get; set; }
+
+        public int LastingDuration { get; set; }
 
         public Vector3 EndPoint
         {
@@ -177,7 +182,8 @@ namespace Lockstep
         {
             get
             {
-                return (256 <= this.Delay) ? this.Delay : 256;
+                int minTime = this.Delay + this.LastingDuration;
+                return (LockstepManager.FrameRate * 16 <= minTime) ? minTime : LockstepManager.FrameRate * 16;
             }
         }
 
@@ -337,7 +343,7 @@ namespace Lockstep
             return IsExclusiveTarget(AgentTag) ? Damage.Mul(this.ExclusiveDamageModifier) : Damage;
         }
 
-        private void Hit()
+        private void Hit(bool destroy = true)
         {
             if (this.TargetingBehavior == TargetingType.Homing && this.HitBehavior == HitType.Single && this.Target.SpawnVersion != this.TargetVersion)
             {
@@ -347,7 +353,7 @@ namespace Lockstep
             this.OnHit();
             if (this.onHit.IsNotNull())
             {
-                this.onHit.Invoke();
+                this.onHit(this);
             }
             if (this.UseEffects)
             {
@@ -366,7 +372,9 @@ namespace Lockstep
                     }
                 }
             }
-            ProjectileManager.EndProjectile(this);
+
+            if (destroy)
+                ProjectileManager.EndProjectile(this);
         }
 
         public Func<byte,bool> BucketConditional { get; private set; }
@@ -389,6 +397,8 @@ namespace Lockstep
             this.ID = id;
 
             this.AliveTime = 0;
+            this.IsLasting = false;
+
 
             this.BucketConditional = bucketConditional;
             this.AgentConditional = agentConditional;
@@ -433,10 +443,14 @@ namespace Lockstep
 
         }
 
-        public void UpdateVisuals () {
+        public void UpdateVisuals()
+        {
             cachedTransform.rotation = Quaternion.LookRotation(Forward.ToVector3());
             cachedTransform.position = this.Position.ToVector3();
         }
+
+        private bool IsLasting;
+        private int tickTimer;
 
         public void LateInit()
         {
@@ -452,14 +466,8 @@ namespace Lockstep
             switch (this.TargetingBehavior)
             {
                 case TargetingType.Timed:
-                    if (this.Delay == 0)
-                    {
-                        this.CountDown--;
-                        this.Hit();
-                    } else
-                    {
-                        this.CountDown = this.Delay;
-                    }
+                    this.CountDown = this.Delay;
+
                     break;
                 case TargetingType.Positional:
                 case TargetingType.Homing:
@@ -502,7 +510,7 @@ namespace Lockstep
             }
         }
 
-        private void OnHit()
+        private void OnHit ()
         {
             if (this.TargetingBehavior == TargetingType.Free)
             {
@@ -524,7 +532,7 @@ namespace Lockstep
                         this.HitEffect(Target);
                         break;
                     case HitType.Area:
-                        ApplyArea(this.TargetPosition, this.Radius);
+                        ApplyArea(this.Position.ToVector2d(), this.Radius);
                         break;
                     case HitType.Cone:
                         ApplyCone(this.Position, this.Forward, this.Radius, this.Angle, this.HitEffect, this.TargetPlatform);
@@ -553,11 +561,11 @@ namespace Lockstep
         {
             this.Delay = this._delay;
             this.Speed = this._speed;
+            this.LastingDuration = this._lastingDuration;
         }
 
         private void ResetTrajectory()
         {
-            this.InterpolationRate = this._interpolationRate;
         }
 
         private void ResetVariables()
@@ -600,9 +608,22 @@ namespace Lockstep
             {
                 case TargetingType.Timed:
                     this.CountDown--;
-                    if (this.CountDown == 0)
+
+                    if (!IsLasting) {
+                        if (this.CountDown <= 0)
+                        {
+                            IsLasting = true;
+                            tickTimer = 0;
+                        }
+                    }
+                    if (IsLasting)
                     {
-                        this.Hit();
+                        tickTimer--;
+                        if (tickTimer <= 0)
+                        {
+                            tickTimer = TickRate;
+                            this.Hit((this.AliveTime + TickRate - this.Delay) >= this.LastingDuration);
+                        }
                     }
                     break;
                 case TargetingType.Homing:
@@ -622,7 +643,7 @@ namespace Lockstep
                     RaycastMove(this.Velocity);
                     break;
                 case TargetingType.Positional:
-                    MoveToTargetPosition ();
+                    MoveToTargetPosition();
                     break;
             }
         }
@@ -702,7 +723,7 @@ namespace Lockstep
         //
         public event Action onDeactivate;
 		
-        public event Action onHit;
+        public event Action<LSProjectile> onHit;
 		
         public event Action onInitialize;
 		

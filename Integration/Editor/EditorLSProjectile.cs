@@ -27,6 +27,7 @@ namespace Lockstep.Integration
                     break;
                 case TargetingType.Timed:
                     so.PropertyField("_delay");
+                    so.PropertyField ("_lastingDuration");
                     break;
             }
             EditorGUILayout.Space ();

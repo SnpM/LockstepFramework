@@ -343,7 +343,7 @@ namespace Lockstep
                                           this.ProjectileOffset,
                                           this.TargetAllegiance,
                                           (other) => healther.IsNotNull() && healther.HealthAmount > 0,
-                                          (other) => healther.TakeRawDamage(appliedDamage));
+                                          (other) => healther.TakeDamage(appliedDamage));
 
             switch (projectile.TargetingBehavior)
             {

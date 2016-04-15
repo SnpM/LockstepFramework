@@ -181,6 +181,15 @@ namespace Lockstep {
 		public Transform VisualCenter {get {return _visualCenter;}}
 		public float SelectionRadiusSquared {get; private set;}
 
+        public FastBucket<Buff> Buffs = new FastBucket<Buff>();
+
+        internal void AddBuff (Buff buff) {
+            buff.ID = Buffs.Add(buff);
+        }
+        internal void RemoveBuff (Buff buff) {
+            Buffs.RemoveAt(buff.ID);
+        }
+
         public IAgentData Data {get; private set;}
         private readonly FastList<int> TrackedLockstepTickets = new FastList<int>();
         void Awake () {
@@ -299,9 +308,15 @@ namespace Lockstep {
 				SetState (AnimState.Idling);
 			}
 
+ 
         }
 		public void LateSimulate () {
 			abilityManager.LateSimulate ();
+            for (int i = 0; i < this.Buffs.PeakCount; i++) {
+                if (this.Buffs.arrayAllocation[i]) {
+                    this.Buffs[i].Simulate();
+                }
+            }
 		}
 		[HideInInspector]
 		public bool VisualPositionChanged;

@@ -15,6 +15,10 @@ namespace Lockstep
 			set { _maxHealth = value; }
 		}
 
+        public long DamageMultiplier {
+            get; set;
+        }
+
         public event Action onHealthChange;
         [SerializeField, FixedNumber]
         private long _currentHealth;
@@ -47,11 +51,12 @@ namespace Lockstep
 				{
 					OnTakeProjectile (projectile);
 				}
-				TakeRawDamage (projectile.CheckExclusiveDamage (Agent.Tag));               
+				TakeDamage (projectile.CheckExclusiveDamage (Agent.Tag));               
 			}
 		}
 
-		public void TakeRawDamage (long damage) {
+		public void TakeDamage (long damage) {
+            damage.Mul(DamageMultiplier);
 			HealthAmount -= damage;
 			// don't let the health go below zero
 			if (HealthAmount <= 0) {
