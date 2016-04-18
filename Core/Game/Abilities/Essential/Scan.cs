@@ -485,17 +485,30 @@ namespace Lockstep
 
         protected virtual LSAgent DoScan()
         {
-
+            
+            Func<LSAgent,bool> agentConditional = null;
+            if (this._damage >= 0) {
+                agentConditional = (other) => {
+                    Health health = other.GetAbility<Health> ();
+                    return Agent.GlobalID != other.GlobalID && health != null && health.CanLose;
+                };
+            }
+            else {
+                agentConditional = (other) => {
+                    Health health = other.GetAbility<Health> ();
+                    return Agent.GlobalID != other.GlobalID && health != null && health.CanGain;
+                };
+            }
             LSAgent agent = InfluenceManager.Scan(
-                this.cachedBody.Position,
-                this.Sight,
-                (other) => other.GetAbility<Health>().IsNotNull() && other.GlobalID != this.Agent.GlobalID,
-                (bite) =>
+                                this.cachedBody.Position,
+                                this.Sight,
+                                agentConditional,
+                                (bite) =>
                 {
                     return ((this.Agent.Controller.GetAllegiance(bite) & this.TargetAllegiance) != 0);
 
                 }
-            );
+                            );
 
             return agent;
         }

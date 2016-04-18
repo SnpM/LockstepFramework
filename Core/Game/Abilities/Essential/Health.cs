@@ -23,6 +23,17 @@ namespace Lockstep
 
         public event Action onHealthChange;
 
+        public bool CanLose {
+            get {
+                return HealthAmount > 0;
+            }
+        }
+        public bool CanGain {
+            get {
+                return HealthAmount < MaxHealth;
+            }
+        }
+
         [SerializeField, FixedNumber]
         private long _currentHealth;
 
