@@ -60,7 +60,7 @@ namespace Lockstep
         [SerializeField]
         private bool _visualArc;
 				
-        [SerializeField]
+        [SerializeField,FrameCount]
         private int _delay;
 
         [SerializeField]
