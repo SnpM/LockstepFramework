@@ -84,7 +84,7 @@ namespace Lockstep
             else {
                 HealthAmount -= damage;
                 if (HealthAmount >= this.MaxHealth) {
-                    HealthAmount = MaxHealth
+                    HealthAmount = MaxHealth;
                 }
             }
            
