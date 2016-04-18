@@ -312,7 +312,7 @@ namespace Lockstep
                 if (distance > closingDistance || movingToWaypoint)
                 {
                     desiredVelocity = (movementDirection);
-                    if (movementDirection.Cross(lastMovementDirection.x, lastMovementDirection.y).AbsMoreThan(FixedMath.Half))
+                    if (movementDirection.Cross(lastMovementDirection.x, lastMovementDirection.y).AbsMoreThan(FixedMath.One / 4))
                     {
                         lastMovementDirection = movementDirection;
                         if (CanTurn)

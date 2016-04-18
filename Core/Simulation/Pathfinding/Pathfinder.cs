@@ -177,7 +177,6 @@ namespace Lockstep
 				}
 			}
 			#endregion
-            Debug.Log("asdf");
 			return false;
 		}
 
