@@ -485,12 +485,20 @@ namespace Lockstep
 
         protected virtual LSAgent DoScan()
         {
-            return InfluenceManager.Scan(
+
+            LSAgent agent = InfluenceManager.Scan(
                 this.cachedBody.Position,
                 this.Sight,
-                (other) => other.GetAbility<Health>().IsNotNull(),
-                (bite) => ((this.Agent.Controller.GetAllegiance(bite) & this.TargetAllegiance) != 0)
+                (other) => other.GetAbility<Health>().IsNotNull() && other.GlobalID != this.Agent.GlobalID,
+                (bite) =>
+                {
+                    return ((this.Agent.Controller.GetAllegiance(bite) & this.TargetAllegiance) != 0);
+
+                }
             );
+            if (this.Agent.name.Contains("Medic"))
+             Debug.Log(agent);
+            return agent;
         }
 
         public bool ScanWithinRangeAndEngage()
