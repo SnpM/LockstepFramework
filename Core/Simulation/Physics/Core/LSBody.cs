@@ -591,6 +591,7 @@ namespace Lockstep
                 PositionChangedBuffer = true;
                 PositionChanged = false;
                 this.SetVisualPosition = true;
+				this.HeightPosChanged = false;
             } else
             {
                 PositionChangedBuffer = false;
