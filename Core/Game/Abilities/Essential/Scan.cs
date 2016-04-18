@@ -496,8 +496,7 @@ namespace Lockstep
 
                 }
             );
-            if (this.Agent.name.Contains("Medic"))
-             Debug.Log(agent);
+
             return agent;
         }
 
