@@ -98,7 +98,7 @@ public static class GridBuilder {
     #endregion
 
     #region Unbuilding
-    private static void Unbuild (IBuildable buildable) {
+    public static void Unbuild (IBuildable buildable) {
         BuildGridAPI.Unbuild (buildable.GridPosition,buildable);
     }
     #endregion
