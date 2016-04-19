@@ -402,6 +402,9 @@ namespace Lockstep {
         public T GetAbility<T>() where T : Ability{
             return abilityManager.GetAbility<T>();
         }
+        public Ability GetAbility (string name) {
+            return abilityManager.GetAbility (name);
+        }
 
         public long GetStateHash () {
             long hash = 3;

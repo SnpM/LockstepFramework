@@ -95,6 +95,15 @@ namespace Lockstep {
                 Abilitys[k].Deactivate();
             }
         }
+        public Ability GetAbility (string name) {
+            for (var k = 0; k < Abilitys.Length; k++) {
+                var ability = Abilitys[k];
+                if (ability.name == name) {
+                    return ability;
+                }
+            }
+            return null;
+        }
         public T GetAbility<T>() where T : Ability {
             for (var k = 0; k < Abilitys.Length; k++) {
                 var ability = Abilitys[k] as T;
