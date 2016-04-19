@@ -148,12 +148,9 @@ namespace Lockstep
 
         static int CachedSize;
         static Func<bool> CachedUnpassableFunction;
-        static int CachedLargeDeltaCount;
         public static void PrepareUnpassableCheck(int size)
         {
             CachedSize = size;
-            //TODO: Get rid of delta counts
-            CachedLargeDeltaCount = GridManager.GenerateDeltaCount((CachedSize + 1) / 2);
 
             /*if (CachedSize == 1)
                 CachedUnpassableFunction = () => false;
@@ -208,12 +205,13 @@ namespace Lockstep
 
         public bool UnpassableLarge()
         {
-            for (_i = 1; _i < CachedLargeDeltaCount; _i++)
-            {
-                GridNode node = GridManager.GetNode(DeltaCache.CacheX [_i] + this.gridX, DeltaCache.CacheY [_i] + this.gridY);
-                if (node.Unwalkable)
-                    return true;
-
+            int half = (CachedSize + 1) / 2;
+            for (int x = -half; x <= half; x++) {
+                for (int y = -half; y <= half; y++) {
+                    if (GridManager.Grid[GridManager.GetGridIndex(gridX + x, gridY + y)].Unwalkable) {
+                        return true;
+                    }
+                }
             }
             return false;
         }
