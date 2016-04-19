@@ -4,7 +4,7 @@ namespace Lockstep {
     public abstract class ActiveAbility : Ability {
 
         [SerializeField,FrameCount]
-        private int _cooldown;
+        protected int _cooldown;
         public int Cooldown {get {return _cooldown;}}
 
 		public ushort ListenInput {get; private set;}

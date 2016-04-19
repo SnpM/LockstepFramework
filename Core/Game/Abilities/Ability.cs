@@ -75,7 +75,6 @@ namespace Lockstep
                     mainType = mainType.BaseType;
                 }
                 Data = AbilityDataItem.FindInterfacer(mainType);
-
                 if (Data == null)
                 {
                     throw new System.ArgumentException("The Ability of type " + mainType + " has not been registered in database");
