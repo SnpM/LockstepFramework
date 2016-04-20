@@ -12,7 +12,6 @@ namespace Lockstep
         public long MaxHealth
         {
             get { return _maxHealth; }
-            set { _maxHealth = value; }
         }
 
         public long DamageMultiplier
