@@ -270,7 +270,7 @@ namespace Lockstep
             }
             set
             {
-                _canSetVisualPosition = value && _positionalTransform != null;
+                _canSetVisualPosition = value && PositionalTransform != null;
             }
         }
 
@@ -289,7 +289,7 @@ namespace Lockstep
             }
             set
             {
-                _canSetVisualRotation = value && _rotationalTransform;
+                _canSetVisualRotation = value && RotationalTransform;
             }
         }
 
@@ -408,22 +408,22 @@ namespace Lockstep
 			
             ID = PhysicsManager.Assimilate(this);
             Partition.PartitionObject(this);
-            if (_positionalTransform != null)
+            if (PositionalTransform != null)
             {
                 CanSetVisualPosition = true;
                 _visualPosition = _position.ToVector3(HeightPos.ToFloat());
                 lastVisualPos = _visualPosition;
-                _positionalTransform.position = _visualPosition;
+                PositionalTransform.position = _visualPosition;
             } else
             {
                 CanSetVisualPosition = false;
             }
-            if (_rotationalTransform != null)
+            if (RotationalTransform != null)
             {
                 CanSetVisualRotation = true;
                 visualRot = Quaternion.LookRotation(Forward.ToVector3(0f));
                 lastVisualRot = visualRot;
-                _rotationalTransform.rotation = visualRot;
+                RotationalTransform.rotation = visualRot;
             } else
             {
                 CanSetVisualRotation = false;
@@ -675,7 +675,7 @@ namespace Lockstep
                     //Interpolates between the current position and the interpolation between the last lockstep position and the current lockstep position
                     //LerpTime = time passed since last simulation frame
                     //LerpDamping = special value calculated based on Time.deltaTime for the extra layer of interpolation
-                    _positionalTransform.position = 
+                    PositionalTransform.position = 
                         Vector3.Lerp(lastVisualPos, _visualPosition, PhysicsManager.LerpTime);
                 
                 }
@@ -685,7 +685,7 @@ namespace Lockstep
             {
                 if (SetRotationBuffer)
                 {
-                    _rotationalTransform.rotation =
+                    RotationalTransform.rotation =
 
                             Quaternion.Lerp(lastVisualRot, visualRot, PhysicsManager.LerpTime);
                     SetRotationBuffer = PhysicsManager.LerpTime < 1f;
@@ -701,7 +701,7 @@ namespace Lockstep
             {
                 if (SetRotationBuffer)
                 {
-                    _rotationalTransform.rotation = visualRot;
+                    RotationalTransform.rotation = visualRot;
                     SetRotationBuffer = false;
                 }
             }
@@ -709,7 +709,7 @@ namespace Lockstep
             {
                 if (this.SetPositionBuffer)
                 {
-                    _positionalTransform.position = this._visualPosition;
+                    PositionalTransform.position = this._visualPosition;
                     SetPositionBuffer = false;
                 }
             }
