@@ -253,12 +253,23 @@ namespace Lockstep
             {
                 if (agent.Body._position.FastDistance(center.x, center.y) < num)
                 {
-                    this.HitEffect(agent);
+                    HitAgent(agent);
                 }
             }
         }
 
-        private void ApplyCone(Vector3d center3d, Vector2d forward, long radius, long angle, Action<LSAgent> apply, PlatformType targetPlatform)
+        void HitAgent (LSAgent agent) {
+            if (this.UseEffects && this.AttachEndEffectToTarget) {
+                LSEffect lSEffect = EffectManager.CreateEffect(this.HitFX);
+                lSEffect.CachedTransform.parent = agent.VisualCenter;
+                lSEffect.CachedTransform.localPosition = Vector3.up;
+                lSEffect.CachedTransform.rotation = this.cachedTransform.rotation;
+                lSEffect.Initialize();
+            }
+            this.HitEffect(agent);
+        }
+
+        private void ApplyCone(Vector3d center3d, Vector2d forward, long radius, long angle)
         {
             Vector2d center = center3d.ToVector2d();
             long fastRange = radius * radius;
@@ -283,7 +294,7 @@ namespace Lockstep
                 {
                     continue;
                 }
-                apply(agent);
+                HitAgent(agent);
 
             }
         }
@@ -359,11 +370,13 @@ namespace Lockstep
             {
                 if (this.AttachEndEffectToTarget)
                 {
+                    /*
                     LSEffect lSEffect = EffectManager.CreateEffect(this.HitFX);
                     lSEffect.CachedTransform.parent = this.Target.VisualCenter;
                     lSEffect.CachedTransform.localPosition = Vector3.up;
                     lSEffect.CachedTransform.rotation = this.cachedTransform.rotation;
                     lSEffect.Initialize();
+                    */
                 } else
                 {
 
@@ -529,13 +542,13 @@ namespace Lockstep
                         {
                             throw new System.Exception("Cannot use single hit effect without target");
                         }
-                        this.HitEffect(Target);
+                        this.HitAgent(Target);
                         break;
                     case HitType.Area:
                         ApplyArea(this.Position.ToVector2d(), this.Radius);
                         break;
                     case HitType.Cone:
-                        ApplyCone(this.Position, this.Forward, this.Radius, this.Angle, this.HitEffect, this.TargetPlatform);
+                        ApplyCone(this.Position, this.Forward, this.Radius, this.Angle);
                         break;
                 }
             }
