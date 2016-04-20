@@ -10,10 +10,13 @@ namespace Lockstep
         }
 
         public static Object Target{ get; private set;}
-
-        public static void SetField (string name, float value, FieldType fieldType) {
+        public static SerializedProperty GetProperty (string name) {
             SerializedObject so = new SerializedObject (Target);
             SerializedProperty prop = so.FindProperty(name);
+            return prop;
+        }
+        public static void SetField (string name, float value, FieldType fieldType) {
+            SerializedProperty prop = GetProperty (name);
             switch (fieldType) {
                 case FieldType.FixedNumber:
                     prop.longValue = FixedMath.Create(value);
@@ -28,8 +31,7 @@ namespace Lockstep
         }
 
         public static float GetField (string name, FieldType fieldType) {
-            SerializedObject so = new SerializedObject (Target);
-            SerializedProperty prop = so.FindProperty(name);
+            SerializedProperty prop = GetProperty (name);
             switch (fieldType) {
                 case FieldType.FixedNumber:
                     return prop.longValue.ToFloat();
