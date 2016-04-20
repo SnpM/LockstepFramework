@@ -65,8 +65,8 @@ namespace Lockstep.Integration
 
 			if (useEffectProp.boolValue)
 			{
-				so.PropertyField("_startEffect");
-				so.PropertyField("_endEffect");
+				so.PropertyField("_startFX");
+				so.PropertyField("_hitFX");
 				so.PropertyField("_attachEndEffectToTarget");
 			}
 

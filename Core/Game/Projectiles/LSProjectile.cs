@@ -68,17 +68,17 @@ namespace Lockstep
 
         public bool AttachEndEffectToTarget { get { return _attachEndEffectToTarget; } }
 
-        [SerializeField,DataCode("Effects")]
-        private string _endEffect;
+        [SerializeField,DataCode("Effects"),UnityEngine.Serialization.FormerlySerializedAs("_endEffect")]
+        private string _hitFX;
 
-        public string EndEffect { get { return _endEffect; } }
+        public string HitFX { get { return _hitFX; } }
 
         public bool CanRotate = true;
 
-        [SerializeField,DataCode("Effects")]
-        private string _startEffect;
+        [SerializeField,DataCode("Effects"),UnityEngine.Serialization.FormerlySerializedAs("_startEffect")]
+        private string _startFX;
 
-        public string StartEffect { get { return _startEffect; } }
+        public string StartFX { get { return _startFX; } }
 
         public bool IsActive;
 		
@@ -359,7 +359,7 @@ namespace Lockstep
             {
                 if (this.AttachEndEffectToTarget)
                 {
-                    LSEffect lSEffect = EffectManager.CreateEffect(this.EndEffect);
+                    LSEffect lSEffect = EffectManager.CreateEffect(this.HitFX);
                     lSEffect.CachedTransform.parent = this.Target.VisualCenter;
                     lSEffect.CachedTransform.localPosition = Vector3.up;
                     lSEffect.CachedTransform.rotation = this.cachedTransform.rotation;
@@ -368,7 +368,7 @@ namespace Lockstep
                 {
 
                     {
-                        EffectManager.LazyCreateEffect(this.EndEffect, this.cachedTransform.position, this.cachedTransform.rotation);
+                        EffectManager.LazyCreateEffect(this.HitFX, this.cachedTransform.position, this.cachedTransform.rotation);
                     }
                 }
             }
@@ -506,7 +506,7 @@ namespace Lockstep
 
             if (UseEffects)
             {
-                EffectManager.LazyCreateEffect(this.StartEffect, this.Position.ToVector3(), this.cachedTransform.rotation);
+                EffectManager.LazyCreateEffect(this.StartFX, this.Position.ToVector3(), this.cachedTransform.rotation);
             }
         }
 
