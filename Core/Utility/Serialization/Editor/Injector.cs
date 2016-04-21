@@ -16,6 +16,10 @@ namespace Lockstep
             SerializedProperty prop = so.FindProperty(name);
             return prop;
         }
+        public static void Apply () {
+            so.ApplyModifiedProperties();
+            EditorUtility.SetDirty(Target);
+        }
         public static void SetField (string name, float value, FieldType fieldType) {
             SerializedProperty prop = GetProperty (name);
             switch (fieldType) {
@@ -29,8 +33,7 @@ namespace Lockstep
                     prop.intValue = Mathf.RoundToInt((1 / value) * LockstepManager.FrameRate);
                     break;
             }
-            so.ApplyModifiedProperties();
-            EditorUtility.SetDirty(Target);
+            Apply ();
         }
 
         public static float GetField (string name, FieldType fieldType) {
@@ -47,6 +50,23 @@ namespace Lockstep
                     break;
             }
             return 0;
+        }
+        public static void SetVector3 (string name, Vector3 value) {
+            SerializedProperty prop = GetProperty (name);
+            Vector3d vec = new Vector3d(value);
+            prop.FindPropertyRelative("x").longValue = vec.x;
+            prop.FindPropertyRelative("y").longValue = vec.y;
+            prop.FindPropertyRelative("z").longValue = vec.z;
+            Apply ();
+        }
+
+        public static Vector3 GetVector3 (string name) {
+            SerializedProperty prop = GetProperty (name);
+            Vector3d vec = new Vector3d(
+                prop.FindPropertyRelative("x").longValue,
+                prop.FindPropertyRelative("y").longValue,
+                prop.FindPropertyRelative("z").longValue);
+            return vec.ToVector3();
         }
 
     }
