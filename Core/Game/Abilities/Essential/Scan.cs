@@ -482,7 +482,9 @@ namespace Lockstep
                 return true;
             }
         }
-
+        protected virtual bool AgentValid (LSAgent agent) {
+            return true;
+        }
         protected virtual LSAgent DoScan()
         {
             
@@ -490,13 +492,13 @@ namespace Lockstep
             if (this._damage >= 0) {
                 agentConditional = (other) => {
                     Health health = other.GetAbility<Health> ();
-                    return Agent.GlobalID != other.GlobalID && health != null && health.CanLose;
+                    return Agent.GlobalID != other.GlobalID && health != null && health.CanLose && AgentValid (other);
                 };
             }
             else {
                 agentConditional = (other) => {
                     Health health = other.GetAbility<Health> ();
-                    return Agent.GlobalID != other.GlobalID && health != null && health.CanGain;
+                    return Agent.GlobalID != other.GlobalID && health != null && health.CanGain && AgentValid (other);
                 };
             }
             LSAgent agent = InfluenceManager.Scan(
