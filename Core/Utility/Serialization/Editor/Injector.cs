@@ -10,8 +10,9 @@ namespace Lockstep
         }
 
         public static Object Target{ get; private set;}
+        static SerializedObject so;
         public static SerializedProperty GetProperty (string name) {
-            SerializedObject so = new SerializedObject (Target);
+            so = new SerializedObject (Target);
             SerializedProperty prop = so.FindProperty(name);
             return prop;
         }
@@ -28,6 +29,8 @@ namespace Lockstep
                     prop.intValue = Mathf.RoundToInt((1 / value) * LockstepManager.FrameRate);
                     break;
             }
+            so.ApplyModifiedProperties();
+            EditorUtility.SetDirty(Target);
         }
 
         public static float GetField (string name, FieldType fieldType) {
