@@ -121,10 +121,6 @@ namespace Lockstep {
         }
 
 
-		public PlatformType Platform {
-			get { return CachedGameObject.layer == LayerMask.NameToLayer("Air") ? PlatformType.Air : PlatformType.Ground; }
-		}
-
 
         public uint SpawnVersion { get; private set; }
         public AgentController Controller { get; private set; }  

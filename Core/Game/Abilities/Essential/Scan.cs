@@ -65,10 +65,6 @@ namespace Lockstep
             get { return this._targetAllegiance; }
         }
 
-        protected virtual PlatformType TargetPlatform //PlatformType of the target
-        {
-            get { return this._targetPlatform; }
-        }
 
         public Vector3d ProjectileOffset { get { return _projectileOffset; } }
         //Offset of projectile
@@ -87,8 +83,7 @@ namespace Lockstep
         protected int _attackRate = 1 * LockstepManager.FrameRate;
         [SerializeField, EnumMask]
         protected AllegianceType _targetAllegiance = AllegianceType.Enemy;
-        [SerializeField, EnumMask]
-        protected PlatformType _targetPlatform = PlatformType.Ground;
+
         [SerializeField]
         protected  bool _trackAttackAngle = true;
         [FixedNumberAngle, SerializeField]
@@ -148,7 +143,7 @@ namespace Lockstep
             }
 
             CanTurn = cachedTurn.IsNotNull();
-
+            CachedOnHit = OnHit;
         }
 
         private void HandleOnArrive()
@@ -319,6 +314,14 @@ namespace Lockstep
             }
         }
 
+        protected virtual void OnHit(LSAgent agent)
+        {
+            Health healther = agent.GetAbility<Health>();
+            healther.TakeDamage(_damage);
+        }
+
+        private Action<LSAgent> CachedOnHit;
+
         public void Fire()
         {
 
@@ -336,14 +339,18 @@ namespace Lockstep
         {
             long appliedDamage = Damage;
 
-            Health healther = Target.GetAbility<Health>();
             LSProjectile projectile = ProjectileManager.Create(
                                           ProjCode,
                                           this.Agent,
                                           this.ProjectileOffset,
                                           this.TargetAllegiance,
-                                          (other) => healther.IsNotNull() && healther.HealthAmount > 0,
-                                          (other) => healther.TakeDamage(appliedDamage));
+                                          (other) =>
+                {
+                    Health healther = other.GetAbility<Health>();
+                    return healther.IsNotNull() && healther.HealthAmount > 0;
+
+                },
+                                          CachedOnHit);
 
             switch (projectile.TargetingBehavior)
             {
@@ -361,7 +368,6 @@ namespace Lockstep
                     throw new System.Exception("Not implemented yet.");
                     break;
             }
-            projectile.TargetPlatform = TargetPlatform;
             ProjectileManager.Fire(projectile);
         }
 
@@ -482,23 +488,29 @@ namespace Lockstep
                 return true;
             }
         }
-        protected virtual bool AgentValid (LSAgent agent) {
+
+        protected virtual bool AgentValid(LSAgent agent)
+        {
             return true;
         }
+
         protected virtual LSAgent DoScan()
         {
             
             Func<LSAgent,bool> agentConditional = null;
-            if (this._damage >= 0) {
-                agentConditional = (other) => {
-                    Health health = other.GetAbility<Health> ();
-                    return Agent.GlobalID != other.GlobalID && health != null && health.CanLose && AgentValid (other);
+            if (this._damage >= 0)
+            {
+                agentConditional = (other) =>
+                {
+                    Health health = other.GetAbility<Health>();
+                    return Agent.GlobalID != other.GlobalID && health != null && health.CanLose && AgentValid(other);
                 };
-            }
-            else {
-                agentConditional = (other) => {
-                    Health health = other.GetAbility<Health> ();
-                    return Agent.GlobalID != other.GlobalID && health != null && health.CanGain && AgentValid (other);
+            } else
+            {
+                agentConditional = (other) =>
+                {
+                    Health health = other.GetAbility<Health>();
+                    return Agent.GlobalID != other.GlobalID && health != null && health.CanGain && AgentValid(other);
                 };
             }
             LSAgent agent = InfluenceManager.Scan(

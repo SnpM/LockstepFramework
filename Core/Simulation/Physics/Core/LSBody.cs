@@ -285,11 +285,11 @@ namespace Lockstep
         {
             get
             {
-                return _canSetVisualRotation;
+                return _canSetVisualRotation && RotationalTransform != null;
             }
             set
             {
-                _canSetVisualRotation = value && RotationalTransform;
+                _canSetVisualRotation = value;
             }
         }
 
@@ -681,7 +681,7 @@ namespace Lockstep
                 }
             }
             const float rotationLerpDamping = 1f;
-            if (CanSetVisualRotation)
+            if (CanSetVisualRotation && RotationalTransform != null)
             {
                 if (SetRotationBuffer)
                 {

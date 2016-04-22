@@ -98,8 +98,6 @@ namespace Lockstep
 
         public TargetingType TargetingBehavior { get { return _targetingBehavior; } }
 
-        [SerializeField]
-        public PlatformType _targetPlatform;
 
         [SerializeField]
         private HitType _hitBehavior;
@@ -214,11 +212,6 @@ namespace Lockstep
             set;
         }
 
-        public PlatformType TargetPlatform
-        {
-            get;
-            set;
-        }
 
         public Vector2d TargetPosition
         {
@@ -555,7 +548,6 @@ namespace Lockstep
         private void ResetHit()
         {
             this.ExclusiveTargetType = this._exclusiveTargetType;
-            this.TargetPlatform = this._targetPlatform;
         }
 
         private void ResetEffects()

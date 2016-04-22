@@ -48,6 +48,7 @@ namespace Lockstep
 					return;
 				
 				if (System.Object.ReferenceEquals (tempNode, LocatedNode) == false) {
+                    if (LocatedNode != null)
                     LocatedNode.Remove (this);
 					 tempNode.Add (this);
 					LocatedNode = tempNode;
@@ -62,13 +63,8 @@ namespace Lockstep
 		}
 
 
-        const PlatformType AllPlatforms = (PlatformType)~0;
         const AllegianceType AllAllegiance = (AllegianceType)~0;
 	}
 
-	public enum PlatformType
-	{
-		Air             = 1 << 1,
-		Ground          = 1 << 2
-	}
+
 }
