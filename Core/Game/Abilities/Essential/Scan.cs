@@ -193,6 +193,11 @@ namespace Lockstep
             windupCount = this.Windup;
             IsWindingUp = true;
             Agent.ApplyImpulse(AnimImpulse.Fire);
+            OnStartWindup ();
+        }
+
+        protected virtual void OnStartWindup () {
+
         }
 
         void BehaveWithTarget()
