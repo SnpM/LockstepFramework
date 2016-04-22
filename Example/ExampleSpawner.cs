@@ -13,18 +13,22 @@ namespace Lockstep.Example
 
 
         protected FastList<LSAgent> bufferSpawnedAgents = new FastList<LSAgent>();
+
+        protected ushort cacheTarget;
+        protected ushort cacheCount;
+        protected string cacheAgentCode;
 		protected override void OnExecute (Command com)
 		{
 			byte conID = com.ControllerID;
             Vector2d pos = com.GetData<Vector2d>();
-            ushort target = (ushort)com.GetData<DefaultData>(0).Value;
-            ushort count = (ushort)com.GetData<DefaultData>(1).Value;
+            cacheTarget = (ushort)com.GetData<DefaultData>(0).Value;
+            cacheCount = (ushort)com.GetData<DefaultData>(1).Value;
 
 			AgentController ac = AgentController.InstanceManagers [conID];
-			string agentCode = AgentController.GetAgentCode (target);
+			cacheAgentCode = AgentController.GetAgentCode (cacheTarget);
             bufferSpawnedAgents.FastClear();
-			for (int i = 0; i < count; i++) {
-				LSAgent agent = ac.CreateAgent (agentCode, pos);
+			for (int i = 0; i < cacheCount; i++) {
+				LSAgent agent = ac.CreateAgent (cacheAgentCode, pos);
                 bufferSpawnedAgents.Add(agent);
 			}
 		}
