@@ -144,6 +144,7 @@ namespace Lockstep
 
             CanTurn = cachedTurn.IsNotNull();
             CachedOnHit = OnHit;
+            CachedAgentValid = this.AgentValid;
         }
 
         private void HandleOnArrive()
@@ -493,7 +494,7 @@ namespace Lockstep
         {
             return true;
         }
-
+        private Func<LSAgent,bool> CachedAgentValid;
         protected virtual LSAgent DoScan()
         {
             
@@ -503,14 +504,14 @@ namespace Lockstep
                 agentConditional = (other) =>
                 {
                     Health health = other.GetAbility<Health>();
-                    return Agent.GlobalID != other.GlobalID && health != null && health.CanLose && AgentValid(other);
+                    return Agent.GlobalID != other.GlobalID && health != null && health.CanLose && CachedAgentValid(other);
                 };
             } else
             {
                 agentConditional = (other) =>
                 {
                     Health health = other.GetAbility<Health>();
-                    return Agent.GlobalID != other.GlobalID && health != null && health.CanGain && AgentValid(other);
+                    return Agent.GlobalID != other.GlobalID && health != null && health.CanGain && CachedAgentValid(other);
                 };
             }
             LSAgent agent = InfluenceManager.Scan(
