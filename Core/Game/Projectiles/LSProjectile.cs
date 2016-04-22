@@ -417,8 +417,6 @@ namespace Lockstep
             this.AgentConditional = agentConditional;
         }
 
-        Vector3 bindPositionShift = new Vector3(0, 2, 0);
-
         public void InitializeHoming(LSAgent target)
         {
             this.HeightReached = false;
