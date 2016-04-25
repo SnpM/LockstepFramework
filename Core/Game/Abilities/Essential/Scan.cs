@@ -184,7 +184,7 @@ namespace Lockstep
         }
 
         [Lockstep(true)]
-        bool IsWindingUp { get; set; }
+        public bool IsWindingUp { get; set; }
 
         int windupCount;
 
