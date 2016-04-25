@@ -358,9 +358,11 @@ namespace Lockstep
             }
         }
 
+        public Command LastCommand;
+
         protected override void OnExecute(Command com)
         {
-
+            LastCommand = com;
             if (com.ContainsData<Vector2d> ())
             {
                 Agent.StopCast(ID);
