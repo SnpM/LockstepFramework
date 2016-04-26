@@ -138,12 +138,14 @@ namespace Lockstep
         bool Quited = false;
         void OnDisable ()
         {
+			Instance = null;
             if (Quited) return;
             LockstepManager.Deactivate();
         }
 
         void OnApplicationQuit()
         {
+			Instance = null;
             Quited = true;
             LockstepManager.Quit();
         }
