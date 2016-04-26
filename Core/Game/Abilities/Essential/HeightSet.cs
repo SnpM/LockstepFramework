@@ -13,6 +13,7 @@ namespace Lockstep
 
         [SerializeField, FixedNumber]
         private long _bonusHeight;
+        public long BonusHeight {get {return _bonusHeight;}}
 
         private long _offset;
 

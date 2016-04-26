@@ -18,6 +18,7 @@ namespace Lockstep
 
             Target.AddBuff(this);
             Active = true;
+            this.OnInitialize();
         }
 
         protected virtual void OnInitialize () {
@@ -39,6 +40,7 @@ namespace Lockstep
         public void Deactivate () {
             Target.RemoveBuff(this);
             Active = false;
+            this.OnDeactivate();
         }
         protected virtual void OnDeactivate () {
 
