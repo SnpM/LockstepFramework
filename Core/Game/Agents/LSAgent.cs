@@ -116,10 +116,25 @@ namespace Lockstep {
         public bool CheckCasting { get; set; }
         public bool IsCasting {
             get {
+                if (Stunned)
+                    return true;
                 return abilityManager.CheckCasting();
             }
         }
-
+        private bool _stunned;
+        public bool Stunned {
+            get {
+                return _stunned;
+            }
+            set {
+                if (value != _stunned) {
+                    _stunned = value;
+                    if (_stunned) {
+                        this.StopCast();
+                    }
+                }
+            }
+        }
 
 
         public uint SpawnVersion { get; private set; }
