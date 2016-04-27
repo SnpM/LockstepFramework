@@ -408,6 +408,9 @@ namespace Lockstep
 
             this.BucketConditional = bucketConditional;
             this.AgentConditional = agentConditional;
+
+            Forward = Vector2d.up;
+            Position = new Vector3d();
         }
 
         public void InitializeHoming(LSAgent target)
