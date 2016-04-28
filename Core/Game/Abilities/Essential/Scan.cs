@@ -199,7 +199,9 @@ namespace Lockstep
         protected virtual void OnStartWindup () {
 
         }
-
+        protected virtual AnimState EngagingAnimState {
+            get { return AnimState.Engaging;}
+        }
         void BehaveWithTarget()
         {
             if (Target.IsActive == false || Target.SpawnVersion != targetVersion)
@@ -229,7 +231,7 @@ namespace Lockstep
                         if (CanMove)
                             cachedMove.StopMove();
                     }
-                    Agent.SetState(AnimState.Engaging);
+                    Agent.SetState(EngagingAnimState);
                     long mag;
                     targetDirection.Normalize(out mag);
                     bool withinTurn = TrackAttackAngle == false ||

@@ -81,7 +81,8 @@ namespace Lockstep
 		Idling,
 		Moving,
 		Dying,
-		Engaging
+		Engaging,
+        SpecialEngaging
 	}
 
 	public enum AnimImpulse
