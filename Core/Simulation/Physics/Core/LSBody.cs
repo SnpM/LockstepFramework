@@ -34,12 +34,10 @@ namespace Lockstep
         {
             get
             {
-                if (ForwardNeedsSet)
-                {
-                    _forward = _rotation.ToDirection();
-                    ForwardNeedsSet = false;
-                }
-                return _forward;
+                return Rotation.ToDirection();
+            }
+            set {
+                Rotation = value.ToRotation();
             }
         }
 
