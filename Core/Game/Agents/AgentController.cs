@@ -158,7 +158,13 @@ namespace Lockstep
             }
         }
         public static void ChangeController (LSAgent agent, AgentController newCont) {
-           
+
+            agent.Influencer.Deactivate();
+
+            AgentController leController = agent.Controller;
+            leController.LocalAgentActive [agent.LocalID] = false;
+            leController.OpenLocalIDs.Add(agent.LocalID);
+            OpenGlobalIDs.Add(agent.GlobalID);
 
             if (newCont == null) {
                 agent.InitializeController(null,0,0);
@@ -166,6 +172,9 @@ namespace Lockstep
             else {
                 newCont.AddAgent(agent);
             }
+
+            agent.Influencer.Initialize();
+
         }
         public static void DestroyAgent(LSAgent agent, bool Immediate = false)
         {
