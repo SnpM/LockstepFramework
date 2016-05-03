@@ -17,18 +17,6 @@ namespace Lockstep
 
         public static GameManager Instance { get; private set; }
 
-        /// <summary>
-        /// If true, LS will run in headless mode and only frames will be processed. Disables all physics, abilities, etc..
-        /// </summary>
-        /// <value><c>true</c> if headless; otherwise, <c>false</c>.</value>
-        public virtual bool Headless
-        {
-            get
-            {
-                return false;
-            }
-        }
-
         private NetworkHelper _mainNetworkHelper;
 
         public virtual NetworkHelper MainNetworkHelper
@@ -49,30 +37,13 @@ namespace Lockstep
         }
 
 
-        private static InterfacingHelper _defaultHelper;
-
-        public virtual InterfacingHelper MainInterfacingHelper
-        {
-            get
-            {
-                if (_defaultHelper.IsNull()) {
-                    _defaultHelper = this.GetComponent<InterfacingHelper> ();
-                    if (_defaultHelper == null) {
-                        Debug.Log("InterfacingHelper not found. Defaulting to RTSInterfacingHelper.");
-						_defaultHelper = base.gameObject.AddComponent<RTSInterfacingHelper>();
-                    }
-                }
-                return _defaultHelper;
-            }
-        }
-
         public void ScanForHelpers()
         {
             //Currently deterministic but not guaranteed by Unity
             _helpers = this.gameObject.GetComponents<BehaviourHelper>();
         }
 
-        public virtual void GetBehaviourHelpers(FastList<BehaviourHelper> output)
+        public void GetBehaviourHelpers(FastList<BehaviourHelper> output)
         {
             //if (Helpers == null)
             ScanForHelpers();
@@ -89,14 +60,8 @@ namespace Lockstep
         {
             Instance = this;
             LockstepManager.Initialize(this);
-            this.Startup();
         }
-
-        protected virtual void Startup()
-        {
-
-        }
-
+            
 
         protected virtual void FixedUpdate()
         {
@@ -113,28 +78,15 @@ namespace Lockstep
                 timeToNextSimulate = LockstepManager.BaseDeltaTime;
             }
             LockstepManager.Visualize();
-            CheckInput();
         }
 
-        protected virtual void CheckInput()
-        {
-        
-        }
 
-		protected virtual void LateUpdate()
+
+		protected void LateUpdate()
         {
             LockstepManager.LateVisualize();
         }
-
-        public static void GameStart()
-        {
-            Instance.OnGameStart();
-        }
-
-        protected virtual void OnGameStart()
-        {
-            //When the game starts (first simulation frame)
-        }
+            
         bool Quited = false;
         void OnDisable ()
         {
