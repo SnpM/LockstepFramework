@@ -76,6 +76,12 @@ namespace Lockstep
             }
         }
 
+        public static void Reset () {
+            LockstepManager.Deactivate();
+            GameObject copy = GameObject.Instantiate(MainGameManager.gameObject);
+            GameObject.Destroy(MainGameManager.gameObject);
+        }
+
         internal static void Setup()
         {
             DefaultMessageRaiser.EarlySetup();
