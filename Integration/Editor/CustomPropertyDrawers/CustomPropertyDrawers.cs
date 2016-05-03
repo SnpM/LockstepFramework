@@ -19,7 +19,8 @@ namespace Lockstep
             public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
             {
                 FixedNumberAttribute a = ((FixedNumberAttribute)this.attribute);
-                long value = property.longValue;
+                long orgValue = property.longValue;
+                long value = orgValue;
                 LSEditorUtility.DoubleField(
                     position,
                     label,
@@ -32,6 +33,7 @@ namespace Lockstep
                     else if (value < a.Min)
                         value = a.Min;
                 }
+                if (orgValue != value)
                 property.longValue = value;
             }
         }
