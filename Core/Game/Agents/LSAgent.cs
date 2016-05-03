@@ -268,16 +268,17 @@ namespace Lockstep {
 			this.SpawnVersion = 0;
 		}
 
+        internal void InitializeController (AgentController controller, ushort localID, ushort globalID) {
+            this.Controller = controller;
+            this.LocalID = localID;
+            this.GlobalID = globalID;
+        }
+
         public void Initialize(
-			AgentController controller,
-		    ushort localID,
-			ushort globalID,
 			Vector2d position = default (Vector2d),
             Vector2d rotation = default (Vector2d)) {
 
-			LocalID = localID;
-			GlobalID = globalID;
-			Controller = controller;
+
 
 			IsActive = true;
 			CheckCasting = true;

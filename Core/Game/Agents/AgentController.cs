@@ -157,21 +157,27 @@ namespace Lockstep
                 }
             }
         }
+        public static void ChangeController (LSAgent agent, AgentController newCont) {
+           
 
+            if (newCont == null) {
+                agent.InitializeController(null,0,0);
+            }
+            else {
+                newCont.AddAgent(agent);
+            }
+        }
         public static void DestroyAgent(LSAgent agent, bool Immediate = false)
         {
-            GlobalAgentActive [agent.GlobalID] = false;
-            
-            AgentController leController = agent.Controller;
-            leController.LocalAgentActive [agent.LocalID] = false;
-            leController.OpenLocalIDs.Add(agent.LocalID);
-            OpenGlobalIDs.Add(agent.GlobalID);
+          
 
             agent.Deactivate(Immediate);
 
             ushort agentCodeID = AgentController.GetAgentCodeIndex (agent.MyAgentCode);
 
             TypeAgentsActive[agentCodeID][agent.TypeIndex] = false;
+
+            ChangeController (agent, null);
 
         }
 
@@ -318,7 +324,17 @@ namespace Lockstep
         {
             return Lockstep.Example.ExampleSpawner.GenerateSpawnCommand(cont, agentCode, count, position);
         }
+        public void AddAgent (LSAgent agent) {
+            ushort localID = GenerateLocalID();
+            LocalAgents [localID] = agent;
+            LocalAgentActive [localID] = true;
 
+            ushort globalID = GenerateGlobalID();
+            GlobalAgentActive [globalID] = true;
+            GlobalAgents [globalID] = agent;
+
+            agent.InitializeController(this,localID, globalID);
+        }
         public LSAgent CreateAgent(
             string agentCode,
             Vector2d? position = null, //nullable position
@@ -370,29 +386,13 @@ namespace Lockstep
             InitializeAgent(curAgent, pos, rot);
             return curAgent;
         }
-        /*
-        //Create agent from pre-existing template
-        public LSAgent CreateAgent(GameObject agentObject,
-                                   Vector2d position = default(Vector2d)) {
-            curAgent = GameObject.Instantiate(agentObject).GetComponent<LSAgent>();
-            curAgent.Setup(this, default(AgentCode));
-            InitializeAgent (curAgent, position);
-
-            return curAgent;
-        }*/
         
         private void InitializeAgent(LSAgent agent,
                                      Vector2d position,
                                      Vector2d rotation)
         {
-            ushort localID = GenerateLocalID();
-            LocalAgents [localID] = agent;
-            LocalAgentActive [localID] = true;
-            
-            ushort globalID = GenerateGlobalID();
-            GlobalAgentActive [globalID] = true;
-            GlobalAgents [globalID] = agent;
-            agent.Initialize(this, localID, globalID, position, rotation);
+            AddAgent (agent);
+            agent.Initialize(position, rotation);
         }
 
         private ushort GenerateLocalID()
