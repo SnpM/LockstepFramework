@@ -360,6 +360,7 @@ namespace Lockstep {
 			if (Animator .IsNotNull ())
 			{
 				SetState (AnimState.Dying);
+
 				Animator.Visualize ();
 			}
 		}
