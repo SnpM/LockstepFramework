@@ -83,6 +83,8 @@ namespace Lockstep
         public bool IsActive;
 		
         public bool UseEffects;
+
+		public bool RotateHitFX = true;
 		
         [SerializeField]
         private bool _canVisualize = true;
@@ -372,10 +374,10 @@ namespace Lockstep
                     */
                 } else
                 {
-
-                    {
-                        EffectManager.LazyCreateEffect(this.HitFX, this.cachedTransform.position, this.cachedTransform.rotation);
-                    }
+					if (RotateHitFX)
+						EffectManager.LazyCreateEffect(this.HitFX, this.cachedTransform.position, this.cachedTransform.rotation);
+					else
+						EffectManager.LazyCreateEffect(this.HitFX, this.cachedTransform.position);
                 }
             }
 
