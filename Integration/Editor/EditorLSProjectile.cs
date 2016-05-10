@@ -65,9 +65,11 @@ namespace Lockstep.Integration
 
 			if (useEffectProp.boolValue)
 			{
+				so.PropertyField("RotateHitFX");
 				so.PropertyField("_startFX");
 				so.PropertyField("_hitFX");
 				so.PropertyField("_attachEndEffectToTarget");
+
 			}
 
             if (EditorGUI.EndChangeCheck ()) {
