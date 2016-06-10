@@ -34,7 +34,11 @@ MonoBehaviour:
     _description: 
     _icon: {fileID: 0}
     _prefab: {fileID: 167620, guid: 479c1b29b5d8046428adaddf16b43ce8, type: 2}
-  _effectData: []
+  _effectData:
+  - _name: Muzzle Ball
+    _description: 
+    _icon: {fileID: 0}
+    _prefab: {fileID: 152766, guid: 375e2715adad54b21ba75951c35ebf8f, type: 2}
   _abilityData:
   - _name: Move
     _description: 
