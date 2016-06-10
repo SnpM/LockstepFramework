@@ -122,6 +122,7 @@ namespace Lockstep
             FastStack<LSEffect> pool;
 
             if (!EffectPool.TryGetValue(effectCode, out pool))  {
+				Debug.LogError(string.Format("Effect not found with code {0} in pool. Did you remember to add it to the Lockstep Database?", effectCode));
                 return null;
             }
             LSEffect effect = null;
