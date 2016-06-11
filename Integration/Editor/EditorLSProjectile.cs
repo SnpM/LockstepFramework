@@ -20,12 +20,14 @@ namespace Lockstep.Integration
                 case TargetingType.Free:
 					so.PropertyField("_speed");
 					break;
+                case TargetingType.Positional:
                 case TargetingType.Homing:
                     so.PropertyField("_speed");
 					so.PropertyField("_visualArc");
                     break;
                 case TargetingType.Timed:
                     so.PropertyField("_delay");
+                    so.PropertyField ("_lastingDuration");
                     break;
             }
             EditorGUILayout.Space ();
@@ -63,9 +65,11 @@ namespace Lockstep.Integration
 
 			if (useEffectProp.boolValue)
 			{
-				so.PropertyField("_startEffect");
-				so.PropertyField("_endEffect");
+				so.PropertyField("RotateHitFX");
+				so.PropertyField("_startFX");
+				so.PropertyField("_hitFX");
 				so.PropertyField("_attachEndEffectToTarget");
+
 			}
 
             if (EditorGUI.EndChangeCheck ()) {

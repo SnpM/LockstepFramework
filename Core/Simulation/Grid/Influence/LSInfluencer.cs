@@ -4,71 +4,78 @@ using System.Collections.Generic;
 
 namespace Lockstep
 {
-	public class LSInfluencer
-	{
-		#region Static Helpers
-		static LSAgent tempAgent;
-		static GridNode tempNode;
-		#endregion
+    public class LSInfluencer
+    {
+        #region Static Helpers
 
-		#region Collection Helper
-		[NonSerialized]
-		public int bucketIndex = -1;
-		#endregion
+        static LSAgent tempAgent;
+        static GridNode tempNode;
 
-        #region ScanNode Helper
-        public int NodeTicket;
         #endregion
 
-		public GridNode LocatedNode { get; private set;}
+        #region Collection Helper
 
-		public LSBody Body { get; private set; }
+        [NonSerialized]
+        public int bucketIndex = -1;
 
-		public LSAgent Agent { get; private set; }
+        #endregion
 
-		public void Setup (LSAgent agent)
-		{
-			Agent = agent;
-			Body = agent.Body;
-		}
+        #region ScanNode Helper
 
-		public void Initialize ()
-		{
-			LocatedNode = GridManager.GetNode (Body._position.x, Body._position.y);
-			LocatedNode.Add (this);
-		}
+        public int NodeTicket;
 
-		public void Simulate ()
-		{
+        #endregion
 
-			if (Body.PositionChangedBuffer) {
-				tempNode = GridManager.GetNode (Body._position.x, Body._position.y);
+        public GridNode LocatedNode { get; private set; }
 
-				if (tempNode.IsNull())
-					return;
+        public LSBody Body { get; private set; }
+
+        public LSAgent Agent { get; private set; }
+
+        public void Setup(LSAgent agent)
+        {
+            Agent = agent;
+            Body = agent.Body;
+        }
+
+        public void Initialize()
+        {
+            LocatedNode = GridManager.GetNode(Body._position.x, Body._position.y);
+            LocatedNode.Add(this);
+        }
+
+        public void Simulate()
+        {
+
+            if (Body.PositionChangedBuffer)
+            {
+                tempNode = GridManager.GetNode(Body._position.x, Body._position.y);
+
+                if (tempNode.IsNull())
+                    return;
 				
-				if (System.Object.ReferenceEquals (tempNode, LocatedNode) == false) {
-                    LocatedNode.Remove (this);
-					 tempNode.Add (this);
-					LocatedNode = tempNode;
-				}
-			}
-		}
+                if (System.Object.ReferenceEquals(tempNode, LocatedNode) == false)
+                {
+                    if (LocatedNode != null)
+                        LocatedNode.Remove(this);
+                    tempNode.Add(this);
+                    LocatedNode = tempNode;
+                }
+            }
+        }
 
-		public void Deactivate ()
-		{
-			LocatedNode.Remove (this);
-			LocatedNode = null;
-		}
+        public void Deactivate()
+        {
+            if (LocatedNode != null)
+            {
+                LocatedNode.Remove(this);
+                LocatedNode = null;
+            }
+        }
 
 
-        const PlatformType AllPlatforms = (PlatformType)~0;
         const AllegianceType AllAllegiance = (AllegianceType)~0;
-	}
+    }
 
-	public enum PlatformType
-	{
-		Air             = 1 << 1,
-		Ground          = 1 << 2
-	}
+
 }

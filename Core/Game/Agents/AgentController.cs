@@ -24,6 +24,9 @@ namespace Lockstep
         private static readonly Dictionary<string,IAgentData> CodeInterfacerMap = new Dictionary<string, IAgentData>();
         public static IAgentData[] AgentData;
 
+        public static Dictionary<ushort, FastList<bool>> TypeAgentsActive = new Dictionary<ushort, FastList<bool>>();
+        public static Dictionary<ushort, FastList<LSAgent>> TypeAgents = new Dictionary<ushort, FastList<LSAgent>>();
+
         public static void Setup()
         {
             IAgentDataProvider database;
@@ -154,18 +157,40 @@ namespace Lockstep
                 }
             }
         }
+        public static void ChangeController (LSAgent agent, AgentController newCont) {
 
-        public static void DestroyAgent(LSAgent agent, bool Immediate = false)
-        {
-            GlobalAgentActive [agent.GlobalID] = false;
-            
+
             AgentController leController = agent.Controller;
             leController.LocalAgentActive [agent.LocalID] = false;
+            GlobalAgentActive[agent.GlobalID] = false;
             leController.OpenLocalIDs.Add(agent.LocalID);
             OpenGlobalIDs.Add(agent.GlobalID);
-            
+
+            if (newCont == null) {
+                agent.InitializeController(null,0,0);
+            }
+            else {
+                agent.Influencer.Deactivate();
+
+                newCont.AddAgent(agent);
+                agent.Influencer.Initialize();
+
+            }
+
+
+        }
+        public static void DestroyAgent(LSAgent agent, bool Immediate = false)
+        {
+          
+
             agent.Deactivate(Immediate);
-            
+
+            ushort agentCodeID = AgentController.GetAgentCodeIndex (agent.MyAgentCode);
+
+            TypeAgentsActive[agentCodeID][agent.TypeIndex] = false;
+
+            ChangeController (agent, null);
+
         }
 
         public static void CacheAgent(LSAgent agent)
@@ -311,7 +336,17 @@ namespace Lockstep
         {
             return Lockstep.Example.ExampleSpawner.GenerateSpawnCommand(cont, agentCode, count, position);
         }
+        public void AddAgent (LSAgent agent) {
+            ushort localID = GenerateLocalID();
+            LocalAgents [localID] = agent;
+            LocalAgentActive [localID] = true;
 
+            ushort globalID = GenerateGlobalID();
+            GlobalAgentActive [globalID] = true;
+            GlobalAgents [globalID] = agent;
+
+            agent.InitializeController(this,localID, globalID);
+        }
         public LSAgent CreateAgent(
             string agentCode,
             Vector2d? position = null, //nullable position
@@ -330,42 +365,46 @@ namespace Lockstep
            
             FastStack<LSAgent> cache = CachedAgents [agentCode];
             LSAgent curAgent = null;
+            ushort agentCodeID = AgentController.GetAgentCodeIndex(agentCode);
+
             if (cache.IsNotNull() && cache.Count > 0)
             {
                 curAgent = cache.Pop();
+
+                TypeAgentsActive[agentCodeID][curAgent.TypeIndex] = true;
             } else
             {
                 IAgentData interfacer = AgentController.CodeInterfacerMap [agentCode];
 
                 curAgent = GameObject.Instantiate(interfacer.GetAgent().gameObject).GetComponent<LSAgent>();
                 curAgent.Setup(interfacer);
+
+
+                FastList<bool> typeActive;
+                if (!AgentController.TypeAgentsActive.TryGetValue(agentCodeID, out typeActive)) {
+                    typeActive = new FastList<bool>();
+                    TypeAgentsActive.Add(agentCodeID, typeActive);
+                }
+                FastList<LSAgent> typeAgents;
+                if (!TypeAgents.TryGetValue(agentCodeID,out typeAgents)) {
+                    typeAgents = new FastList<LSAgent>();
+                    TypeAgents.Add(agentCodeID, typeAgents);
+                }
+
+                curAgent.TypeIndex = (ushort)typeAgents.Count;
+                typeAgents.Add (curAgent);
+                typeActive.Add (true);
             }
             InitializeAgent(curAgent, pos, rot);
             return curAgent;
         }
-        /*
-        //Create agent from pre-existing template
-        public LSAgent CreateAgent(GameObject agentObject,
-                                   Vector2d position = default(Vector2d)) {
-            curAgent = GameObject.Instantiate(agentObject).GetComponent<LSAgent>();
-            curAgent.Setup(this, default(AgentCode));
-            InitializeAgent (curAgent, position);
-
-            return curAgent;
-        }*/
         
         private void InitializeAgent(LSAgent agent,
                                      Vector2d position,
                                      Vector2d rotation)
         {
-            ushort localID = GenerateLocalID();
-            LocalAgents [localID] = agent;
-            LocalAgentActive [localID] = true;
-            
-            ushort globalID = GenerateGlobalID();
-            GlobalAgentActive [globalID] = true;
-            GlobalAgents [globalID] = agent;
-            agent.Initialize(this, localID, globalID, position, rotation);
+            AddAgent (agent);
+            agent.Initialize(position, rotation);
         }
 
         private ushort GenerateLocalID()

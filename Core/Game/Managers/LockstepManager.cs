@@ -26,6 +26,7 @@ using UnityEngine;
 
 //using Lockstep.Integration;
 using Lockstep.Data;
+using System;
 
 namespace Lockstep
 {
@@ -58,6 +59,9 @@ namespace Lockstep
 
         private static GameManager _mainGameManager;
 
+        public static event Action onSetup;
+        public static event Action onInitialize;
+
         public static GameManager MainGameManager
         {
             get
@@ -70,6 +74,12 @@ namespace Lockstep
             {
                 _mainGameManager = value;
             }
+        }
+
+        public static void Reset () {
+            LockstepManager.Deactivate();
+            GameObject copy = GameObject.Instantiate(MainGameManager.gameObject);
+            GameObject.Destroy(MainGameManager.gameObject);
         }
 
         internal static void Setup()
@@ -96,18 +106,18 @@ namespace Lockstep
             PhysicsManager.Setup();
             ClientManager.Setup();
 
-            Application.targetFrameRate = 60;
             Time.fixedDeltaTime = BaseDeltaTime;
             Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
             InputCodeManager.Setup();
 
 
             DefaultMessageRaiser.LateSetup();
+            if (onSetup != null)
+                onSetup ();
         }
 
         internal static void Initialize(GameManager gameManager)
         {
-            Application.targetFrameRate = 30;
             MainGameManager = gameManager;
 
             if (!Loaded)
@@ -131,7 +141,6 @@ namespace Lockstep
 
             FrameCount = 0;
             InfluenceFrameCount = 0;
-            MainGameManager.MainInterfacingHelper.Initialize();
 
 			ClientManager.Initialize(MainGameManager.MainNetworkHelper);
 
@@ -156,9 +165,10 @@ namespace Lockstep
             ProjectileManager.Initialize();
 
             DefaultMessageRaiser.LateInitialize();
-            MainGameManager.MainInterfacingHelper.LateInitialize();
 
             BehaviourHelperManager.LateInitialize();
+            if (onInitialize != null)
+                onInitialize ();
         }
 
         static void InitializeHelpers()
@@ -199,7 +209,6 @@ namespace Lockstep
                 return;
             }
 
-            MainGameManager.MainInterfacingHelper.Simulate();
 
             BehaviourHelperManager.Simulate();
             AgentController.Simulate();
@@ -218,7 +227,6 @@ namespace Lockstep
 
         private static void GameStart()
         {
-            GameManager.GameStart();
             BehaviourHelperManager.GameStart();
             GameStarted = true;
 
@@ -259,7 +267,6 @@ namespace Lockstep
             if (!GameStarted) return;
             DefaultMessageRaiser.EarlyVisualize();
             PlayerManager.Visualize();
-            MainGameManager.MainInterfacingHelper.Visualize();
             BehaviourHelperManager.Visualize();
             PhysicsManager.Visualize();
             AgentController.Visualize();
@@ -288,7 +295,6 @@ namespace Lockstep
                 return;
             Selector.Clear();
             AgentController.Deactivate();
-            MainGameManager.MainInterfacingHelper.Deactivate();
             BehaviourHelperManager.Deactivate();
             ProjectileManager.Deactivate();
 			EffectManager.Deactivate();

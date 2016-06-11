@@ -19,7 +19,7 @@ namespace Lockstep {
     /// <summary>
     /// LSAgents manage abilities and interpret commands.
     /// </summary>
-    public class LSAgent : CerealBehaviour, IMousable {
+    public class LSAgent : MonoBehaviour, IMousable {
 
         Vector3 IMousable.WorldPosition {
             get {return this.Body._visualPosition;}
@@ -77,28 +77,28 @@ namespace Lockstep {
 		public bool Selectable {get; set;}
 		public bool CanSelect {get {return Selectable && IsVisible;}}
 
-
+        public ushort TypeIndex;
 
 		public Vector2 Position2 {get{return new Vector2(CachedTransform.position.x, CachedTransform.position.z);}}
 		public FastList<AbilityDataItem> Interfacers {get {return abilityManager.Interfacers;}}
 
-		#region Pre-runtime generated
-		[SerializeField]
+        #region Pre-runtime generated (maybe not)
+		//[SerializeField]
 		private Ability[] _attachedAbilities;
 		public Ability[] AttachedAbilities {get {return _attachedAbilities;}}
-		[SerializeField]
+		//[SerializeField]
 		private LSBody _body;
 		public LSBody Body { get {return _body;} }
-        [SerializeField]
+        //[SerializeField]
         private LSTrigger[] _triggers;
         public LSTrigger[] Triggers {get {return _triggers;}}
-		[SerializeField]
+		//[SerializeField]
 		private LSAnimatorBase _animator;
 		public LSAnimatorBase Animator { get {return _animator;} }
-		[SerializeField]
+		//[SerializeField]
 		private Transform _cachedTransform;
 		public Transform CachedTransform {get{return _cachedTransform;}}
-		[SerializeField]
+		//[SerializeField]
 		private GameObject _cachedGameObject;
 		public GameObject CachedGameObject {get {return _cachedGameObject;}}
 		#endregion
@@ -108,20 +108,33 @@ namespace Lockstep {
 
 		public bool IsActive { get; private set;}
 
+        public event Action<LSAgent> onDeactivate;
+
 
 		public AgentTag Tag;
 
         public bool CheckCasting { get; set; }
         public bool IsCasting {
             get {
+                if (Stunned)
+                    return true;
                 return abilityManager.CheckCasting();
             }
         }
-
-
-		public PlatformType Platform {
-			get { return CachedGameObject.layer == LayerMask.NameToLayer("Air") ? PlatformType.Air : PlatformType.Ground; }
-		}
+        private bool _stunned;
+        public bool Stunned {
+            get {
+                return _stunned;
+            }
+            set {
+                if (value != _stunned) {
+                    _stunned = value;
+                    if (_stunned) {
+                        this.StopCast();
+                    }
+                }
+            }
+        }
 
 
         public uint SpawnVersion { get; private set; }
@@ -172,12 +185,21 @@ namespace Lockstep {
 		public readonly AbilityManager abilityManager = new AbilityManager();
 
 		[SerializeField]
-		private float _selectionRadius = 1f;
-		public float SelectionRadius {get {return _selectionRadius;}}
+        private float _selectionRadius = -1f;
+        public float SelectionRadius {get {return _selectionRadius <= 0 ? this.Body.Radius.ToFloat() + 2f : _selectionRadius;}}
 		[SerializeField]
 		private Transform _visualCenter;
 		public Transform VisualCenter {get {return _visualCenter;}}
 		public float SelectionRadiusSquared {get; private set;}
+
+        public FastBucket<Buff> Buffs = new FastBucket<Buff>();
+
+        internal void AddBuff (Buff buff) {
+            buff.ID = Buffs.Add(buff);
+        }
+        internal void RemoveBuff (Buff buff) {
+            Buffs.RemoveAt(buff.ID);
+        }
 
         public IAgentData Data {get; private set;}
         private readonly FastList<int> TrackedLockstepTickets = new FastList<int>();
@@ -213,7 +235,7 @@ namespace Lockstep {
             Influencer.Setup(this);
             Body.Setup(this);
 
-			SelectionRadiusSquared = _selectionRadius * _selectionRadius;
+			SelectionRadiusSquared = SelectionRadius * SelectionRadius;
 
             this.RegisterLockstep();
 
@@ -246,16 +268,17 @@ namespace Lockstep {
 			this.SpawnVersion = 0;
 		}
 
+        internal void InitializeController (AgentController controller, ushort localID, ushort globalID) {
+            this.Controller = controller;
+            this.LocalID = localID;
+            this.GlobalID = globalID;
+        }
+
         public void Initialize(
-			AgentController controller,
-		    ushort localID,
-			ushort globalID,
 			Vector2d position = default (Vector2d),
             Vector2d rotation = default (Vector2d)) {
 
-			LocalID = localID;
-			GlobalID = globalID;
-			Controller = controller;
+
 
 			IsActive = true;
 			CheckCasting = true;
@@ -277,12 +300,12 @@ namespace Lockstep {
                 Influencer.Initialize();
             }
 
+
+
+            abilityManager.Initialize();
             if (Animator .IsNotNull ()) {
                 Animator.Initialize();
             }
-
-            abilityManager.Initialize();
-
         }
 
         public void Simulate() {
@@ -297,9 +320,15 @@ namespace Lockstep {
 				SetState (AnimState.Idling);
 			}
 
+ 
         }
 		public void LateSimulate () {
 			abilityManager.LateSimulate ();
+            for (int i = 0; i < this.Buffs.PeakCount; i++) {
+                if (this.Buffs.arrayAllocation[i]) {
+                    this.Buffs[i].Simulate();
+                }
+            }
 		}
 		[HideInInspector]
 		public bool VisualPositionChanged;
@@ -331,11 +360,14 @@ namespace Lockstep {
 			if (Animator .IsNotNull ())
 			{
 				SetState (AnimState.Dying);
+
 				Animator.Visualize ();
 			}
 		}
 
         public void Deactivate(bool Immediate = false) {
+            if (onDeactivate != null)
+                this.onDeactivate(this);
 			_Deactivate ();
             if (Immediate == false) {
                 CoroutineManager.StartCoroutine(PoolDelayer());
@@ -383,6 +415,9 @@ namespace Lockstep {
         public T GetAbility<T>() where T : Ability{
             return abilityManager.GetAbility<T>();
         }
+        public Ability GetAbility (string name) {
+            return abilityManager.GetAbility (name);
+        }
 
         public long GetStateHash () {
             long hash = 3;
@@ -410,7 +445,8 @@ namespace Lockstep {
             so.Update ();
             so.ApplyModifiedProperties ();
 		}
-        public override bool GetSerializedFieldNames(List<string> output)
+
+        /*public override bool GetSerializedFieldNames(List<string> output)
         {
             return false;
             base.GetSerializedFieldNames(output);
@@ -423,7 +459,7 @@ namespace Lockstep {
             output.Add("_globalID");
 			//output.Add("_myAgentCode");
             return true;
-        }
+        }*/
 		/*protected override bool OnSerialize ()
 		{
 			LSEditorUtility.FrameCountField ("Death Time", ref _deathTime);
@@ -436,7 +472,7 @@ namespace Lockstep {
 			return true;
 		}*/
 		void Reset () {
-			_selectionRadius = 1f;
+			_selectionRadius = -1f;
 			_visualCenter = transform;
 		}
 

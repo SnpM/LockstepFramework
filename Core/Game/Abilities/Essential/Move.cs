@@ -9,7 +9,7 @@ namespace Lockstep
         public const long GroupDirectStop = FixedMath.One;
         public const long DirectStop = FixedMath.One / 8;
         private const int MinimumOtherStopTime = (int)(LockstepManager.FrameRate / 4);
-        private const int repathRate = (int)LockstepManager.FrameRate * 4 / 4;
+        private const int repathRate = (int)LockstepManager.FrameRate;
         private const int CollisionStopCount = LockstepManager.FrameRate * 2;
         private const long CollisionStopTreshold = FixedMath.One / 2;
 
@@ -26,7 +26,7 @@ namespace Lockstep
 
         private int RepathRate
         {
-            get { return LSUtility.GetRandom(FixedMath.Create(repathRate).Div(this.Speed).CeilToInt()); }
+            get { return FixedMath.Create(repathRate).Div(this.Speed).CeilToInt(); }
         }
 
         private const int straightRepathRate = repathRate * 4;
@@ -120,12 +120,22 @@ namespace Lockstep
 			get { return _canMove; }
 		}
 
-        [SerializeField]
-        private bool _canTurn = true;
-        public bool CanTurn {get; private set;}
-        [SerializeField, FixedNumber]
-        private long _speed = FixedMath.One * 4;
-        public long Speed {get {return _speed;}}
+		[SerializeField]
+		private bool _canTurn = true;
+		public bool CanTurn {get; private set;}
+		
+		[SerializeField, FixedNumber]
+		private long _speed = FixedMath.One * 4;
+		
+		public virtual long Speed
+		{
+			get { return _speed; }
+			//set { _speed = value; }
+            //This'll make Speed indeterministic across multiple sessions since the original value isn't stored and reset
+            //Underlying value can't be changed but we can make Speed virtual to return a modified value
+		}
+
+
         [SerializeField, FixedNumber]
         private long _acceleration = FixedMath.One;
         public long Acceleration {get {return _acceleration;}}
@@ -191,7 +201,7 @@ namespace Lockstep
             {
                 if (CanPathfind)
                 {
-                    if (repathCount <= 0)
+                   if (repathCount <= 0)
                     {
                         if (viableDestination)
                         {
@@ -246,6 +256,7 @@ namespace Lockstep
                                 }
                             } else
                             {
+
                             }
                         } else
                         {
@@ -264,7 +275,7 @@ namespace Lockstep
                             repathCount--;
                         } else
                         {
-                            repathCount--;
+                            repathCount-= 2;
                         }
                     }
 
@@ -301,7 +312,7 @@ namespace Lockstep
                 if (distance > closingDistance || movingToWaypoint)
                 {
                     desiredVelocity = (movementDirection);
-                    if (movementDirection.Cross(lastMovementDirection.x, lastMovementDirection.y).AbsMoreThan(FixedMath.Half))
+                    if (movementDirection.Cross(lastMovementDirection.x, lastMovementDirection.y).AbsMoreThan(FixedMath.One / 4))
                     {
                         lastMovementDirection = movementDirection;
                         if (CanTurn)
@@ -347,9 +358,11 @@ namespace Lockstep
             }
         }
 
+        public Command LastCommand;
+
         protected override void OnExecute(Command com)
         {
-
+            LastCommand = com;
             if (com.ContainsData<Vector2d> ())
             {
                 Agent.StopCast(ID);

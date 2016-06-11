@@ -19,7 +19,8 @@ namespace Lockstep
             public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
             {
                 FixedNumberAttribute a = ((FixedNumberAttribute)this.attribute);
-                long value = property.longValue;
+                long orgValue = property.longValue;
+                long value = orgValue;
                 LSEditorUtility.DoubleField(
                     position,
                     label,
@@ -32,6 +33,7 @@ namespace Lockstep
                     else if (value < a.Min)
                         value = a.Min;
                 }
+                if (orgValue != value)
                 property.longValue = value;
             }
         }
@@ -81,6 +83,12 @@ namespace Lockstep
         [CustomPropertyDrawer(typeof(VectorRotationAttribute))]
         public class EditorVectorRotation : PropertyDrawer
         {
+            float height = 0f;
+            public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+            {
+                float h = height;
+                return h;
+            }
             public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
             {
                 VectorRotationAttribute at = this.attribute as VectorRotationAttribute;
@@ -92,7 +100,9 @@ namespace Lockstep
                 double angleInRadians = Math.Atan2(y.longValue.ToDouble(),x.longValue.ToDouble());
 
                 double angleInDegrees = (angleInRadians * 180d / Math.PI) * scale;
-                angleInDegrees = (EditorGUILayout.DoubleField("Angle", angleInDegrees)) / scale;
+                height = 15f;
+                position.height = height;
+                angleInDegrees = (EditorGUI.DoubleField(position, "Angle", angleInDegrees)) / scale;
 
                 double newAngleInRadians = angleInDegrees * Math.PI / 180d;
                 if (Math.Abs(newAngleInRadians - angleInRadians) >= .001f) {

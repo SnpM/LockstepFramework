@@ -9,7 +9,7 @@ using Lockstep.Data;
 
 namespace Lockstep
 {
-    public abstract class Ability : CerealBehaviour
+    public abstract class Ability : MonoBehaviour//CerealBehaviour
     {
         private bool isCasting;
         
@@ -75,7 +75,6 @@ namespace Lockstep
                     mainType = mainType.BaseType;
                 }
                 Data = AbilityDataItem.FindInterfacer(mainType);
-
                 if (Data == null)
                 {
                     throw new System.ArgumentException("The Ability of type " + mainType + " has not been registered in database");
@@ -123,11 +122,17 @@ namespace Lockstep
 
         internal void Simulate()
         {
+            TemplateSimulate ();
+
             OnSimulate();
             if (isCasting)
             {
                 OnCast();
             }
+        }
+
+        protected virtual void TemplateSimulate () {
+
         }
 
         protected virtual void OnSimulate()

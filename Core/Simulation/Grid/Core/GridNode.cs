@@ -148,12 +148,10 @@ namespace Lockstep
 
         static int CachedSize;
         static Func<bool> CachedUnpassableFunction;
-        static int CachedLargeDeltaCount;
+
         public static void PrepareUnpassableCheck(int size)
         {
             CachedSize = size;
-            //TODO: Get rid of delta counts
-            CachedLargeDeltaCount = GridManager.GenerateDeltaCount((CachedSize + 1) / 2);
 
             /*if (CachedSize == 1)
                 CachedUnpassableFunction = () => false;
@@ -169,7 +167,7 @@ namespace Lockstep
         {
             if (this._unwalkable)
                 return true;
-            if (CachedSize == 1)
+            if (CachedSize <= 2)
             {
                 return false;
             }
@@ -194,6 +192,7 @@ namespace Lockstep
         }
 
         GridNode _node;
+
         public bool UnpassableMedium()
         {
             for (_i = 0; _i < 8; _i++)
@@ -208,12 +207,20 @@ namespace Lockstep
 
         public bool UnpassableLarge()
         {
-            for (_i = 1; _i < CachedLargeDeltaCount; _i++)
+            int half = (CachedSize + 1) / 2;
+            for (int x = -half; x <= half; x++)
             {
-                GridNode node = GridManager.GetNode(DeltaCache.CacheX [_i] + this.gridX, DeltaCache.CacheY [_i] + this.gridY);
-                if (node.Unwalkable)
-                    return true;
-
+                for (int y = -half; y <= half; y++)
+                {
+                    int index = GridManager.GetGridIndex(gridX + x, gridY + y);
+                    if (GridManager.ValidateIndex(index))
+                    {
+                        if (GridManager.Grid [index].Unwalkable)
+                        {
+                            return true;
+                        }
+                    }
+                }
             }
             return false;
         }
@@ -240,16 +247,16 @@ namespace Lockstep
                     if (GridManager.ValidateCoordinates(checkX, checkY))
                     {
                         int neighborIndex;
-                        if ((i != 0 && j != 0)) 
+                        if ((i != 0 && j != 0))
                         {
                             //Diagonal
-                            if (GridManager.UseDiagonalConnections) {
+                            if (GridManager.UseDiagonalConnections)
+                            {
                                 neighborIndex = diagonalIndex++;
-                            }
-                            else
-                            continue;
-                        }
-                        else {
+                            } else
+                                continue;
+                        } else
+                        {
                             neighborIndex = sideIndex++;
                         }
                         GridNode checkNode = GridManager.Grid [GridManager.GetGridIndex(checkX, checkY)];
@@ -260,7 +267,7 @@ namespace Lockstep
 			
 			
         }
-            
+
         static int dstX;
         static int dstY;
         public static int HeuristicTargetX;
@@ -269,10 +276,10 @@ namespace Lockstep
         public void CalculateHeuristic()
         {
             
-			//Euclidian
-			dstX = HeuristicTargetX - gridX;
-			dstY = HeuristicTargetY - gridY;
-			hCost = (dstX * dstX + dstY * dstY);
+            //Euclidian
+            dstX = HeuristicTargetX - gridX;
+            dstY = HeuristicTargetY - gridY;
+            hCost = (dstX * dstX + dstY * dstY);
 
 			
             /*

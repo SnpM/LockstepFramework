@@ -100,6 +100,7 @@ namespace Lockstep {
             Vector2d worldPos = relativePos.Rotated(source.Body.Rotation);
             Vector3d pos = new Vector3d(worldPos.x,worldPos.y,offset.z + source.Body.HeightPos);
             pos.Add(ref source.Body._position);
+
             return Create (projCode,pos,agentConditional,(bite) => ((source.Controller.GetAllegiance(bite) & targetAllegiance) != 0),hitEffect);
         }
         public static LSProjectile Create (string projCode, Vector3d position, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional, Action<LSAgent> hitEffect)

@@ -16,17 +16,26 @@ namespace Lockstep
 		[SerializeField]
 		private string engaging = "engaging";
 
+        [SerializeField]
+        private string specialEngaging = "specialEngaging";
+
 		[SerializeField]
 		private string dying = "dying";
 
 		[Space(10f), SerializeField]
 		private string fire = "fire";
 
+        [SerializeField]
+        private string specialAttack = "specialAttack";
+
 		private AnimationClip idlingClip;
 		private  AnimationClip movingClip;
 		private  AnimationClip engagingClip;
 		private  AnimationClip dyingClip;
+        private AnimationClip specialEngagingClip;
+
 		private  AnimationClip fireClip;
+        private AnimationClip specialAttackClip;
 
 		private Animation animator;
 
@@ -49,8 +58,10 @@ namespace Lockstep
                 movingClip = animator.GetClip(moving);
                 engagingClip = animator.GetClip(engaging);
                 dyingClip = animator.GetClip(dying);
+                specialEngagingClip = animator.GetClip(this.specialEngaging);
                 //Impulses
                 fireClip = animator.GetClip(fire);
+                specialAttackClip = animator.GetClip(specialAttack);
             }
 			Play(AnimState.Idling);
 		}
@@ -95,6 +106,8 @@ namespace Lockstep
 					return engagingClip;
 				case AnimState.Dying:
 					return dyingClip;
+                case AnimState.SpecialEngaging:
+                    return this.specialEngagingClip;
 			}
 			return idlingClip;
 		}
@@ -111,6 +124,8 @@ namespace Lockstep
 					return engaging;
 				case AnimState.Dying:
 					return dying;
+                case AnimState.SpecialEngaging:
+                    return this.specialEngaging;
 			}
 			return idling;
 		}
@@ -121,7 +136,8 @@ namespace Lockstep
 			{
 				case AnimImpulse.Fire:
 					return fire;
-
+                case AnimImpulse.SpecialAttack:
+                    return specialAttack;
 			}
 			return idling;
 		}
@@ -132,7 +148,8 @@ namespace Lockstep
 			{
 				case AnimImpulse.Fire:
 					return fireClip;
-
+                case AnimImpulse.SpecialAttack:
+                    return specialAttackClip;
 			}
 			return idlingClip;
 		}

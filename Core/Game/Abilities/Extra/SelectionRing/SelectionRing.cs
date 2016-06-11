@@ -27,6 +27,21 @@ namespace Lockstep
         protected virtual void OnSetup () {
             cachedRenderer = GetComponent<Renderer> ();
         }
+
+        private Color _tint;
+        public Color Tint {
+            get {
+                return _tint;
+            }
+            set {
+                if (_tint != value) {
+                    _tint = value;
+                    SetState (lastState);
+                }
+            }
+        }
+
+        SelectionRingState lastState;
         public void SetState (SelectionRingState state) {
             Color setColor = default(Color);
             switch (state) {
@@ -40,7 +55,10 @@ namespace Lockstep
                     setColor = NoneColor;
                     break;
             }
+            if (Tint != Color.clear)
+            setColor = setColor / 4 + Tint;
             SetColor (setColor);
+            lastState = state;
         }
 
         public virtual void SetColor (Color color) {

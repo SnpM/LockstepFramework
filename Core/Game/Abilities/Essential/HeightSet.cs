@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Lockstep
 {
+    [UnityEngine.DisallowMultipleComponent]
     public class HeightSet : Ability
     {
         [SerializeField]
@@ -10,8 +11,9 @@ namespace Lockstep
 
         public int MapIndex { get { return _mapIndex; } }
 
-        [SerializeField]
+        [SerializeField, FixedNumber]
         private long _bonusHeight;
+        public long BonusHeight {get {return _bonusHeight;}}
 
         private long _offset;
 
