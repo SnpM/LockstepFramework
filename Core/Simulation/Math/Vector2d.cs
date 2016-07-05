@@ -452,7 +452,7 @@ namespace Lockstep
             return x * 31 + y * 7;
         }
 
-        public int GetStateHash()
+        public override int GetHashCode()
         {
             return (int)(GetLongHashCode() % int.MaxValue);
         }
