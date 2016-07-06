@@ -61,10 +61,3 @@ MonoBehaviour:
       _classRef: Lockstep.Stop, Assembly-CSharp
     _listenInputCode: 
     _informationGather: 0
-  - _name: Trap
-    _description: 
-    _icon: {fileID: 0}
-    _script:
-      _classRef: InvasionDay.Trap, Assembly-CSharp
-    _listenInputCode: 
-    _informationGather: 0
