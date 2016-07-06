@@ -103,6 +103,7 @@ namespace Lockstep
                     DestroyAgent(GlobalAgents [i], true);
                 }
             }
+			CheckDestroyAgent();
         }
 
         private static ushort GenerateGlobalID()
@@ -136,6 +137,7 @@ namespace Lockstep
                     GlobalAgents [iterator].Simulate();
                 }
             }
+
         }
 
         public static void LateSimulate()
@@ -145,8 +147,19 @@ namespace Lockstep
                 if (GlobalAgentActive [i])
                     GlobalAgents [i].LateSimulate();
             }
-        }
+			CheckDestroyAgent();
 
+
+		}
+		static void CheckDestroyAgent()
+		{
+			for (int i = 0; i < DeactivationBuffer.Count; i++)
+			{
+				DestroyAgentBuffer(DeactivationBuffer[i]);
+			}
+			DeactivationBuffer.FastClear();
+
+		}
         public static void Visualize()
         {
             for (int iterator = 0; iterator < PeakGlobalID; iterator++)
@@ -157,33 +170,61 @@ namespace Lockstep
                 }
             }
         }
+		public static void ClearAgents()
+		{
+			for (int i = GlobalAgents.Length - 1; i >= 0; i--)
+			{
+				if (GlobalAgentActive[i])
+				{
+					LSAgent agent = GlobalAgents[i];
+					AgentController.DestroyAgent(agent);
+				}
+			}
+		}
         public static void ChangeController (LSAgent agent, AgentController newCont) {
 
-
             AgentController leController = agent.Controller;
-            leController.LocalAgentActive [agent.LocalID] = false;
-            GlobalAgentActive[agent.GlobalID] = false;
-            leController.OpenLocalIDs.Add(agent.LocalID);
-            OpenGlobalIDs.Add(agent.GlobalID);
+			if (leController != null) {
+				leController.LocalAgentActive[agent.LocalID] = false;
+				GlobalAgentActive[agent.GlobalID] = false;
+				leController.OpenLocalIDs.Add(agent.LocalID);
+				OpenGlobalIDs.Add(agent.GlobalID);
 
-            if (newCont == null) {
-                agent.InitializeController(null,0,0);
-            }
-            else {
-                agent.Influencer.Deactivate();
+				if (newCont == null) {
+					agent.InitializeController(null, 0, 0);
+				}
+				else {
+					agent.Influencer.Deactivate();
 
-                newCont.AddAgent(agent);
-                agent.Influencer.Initialize();
+					newCont.AddAgent(agent);
+					agent.Influencer.Initialize();
 
-            }
-
-
+				}
+			}
         }
-        public static void DestroyAgent(LSAgent agent, bool Immediate = false)
-        {
-          
+		public struct DeactivationData
+		{
+			public LSAgent Agent;
+			public bool Immediate;
 
-            agent.Deactivate(Immediate);
+			public DeactivationData(LSAgent agent, bool immediate)
+			{
+				Agent = agent;
+				Immediate = immediate;
+			}
+		}
+		static FastList<DeactivationData> DeactivationBuffer = new FastList<DeactivationData>();
+		public static void DestroyAgent(LSAgent agent, bool immediate = false)
+		{
+			DeactivationBuffer.Add(new DeactivationData(agent, immediate));
+
+		}
+		private static void DestroyAgentBuffer (DeactivationData data) 
+		{
+			LSAgent agent = data.Agent;
+			bool immediate = data.Immediate;
+
+            agent.Deactivate(immediate);
 
             ushort agentCodeID = AgentController.GetAgentCodeIndex (agent.MyAgentCode);
 

@@ -31,6 +31,10 @@ namespace Lockstep
 
         public void HandleSelectedChange()
         {
+			if (ReplayManager.IsPlayingBack) {
+				return;
+			}
+
             if (!Agent.IsSelected)
             {
                 if (Agent.IsHighlighted)
@@ -49,6 +53,10 @@ namespace Lockstep
 
         public void HandleHighlightedChange()
         {
+			if (ReplayManager.IsPlayingBack) {
+				return;
+			}
+
             if (Agent.IsHighlighted) {
                 if (Agent.IsSelected) {
 

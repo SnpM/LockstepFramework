@@ -84,10 +84,10 @@ namespace Lockstep.NetworkHelpers {
                 OnDataReceived.Invoke (messageType,data);
             //Huge switch statement for distributing data based on MessageType
             switch (messageType) {
-                case MessageType.Input:
-                    if (OnInputData != null) {
-                        OnInputData.Invoke (data);
-                    }
+			case MessageType.Input:
+				if (OnInputData != null) {
+					OnInputData.Invoke (data);
+				}
                     break;
                 case MessageType.Frame:
                     if (OnFrameData != null) {

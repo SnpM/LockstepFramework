@@ -56,35 +56,40 @@ namespace Lockstep
 
         public static bool IsValid(string effectCode)
         {
-            return !string.IsNullOrEmpty(effectCode) && effectCode != "None";
+			return !string.IsNullOrEmpty (effectCode) && effectCode != "None" && CodeDataMap.ContainsKey (effectCode);
         }
 
-        public static void LazyCreateEffect(string effectCode, Vector3 position)
+        public static LSEffect LazyCreateEffect(string effectCode, Vector3 position)
         {
             if (!IsValid(effectCode))
-                return;
+                return null;
             LSEffect effect = CreateEffect(effectCode);
             effect.CachedTransform.position = position;
             Fire (effect);
+            return effect;
         }
 
-        public static void LazyCreateEffect(string effectCode, Vector3 position, Quaternion rotation)
+        public static LSEffect LazyCreateEffect(string effectCode, Vector3 position, Quaternion rotation)
         {
             if (!IsValid(effectCode))
-                return;
+                return null;
             LSEffect effect = CreateEffect(effectCode);
             effect.CachedTransform.position = position;
             effect.CachedTransform.rotation = rotation;
             Fire (effect);
+            return effect;
+
         }
 
-        public static void LazyCreateEffect(string effectCode, Transform spawnParent)
+        public static LSEffect LazyCreateEffect(string effectCode, Transform spawnParent)
         {
             if (!IsValid(effectCode))
-                return;
+                return null;
             LSEffect effect = CreateEffect(effectCode);
             effect.CachedTransform.parent = spawnParent;
             Fire (effect);
+            return effect;
+
         }
 
         public static LSEffect CreateEffect(string effectCode)
@@ -122,7 +127,6 @@ namespace Lockstep
             FastStack<LSEffect> pool;
 
             if (!EffectPool.TryGetValue(effectCode, out pool))  {
-				Debug.LogError(string.Format("Effect not found with code {0} in pool. Did you remember to add it to the Lockstep Database?", effectCode));
                 return null;
             }
             LSEffect effect = null;

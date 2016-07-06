@@ -12,6 +12,9 @@ namespace Lockstep
 
 		#region public members
 		public static bool IsPlayingBack;
+
+		public static System.Action<bool> onIsPlayingBack;
+
 		public static Replay CurrentReplay;
 		#endregion
 
@@ -30,6 +33,11 @@ namespace Lockstep
 		{
 			IsPlayingBack = true;
 			StartStreaming (replay);
+			FrameManager.AdjustFramerate = false;
+
+			if (onIsPlayingBack != null) {
+				onIsPlayingBack.Invoke(IsPlayingBack);
+			}
 		}
 
 		public static void Stop ()
@@ -39,8 +47,14 @@ namespace Lockstep
 				AgentController.Deactivate ();
 				IsPlayingBack = false;
 				StopStreaming ();
+
+				if (onIsPlayingBack != null) {
+					onIsPlayingBack.Invoke(IsPlayingBack);
+				}
 			}
-        }
+			FrameManager.AdjustFramerate = true;
+
+		}
 
         static Writer cachedWriter = new Writer();
         public static Replay SerializeCurrent () {
@@ -129,9 +143,7 @@ namespace Lockstep
 			yield break;
 		}
 
-        public static void ChangeTimescale (float newScale) {
-            Time.timeScale = newScale;
-        }
+
 
 		private static void StartStreaming (Replay replay)
 		{
@@ -147,12 +159,8 @@ namespace Lockstep
 			}
 		}
 		#endregion
+
+	
 	}
 
-	public enum RecordState
-	{
-		None,
-		Record,
-		Playback
-	}
 }

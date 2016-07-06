@@ -59,7 +59,6 @@ namespace Lockstep
 
         private bool forcePathfind { get; set; }
 
-        private Vector2d lastPosition;
         private bool collisionTicked;
         private int stuckTick;
 
@@ -78,6 +77,8 @@ namespace Lockstep
         private LSBody cachedBody {get; set;}
         private Turn CachedTurn {get; set;}
 
+		public Vector2d LastPosition {get; set;}
+
         public long timescaledSpeed
         {
             get
@@ -92,8 +93,9 @@ namespace Lockstep
         private long collisionStopTreshold;
         private long timescaledAcceleration;
 
+        [Lockstep (true)]
         public long AdditiveSpeedModifier { get; set; }
-
+        [Lockstep (true)]
         public long MultiplicativeSpeedModifier { get; set; }
 
         private Vector2d lastTargetPos;
@@ -129,10 +131,7 @@ namespace Lockstep
 		
 		public virtual long Speed
 		{
-			get { return _speed; }
-			//set { _speed = value; }
-            //This'll make Speed indeterministic across multiple sessions since the original value isn't stored and reset
-            //Underlying value can't be changed but we can make Speed virtual to return a modified value
+			get { return _speed ; }
 		}
 
 
@@ -184,12 +183,13 @@ namespace Lockstep
             stuckTick = 0;
 
             forcePathfind = false;
-            lastPosition = Vector2d.zero;
             lastMovementDirection = Vector2d.up;
 
             Arrived = true;
+			LastPosition = Agent.Body.Position;
         }
 
+		public int StopTimer;
 
         protected override void OnSimulate()
         {
@@ -318,8 +318,21 @@ namespace Lockstep
                         if (CanTurn)
                             CachedTurn.StartTurnDirection(movementDirection);
                     }
+
+					long threshold = this.timescaledSpeed / 4;
+
+					if ((Agent.Body.Position - this.LastPosition).FastMagnitude () < (threshold * threshold)) {
+						StopTimer++;
+						if (StopTimer >= LockstepManager.FrameRate) {
+							StopTimer = 0;
+							this.Arrive ();
+						}
+					} else {
+						StopTimer = 0;
+					}
                 } else
                 {
+					StopTimer = 0;
                     if (distance < FixedMath.Mul(closingDistance, CollisionStopMultiplier))
                     {
                         Arrive();
@@ -356,6 +369,8 @@ namespace Lockstep
                 }
                 stopTime++;
             }
+			LastPosition = Agent.Body.Position;
+
         }
 
         public Command LastCommand;
@@ -389,13 +404,15 @@ namespace Lockstep
 
         public void Arrive()
         {
-            if (onArrive.IsNotNull())
-            {
-                onArrive();
-            }
-            this.OnArrive();
-            Arrived = true;
+
             StopMove();
+
+			if (onArrive.IsNotNull())
+			{
+				onArrive();
+			}
+			this.OnArrive();
+			Arrived = true;
         }
 
         protected virtual void OnArrive () {
@@ -469,6 +486,7 @@ namespace Lockstep
                 forcePathfind = false;
                 if (onStartMove != null)
                     onStartMove ();
+
             }
         }
 

@@ -11,11 +11,11 @@ namespace Lockstep
         public static Frame[] Frames {get {return frames;}}
         private static int capacity = StartCapacity;
         private static int _foreSight;
-
+		public static int LoadedFrames { get; private set;}
         public static int ForeSight
         {
             get { return _foreSight;}
-            set
+            private set
             {
                 _foreSight = value;
 
@@ -100,6 +100,7 @@ namespace Lockstep
             {
                 ForeSight++;
                 nextFrame++;
+				LoadedFrames++;
             }
         }
 

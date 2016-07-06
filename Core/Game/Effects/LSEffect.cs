@@ -16,13 +16,17 @@ namespace Lockstep
 		#region Default Values
 		Vector3 defaultScale;
 		[SerializeField]
-		private float
-			defaultDuration;
+		private float defaultDuration;
+
 		#endregion
 
 		public string MyEffectCode { get; private set; }
 		public Transform CachedTransform {get; private set;}
 		public GameObject CachedGameObject {get; private set;}
+        public Vector3 StartPos {get; set;}
+        public Vector3 EndPos {get; set;}
+		public Transform Target { get; set;}
+
 
 		public ParticleSystem CachedShuriken {get; private set;}
         private float StartSpeed {
@@ -45,6 +49,7 @@ namespace Lockstep
 
 		public event Action OnSetup;
 		public event Action OnInitialize;
+		public event Action OnLateInitialize;
 		public event Action OnVisualize;
 		public event Action OnDeactivate;
 		/// <summary>
@@ -93,7 +98,6 @@ namespace Lockstep
 		/// </summary>
 		internal void Initialize ()
 		{
-
 			CachedGameObject.SetActive (true);
 			StartCoroutine (LifeTimer ());
 			if (OnInitialize .IsNotNull ())
@@ -104,13 +108,21 @@ namespace Lockstep
                 CachedShuriken.startSize = StartSize;
                 CachedShuriken.Play();
             }
+
+			lateInitialized = false;
 		}
 
+		bool lateInitialized = false;
 		/// <summary>
 		/// Called every Update frame.
 		/// </summary>
         internal void Visualize ()
 		{
+			if (lateInitialized == false) {
+				lateInitialized = true;
+				if (OnLateInitialize != null)
+					OnLateInitialize ();
+			}
 			if (OnVisualize .IsNotNull ()) 
 				OnVisualize ();
 		}
@@ -123,8 +135,14 @@ namespace Lockstep
             if (CachedShuriken != null) {
                 CachedShuriken.Stop();
             }
-			CachedTransform.SetParent (null);
-			CachedGameObject.SetActive (false);
+			if (CachedTransform != null) {
+				CachedTransform.SetParent(null);
+			}
+
+			if (CachedGameObject != null) {
+				CachedGameObject.SetActive(false);
+			}
+
 			if (OnDeactivate .IsNotNull ())
 				OnDeactivate ();
 		}
