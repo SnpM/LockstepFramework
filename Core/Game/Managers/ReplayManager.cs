@@ -29,10 +29,10 @@ namespace Lockstep
 
 		#region public methods
 
-		public static void Play (Replay replay)
+		public static void Play (Replay replay, bool immediate = true)
 		{
 			IsPlayingBack = true;
-			StartStreaming (replay);
+			StartStreaming (replay, immediate);
 			FrameManager.AdjustFramerate = false;
 
 			if (onIsPlayingBack != null) {
@@ -145,10 +145,22 @@ namespace Lockstep
 
 
 
-		private static void StartStreaming (Replay replay)
+		private static void StartStreaming (Replay replay, bool immediate)
 		{
 			StopStreaming ();
+			if (immediate)
+			{
+				var iter = StreamPlayback(replay);
+				{
+					while (iter.MoveNext())
+					{
+
+					}
+				}
+			}
+			else
 			streamer = LockstepManager.UnityInstance.StartCoroutine (StreamPlayback (replay));
+
 		}
 
 		private static void StopStreaming ()
