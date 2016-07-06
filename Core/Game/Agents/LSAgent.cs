@@ -521,9 +521,9 @@ namespace Lockstep
 			long hash = 3;
 			hash ^= this.GlobalID;
 			hash ^= this.LocalID;
-			hash ^= this.Body._position.GetStateHash();
-			hash ^= this.Body._rotation.GetStateHash();
-			hash ^= this.Body.Velocity.GetStateHash();
+			hash ^= this.Body._position.GetHashCode();
+			hash ^= this.Body._rotation.GetHashCode();
+			hash ^= this.Body.Velocity.GetHashCode();
 			return hash;
 		}
 
