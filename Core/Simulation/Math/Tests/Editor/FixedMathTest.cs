@@ -44,7 +44,7 @@ namespace MonoTests.Lockstep {
             // Assert 33 - 66 = -33
             Assert.AreEqual(-33 << 16, FixedMath.Create(33L).Sub(FixedMath.Create(66L)));
 
-            // Assert -33 - -66 = -33
+            // Assert -33 - -66 = 33
             Assert.AreEqual(33 << 16, FixedMath.Create(-33L).Sub(FixedMath.Create(-66L)));
         }
 
@@ -73,7 +73,7 @@ namespace MonoTests.Lockstep {
 
         [Test]
         public void RoundTest() {
-            // Keep in mind the current rounding uses .5 -> 0
+            // Keep in mind the current rounding uses 0.5 -> 0
             Assert.AreEqual(0, FixedMath.Round(FixedMath.Create(0.5f)));
             Assert.AreEqual(1 << 16, FixedMath.Round(FixedMath.Create(0.6f)));
             Assert.AreEqual(0, FixedMath.Round(FixedMath.Create(0.4f)));
@@ -108,7 +108,6 @@ namespace MonoTests.Lockstep {
             long answer = FixedMath.Create(1073741823.5);
             Assert.AreEqual(70368744144896L, answer);
 
-            // Assert.AreEqual(answer, max.Div(two));
             Assert.AreEqual(answer, max.Div(two));
             Assert.AreEqual(1 << 16, max.Div(max));
         }
@@ -119,9 +118,6 @@ namespace MonoTests.Lockstep {
             Assert.AreEqual(1, FixedMath.Create(1).ToInt());
             Assert.AreEqual(-1, FixedMath.Create(-1).ToInt());
         }
-
-        // Test ToFormattedDouble
-        // test ToPreciseFloat
     }
 }
 
