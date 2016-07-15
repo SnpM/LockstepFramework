@@ -67,6 +67,10 @@ namespace Lockstep
         }
 
         public virtual void SetSize (float size) {
+			float _size = size;
+			if (size <= 0.0f) {
+				size = 1.0f;
+			}
             transform.localScale = Vector3.one * size;
         }
 

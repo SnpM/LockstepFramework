@@ -275,6 +275,8 @@ namespace Lockstep
         [SerializeField]
         private Transform _rotationalTransform;
 
+		public Vector3 _rotationOffset;
+
         public Transform RotationalTransform { get; set; }
 
         private bool _canSetVisualRotation;
@@ -419,7 +421,9 @@ namespace Lockstep
             if (RotationalTransform != null)
             {
                 CanSetVisualRotation = true;
-                visualRot = Quaternion.LookRotation(Forward.ToVector3(0f));
+//                visualRot = Quaternion.LookRotation(Forward.ToVector3(0f) + _rotationOffset);
+//				_rotationOffset = transform.GetComponent<InvasionDay.GeoHandler>()._eulerOffset;
+				visualRot = Quaternion.Euler(Quaternion.LookRotation(Forward.ToVector3(0f)).eulerAngles + _rotationOffset);
                 lastVisualRot = visualRot;
                 RotationalTransform.rotation = visualRot;
             } else
@@ -637,8 +641,9 @@ namespace Lockstep
 
         private void DoSetVisualRotation(Vector2d rot)
         {
-            lastVisualRot = visualRot;
-            visualRot = Quaternion.LookRotation(Forward.ToVector3(0f));
+			lastVisualRot = visualRot;
+			visualRot = Quaternion.Euler(Quaternion.LookRotation(Forward.ToVector3(0f)).eulerAngles + _rotationOffset);
+//            visualRot = Quaternion.LookRotation(Forward.ToVector3(0f));
             SetRotationBuffer = true;
         }
 

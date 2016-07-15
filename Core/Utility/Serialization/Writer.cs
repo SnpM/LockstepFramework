@@ -81,6 +81,10 @@ namespace Lockstep
             Canvas.AddRange(byteArray);
         }
 
+		public void Write (ICommandData data) {
+			data.Write (this);
+		}
+
         public void Reset () {
             this.Canvas.FastClear();
         }

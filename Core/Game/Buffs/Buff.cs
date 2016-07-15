@@ -28,6 +28,7 @@ namespace Lockstep
         public void Simulate () {
             Timer++;
             OnSimulate ();
+            if (Duration >= 0)
             if (Timer > Duration) {
                 Deactivate ();
             }

@@ -2,7 +2,7 @@
 using Lockstep.Data;
 namespace Lockstep {
     public abstract class ActiveAbility : Ability {
-
+		const bool UseCooldown = true;
         [SerializeField,FrameCount]
         protected int _cooldown;
         public int Cooldown {get {return _cooldown;}}
@@ -17,9 +17,10 @@ namespace Lockstep {
             ListenInput = Data.ListenInputID;
 		}
 
-        public void Execute(Command com) {
+		public void Execute(Command com)
+		{
 
-            if (Heat <= 0) {
+			if (Heat <= 0 || UseCooldown == false) {
                 OnExecute(com);
                 Heat = Cooldown;
             }

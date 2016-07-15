@@ -4,10 +4,9 @@ using System;
 namespace Lockstep {
     public class Stats : Ability {
 
-
-        Move cachedMove;
-        Scan cachedScan;
-        Health cachedHealth;
+        protected Move cachedMove;
+        protected Scan cachedScan;
+        protected Health cachedHealth;
         protected override void OnLateSetup()
         {
             cachedMove = Agent.GetAbility<Move> ();

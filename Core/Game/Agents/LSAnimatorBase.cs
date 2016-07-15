@@ -88,6 +88,8 @@ namespace Lockstep
 	public enum AnimImpulse
 	{
 		Fire,
-		SpecialAttack
+        SpecialFire,
+		SpecialAttack,
+		Extra
 	}
 }

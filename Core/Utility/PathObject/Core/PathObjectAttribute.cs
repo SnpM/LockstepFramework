@@ -8,7 +8,7 @@ namespace Lockstep
     {
         public Type ObjectType { get; private set; }
 
-        public PathObjectAttribute(Type requiredType)
+		public PathObjectAttribute(Type requiredType)
         {
             this.ObjectType = requiredType;
             if (requiredType.IsSubclassOf(typeof(UnityEngine.Object)) == false)

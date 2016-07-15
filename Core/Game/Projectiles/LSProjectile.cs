@@ -12,8 +12,8 @@ namespace Lockstep
 {
     public sealed class LSProjectile : CerealBehaviour
     {
+		public const int DefaultTickRate = LockstepManager.FrameRate / 4;
         private const long Gravity = FixedMath.One * 98 / 10;
-        public const int TickRate = LockstepManager.FrameRate / 4;
         //
         // Static Fields
         //
@@ -83,8 +83,6 @@ namespace Lockstep
         public bool IsActive;
 		
         public bool UseEffects;
-
-		public bool RotateHitFX = true;
 		
         [SerializeField]
         private bool _canVisualize = true;
@@ -116,11 +114,17 @@ namespace Lockstep
         [SerializeField, FrameCount]
         private int _lastingDuration;
 
+		[SerializeField, FrameCount]
+		private int _tickRate = DefaultTickRate;
+
         //
         // Properties
         //
 
-        public uint SpawnVersion { get; private set; }
+		public uint SpawnVersion { get; private set; }
+
+		//PAPPS ADDED THIS:	it detaches the children particle effects inside the projectile, and siwtches em off.. REALLY NECESSARY
+		public bool DoReleaseChildren = false;
 
         public int AliveTime
         {
@@ -139,6 +143,8 @@ namespace Lockstep
         public int Delay{ get; set; }
 
         public int LastingDuration { get; set; }
+
+		public int TickRate { get; set;}
 
         public Vector3 EndPoint
         {
@@ -244,6 +250,7 @@ namespace Lockstep
         private void ApplyArea(Vector2d center, long radius)
         {
             long num = radius * radius;
+
             foreach (LSAgent agent in Scan(center, radius))
             {
                 if (agent.Body._position.FastDistance(center.x, center.y) < num)
@@ -307,15 +314,17 @@ namespace Lockstep
 
         private IEnumerable<LSAgent> Scan(Vector2d center, long radius)
         {
-
             foreach (LSAgent agent in InfluenceManager.ScanAll (
                 center,
                 radius,
                 this.AgentConditional,
-                this.BucketConditional))
+                this.BucketConditional
+            )
+            )
             {
                 yield return agent;
             }
+
         }
 
         private void SetupCachedActions()
@@ -359,7 +368,7 @@ namespace Lockstep
             this.OnHit();
             if (this.onHit.IsNotNull())
             {
-                this.onHit(this);
+                this.onHit();
             }
             if (this.UseEffects)
             {
@@ -374,10 +383,10 @@ namespace Lockstep
                     */
                 } else
                 {
-					if (RotateHitFX)
-						EffectManager.LazyCreateEffect(this.HitFX, this.cachedTransform.position, this.cachedTransform.rotation);
-					else
-						EffectManager.LazyCreateEffect(this.HitFX, this.cachedTransform.position);
+
+                    {
+                        EffectManager.LazyCreateEffect(this.HitFX, this.cachedTransform.position, this.cachedTransform.rotation);
+                    }
                 }
             }
 
@@ -409,6 +418,7 @@ namespace Lockstep
 
 
             this.BucketConditional = bucketConditional;
+
             this.AgentConditional = agentConditional;
 
             Forward = Vector2d.up;
@@ -487,6 +497,7 @@ namespace Lockstep
                         this.arcStartVerticalSpeed = (this.TargetHeight - this.Position.z).Div(timeToHit) + timeToHit.Mul(Gravity);
                     } else
                     {
+                        if (timeToHit > 0)
                         this.linearHeightSpeed = (this.TargetHeight - Position.z).Div(timeToHit).Abs() / LockstepManager.FrameRate;
 
                     }
@@ -514,7 +525,14 @@ namespace Lockstep
 
             if (UseEffects)
             {
-                EffectManager.LazyCreateEffect(this.StartFX, this.Position.ToVector3(), this.cachedTransform.rotation);
+                LSEffect effect = EffectManager.LazyCreateEffect(this.StartFX, this.Position.ToVector3(), this.cachedTransform.rotation);
+				if (effect != null)
+				{
+					effect.StartPos = this.Position.ToVector3();
+					effect.EndPos = this.TargetPosition.ToVector3(this.TargetHeight.ToFloat());
+					if (this.Target != null)
+						effect.Target = Target.transform;
+				}
             }
         }
 
@@ -535,7 +553,9 @@ namespace Lockstep
                     case HitType.Single:
                         if (Target == null)
                         {
-                            throw new System.Exception("Cannot use single hit effect without target");
+                            //throw new System.Exception("Cannot use single hit effect without target");
+
+                            break;
                         }
                         this.HitAgent(Target);
                         break;
@@ -547,11 +567,28 @@ namespace Lockstep
                         break;
                 }
             }
+			//PAPPS ADDED THIS:
+			if(DoReleaseChildren){
+				foreach(Transform each in transform){
+                    ParticleSystem ps;
+					if(ps = each.GetComponent<ParticleSystem>()){
+						each.parent = null;
+						ps.enableEmission = false;
+						foreach(Transform eachChild in each){
+                            ParticleSystem cps;
+							if(cps = eachChild.GetComponent<ParticleSystem>()){
+								cps.enableEmission = false;
+							}
+						}
+					}
+				}
+			}
         }
 
         private void ResetHit()
         {
             this.ExclusiveTargetType = this._exclusiveTargetType;
+            this.onHit = null;
         }
 
         private void ResetEffects()
@@ -569,6 +606,8 @@ namespace Lockstep
             this.Delay = this._delay;
             this.Speed = this._speed;
             this.LastingDuration = this._lastingDuration;
+			this.TickRate = this._tickRate;
+
         }
 
         private void ResetTrajectory()
@@ -730,7 +769,7 @@ namespace Lockstep
         //
         public event Action onDeactivate;
 		
-        public event Action<LSProjectile> onHit;
+        public event Action onHit;
 		
         public event Action onInitialize;
 		

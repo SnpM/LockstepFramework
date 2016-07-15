@@ -26,7 +26,14 @@ namespace Lockstep
 		private string fire = "fire";
 
         [SerializeField]
-        private string specialAttack = "specialAttack";
+        private string specialFire = "specialFire";
+
+        [SerializeField]
+		private string specialAttack = "specialAttack";
+
+		[SerializeField]
+		private string extra = "extra";
+
 
 		private AnimationClip idlingClip;
 		private  AnimationClip movingClip;
@@ -35,7 +42,10 @@ namespace Lockstep
         private AnimationClip specialEngagingClip;
 
 		private  AnimationClip fireClip;
-        private AnimationClip specialAttackClip;
+        private AnimationClip specialFireClip;
+
+		private AnimationClip specialAttackClip;
+		private AnimationClip extraClip;
 
 		private Animation animator;
 
@@ -61,7 +71,9 @@ namespace Lockstep
                 specialEngagingClip = animator.GetClip(this.specialEngaging);
                 //Impulses
                 fireClip = animator.GetClip(fire);
-                specialAttackClip = animator.GetClip(specialAttack);
+                specialFireClip = animator.GetClip(specialFire);
+				specialAttackClip = animator.GetClip(specialAttack);
+				extraClip = animator.GetClip(extra);
             }
 			Play(AnimState.Idling);
 		}
@@ -136,8 +148,12 @@ namespace Lockstep
 			{
 				case AnimImpulse.Fire:
 					return fire;
+                case AnimImpulse.SpecialFire:
+                    return specialFire;
                 case AnimImpulse.SpecialAttack:
-                    return specialAttack;
+					return specialAttack;
+				case AnimImpulse.Extra:
+					return extra;
 			}
 			return idling;
 		}
@@ -148,8 +164,12 @@ namespace Lockstep
 			{
 				case AnimImpulse.Fire:
 					return fireClip;
+                case AnimImpulse.SpecialFire:
+                    return specialFireClip;
                 case AnimImpulse.SpecialAttack:
-                    return specialAttackClip;
+					return specialAttackClip;
+				case AnimImpulse.Extra:
+						return extraClip;
 			}
 			return idlingClip;
 		}

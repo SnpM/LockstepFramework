@@ -2,7 +2,7 @@
 namespace Lockstep {
 public class MovementGroup
 {       
-    const int MinGroupSize = 3;
+    const int MinGroupSize = 2;
 
     public Vector2d Destination { get; private set; }
 
