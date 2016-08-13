@@ -17,7 +17,7 @@ namespace Lockstep
 		private long turnCos;
 		private long cachedBeginCheck;
 		const int checkCollisionTurnRate = 1;//LockstepManager.FrameRate;
-		private int checkCollisionCount;
+		//private int checkCollisionCount;
 
         private long collisionTurnThreshold;
 
@@ -36,7 +36,7 @@ namespace Lockstep
 		{
 			targetReached = true;
 			targetRotation = Vector2d.up;
-            checkCollisionCount = 0;
+            //checkCollisionCount = 0;
             cachedBeginCheck = 0;
 
 			bufferStartTurn = false;

@@ -60,7 +60,13 @@ namespace Lockstep {
                 Abilitys[i].Visualize();
             }
         }
-
+		public void LateVisualize()
+		{
+			for (int i = 0; i < Abilitys.Length; i++)
+			{
+				Abilitys[i].LateVisualize();
+			}
+		}
         public void Execute(Command com) {
             for (int k = 0; k < ActiveAbilitys.Length; k++) {
                 ActiveAbility abil = ActiveAbilitys[k];

@@ -9,7 +9,9 @@ namespace Lockstep
 
 
         void OnGUI () {
-            if (GameManager.Instance != null && GameManager.Instance.MainNetworkHelper.IsConnected)
+			GUILayout.Label("State Hash: " + AgentController.GetStateHash());
+
+			if (GameManager.Instance != null && GameManager.Instance.MainNetworkHelper.IsConnected)
             {
                 return;
             }
@@ -33,7 +35,6 @@ namespace Lockstep
                 //Connecting to the server with ip address 'IP'
                 ClientManager.ConnectGame(IP);
             }
-
             GUILayout.EndVertical();
         }
 

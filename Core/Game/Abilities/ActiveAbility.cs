@@ -19,14 +19,13 @@ namespace Lockstep {
 
 		public void Execute(Command com)
 		{
-
 			if (Heat <= 0 || UseCooldown == false) {
                 OnExecute(com);
                 Heat = Cooldown;
             }
         }
 
-        protected override void TemplateSimulate()
+        protected sealed override void TemplateSimulate()
         {
             Heat--;
         }

@@ -27,11 +27,12 @@ namespace Lockstep
 
         public static LSAgent MainSelectedAgent { get { return _mainAgent; } private set { _mainAgent = value; } }
 
-        private static FastSorter<LSAgent> SelectedAgents;
+        private static FastSorter<LSAgent> _selectedAgents;
+        private static FastSorter<LSAgent> SelectedAgents { get { return _selectedAgents; } }
 
         public static void Initialize()
         {
-
+            _selectedAgents = new FastSorter<LSAgent>();
         }
 
         public static void Add(LSAgent agent)
@@ -55,7 +56,7 @@ namespace Lockstep
         }
 
         public static void Clear()
-        {
+		{
             for (int i = 0; i < PlayerManager.AgentControllers.PeakCount; i++)
             {
                 if (PlayerManager.AgentControllers.arrayAllocation [i])

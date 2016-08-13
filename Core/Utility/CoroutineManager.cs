@@ -8,70 +8,59 @@ namespace Lockstep
 {
 	public static class CoroutineManager
 	{
-		const int MaxCoroutines = 8196;
 
-		static Coroutine[] Coroutines = new Coroutine[MaxCoroutines];
+		static FastBucket<Coroutine> Coroutines = new FastBucket<Coroutine>();
 
-		static FastStack<int> OpenSlots = new FastStack<int>();
-		static int HighCount;
 
-		static Coroutine coroutine;
 
-		public static void Initialize ()
+		public static void Initialize()
 		{
-			for (int i = 0; i < HighCount; i++)
-			{
-				while (Coroutines[i].Enumerator.MoveNext ());
-			}
-			Array.Clear (Coroutines,0,Coroutines.Length);
-			OpenSlots.FastClear ();
-			HighCount = 0;
+			Coroutines.Clear();
 		}
 
-		public static void Simulate ()
+		public static void Simulate()
 		{
-			for (int i = 0; i < HighCount; i++)
+			for (int i = 0; i < Coroutines.PeakCount; i++)
 			{
-				coroutine = Coroutines[i];
-				if (coroutine.Active)
+				if (Coroutines.arrayAllocation[i])
 				{
-					coroutine.Simulate ();
+					Coroutine coroutine = Coroutines[i];
+					if (coroutine.Active)
+					{
+						coroutine.Simulate();
+					}
 				}
 			}
 		}
 
-		public static Coroutine StartCoroutine (IEnumerator<int> enumerator)
+		public static Coroutine StartCoroutine(IEnumerator<int> enumerator)
 		{
-			if (OpenSlots.Count > 0)
-			{
-				int leIndex = OpenSlots.Pop();
-				coroutine = Coroutines[leIndex];
-				coroutine.Initialize (enumerator);
-				coroutine.Index = leIndex;
-				leIndex++;
-				if (leIndex > HighCount) HighCount = leIndex;
-
-			}
-			else {
-				coroutine = new Coroutine ();
-				coroutine.Initialize (enumerator);
-				Coroutines[HighCount] = coroutine;
-				coroutine.Index = HighCount++;
-			}
+			Coroutine coroutine = new Coroutine();
+			coroutine.Initialize(enumerator);
+			coroutine.Index = Coroutines.Add(coroutine);
 			return coroutine;
 		}
 
-		public static void StopCoroutine (Coroutine _coroutine)
+		public static void StopCoroutine(Coroutine _coroutine)
 		{
-			int leIndex = _coroutine.Index;
-			OpenSlots.Add (	leIndex);
-			_coroutine.End ();
+			if (_coroutine.Active == false)
+			{
+				Debug.LogError("Coroutine already stopped");
+			}
+			Coroutines.RemoveAt(_coroutine.Index);
+			_coroutine.Active = false;
+			_coroutine.End();
+		}
+
+		public static void Deactivate()
+		{
+			Coroutines.Clear();
 		}
 
 		#region ND coroutines
-		public static UnityEngine.Coroutine StartUnityCoroutine (IEnumerator enumerator)
+		public static UnityEngine.Coroutine StartUnityCoroutine(IEnumerator enumerator)
 		{
-			return LockstepManager.UnityInstance.StartCoroutine (enumerator);
+			return LockstepManager.UnityInstance.StartCoroutine(enumerator);
 		}
 		#endregion
 	}
@@ -83,31 +72,31 @@ namespace Lockstep
 		public bool Active = true;
 		public int Index;
 
-		public void Initialize (IEnumerator<int> enumerator)
+		public void Initialize(IEnumerator<int> enumerator)
 		{
 			Enumerator = enumerator;
 			WaitFrames = 0;
 			Active = true;
 		}
-		public void Simulate ()
+		public void Simulate()
 		{
 			WaitFrames--;
 			if (WaitFrames > 0)
 			{
 				return;
 			}
-			if (Enumerator.MoveNext ())
+			if (Enumerator.MoveNext())
 			{
 				WaitFrames = (int)Enumerator.Current;
 			}
 			else {
-				CoroutineManager.StopCoroutine (this);
+				CoroutineManager.StopCoroutine(this);
 			}
 		}
-		public void End ()
+		public void End()
 		{
 			Active = false;
-			Enumerator.Dispose ();
+			Enumerator.Dispose();
 		}
 	}
 

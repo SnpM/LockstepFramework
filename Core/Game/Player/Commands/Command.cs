@@ -235,5 +235,19 @@ namespace Lockstep
             }
             return items;
         }
+
+		public Command Clone()
+		{
+			Command com = new Command();
+			com.ControllerID = this.ControllerID;
+			com.InputCode = this.InputCode;
+			foreach (KeyValuePair<ushort, FastList<ICommandData>> pair in this.ContainedData) {
+				FastList<ICommandData> list = new FastList<ICommandData>();
+				pair.Value.CopyTo(list);
+
+				com.ContainedData.Add(pair.Key,list);
+			}
+			return com;
+		}
     }
 }

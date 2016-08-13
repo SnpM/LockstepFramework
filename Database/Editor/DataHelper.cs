@@ -149,7 +149,7 @@ namespace Lockstep.Data
             Apply ();
         }
 
-        protected void OnManage () {
+        private void OnManage () {
 
         }
 
@@ -215,6 +215,12 @@ namespace Lockstep.Data
                 return System.Object.ReferenceEquals (this, null) || DataProperty == null || DataProperty.isArray == false;
             return System.Object.ReferenceEquals (this, obj);
         }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public static bool operator == (DataHelper source, DataHelper other) {
             if (System.Object.ReferenceEquals(source, null))
                 return System.Object.ReferenceEquals (other, null);

@@ -106,7 +106,7 @@ namespace Lockstep
             long h2 = FixedMath.Lerp(map.GetHeight(gridX, nextY), map.GetHeight(nextX, nextY), fractionX);
             return FixedMath.Lerp(h1, h2, fractionY);
 
-            return baseHeight;
+            //return baseHeight;
         }
         [SerializeField]
         private bool _show;

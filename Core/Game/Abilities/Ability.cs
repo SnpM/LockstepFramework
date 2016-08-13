@@ -159,9 +159,18 @@ namespace Lockstep
             OnVisualize();
         }
 
+
         protected virtual void OnVisualize()
         {
         }
+		public void LateVisualize()
+		{
+			this.OnLateVisualize();
+		}
+		protected virtual void OnLateVisualize()
+		{
+
+		}
 
         public void BeginCast()
         {

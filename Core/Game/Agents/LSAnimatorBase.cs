@@ -58,17 +58,20 @@ namespace Lockstep
 			}
 		}
 
-		private bool isImpulsing;
+        private bool isImpulsing = false;
 		private bool animStateChanged;
 		private AnimState lastAnimState;
+
 
 		public virtual void Visualize()
 		{
 			if (isImpulsing == false)
 			{
+
 				if (animStateChanged)
 				{
 					Play(currentAnimState);
+
 					animStateChanged = false;
 					lastAnimState = currentAnimState;
 				}

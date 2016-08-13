@@ -118,8 +118,8 @@ namespace Lockstep
                 Partition.GetRelativeY(end.x).ToDouble(),
                 Partition.GetRelativeY(end.y).ToDouble()))
             {
-                int indexX = coor.X;
-                int indexY = coor.Y;
+                //int indexX = coor.X;
+                //int indexY = coor.Y;
                 yield return coor;
             }
         }

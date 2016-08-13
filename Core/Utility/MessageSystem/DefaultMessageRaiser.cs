@@ -5,7 +5,9 @@ namespace Lockstep
 {
     public static class DefaultMessageRaiser
     {
-        const bool Do = false;
+        private static bool _do = false;
+        public static bool Do { get { return _do; } }
+
         static readonly DefaultMessage EmptyMessage = new DefaultMessage();
 
         public static void EarlySetup()

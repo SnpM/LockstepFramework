@@ -5,7 +5,7 @@ namespace Lockstep
 {
     public class Move : ActiveAbility
     {
-        public const long FormationStop = FixedMath.One / 8;
+        public const long FormationStop = FixedMath.One / 4;
         public const long GroupDirectStop = FixedMath.One;
         public const long DirectStop = FixedMath.One / 8;
         private const int MinimumOtherStopTime = (int)(LockstepManager.FrameRate / 4);
@@ -61,6 +61,9 @@ namespace Lockstep
 
         private bool collisionTicked;
         private int stuckTick;
+
+        public bool CollisionTicked {  get { return collisionTicked; } }
+        public int StuckTick {  get { return stuckTick; } }
 
         //Has this unit arrived at destination? Default set to false.
         public bool Arrived { get; private set; }
@@ -348,7 +351,7 @@ namespace Lockstep
 
 
                 if (movingToWaypoint) {
-                    if (distance < FixedMath.Mul(closingDistance, FixedMath.One))
+					if (distance < FixedMath.Mul(closingDistance, FixedMath.Half))
                     {
                         this.pathIndex++;
                     }
@@ -380,18 +383,23 @@ namespace Lockstep
             LastCommand = com;
             if (com.ContainsData<Vector2d> ())
             {
-                Agent.StopCast(ID);
-                IsCasting = true;
-                RegisterGroup();
-                if (straightPath)
-                {
-                    repathCount /= 8;
-                } else
-                {
-                    repathCount /= 8;
-                }
+				StartFormalMove(com.GetData<Vector2d>());
             }
         }
+		public void StartFormalMove (Vector2d position)
+		{
+			Agent.StopCast(ID);
+			IsCasting = true;
+			RegisterGroup();
+			if (straightPath)
+			{
+				repathCount /= 8;
+			}
+			else
+			{
+				repathCount /= 8;
+			}
+		}
 
         public void RegisterGroup(bool moveOnProcessed = true)
         {
@@ -464,30 +472,23 @@ namespace Lockstep
 
         public void StartMove(Vector2d destination)
         {
-            if (false && IsMoving == true && destination.x == this.Destination.x && destination.y == this.Destination.y)
-            {
-                //TODO: guard return
-            } else
-            {
-                if (CanTurn)
-                    CachedTurn.StartTurnVector(destination - cachedBody._position);
-                Agent.SetState(AnimState.Moving);
-                hasPath = false;
-                straightPath = false;
-                this.Destination = destination;
-                IsMoving = true;
-                stopTime = 0;
-                Arrived = false;
+            if (CanTurn)
+                CachedTurn.StartTurnVector(destination - cachedBody._position);
+            Agent.SetState(AnimState.Moving);
+            hasPath = false;
+            straightPath = false;
+            this.Destination = destination;
+            IsMoving = true;
+            stopTime = 0;
+            Arrived = false;
 
-                viableDestination = Pathfinder.GetPathNode(this.Destination.x, this.Destination.y, out destinationNode);
+            viableDestination = Pathfinder.GetPathNode(this.Destination.x, this.Destination.y, out destinationNode);
 
-                IsCasting = true;
-                stuckTick = 0;
-                forcePathfind = false;
-                if (onStartMove != null)
-                    onStartMove ();
-
-            }
+            IsCasting = true;
+            stuckTick = 0;
+            forcePathfind = false;
+            if (onStartMove != null)
+                onStartMove();
         }
 
         protected override void OnStopCast()

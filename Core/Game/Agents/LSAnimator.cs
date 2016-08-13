@@ -81,17 +81,16 @@ namespace Lockstep
 		public override void Play(AnimState state)
 		{
 			base.Play(state);
-
 			if (CanAnimate)
 			{
 				AnimationClip clip = GetStateClip(state);
 				if (clip.IsNotNull())
 				{
-					animator.CrossFade(clip.name);
+					animator.CrossFade(clip.name, fadeLength);
 				}
 			}
 		}
-
+		const float fadeLength = .5f;
 		public override void Play(AnimImpulse impulse, int rate = 0)
 		{
 			base.Play(impulse, rate);
@@ -101,7 +100,7 @@ namespace Lockstep
 				AnimationClip clip = GetImpulseClip(impulse);
 				if (clip.IsNotNull())
 				{
-					animator.Blend(clip.name);
+					animator.Blend(clip.name,.8f,fadeLength);
 				}
 			}
 		}

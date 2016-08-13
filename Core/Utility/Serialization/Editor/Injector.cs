@@ -41,13 +41,13 @@ namespace Lockstep
             switch (fieldType) {
                 case FieldType.FixedNumber:
                     return prop.longValue.ToFloat();
-                    break;
+                    //break;
                 case FieldType.Interval:
                     return prop.intValue / (float) LockstepManager.FrameRate;
-                    break;
+                    //break;
                 case FieldType.Rate:
                     return 1 / (prop.intValue / (float)LockstepManager.FrameRate);
-                    break;
+                    //break;
             }
             return 0;
         }

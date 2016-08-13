@@ -19,7 +19,7 @@ namespace Lockstep
             PathObjectAttribute Atb = attribute as PathObjectAttribute;
             SerializedProperty prefabNameProp = property.FindPropertyRelative("_path");
             //SerializedProperty prefabProp = property.FindPropertyRelative ("_editorPrefab");
-            string lastName = prefabNameProp.stringValue;
+            //string lastName = prefabNameProp.stringValue;
             UnityEngine.Object obj = PathObjectFactory.Load(prefabNameProp.stringValue) as UnityEngine.Object;
             obj = (UnityEngine.Object)EditorGUI.ObjectField(position, label, obj, Atb.ObjectType, false);
             string relativePath = "";

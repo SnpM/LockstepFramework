@@ -302,6 +302,7 @@ namespace Lockstep
 				TrackedLockstepTickets.Add(LSVariableManager.Register(abil));
 			}
 		}
+
 		public IEnumerable<LSVariable> GetDesyncs(int[] compare)
 		{
 			int position = 0;
@@ -414,11 +415,16 @@ namespace Lockstep
 			}
 
 			abilityManager.Visualize();
+
+
+		}
+		public void LateVisualize()
+		{
+			abilityManager.LateVisualize();
 			if (Animator.IsNotNull())
 			{
 				Animator.Visualize();
 			}
-
 		}
 
 		public void Execute(Command com)
@@ -445,17 +451,19 @@ namespace Lockstep
 
 		internal void Deactivate(bool Immediate = false)
 		{
+			if (IsActive == false)
+				Debug.Log("NOASER");
 			if (onDeactivate != null)
 				this.onDeactivate(this);
 			_Deactivate();
 
-
+			Immediate = true;
 			if (Immediate == false)
 			{
 				if (Animator.IsNotNull())
 					Animator.Play(AnimState.Dying);
 				
-				CoroutineManager.StartCoroutine(PoolDelayer());
+				poolCoroutine = CoroutineManager.StartCoroutine(PoolDelayer());
 			}
 			else {
 				Pool();
@@ -478,13 +486,21 @@ namespace Lockstep
 			}
 
 		}
+		int deathingIndex;
+		public Coroutine poolCoroutine;
+
 		private IEnumerator<int> PoolDelayer()
 		{
+			deathingIndex = AgentController.DeathingAgents.Add(this);
+	
+
 			yield return _deathTime;
+			AgentController.DeathingAgents.RemoveAt(deathingIndex);
+
 			Pool();
 		}
 
-		private void Pool()
+		public void Pool()
 		{
 			AgentController.CacheAgent(this);
 			if (CachedGameObject != null)
@@ -521,9 +537,9 @@ namespace Lockstep
 			long hash = 3;
 			hash ^= this.GlobalID;
 			hash ^= this.LocalID;
-			hash ^= this.Body._position.GetHashCode();
-			hash ^= this.Body._rotation.GetHashCode();
-			hash ^= this.Body.Velocity.GetHashCode();
+			hash ^= this.Body._position.GetStateHash();
+			hash ^= this.Body._rotation.GetStateHash();
+			hash ^= this.Body.Velocity.GetStateHash();
 			return hash;
 		}
 

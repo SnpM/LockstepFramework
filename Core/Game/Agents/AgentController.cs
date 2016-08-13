@@ -93,9 +93,11 @@ namespace Lockstep
             
         }
 
+		internal static FastBucket<LSAgent> DeathingAgents = new FastBucket<LSAgent>();
         
         public static void Deactivate()
         {
+	
             for (int i = 0; i < PeakGlobalID; i++)
             {
                 if (GlobalAgentActive [i])
@@ -104,6 +106,17 @@ namespace Lockstep
                 }
             }
 			CheckDestroyAgent();
+			/*
+			for (int i = 0; i < DeathingAgents.PeakCount; i++)
+			{
+				if (DeathingAgents.arrayAllocation[i])
+				{
+					LSAgent agent = DeathingAgents[i];
+					agent.Pool();
+				}
+			}
+			DeathingAgents.FastClear();
+*/
         }
 
         private static ushort GenerateGlobalID()
@@ -170,6 +183,16 @@ namespace Lockstep
                 }
             }
         }
+		public static void LateVisualize()
+		{
+			for (int iterator = 0; iterator < PeakGlobalID; iterator++)
+			{
+				if (GlobalAgentActive[iterator])
+				{
+					GlobalAgents[iterator].LateVisualize();
+				}
+			}
+		}
 		public static void ClearAgents()
 		{
 			for (int i = GlobalAgents.Length - 1; i >= 0; i--)
@@ -221,7 +244,9 @@ namespace Lockstep
 		}
 		private static void DestroyAgentBuffer (DeactivationData data) 
 		{
+			
 			LSAgent agent = data.Agent;
+			if (agent.IsActive == false) return;
 			bool immediate = data.Immediate;
 
             agent.Deactivate(immediate);
@@ -257,7 +282,7 @@ namespace Lockstep
                 if (GlobalAgentActive [i])
                 {
                     LSAgent agent = GlobalAgents [i];
-                    int n1 = agent.Body._position.GetHashCode() + agent.Body._rotation.GetHashCode();
+                    int n1 = agent.Body._position.GetStateHash() + agent.Body._rotation.GetStateHash();
                     switch (operationToggle)
                     {
                         case 0:
@@ -277,8 +302,8 @@ namespace Lockstep
                     }
                     if (agent.Body.IsNotNull())
                     {
-                        hash ^= agent.Body._position.GetHashCode();
-                        hash ^= agent.Body._position.GetHashCode();
+                        hash ^= agent.Body._position.GetStateHash();
+                        hash ^= agent.Body._position.GetStateHash();
                     }
                 }
             }
@@ -375,7 +400,7 @@ namespace Lockstep
         //Backward compat.
         public static Command GenerateSpawnCommand(AgentController cont, string agentCode, int count, Vector2d position)
         {
-            return Lockstep.Example.ExampleSpawner.GenerateSpawnCommand(cont, agentCode, count, position);
+            return Lockstep.Example.ExampleSpawner.GenerateSpawnCommand(cont, agentCode, count, position,"");
         }
         public void AddAgent (LSAgent agent) {
             ushort localID = GenerateLocalID();
@@ -388,14 +413,23 @@ namespace Lockstep
 
             agent.InitializeController(this,localID, globalID);
         }
+		public LSAgent CreateAgent(string agentCode, Vector2d position)
+		{
+			return CreateAgent(agentCode, position, Vector2d.right);
+		}
+		public static GameObject GetTemplate(string agentCode)
+		{
+			IAgentData interfacer = AgentController.CodeInterfacerMap[agentCode];
+			return interfacer.GetAgent().gameObject;
+		}
         public LSAgent CreateAgent(
             string agentCode,
-            Vector2d? position = null, //nullable position
-            Vector2d? rotation = null  //Nullable rotation for default parametrz
+            Vector2d position,
+            Vector2d rotation
         )
         {
-            Vector2d pos = position != null ? position.Value : new Vector2d(0, 0);
-            Vector2d rot = rotation != null ? rotation.Value : Vector2d.radian0;
+			Vector2d pos = position;
+			Vector2d rot = rotation;
 
 
             if (!IsValidAgentCode(agentCode))

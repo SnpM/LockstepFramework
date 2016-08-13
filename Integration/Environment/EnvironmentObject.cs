@@ -17,5 +17,14 @@ namespace Lockstep
         protected virtual void OnLateInitialize () {
 
         }
+
+		internal void Save()
+		{
+			this.OnSave();
+		}
+		protected virtual void OnSave()
+		{
+
+		}
     }
 }

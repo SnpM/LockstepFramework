@@ -16,12 +16,15 @@ namespace Lockstep.UI
 		[SerializeField]
 		private BarElement
 			_energy;
-		Vector3 Offset;
+
+        Vector3 _offset;
+        Vector3 Offset { get { return _offset; } }
 
 		public LSAgent TrackedAgent { get; private set; }
 
 		void Awake ()
 		{
+            _offset = Vector3.zero;
 			gameObject.SetActive (false);
 		}
 
