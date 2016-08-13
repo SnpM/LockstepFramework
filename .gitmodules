@@ -1,6 +1,3 @@
 [submodule "Database/Newtonsoft.Json"]
 	path = Database/Newtonsoft.Json
 	url = ../../JamesNK/Newtonsoft.Json.git
-[submodule "Core/Simulation/Math/Pan-Line-Algorithm"]
-	path = Core/Simulation/Math/Pan-Line-Algorithm
-	url = ../Pan-Line-Algorithm.git
