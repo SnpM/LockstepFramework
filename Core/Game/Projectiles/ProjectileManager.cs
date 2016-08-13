@@ -46,9 +46,10 @@ namespace Lockstep {
 	    {
             for (int i = ProjectileBucket.PeakCount - 1; i >= 0; i--)
 			{
-                if (ProjectileBucket.arrayAllocation[i])
-				{
-					ProjectileBucket[i].Visualize ();
+				if (ProjectileBucket.arrayAllocation[i]) {
+					if (ProjectileBucket[i] != null) {
+						ProjectileBucket[i].Visualize();
+					}
 				}
 			}
             VisualizeBucket (NDProjectileBucket);
@@ -91,17 +92,31 @@ namespace Lockstep {
         private static LSProjectile NewProjectile (string projCode)
 		{
             IProjectileData projData = CodeDataMap[projCode];
-            curProj = ((GameObject)GameObject.Instantiate<GameObject> (projData.GetProjectile().gameObject)).GetComponent<LSProjectile> ();
-			curProj.Setup (projData);
-			return curProj;
+			if (projData.GetProjectile().gameObject != null) {
+				curProj = ((GameObject)GameObject.Instantiate<GameObject>(projData.GetProjectile().gameObject)).GetComponent<LSProjectile>();
+				if (curProj != null) {
+					curProj.Setup(projData);
+					return curProj;
+				}
+				else return null;
+			}
+			else return null;
 		}
         public static LSProjectile Create (string projCode, LSAgent source, Vector3d offset, AllegianceType targetAllegiance, Func<LSAgent,bool> agentConditional,Action<LSAgent> hitEffect) {
             Vector2d relativePos = offset.ToVector2d();
-            Vector2d worldPos = relativePos.Rotated(source.Body.Rotation);
+            Vector2d worldPos = relativePos.Rotated(source.Body.Rotation) + source.Body.Position;
             Vector3d pos = new Vector3d(worldPos.x,worldPos.y,offset.z + source.Body.HeightPos);
-            pos.Add(ref source.Body._position);
-
-            return Create (projCode,pos,agentConditional,(bite) => ((source.Controller.GetAllegiance(bite) & targetAllegiance) != 0),hitEffect);
+            AgentController sourceController = source.Controller;
+            LSProjectile proj = Create (
+                projCode,
+                pos,
+                agentConditional,
+                (bite) => {
+                return ((sourceController.GetAllegiance(bite) & targetAllegiance) != 0);
+            }
+                ,
+                hitEffect);
+            return proj;
         }
         public static LSProjectile Create (string projCode, Vector3d position, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional, Action<LSAgent> hitEffect)
 		{
@@ -128,17 +143,22 @@ namespace Lockstep {
         }
 		public static void Fire (LSProjectile projectile)
 		{
-			projectile.LateInit ();
+			if (projectile != null) {
+				projectile.LateInit();
+			}
 		}
 
         private static FastBucket<LSProjectile> NDProjectileBucket = new FastBucket<LSProjectile>();
         public static LSProjectile NDCreateAndFire (string projCode, Vector3d position, Vector3d direction, bool gravity = false) {
-            curProj = RawCreate (projCode);
-            int id = NDProjectileBucket.Add (curProj);
-            curProj.Prepare(id,position,(a)=>false,(a)=>false,(a)=>{}, false);
-            curProj.InitializeFree(direction,(a)=>false,gravity);
-            ProjectileManager.Fire (curProj);
-            return curProj;
+			if (curProj != null) {
+				curProj = RawCreate(projCode);
+				int id = NDProjectileBucket.Add(curProj);
+				curProj.Prepare(id, position, (a) => false, (a) => false, (a) => { }, false);
+				curProj.InitializeFree(direction, (a) => false, gravity);
+				ProjectileManager.Fire(curProj);
+				return curProj;
+			}
+			else return null;
         }
 
 		public static void EndProjectile (LSProjectile projectile)

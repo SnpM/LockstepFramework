@@ -66,13 +66,8 @@ namespace Lockstep
         {
         }
 
-        public Command(ushort inputCode)
-        {
-            this.Initialize();
-            InputCode = inputCode;
-        }
 
-        public Command(ushort inputCode, byte controllerID)
+		public Command(ushort inputCode, byte controllerID = byte.MaxValue)
         {
             this.Initialize();
             this.InputCode = inputCode;
@@ -136,6 +131,14 @@ namespace Lockstep
 			}
 			return default(TData);
         }
+		public TData[] GetDataArray<TData>() where TData : ICommandData{
+			int count = this.GetDataCount<TData> ();
+			TData[] array = new TData[count];
+			for (int i = 0; i < count; i++) {
+				array [i] = GetData<TData> (i);
+			}
+			return array;
+		}
         public bool TryGetData<TData> (out TData data, int index = 0) where TData : ICommandData
         {
             data = default(TData);
@@ -232,5 +235,19 @@ namespace Lockstep
             }
             return items;
         }
+
+		public Command Clone()
+		{
+			Command com = new Command();
+			com.ControllerID = this.ControllerID;
+			com.InputCode = this.InputCode;
+			foreach (KeyValuePair<ushort, FastList<ICommandData>> pair in this.ContainedData) {
+				FastList<ICommandData> list = new FastList<ICommandData>();
+				pair.Value.CopyTo(list);
+
+				com.ContainedData.Add(pair.Key,list);
+			}
+			return com;
+		}
     }
 }

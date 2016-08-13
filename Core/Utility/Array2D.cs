@@ -36,7 +36,8 @@ namespace Lockstep
 
         public T[] InnerArray { get { return _innerArray; } }
 
-        private T StartVal;
+        private T _startVal;
+        private T StartVal {  get { return _startVal; } }
 
         public Array2D () : this(0,0){
 
@@ -44,7 +45,7 @@ namespace Lockstep
 
         public Array2D(int width, int height, T startVal) : this(width, height)
         {
-            StartVal = startVal;
+            _startVal = startVal;
         }
 
         public Array2D (int width, int height) {

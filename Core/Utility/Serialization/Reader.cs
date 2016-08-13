@@ -111,5 +111,13 @@ namespace Lockstep
             return ret;
 
         }
+
+		public TData Read <TData> () where TData : ICommandData 
+		{
+			TData data = Activator.CreateInstance<TData> ();
+			data.Read (this);
+
+			return data;
+		}
     }
 }

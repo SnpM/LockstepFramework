@@ -412,12 +412,12 @@ namespace Lockstep
                 return result;
             }
             public static long Cos(long theta) {
-
-                return Sin (theta - FixedMath.Pi / 2);
+				long sin = Sin(theta);
+				return FixedMath.Sqrt(FixedMath.One - (sin.Mul(sin)));
             }
             public static long SinToCos(long sin)
             {
-                return Sqrt(FixedMath.One - (sin.Mul( sin)).Normalized());
+                return Sqrt(FixedMath.One - (sin.Mul( sin)));
             }
             public static long Tan (long theta) {
                 return Sin(theta).Div(Cos(theta));

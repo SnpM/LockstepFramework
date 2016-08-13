@@ -9,9 +9,28 @@ namespace Lockstep
         [SerializeField, FixedNumber]
         private long _maxHealth = FixedMath.One * 100;
 
+        public long BaseHealth {get {return _maxHealth;}}
+
         public long MaxHealth
         {
-            get { return _maxHealth; }
+            get { return _maxHealth + MaxHealthModifier; }
+        }
+
+        private long _maxHealthModifier;
+        [Lockstep (true)]
+        public long MaxHealthModifier {
+            get {
+                return _maxHealthModifier;
+            }
+            set {
+                if (value != _maxHealthModifier) {
+                    long dif = _maxHealthModifier - value;
+                    if (dif > 0) {
+                        this.TakeDamage(-dif);
+                        _maxHealthModifier = value;
+                    }
+                }
+            }
         }
 
         public long DamageMultiplier
@@ -20,7 +39,8 @@ namespace Lockstep
             set;
         }
 
-        public event Action onHealthChange;
+		public event Action onHealthChange ;
+		public event Action<long> onHealthDelta;
 
         public bool CanLose {
             get {
@@ -44,12 +64,17 @@ namespace Lockstep
             }
             set
             {
+				long delta = value - _currentHealth;
                 _currentHealth = value;
                 if (onHealthChange != null)
                     onHealthChange();
+				if (onHealthDelta != null)
+					onHealthDelta (delta);
             }
 
         }
+
+		public LSAgent LastDamageSource { get; set;}
 
         protected override void OnSetup()
         {
@@ -59,6 +84,8 @@ namespace Lockstep
         {
             HealthAmount = MaxHealth;
             OnTakeProjectile = null;
+            MaxHealthModifier = 0;
+			LastDamageSource = null;
         }
 
         public void TakeProjectile(LSProjectile projectile)
@@ -72,13 +99,14 @@ namespace Lockstep
                 TakeDamage(projectile.CheckExclusiveDamage(Agent.Tag));               
             }
         }
-
-        public void TakeDamage(long damage)
+        public void TakeDamage(long damage, LSAgent source = null)
         {
             if (damage >= 0)
             {
                 damage.Mul(DamageMultiplier);
                 HealthAmount -= damage;
+				if (source != null)
+					LastDamageSource = source;
                 // don't let the health go below zero
                 if (HealthAmount <= 0)
                 {

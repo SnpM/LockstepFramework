@@ -70,7 +70,8 @@ namespace Lockstep
             System.Type mainType = this.GetType();
             if (mainType.IsSubclassOf(typeof(ActiveAbility)))
             {
-                while ( mainType.BaseType != typeof(ActiveAbility))
+				while ( mainType.BaseType != typeof(ActiveAbility) &&
+				       mainType.GetCustomAttributes(typeof (CustomActiveAbilityAttribute),false).Length == 0)
                 {
                     mainType = mainType.BaseType;
                 }
@@ -158,9 +159,18 @@ namespace Lockstep
             OnVisualize();
         }
 
+
         protected virtual void OnVisualize()
         {
         }
+		public void LateVisualize()
+		{
+			this.OnLateVisualize();
+		}
+		protected virtual void OnLateVisualize()
+		{
+
+		}
 
         public void BeginCast()
         {

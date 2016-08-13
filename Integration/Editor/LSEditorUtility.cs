@@ -475,7 +475,7 @@ namespace Lockstep
                 if (string.IsNullOrEmpty(memberName))
                 {
                     throw new System.ArgumentException("Member cannot have empty name");
-                    continue;
+                    //continue;
                 }
                 if (memberName.Contains(" "))
                 {
@@ -485,7 +485,7 @@ namespace Lockstep
                 if (enumValues.Contains(memberValue) || enumNames.Contains(memberName))
                 {
                     throw new System.ArgumentException("Duplicate member at index: " + i);
-                    continue;
+                    //continue;
                 }
                 CodeMemberField member = new CodeMemberField
                 {

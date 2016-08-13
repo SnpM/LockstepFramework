@@ -27,14 +27,15 @@ namespace Lockstep
                     ref value,
                     a.Timescaled
                 );
-                if (a.Ranged) {
+                if (a.Ranged)
+                {
                     if (value > a.Max)
                         value = a.Max;
                     else if (value < a.Min)
                         value = a.Min;
                 }
                 if (orgValue != value)
-                property.longValue = value;
+                    property.longValue = value;
             }
         }
 
@@ -67,14 +68,22 @@ namespace Lockstep
                 FrameCountAttribute a = attribute as FrameCountAttribute;
                 if (a.IsRate == false)
                 {
-                    property.intValue =
+                    
+                    int set =
                 (int)(EditorGUI.DoubleField(position, label,
                         property.intValue / (double)LockstepManager.FrameRate) * LockstepManager.FrameRate);
-                }
-                else {
+                    if (property.intValue != set)
+                        property.intValue = set;
+                    
+                } else
+                {
+                    
                     double showVal = 1d / (property.intValue / (double)LockstepManager.FrameRate);
-                    showVal = EditorGUI.DoubleField(position,label,showVal);
-                    property.intValue = (int)((1d / showVal) * LockstepManager.FrameRate);
+                    showVal = EditorGUI.DoubleField(position, label, showVal);
+
+                    int set = (int)((1d / showVal) * LockstepManager.FrameRate);
+                    if (property.intValue != set)
+                        property.intValue = set;
                 }
 
             }
@@ -84,11 +93,13 @@ namespace Lockstep
         public class EditorVectorRotation : PropertyDrawer
         {
             float height = 0f;
+
             public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
             {
                 float h = height;
                 return h;
             }
+
             public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
             {
                 VectorRotationAttribute at = this.attribute as VectorRotationAttribute;
@@ -97,7 +108,7 @@ namespace Lockstep
                 SerializedProperty x = property.FindPropertyRelative("x");
                 SerializedProperty y = property.FindPropertyRelative("y");
 
-                double angleInRadians = Math.Atan2(y.longValue.ToDouble(),x.longValue.ToDouble());
+                double angleInRadians = Math.Atan2(y.longValue.ToDouble(), x.longValue.ToDouble());
 
                 double angleInDegrees = (angleInRadians * 180d / Math.PI) * scale;
                 height = 15f;
@@ -105,7 +116,8 @@ namespace Lockstep
                 angleInDegrees = (EditorGUI.DoubleField(position, "Angle", angleInDegrees)) / scale;
 
                 double newAngleInRadians = angleInDegrees * Math.PI / 180d;
-                if (Math.Abs(newAngleInRadians - angleInRadians) >= .001f) {
+                if (Math.Abs(newAngleInRadians - angleInRadians) >= .001f)
+                {
                     long cos = FixedMath.Create(Math.Cos(newAngleInRadians));
                     long sin = FixedMath.Create(Math.Sin(newAngleInRadians));
                     x.longValue = cos;
@@ -135,7 +147,7 @@ namespace Lockstep
                         break;
                     default:
                         throw new System.ArgumentException(string.Format("The visualization behavior of Type {0} is not implemented", property.propertyType));
-                        break;
+                        //break;
                 }
             }
 
@@ -149,7 +161,7 @@ namespace Lockstep
                         break;
                     default:
                         throw new System.ArgumentException(string.Format("The visualization behavior of Type {0} is not implemented", property.propertyType));
-                        break;
+                        //break;
                 }
             }
         }

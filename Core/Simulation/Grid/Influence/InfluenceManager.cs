@@ -5,115 +5,121 @@ using System;
 
 namespace Lockstep
 {
-    public static class InfluenceManager
-    {
-        public static void Initialize()
-        {
-            //DeltaCache.GenerateCache ();
-        }
+	public static class InfluenceManager
+	{
+		public static void Initialize()
+		{
+			//DeltaCache.GenerateCache ();
+		}
 
-        public static void Simulate()
-        {
+		public static void Simulate()
+		{
 
-        }
+		}
 
-        public static int GenerateDeltaCount(long radius)
-        {
-            radius /= GridManager.ScanResolution;
-            int ret = FixedMath.Mul(FixedMath.Mul(radius, radius), FixedMath.Pi).CeilToInt();
-            //if (ret < 5) ret = 5;
-            return ret;
-        }
+		public static int GenerateDeltaCount(long radius)
+		{
+			radius /= GridManager.ScanResolution;
+			int ret = FixedMath.Mul(FixedMath.Mul(radius, radius), FixedMath.Pi).CeilToInt();
+			//if (ret < 5) ret = 5;
+			return ret;
+		}
 
-        #region Scanning
+		#region Scanning
 
-        const int FoundScanBuffer = 5;
+		const int FoundScanBuffer = 5;
 
-        public static LSAgent FindClosestAgent(Vector2d position, IEnumerable<LSAgent> agents)
-        {
-            long sourceX = position.x;
-            long sourceY = position.y;
-            LSAgent closestAgent = null;
-            long closestDistance = 0;
-            int foundBuffer = FoundScanBuffer;
-            foreach (LSAgent agent in agents)
-            {
-                if (FoundScanBuffer == 0)
-                    break;
-                if (closestAgent != null)
-                {
-                    long tempDistance = agent.Body._position.FastDistance(sourceX, sourceY);
-                    if (tempDistance < closestDistance)
-                    {
-                        closestAgent = agent;
-                        closestDistance = tempDistance;
-                        foundBuffer = FoundScanBuffer;
-                    } else
-                    {
-                        foundBuffer--;
-                    }
-                } else
-                {
-                    closestAgent = agent;
-                    closestDistance = agent.Body._position.FastDistance(sourceX, sourceY);
-                }
-            }
-            return closestAgent;
-        }
+		public static LSAgent FindClosestAgent(Vector2d position, FastList<LSAgent> agents)
+		{
+			long sourceX = position.x;
+			long sourceY = position.y;
+			LSAgent closestAgent = null;
+			long closestDistance = 0;
+			int foundBuffer = FoundScanBuffer;
+			foreach (LSAgent agent in agents)
+			{
 
-        public static LSAgent Scan(Vector2d position, long radius, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional)
-        {
+				if (closestAgent != null)
+				{
+					long tempDistance = agent.Body._position.FastDistance(sourceX, sourceY);
+					if (tempDistance < closestDistance)
+					{
+						closestAgent = agent;
+						closestDistance = tempDistance;
+						foundBuffer = FoundScanBuffer;
+					}
+					else
+					{
+						foundBuffer--;
+					}
+				}
+				else
+				{
+					closestAgent = agent;
+					closestDistance = agent.Body._position.FastDistance(sourceX, sourceY);
+				}
+			}
+			return closestAgent;
+		}
 
-            return FindClosestAgent(position, ScanAll(position, radius, agentConditional, bucketConditional));
-        }
+		public static LSAgent Scan(Vector2d position, long radius, Func<LSAgent, bool> agentConditional, Func<byte, bool> bucketConditional)
+		{
+			ScanAll(position, radius, agentConditional, bucketConditional, bufferAgents);
+			return FindClosestAgent(position, bufferAgents);
+		}
 
-        public static IEnumerable<LSAgent> ScanAll(Vector2d position, long radius, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional)
-        {
-            int xMin = ((position.x - radius - GridManager.OffsetX) / (long)GridManager.ScanResolution).ToInt();
-            int xMax = ((position.x + radius - GridManager.OffsetX) / (long)GridManager.ScanResolution).CeilToInt();
-            int yMin = ((position.y - radius - GridManager.OffsetY) / (long)GridManager.ScanResolution).ToInt();
-            int yMax = ((position.y + radius - GridManager.OffsetY) / (long)GridManager.ScanResolution).CeilToInt();
+		public static FastList<LSAgent> bufferAgents = new FastList<LSAgent>();
+		public static void ScanAll(Vector2d position, long radius, Func<LSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, FastList<LSAgent> output)
+		{
+			output.FastClear();
+			int xMin = ((position.x - radius - GridManager.OffsetX) / (long)GridManager.ScanResolution).ToInt();
+			int xMax = ((position.x + radius - GridManager.OffsetX) / (long)GridManager.ScanResolution).CeilToInt();
+			int yMin = ((position.y - radius - GridManager.OffsetY) / (long)GridManager.ScanResolution).ToInt();
+			int yMax = ((position.y + radius - GridManager.OffsetY) / (long)GridManager.ScanResolution).CeilToInt();
 
-            long fastRadius = radius * radius;
-            for (int x = xMin; x <= xMax; x++)
-            {
-                for (int y = yMin; y <= yMax; y++)
-                {
-                    ScanNode tempNode = GridManager.GetScanNode(
-                                            x,
-                                            y);
+			long fastRadius = radius * radius;
+			for (int x = xMin; x <= xMax; x++)
+			{
+				for (int y = yMin; y <= yMax; y++)
+				{
+					ScanNode tempNode = GridManager.GetScanNode(
+											x,
+											y);
 
-                    if (tempNode.IsNotNull())
-                    {
-                        foreach (FastBucket<LSInfluencer> tempBucket in tempNode.BucketsWithAllegiance(bucketConditional))
-                        {
-                            BitArray arrayAllocation = tempBucket.arrayAllocation;
-                            for (int j = 0; j < tempBucket.PeakCount; j++)
-                            {
-                                if (arrayAllocation.Get(j))
-                                {
-                                    LSAgent tempAgent = tempBucket [j].Agent;
+					if (tempNode.IsNotNull())
+					{
+						if (tempNode.AgentCount > 0)
+						{
+							foreach (FastBucket<LSInfluencer> tempBucket in tempNode.BucketsWithAllegiance(bucketConditional))
+							{
+								BitArray arrayAllocation = tempBucket.arrayAllocation;
+								for (int j = 0; j < tempBucket.PeakCount; j++)
+								{
+									if (arrayAllocation.Get(j))
+									{
+										LSAgent tempAgent = tempBucket[j].Agent;
 
-                                    long distance = (tempAgent.Body.Position - position).FastMagnitude();
-                                    if (distance < fastRadius)
-                                    {
+										long distance = (tempAgent.Body.Position - position).FastMagnitude();
+										if (distance < fastRadius)
+										{
 
-                                        if (agentConditional(tempAgent))
-                                        {
-                                            yield return tempAgent;
-                                        }
-                                    }
-                                    else {
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+											if (agentConditional(tempAgent))
+											{
+												output.Add(tempAgent);
+											}
+										}
+										else {
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 
-        }
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

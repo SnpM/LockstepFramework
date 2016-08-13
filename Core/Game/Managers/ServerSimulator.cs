@@ -51,7 +51,6 @@ namespace Lockstep
 
 		static IEnumerator Tick ()
 		{
-			float accumulator = 0;
 			while (true)
 			{
 				if (IsSimulating && LockstepManager.GameStarted) {
@@ -62,11 +61,8 @@ namespace Lockstep
 					receivedBytes.FastClear ();
 					Send (bufferBytes.ToArray ());
 				}
-				accumulator = 0;
 				yield return LSUtility.WaitRealTime (LockstepManager.BaseDeltaTime * LockstepManager.InfluenceResolution);
-
 			}
-			yield break;
 		}
 	}
 }

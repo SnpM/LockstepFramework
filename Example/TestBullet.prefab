@@ -27,7 +27,6 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 15.286378, y: -4.2496395, z: -15.54683}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -75,27 +74,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14e14365092354525b827ca9117ed940, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Position:
-    x: 0
-    y: 0
-    z: 0
   _speed: 1048576
   _visualArc: 1
   _delay: 0
   _attachEndEffectToTarget: 0
-  _hitFX: 
+  _endEffect: 
   CanRotate: 1
-  _startFX: Muzzle Ball
+  _startEffect: Muzzle Ball
   IsActive: 0
   UseEffects: 1
-  RotateHitFX: 1
   _canVisualize: 1
+  _interpolationRate: 8
   _exclusiveTargetType: 0
   _targetingBehavior: 1
+  _targetPlatform: 0
   _hitBehavior: 0
   _angle: 32768
   _radius: 131072
-  _lastingDuration: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

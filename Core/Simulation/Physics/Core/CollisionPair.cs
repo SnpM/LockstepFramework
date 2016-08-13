@@ -152,7 +152,9 @@ namespace Lockstep
                     DistX = (DistX * depth / dist) / 2L;
                     DistY = (DistY * depth / dist) / 2L;
 
-                    const bool applyVelocity = false;
+                    //Switch, used to be const
+                    bool applyVelocity = false;
+
                     //Resolving collision
                     if (Body1.Immovable && Body1.isActiveAndEnabled || (Body2.Immovable == false && Body1.Priority > Body2.Priority))
                     {
@@ -308,7 +310,7 @@ namespace Lockstep
             //Check
                 case CollisionType.Circle_Circle:
                     return CheckCircle();
-                    break;
+                    //break;
             
             //Check
                 case CollisionType.Circle_AABox:
@@ -357,6 +359,7 @@ namespace Lockstep
                 case CollisionType.AABox_AABox:
                 //Not supported
                     return false;
+                    /*
                     if (DoPhysics)
                     {
                         if (CheckCircle())
@@ -374,10 +377,12 @@ namespace Lockstep
                         }
                     }
                     break;
+                    */
 
                 case CollisionType.AABox_Polygon:
                 //Not supported
                     return false;
+                    /*
                     if (CheckCircle())
                     {
                         if (Body1.Shape == ColliderType.AABox)
@@ -396,10 +401,12 @@ namespace Lockstep
                         }
                     }
                     break;
+                    */
 
                 case CollisionType.Polygon_Polygon:
                 //Not supported
                     return false;
+                    /*
                     if (CheckCircle())
                     {
                         if (CheckPoly_Poly(Body1, Body2))
@@ -408,6 +415,7 @@ namespace Lockstep
                         }
                     }
                     break;
+                    */
             }
 
             return false;
@@ -499,6 +507,7 @@ namespace Lockstep
         private static Vector2d ClosestAxis;
         private static long ClosestDist;
         private static long ClosestAxisProjection;
+
 
         public static bool CheckCircle_Poly(LSBody circle, LSBody poly)
         {

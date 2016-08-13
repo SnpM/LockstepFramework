@@ -33,12 +33,16 @@ namespace Lockstep
 
         public bool ForceUpdate { get; set; }
 
+        public void UpdateHeight () {
+            long height = HeightmapHelper.Instance.GetHeight(MapIndex, Agent.Body.Position) + _bonusHeight + Offset;
+            Agent.Body.HeightPos = height;
+        }
+
         protected override void OnSimulate()
         {
             if (Agent.Body.PositionChanged || Agent.Body.PositionChangedBuffer || ForceUpdate)
             {
-                long height = HeightmapHelper.Instance.GetHeight(MapIndex, Agent.Body.Position) + _bonusHeight + Offset;
-                Agent.Body.HeightPos = height;
+                UpdateHeight ();
             }
         }
     }

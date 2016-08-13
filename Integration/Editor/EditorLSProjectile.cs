@@ -28,6 +28,7 @@ namespace Lockstep.Integration
                 case TargetingType.Timed:
                     so.PropertyField("_delay");
                     so.PropertyField ("_lastingDuration");
+					so.PropertyField("_tickRate");
                     break;
             }
             EditorGUILayout.Space ();
@@ -65,17 +66,18 @@ namespace Lockstep.Integration
 
 			if (useEffectProp.boolValue)
 			{
-				so.PropertyField("RotateHitFX");
 				so.PropertyField("_startFX");
 				so.PropertyField("_hitFX");
 				so.PropertyField("_attachEndEffectToTarget");
-
 			}
+
+			//PAPPS ADDED THIS:
+			so.PropertyField("DoReleaseChildren");
 
             if (EditorGUI.EndChangeCheck ()) {
                 serializedObject.ApplyModifiedProperties ();
                 EditorUtility.SetDirty (target);
-            }
+			}
         }
     }
 }

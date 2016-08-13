@@ -28,9 +28,14 @@ namespace Lockstep
         public static Vector2 Box_BottomRight;
         public static bool Boxing;
         private static float BoxingTime;
-        private static bool CheckBoxDistance;
+
+        private static bool _checkBoxDistance;
+        private static bool CheckBoxDistance { get { return _checkBoxDistance;  } }
+
         private const float MinBoxSqrDist = 4;
         private static Camera mainCamera;
+        private static Camera MainCamera {  get { return mainCamera;  } }
+
         static Vector2 agentPos;
         static readonly FastSorter<LSAgent> bufferBoxedAgents = new FastSorter<LSAgent>(
                                                                     ((source, other) => source.BoxPriority - other.BoxPriority)
@@ -48,12 +53,10 @@ namespace Lockstep
         public static void Update()
         {
 
-
             MousePosition = Input.mousePosition;
             MouseWorldPosition = RTSInterfacing.GetWorldPos(MousePosition);
             CanClearSelection = !Input.GetKey(KeyCode.LeftShift);
             GetMousedAgent();
-
             if (Boxing)
             {
                 if (CanBox)
@@ -100,7 +103,7 @@ namespace Lockstep
                         Box_BottomRight = RTSInterfacing.GetWorldPos(RaycastBotRight);
                     }
                     ClearBox();
-                    int lecount = 0;
+                    //int lecount = 0;
                     if ((BoxEnd - BoxStart).sqrMagnitude >= MinBoxSqrDist)
                     {
                         bufferBoxedAgents.Clear();
@@ -149,7 +152,7 @@ namespace Lockstep
                             }
                         }
                         bufferBoxable.FastClear();
-                        bool noneBoxable = true;
+                        //bool noneBoxable = true;
                         if (bufferBoxedAgents.Count > 0)
                         {
                             int peakBoxPriority = bufferBoxedAgents.PeekMax().BoxPriority;
@@ -187,7 +190,7 @@ namespace Lockstep
 
                 if (IsGathering == false && Input.GetMouseButtonDown(0))
                 {
-                    CheckBoxDistance = true;
+                    _checkBoxDistance = true;
                     Boxing = true;
                     BoxingTime = 0f;
                     BoxStart = MousePosition;
@@ -207,7 +210,8 @@ namespace Lockstep
 
         public static void SelectAgent(LSAgent agent)
         {
-            if (agent.IsNotNull())
+
+			if (agent.IsNotNull())
             {
                 agent.IsSelected = true;
                 Selector.Add(agent);
@@ -240,7 +244,8 @@ namespace Lockstep
 
         private static void SelectBoxedAgents()
         {
-            for (int i = 0; i < BoxedAgents.Count; i++)
+
+			for (int i = 0; i < BoxedAgents.Count; i++)
             {
                 SelectAgent(BoxedAgents.innerArray [i]);
             }

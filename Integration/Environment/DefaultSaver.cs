@@ -62,6 +62,10 @@ namespace Lockstep
                 objectBuffer.Add(obj);
             }
             _environmentObjects = objectBuffer.ToArray();
+			for (int i = 0; i < _environmentObjects.Length; i++)
+			{
+				_environmentObjects[i].Save();
+			}
         }
         static bool IsAgent (object obj) {
             MonoBehaviour mb = obj as MonoBehaviour;
