@@ -66,6 +66,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0.48}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.6}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 450234}
   m_RootOrder: 0
@@ -78,6 +79,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 422538}
   m_Father: {fileID: 465378}
@@ -89,8 +91,9 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100310}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.778}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 450234}
   m_Father: {fileID: 0}
@@ -104,17 +107,20 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: b30447a543b0c4e6b9494c581702fd8c, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
   m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_SelectedWireframeHidden: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -130,17 +136,20 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: b30447a543b0c4e6b9494c581702fd8c, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
   m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_SelectedWireframeHidden: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -185,6 +194,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mapIndex: 0
+  _bonusHeight: 0
 --- !u!114 &11425566
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -196,6 +206,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7cc9ef18533c9f4c943ac00aab4efd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _cooldown: 0
   Destination:
     x: 0
     y: 0
@@ -203,7 +214,8 @@ MonoBehaviour:
   _canTurn: 1
   _speed: 131072
   _acceleration: 65536
-  _canPathfind: 0
+  _canPathfind: 1
+  StopTimer: 0
   DrawPath: 1
 --- !u!114 &11439568
 MonoBehaviour:
@@ -231,6 +243,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHealth: 65536000
+  _currentHealth: 0
 --- !u!114 &11479720
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -242,17 +255,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4525e3f8c8889d43a4d23626ea32d54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _cooldown: 0
   _projectileCode: TestBullet
   _range: 786432
   _sight: 655360
   _damage: 65536
   _attackRate: 32
   _targetAllegiance: 4
-  _targetPlatform: 4
   _trackAttackAngle: 1
   _attackAngle: 11380
-  _energyCost: 0
-  _projectileOrigin: {x: 0, y: 0, z: 1.273089}
+  _projectileOffset:
+    x: 0
+    y: 0
+    z: 0
+  _secondaryProjectileOffsets: []
+  _cycleProjectiles: 0
+  _windup: 0
+  _increasePriority: 1
 --- !u!114 &11485440
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -267,15 +286,10 @@ MonoBehaviour:
   _deathTime: 64
   _agentType: 0
   _globalID: 0
-  _statsBarOffset: {x: 0, y: 1, z: 0}
   _boxPriority: 0
   _selectionPriority: 0
-  _attachedAbilities: []
-  _body: {fileID: 0}
-  _triggers: []
-  _animator: {fileID: 0}
-  _cachedTransform: {fileID: 0}
-  _cachedGameObject: {fileID: 0}
+  _selectable: 1
+  TypeIndex: 0
   Tag: 0
   _selectionRadius: 1
   _visualCenter: {fileID: 465378}
@@ -320,6 +334,7 @@ MonoBehaviour:
   _height: 65536
   _positionalTransform: {fileID: 465378}
   _rotationalTransform: {fileID: 465378}
+  _rotationOffset: {x: 0, y: 0, z: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
