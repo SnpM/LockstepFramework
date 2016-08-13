@@ -452,10 +452,13 @@ namespace Lockstep
             return x * 31 + y * 7;
         }
 
-        public override int GetHashCode()
+        public int GetStateHash()
         {
             return (int)(GetLongHashCode() % int.MaxValue);
         }
+		public override int GetHashCode () {
+			return this.GetStateHash ();
+		}
 
         public void Write(Writer writer)
         {
