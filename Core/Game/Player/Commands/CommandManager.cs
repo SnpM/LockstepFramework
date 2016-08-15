@@ -21,6 +21,10 @@ namespace Lockstep
         {
             SendOut();
         }
+		public static void Visualize()
+		{
+			SendOut();
+		}
 
         public static void ProcessPacket(byte[] packet)
         {
@@ -33,27 +37,29 @@ namespace Lockstep
 
         public static void ProcessPacket(FastList<byte> packet)
         {
-
+			if (ReplayManager.IsPlayingBack) return;
             if (packet == null || packet.Count < 4)
             {
                 throw new System.Exception("Packet is null or not valid length");
             }
             int frameCount = BitConverter.ToInt32(packet.innerArray, 0);
+
             int index = 4;
 
             Frame frame = new Frame();
 
             if (packet.Count > 4)
             {
-                while (index < packet.Count)
+
+				while (index < packet.Count)
                 {
                     Command com = new Command();
                     index += com.Reconstruct(packet.innerArray, index);
                     frame.AddCommand(com);
                 }
-            }
-            ProcessFrame(frameCount, frame);
 
+			}
+            ProcessFrame(frameCount, frame);
         }
 
         public static void ProcessFrame(int frameCount, Frame frame)
@@ -80,7 +86,7 @@ namespace Lockstep
             
         }
 		//static FastList<Command> asdf = new FastList<Command>();
-        public static void SendCommand(Command com, bool immediate = false)
+        public static void SendCommand(Command com)
         {
 			if (com == null)
 			{
@@ -88,11 +94,7 @@ namespace Lockstep
 			}
 
 			bufferedBytes.AddRange(com.Serialized);
-			if (immediate)
-            {
-				
-                SendOut();
-            }
+
         }
     }
 
