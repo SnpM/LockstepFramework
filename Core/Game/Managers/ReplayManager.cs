@@ -92,7 +92,7 @@ namespace Lockstep
             bufferFrames.Clear();
 
             int length = reader.ReadInt();
-            int lastSavedFrame = 0;
+            int lastSavedFrame = -1;
             while (reader.Position < reader.Length) {
 
                 int frameCount = reader.ReadInt();

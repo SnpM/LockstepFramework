@@ -214,7 +214,7 @@ MonoBehaviour:
   _canTurn: 1
   _speed: 131072
   _acceleration: 65536
-  _canPathfind: 1
+  _canPathfind: 0
   StopTimer: 0
   DrawPath: 1
 --- !u!114 &11439568

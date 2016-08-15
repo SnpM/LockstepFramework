@@ -307,6 +307,7 @@ namespace Lockstep
 			AgentController.Visualize ();
 			ProjectileManager.Visualize ();
 			EffectManager.Visualize ();
+			CommandManager.Visualize();
 
 		}
 

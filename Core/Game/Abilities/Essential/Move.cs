@@ -26,7 +26,7 @@ namespace Lockstep
 
         private int RepathRate
         {
-            get { return FixedMath.Create(repathRate).Div(this.Speed).CeilToInt(); }
+			get { return FixedMath.Create(repathRate).Div(this.Speed > FixedMath.One ? this.Speed : FixedMath.One).CeilToInt(); }
         }
 
         private const int straightRepathRate = repathRate * 4;
