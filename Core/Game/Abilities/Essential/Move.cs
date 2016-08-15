@@ -53,7 +53,13 @@ namespace Lockstep
         public Vector2d Destination;
         private int repathCount;
 
+		public bool GetFullCanCollisionStop()
+		{
+			return CanCollisionStop && TempCanCollisionStop;
+		}
         public bool CanCollisionStop { get; set; }
+
+		public bool TempCanCollisionStop { get; set;}
 
         public long CollisionStopMultiplier { get; set; }
 
@@ -174,6 +180,7 @@ namespace Lockstep
             IsFormationMoving = false;
             MyMovementGroupID = -1;
             CanCollisionStop = true;
+			TempCanCollisionStop = true;
             CollisionStopMultiplier = DirectStop;
 
             repathCount = RepathRate;
@@ -324,9 +331,9 @@ namespace Lockstep
 
 					long threshold = this.timescaledSpeed / 4;
 
-					if ((Agent.Body.Position - this.LastPosition).FastMagnitude () < (threshold * threshold)) {
+					if (GetFullCanCollisionStop () && (Agent.Body.Position - this.LastPosition).FastMagnitude () < (threshold * threshold)) {
 						StopTimer++;
-						if (StopTimer >= LockstepManager.FrameRate) {
+						if (StopTimer >= LockstepManager.FrameRate * 2) {
 							StopTimer = 0;
 							this.Arrive ();
 						}
@@ -361,8 +368,8 @@ namespace Lockstep
                 cachedBody._velocity += (desiredVelocity - cachedBody._velocity) * timescaledAcceleration;
 
                 cachedBody.VelocityChanged = true;
-               
 
+				TempCanCollisionStop = false;
             } else
             {
                 if (cachedBody.VelocityFastMagnitude > 0)
@@ -517,13 +524,19 @@ namespace Lockstep
             Move otherMover = tempAgent.GetAbility<Move>();
             if (ReferenceEquals(otherMover, null) == false)
             {
-                if (IsMoving && CanCollisionStop)
+				if (IsMoving && GetFullCanCollisionStop())
                 {
                     if (otherMover.MyMovementGroupID == MyMovementGroupID)
                     {
-                        if (otherMover.IsMoving == false && otherMover.Arrived && otherMover.stopTime > MinimumOtherStopTime)
+						if (otherMover.IsMoving == false && otherMover.Arrived && otherMover.stopTime > MinimumOtherStopTime)
                         {
-                            Arrive();
+							if (otherMover.CanCollisionStop == false)
+							{
+								TempCanCollisionStop = true;
+							}
+							else {
+								Arrive();
+							}
                         } else if (hasPath && otherMover.hasPath && otherMover.pathIndex > 0 && otherMover.lastTargetPos.SqrDistance(targetPos.x, targetPos.y) < FixedMath.One)
                         {
                             if (movementDirection.Dot(targetDirection.x, targetDirection.y) < 0)

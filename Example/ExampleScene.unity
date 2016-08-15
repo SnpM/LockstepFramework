@@ -487,13 +487,9 @@ Prefab:
       propertyPath: m_RootOrder
       value: 6
       objectReference: {fileID: 0}
-    - target: {fileID: 11425566, guid: 7adf26d256267454bb6f9b55470051d7, type: 2}
-      propertyPath: _speed
-      value: 131072
-      objectReference: {fileID: 0}
-    - target: {fileID: 11425566, guid: 7adf26d256267454bb6f9b55470051d7, type: 2}
-      propertyPath: _canTurn
-      value: 1
+    - target: {fileID: 11447240, guid: 7adf26d256267454bb6f9b55470051d7, type: 2}
+      propertyPath: _maxHealth
+      value: 6553600
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 7adf26d256267454bb6f9b55470051d7, type: 2}
@@ -712,6 +708,12 @@ MonoBehaviour:
     Position:
       x: -655360
       y: 0
+  - AgentCode: TestAgent
+    Count: 100
+    ControllerIndex: 1
+    Position:
+      x: 1638400
+      y: 1966080
 --- !u!4 &1811928844
 Transform:
   m_ObjectHideFlags: 0
