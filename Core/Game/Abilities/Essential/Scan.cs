@@ -322,7 +322,7 @@ namespace Lockstep
 							cachedBody.Priority = basePriority;
 						}
 						else {
-							if (Target.Body.PositionChanged || inRange)
+							if (Target.Body.PositionChangedBuffer || inRange)
 							{
 								cachedMove.Destination = Target.Body._position;
 							}

@@ -44,8 +44,15 @@ namespace Lockstep
 				}
 			}
 
+			//Find average of spawn positions
+			Vector2d battlePos = Vector2d.zero;
+			for (int i = 0; i < Spawns.Length; i++)
+			{
+				battlePos += Spawns[i].Position;
+			}
+			battlePos /= Spawns.Length;
 			Command com = new Command(Lockstep.Data.AbilityDataItem.FindInterfacer<Scan>().ListenInputID);
-			com.Add<Vector2d>(Vector2d.zero);
+			com.Add<Vector2d>(battlePos);
 
 			PlayerManager.SendCommand(com);
 

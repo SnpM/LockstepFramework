@@ -106,7 +106,7 @@ namespace Lockstep
                 }
             }
 			CheckDestroyAgent();
-			/*
+
 			for (int i = 0; i < DeathingAgents.PeakCount; i++)
 			{
 				if (DeathingAgents.arrayAllocation[i])
@@ -116,7 +116,7 @@ namespace Lockstep
 				}
 			}
 			DeathingAgents.FastClear();
-*/
+
         }
 
         private static ushort GenerateGlobalID()
