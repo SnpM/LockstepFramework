@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System;
 
@@ -385,10 +385,7 @@ namespace Lockstep
             return new Vector3((float)FixedMath.ToDouble(this.x), z, (float)FixedMath.ToDouble(this.y));
         }
 
-		public Coordinate RoundToCoordinate()
-		{
-			return new Lockstep.Coordinate(x.RoundToInt(), y.RoundToInt());
-		}
+
 
         #endregion
 
@@ -399,11 +396,6 @@ namespace Lockstep
                 return (Vector2d)obj == this;
             }
             return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
         }
 
         #region Operators
@@ -454,6 +446,7 @@ namespace Lockstep
         }
 
         #endregion
+
         public long GetLongHashCode()
         {
             return x * 31 + y * 7;
@@ -463,6 +456,9 @@ namespace Lockstep
         {
             return (int)(GetLongHashCode() % int.MaxValue);
         }
+		public override int GetHashCode () {
+			return this.GetStateHash ();
+		}
 
         public void Write(Writer writer)
         {
