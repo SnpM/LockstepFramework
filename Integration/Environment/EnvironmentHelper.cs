@@ -27,6 +27,7 @@ namespace Lockstep
             InitializeEnvironmentFromObject();
             foreach (EnvironmentSaver saver in Savers) {
                 saver.Save();
+				UnityEditor.EditorUtility.SetDirty(saver);
             }
         }
 
