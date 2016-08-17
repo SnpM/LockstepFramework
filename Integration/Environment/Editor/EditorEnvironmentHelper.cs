@@ -20,9 +20,8 @@ namespace Lockstep
             if (GUILayout.Button("Scan and Save")) {
                 
                 saver.ScanAndSave();
-                EditorUtility.SetDirty(target);
-                serializedObject.Update();
-            }
+
+			}
 
         }
 

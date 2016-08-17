@@ -65,6 +65,9 @@ namespace Lockstep
 			for (int i = 0; i < _environmentObjects.Length; i++)
 			{
 				_environmentObjects[i].Save();
+#if UNITY_EDITOR
+				UnityEditor.EditorUtility.SetDirty(_environmentObjects[i]);
+#endif
 			}
         }
         static bool IsAgent (object obj) {
