@@ -139,7 +139,7 @@ public class MovementGroup
         {
             Move mover = movers [i];
             mover.IsFormationMoving = true;
-            mover.CollisionStopMultiplier = Move.FormationStop;
+            mover.StopMultiplier = Move.FormationStop;
             mover.OnGroupProcessed(mover.Position + groupDirection);
         }
     }
@@ -149,7 +149,7 @@ public class MovementGroup
         {
             Move mover = movers [i];
             mover.IsFormationMoving = false;
-            mover.CollisionStopMultiplier = Move.DirectStop;
+            mover.StopMultiplier = Move.DirectStop;
             mover.OnGroupProcessed(Destination);
         }
     }
@@ -160,7 +160,7 @@ public class MovementGroup
         {
             Move mover = movers [i];
             mover.IsFormationMoving = false;
-            mover.CollisionStopMultiplier = Move.GroupDirectStop;
+            mover.StopMultiplier = Move.GroupDirectStop;
             mover.OnGroupProcessed(Destination);
         }
     }

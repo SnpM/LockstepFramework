@@ -11,7 +11,6 @@ namespace Lockstep
         private const int MinimumOtherStopTime = (int)(LockstepManager.FrameRate / 4);
         private const int repathRate = (int)LockstepManager.FrameRate;
         private const int CollisionStopCount = LockstepManager.FrameRate * 2;
-        private const long CollisionStopTreshold = FixedMath.One / 2;
 
         public int GridSize {get {return cachedBody.Radius <= FixedMath.One ?
                 (cachedBody.Radius * 2).CeilToInt() :
@@ -55,13 +54,14 @@ namespace Lockstep
 
 		public bool GetFullCanCollisionStop()
 		{
+
 			return CanCollisionStop && TempCanCollisionStop;
 		}
         public bool CanCollisionStop { get; set; }
 
 		public bool TempCanCollisionStop { get; set;}
 
-        public long CollisionStopMultiplier { get; set; }
+        public long StopMultiplier { get; set; }
 
         private bool forcePathfind { get; set; }
 
@@ -99,7 +99,6 @@ namespace Lockstep
             }
         }
 
-        private long collisionStopTreshold;
         private long timescaledAcceleration;
 
         [Lockstep (true)]
@@ -159,8 +158,7 @@ namespace Lockstep
             cachedBody.OnContact += HandleCollision;
             CachedTurn = Agent.GetAbility<Turn>();
             CanTurn = _canTurn && CachedTurn != null;
-            collisionStopTreshold = FixedMath.Mul(timescaledSpeed, CollisionStopTreshold);
-            collisionStopTreshold *= collisionStopTreshold;
+
             timescaledAcceleration = Acceleration * 32 / LockstepManager.FrameRate;
             if (timescaledAcceleration > FixedMath.One)
                 timescaledAcceleration = FixedMath.One;
@@ -181,7 +179,7 @@ namespace Lockstep
             MyMovementGroupID = -1;
             CanCollisionStop = true;
 			TempCanCollisionStop = true;
-            CollisionStopMultiplier = DirectStop;
+            StopMultiplier = DirectStop;
 
             repathCount = RepathRate;
             viableDestination = false;
@@ -343,7 +341,7 @@ namespace Lockstep
                 } else
                 {
 					StopTimer = 0;
-                    if (distance < FixedMath.Mul(closingDistance, CollisionStopMultiplier))
+                    if (distance < FixedMath.Mul(closingDistance, StopMultiplier))
                     {
                         Arrive();
                         return;
@@ -369,7 +367,7 @@ namespace Lockstep
 
                 cachedBody.VelocityChanged = true;
 
-				TempCanCollisionStop = false;
+				TempCanCollisionStop = true;
             } else
             {
                 if (cachedBody.VelocityFastMagnitude > 0)
@@ -524,7 +522,7 @@ namespace Lockstep
             Move otherMover = tempAgent.GetAbility<Move>();
             if (ReferenceEquals(otherMover, null) == false)
             {
-				if (IsMoving && GetFullCanCollisionStop())
+				if (IsMoving && (GetFullCanCollisionStop()))
                 {
                     if (otherMover.MyMovementGroupID == MyMovementGroupID)
                     {
@@ -532,7 +530,7 @@ namespace Lockstep
                         {
 							if (otherMover.CanCollisionStop == false)
 							{
-								TempCanCollisionStop = true;
+								TempCanCollisionStop = false;
 							}
 							else {
 								Arrive();

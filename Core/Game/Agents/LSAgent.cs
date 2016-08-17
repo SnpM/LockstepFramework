@@ -90,7 +90,9 @@ namespace Lockstep
 		public bool Selectable { get { return _selectable; } }
 		public bool CanSelect { get { return Selectable && IsVisible; } }
 
-		public ushort TypeIndex;
+		public ushort TypeIndex { get; set;}
+
+		public int ReferenceIndex { get; set;}
 
 		public Vector2 Position2 { get { return new Vector2(CachedTransform.position.x, CachedTransform.position.z); } }
 		public FastList<AbilityDataItem> Interfacers { get { return abilityManager.Interfacers; } }
