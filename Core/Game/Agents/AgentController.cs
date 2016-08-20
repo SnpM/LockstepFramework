@@ -22,11 +22,12 @@ namespace Lockstep
 
         public const int MaxAgents = 16384;
         private static readonly Dictionary<string,IAgentData> CodeInterfacerMap = new Dictionary<string, IAgentData>();
-        public static IAgentData[] AgentData;
+		private static readonly Dictionary<string, LSAgent> CodeTemplateMap = new Dictionary<string, LSAgent>();
+		public static IAgentData[] AgentData;
 
         public static Dictionary<ushort, FastList<bool>> TypeAgentsActive = new Dictionary<ushort, FastList<bool>>();
         public static Dictionary<ushort, FastList<LSAgent>> TypeAgents = new Dictionary<ushort, FastList<LSAgent>>();
-
+		static Transform OrganizerObject;
         public static void Setup()
         {
             IAgentDataProvider database;
@@ -38,7 +39,8 @@ namespace Lockstep
                 AgentCodes = new string[AgentData.Length];
             
                 CachedAgents = new Dictionary<string,FastStack<LSAgent>>(AgentData.Length);
-            
+
+				OrganizerObject = LSUtility.CreateEmpty().transform;
                 for (int i = 0; i < AgentData.Length; i++)
                 {
                     IAgentData interfacer = AgentData [i];
@@ -60,6 +62,19 @@ namespace Lockstep
         {
             return AgentController.CodeInterfacerMap [agentCode];
         }
+
+		public static LSAgent GetAgentTemplate(string agentCode)
+		{
+			LSAgent template;
+			if (!CodeTemplateMap.TryGetValue(agentCode, out template))
+			{
+				template = GameObject.Instantiate(GetAgentSource(agentCode));
+				CodeTemplateMap.Add(agentCode, template);
+				template.transform.parent = OrganizerObject.transform;
+			}
+
+			return template;
+		}
 
         public static ushort GetAgentCodeIndex(string agentCode)
         {
@@ -417,10 +432,10 @@ namespace Lockstep
 		{
 			return CreateAgent(agentCode, position, Vector2d.right);
 		}
-		public static GameObject GetTemplate(string agentCode)
+		public static LSAgent GetAgentSource(string agentCode)
 		{
 			IAgentData interfacer = AgentController.CodeInterfacerMap[agentCode];
-			return interfacer.GetAgent().gameObject;
+			return interfacer.GetAgent();
 		}
         public LSAgent CreateAgent(
             string agentCode,
@@ -451,7 +466,7 @@ namespace Lockstep
             {
                 IAgentData interfacer = AgentController.CodeInterfacerMap [agentCode];
 
-                curAgent = GameObject.Instantiate(interfacer.GetAgent().gameObject).GetComponent<LSAgent>();
+				curAgent = GameObject.Instantiate(AgentController.GetAgentTemplate(agentCode).gameObject).GetComponent<LSAgent>();
                 curAgent.Setup(interfacer);
 
 
