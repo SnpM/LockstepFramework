@@ -505,7 +505,7 @@ namespace Lockstep
 
 		public void Engage(LSAgent other)
 		{
-			if (other != Agent)
+			if (other != Agent && other != null)
 			{
 				cachedTargetHealth = other.GetAbility<Health>();
 				if (cachedTargetHealth.IsNotNull())
