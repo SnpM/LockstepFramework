@@ -505,7 +505,7 @@ namespace Lockstep
 
 		public void Engage(LSAgent other)
 		{
-			if (other != Agent)
+			if (other != Agent && other != null)
 			{
 				cachedTargetHealth = other.GetAbility<Health>();
 				if (cachedTargetHealth.IsNotNull())
@@ -593,8 +593,10 @@ namespace Lockstep
 				isAttackMoving = false;
 				LSAgent tempTarget;
 				ushort targetValue = (ushort)target.Value;
-				AgentController.TryGetAgentInstance(targetValue, out tempTarget);
-				Engage(tempTarget);
+				if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
+					Engage(tempTarget);
+				else
+					Debug.Log("nope");
 			}
 
 

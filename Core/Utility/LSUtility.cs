@@ -55,6 +55,14 @@ namespace Lockstep
 			return FixedMath.Create(GetRandom(), int.MaxValue);
 		}
 
+		public static GameObject CreateEmpty()
+		{
+			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
+			GameObject.Destroy(go.GetComponent<Collider>());
+			GameObject.Destroy(go.GetComponent<Renderer>());
+			return go;
+		}
+
 		public static Vector2d GenerateRandomPointOnCircle(bool evenDistribution = false)
 		{
 
