@@ -593,8 +593,10 @@ namespace Lockstep
 				isAttackMoving = false;
 				LSAgent tempTarget;
 				ushort targetValue = (ushort)target.Value;
-				AgentController.TryGetAgentInstance(targetValue, out tempTarget);
-				Engage(tempTarget);
+				if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))
+					Engage(tempTarget);
+				else
+					Debug.Log("nope");
 			}
 
 
