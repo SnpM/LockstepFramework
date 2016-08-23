@@ -447,7 +447,7 @@ namespace Lockstep
 			{
 				SetState(AnimState.Dying);
 
-				Animator.Visualize();
+				// Animator.Visualize(); // TODO: Now call in LockstepManager.LateVisualize ()
 			}
 		}
 
@@ -459,7 +459,7 @@ namespace Lockstep
 				this.onDeactivate(this);
 			_Deactivate();
 
-			Immediate = true;
+			//Immediate = true; // TODO: Why ?
 			if (Immediate == false)
 			{
 				if (Animator.IsNotNull())
