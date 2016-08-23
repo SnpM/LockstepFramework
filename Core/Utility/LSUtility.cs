@@ -2,6 +2,8 @@
 using System.Collections;
 using System;
 using System.Reflection;
+using UnityEngine.SceneManagement;
+
 namespace Lockstep
 {
 	public static class LSUtility
@@ -48,6 +50,34 @@ namespace Lockstep
 			z = w;
 			return (int)((0x7FFFFFFF & (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)))) % Count);
 		}
+		public static long GetRandomOne()
+		{
+			return FixedMath.Create(GetRandom(), int.MaxValue);
+		}
+
+		public static GameObject CreateEmpty()
+		{
+			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
+			GameObject.Destroy(go.GetComponent<Collider>());
+			GameObject.Destroy(go.GetComponent<Renderer>());
+			return go;
+		}
+
+		public static Vector2d GenerateRandomPointOnCircle(bool evenDistribution = false)
+		{
+
+			long angle = LSUtility.GetRandomOne().Mul(FixedMath.TwoPi);
+			long distance = LSUtility.GetRandomOne();
+			if (evenDistribution)
+				distance = FixedMath.Sqrt(distance);
+
+			Vector2d randomOffset = new Vector2d(
+				FixedMath.Trig.Cos(angle),
+				FixedMath.Trig.Sin(angle)
+			) * distance;
+
+			return randomOffset;
+		}
 
         public static int PeekRandom (int Count = int.MaxValue)
 		{
@@ -72,9 +102,13 @@ namespace Lockstep
 		}
         public static void LoadLevel (string levelName) {
             LockstepManager.Deactivate ();
-            Application.LoadLevel (levelName);
+            SceneManager.LoadScene(levelName);
         }
-
+		public static void LoadLevel(int levelName)
+		{
+			LockstepManager.Deactivate();
+            SceneManager.LoadScene(levelName);
+		}
 		#region BitMask Manipulation
 		//ulong mask
 		public static void SetBitTrue (ref ulong mask, int bitIndex) 
@@ -174,7 +208,9 @@ namespace Lockstep
 			temp2 *= temp2;
 			return temp1 + temp2;
 		}
-		static System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
+		private static System.Text.StringBuilder _stringBuilder = new System.Text.StringBuilder();
+        public static System.Text.StringBuilder StringBuilder { get { return _stringBuilder;  } }
+
 		public static string CharString (this Enum val) {
 			return "" + (char)Convert.ToUInt16 (val);
 		}

@@ -45,9 +45,12 @@ namespace Lockstep
                 Debug.Log("BOOM");
                 return;
             }
+
             agentController.PlayerIndex = AgentControllers.Add(agentController);
-            if (MainController == null)
-                MainController = agentController;
+			if (MainController == null)
+			{
+				MainController = agentController;
+			}
         }
 
         public static void RemoveController(AgentController agentController)
@@ -79,13 +82,14 @@ namespace Lockstep
             {
                 RemoveController(MainController);
             }
-            return;
-            MainController = null;
-            AgentControllers.FastClear();
+            //return;
+            //MainController = null;
+            //AgentControllers.FastClear();
         }
 
         public static bool ContainsController(AgentController controller)
         {
+			if (AgentControllers == null) Debug.Log(controller);
             return controller.PlayerIndex < AgentControllers.PeakCount && AgentControllers.ContainsAt(controller.PlayerIndex, controller);
         }
 
@@ -116,7 +120,8 @@ namespace Lockstep
                 if (AgentControllers.arrayAllocation [i])
                 {
                     AgentController cont = AgentControllers [i];
-                    if (cont.SelectedAgents.Count > 0)
+
+					if (cont.SelectedAgents.Count > 0)
                     {
                         com.ControllerID = cont.ControllerID;
 
@@ -125,7 +130,7 @@ namespace Lockstep
                             com.SetData<Selection>(new Selection(cont.SelectedAgents));
                             cont.SelectionChanged = false;
 
-                        } else
+						} else
                         {
                             com.ClearData<Selection>();
                         }

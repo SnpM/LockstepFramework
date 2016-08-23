@@ -21,10 +21,10 @@ public static class BuildGridAPI {
         GridOffset = gridOffset;
     }
     internal static bool Build (Coordinate buildPos, IBuildable building) {
-        return MainBuildGrid.Build (buildPos, building.BuildSize);
+        return MainBuildGrid.Build (building);
     }
     internal static void Unbuild (Coordinate position, IBuildable building) {
-        MainBuildGrid.Unbuild (building.GridPosition, building.BuildSize);
+        MainBuildGrid.Unbuild (building);
     }
     internal static bool CanBuild (Coordinate buildPos, IBuildable building) {
         return MainBuildGrid.CanBuild (buildPos, building.BuildSize);

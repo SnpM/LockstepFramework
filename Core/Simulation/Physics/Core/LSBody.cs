@@ -12,6 +12,7 @@ namespace Lockstep
 {
     public sealed partial class LSBody : MonoBehaviour
     {
+		
         #region Core deterministic variables
 
         [SerializeField] //For inspector debugging
@@ -27,7 +28,12 @@ namespace Lockstep
 
         #region Lockstep variables
 
-        private bool ForwardNeedsSet;
+        private bool _forwardNeedsSet = false;
+        private bool ForwardNeedsSet {
+            get { return _forwardNeedsSet; }
+            set { _forwardNeedsSet = value; }
+        }
+
         private Vector2d _forward;
 
         public Vector2d Forward
@@ -292,6 +298,14 @@ namespace Lockstep
                 _canSetVisualRotation = value;
             }
         }
+
+		public Vector3d Position3d
+		{
+			get
+			{
+				return this.Position.ToVector3d(this.HeightPos);
+			}
+		}
 
         #endregion
 
@@ -683,7 +697,7 @@ namespace Lockstep
                 
                 }
             }
-            const float rotationLerpDamping = 1f;
+            //const float rotationLerpDamping = 1f;
             if (CanSetVisualRotation && RotationalTransform != null)
             {
                 if (SetRotationBuffer)
@@ -733,11 +747,6 @@ namespace Lockstep
             RotationChanged = true;
         }
 
-        public override int GetHashCode()
-        {
-            return ID;
-        }
-
         public void Deactivate()
         {
             Partition.UpdateObject(this, false);
@@ -769,8 +778,8 @@ namespace Lockstep
 
         public void GetCoveredSnappedPositions(long snapSpacing, FastList<Vector2d> output)
         {
-            long referenceX = 0,
-            referenceY = 0;
+            //long referenceX = 0,
+            //referenceY = 0;
             long xmin = GetFlooredSnap(this.XMin - FixedMath.Half, snapSpacing);
             long ymin = GetFlooredSnap(this.YMin - FixedMath.Half, snapSpacing);
 
@@ -804,9 +813,9 @@ namespace Lockstep
                         return false;
                     goto case ColliderType.AABox;
                 case ColliderType.AABox:
-                    return position.x + FixedMath.Half >= this.XMin && position.x - FixedMath.Half <= this.XMax
-                    && position.y + FixedMath.Half >= this.YMin && position.y - FixedMath.Half <= this.YMax;
-                    break;
+                    return position.x + FixedMath.Half > this.XMin && position.x - FixedMath.Half < this.XMax
+                    && position.y + FixedMath.Half > this.YMin && position.y - FixedMath.Half < this.YMax;
+                    //break;
                 case ColliderType.Polygon:
                     for (int i = this.EdgeNorms.Length - 1; i >= 0; i--)
                     {
@@ -823,7 +832,7 @@ namespace Lockstep
                         }
                     }
                     return true;
-                    break;
+                    //break;
             }
 
 
@@ -881,14 +890,14 @@ namespace Lockstep
                 switch (this.Shape)
                 {
                     case ColliderType.Circle:
-                        return this.Radius;
-                        break;
+                        return this.Radius * 2;
+                        //break;
                     case ColliderType.AABox:
                         if (this.HalfWidth > this.HalfHeight)
-                            return HalfWidth;
+                            return HalfWidth * 2;
                         else
-                            return HalfHeight;
-                        break;
+                            return HalfHeight * 2;
+                        //break;
                 }
                 return 0;
             }

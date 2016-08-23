@@ -2,16 +2,15 @@
 using System.Collections;
 using Lockstep;
 public class OrderMarker : MonoBehaviour {
-	public Animation animation;
-	public Renderer renderer;
 	private Material material;
 
 	private static Color NeutralColor = Color.green;
 	private static Color FriendlyColor = Color.green;
 	private static Color AggresiveColor = Color.red;
-	private static Vector3 InactivePosition = new Vector3(0,10000,0);
+	//private static Vector3 InactivePosition = new Vector3(0,10000,0);
     bool hasRenderer {get; set;}
 	void Awake () {
+        var renderer = GetComponent<Renderer>();
         hasRenderer = renderer != null;
         if (hasRenderer) {
         material = renderer.material;
@@ -20,7 +19,9 @@ public class OrderMarker : MonoBehaviour {
 
 	public void PlayOneShot (Vector3 pos, Vector3 norm, MarkerType markerType) {
 		if (markerType == MarkerType.None) return;
-		renderer.gameObject.SetActiveIfNot (true);
+        
+        var renderer = GetComponent<Renderer>();
+        renderer.gameObject.SetActiveIfNot (true);
 
 		transform.position = pos;
             if (!hasRenderer) return;
@@ -36,6 +37,9 @@ public class OrderMarker : MonoBehaviour {
 			material.color = AggresiveColor;
 			break;
 		}
+
+        var animation = GetComponent<Animation>();
+
 		animation.Stop ();
 		animation.Play ();
 		transform.up = norm;

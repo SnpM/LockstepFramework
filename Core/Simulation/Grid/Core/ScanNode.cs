@@ -17,7 +17,7 @@ namespace Lockstep{
         private Dictionary<byte,FastBucket<LSInfluencer>> LocatedAgents = new Dictionary<byte,FastBucket<LSInfluencer>> ();
 		public int X;
 		public int Y;
-
+		public int AgentCount;
         //Adds the agent and returns a ticket number
         public void Add (LSInfluencer influencer) {
             byte teamID = influencer.Agent.Controller.ControllerID;
@@ -27,16 +27,17 @@ namespace Lockstep{
                 LocatedAgents.Add(teamID, bucket);
             }
             influencer.NodeTicket = bucket.Add(influencer);
+			AgentCount++;
         }
 
         public void Remove (LSInfluencer influencer) {
             LocatedAgents[influencer.Agent.Controller.ControllerID].RemoveAt(influencer.NodeTicket);
+			AgentCount--;
         }
 
         public IEnumerable<FastBucket<LSInfluencer>> BucketsWithAllegiance (Func<byte,bool> bucketConditional) {
             foreach (KeyValuePair<byte,FastBucket<LSInfluencer>> pair in LocatedAgents) {
                 if (bucketConditional (pair.Key))
-                //if ((source.Controller.GetAllegiance(pair.Key) & allegiance) != 0)
                 {
                     yield return pair.Value;
                 }

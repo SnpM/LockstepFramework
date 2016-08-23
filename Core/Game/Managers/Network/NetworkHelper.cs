@@ -42,7 +42,7 @@ namespace Lockstep.NetworkHelpers {
 
         public virtual void Simulate () {}
 
-        public abstract void Disconnect ();
+		public virtual void Disconnect() { }
 
         /// <summary>
         /// Sends the message to server. If this client is the server, automatically sends message directly.

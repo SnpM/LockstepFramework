@@ -90,8 +90,7 @@ namespace Lockstep
 		public static void Reset ()
 		{
 			LockstepManager.Deactivate ();
-			GameObject copy = GameObject.Instantiate (MainGameManager.gameObject);
-
+			GameObject.Instantiate (MainGameManager.gameObject);
 		}
 
 		internal static void Setup ()
@@ -101,7 +100,7 @@ namespace Lockstep
 			LSDatabaseManager.Setup ();
 			Command.Setup ();
 
-			UnityInstance = GameObject.CreatePrimitive (PrimitiveType.Quad).AddComponent<MonoBehaviour> ();
+			UnityInstance = GameObject.CreatePrimitive (PrimitiveType.Sphere).AddComponent<FillerComponent> ();
 			GameObject.Destroy (UnityInstance.GetComponent<Collider> ());
 			UnityInstance.GetComponent<Renderer> ().enabled = false;
 			GameObject.DontDestroyOnLoad (UnityInstance.gameObject);
@@ -110,7 +109,6 @@ namespace Lockstep
 			AbilityDataItem.Setup ();
          
 			AgentController.Setup ();
-			TeamManager.Setup ();
 
 			ProjectileManager.Setup ();
 			EffectManager.Setup ();
@@ -190,7 +188,6 @@ namespace Lockstep
 
 			GridManager.Initialize ();
 
-			TeamManager.Initialize ();
 
 			CoroutineManager.Initialize ();
 			FrameManager.Initialize ();
@@ -198,7 +195,6 @@ namespace Lockstep
 			CommandManager.Initialize ();
 
 			AgentController.Initialize ();
-			TeamManager.LateInitialize ();
 
 			PhysicsManager.Initialize ();
 			PlayerManager.Initialize ();
@@ -253,7 +249,6 @@ namespace Lockstep
 			CoroutineManager.Simulate ();
 			InfluenceManager.Simulate ();
 			ProjectileManager.Simulate ();
-			TeamManager.Simulate ();
 
 			TriggerManager.Simulate ();
 
@@ -312,8 +307,8 @@ namespace Lockstep
 			AgentController.Visualize ();
 			ProjectileManager.Visualize ();
 			EffectManager.Visualize ();
+			CommandManager.Visualize();
 
-			TeamManager.Visualize ();
 		}
 
 		internal static void LateVisualize ()
@@ -340,12 +335,12 @@ namespace Lockstep
 			EffectManager.Deactivate ();
 			ClientManager.Deactivate ();
 
-			TeamManager.Deactivate ();
 			ClientManager.Quit ();
 			PhysicsManager.Deactivate ();
 			GameStarted = false;
 			LSServer.Deactivate ();
 			DefaultMessageRaiser.LateDeactivate ();
+			CoroutineManager.Deactivate();
 
 			if (MainGameManager.gameObject != null)
 				GameObject.Destroy (MainGameManager.gameObject);
@@ -366,5 +361,9 @@ namespace Lockstep
 			hash += 1;
 			return hash;
 		}
+	}
+	public class FillerComponent : MonoBehaviour
+	{
+
 	}
 }

@@ -9,7 +9,7 @@ namespace Lockstep
 		public string Name;
 		public string Date;
 		public float Seconds {
-			get { return (float)FrameManager.Frames.Length / (float)LockstepManager.FrameRate; }
+			get { return (float)FrameManager.LoadedFrames / (float)LockstepManager.FrameRate; }
 		}
 
 		public string SerializeAsString()

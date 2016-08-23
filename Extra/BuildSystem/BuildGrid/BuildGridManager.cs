@@ -4,7 +4,7 @@ using Lockstep;
 using Lockstep.Utility;
 using Lockstep.Abilities;
 using Lockstep.Agents;
-
+using System.Collections.Generic;
 public class BuildGridManager
 {
     
@@ -23,8 +23,6 @@ public class BuildGridManager
 
     private void Initialize()
     {
-//        @JP: why is this set??
-//        Application.targetFrameRate = 20;
         Grid = new BuildGridNode[GridLength, GridLength];
         for (int i = 0; i < GridLength; i++)
         {
@@ -44,32 +42,50 @@ public class BuildGridManager
         get { return bufferNeighborCoordinates; }
     }
 
-    public bool Build(Coordinate position, int size)
+	public IEnumerable<IBuildable> GetOccupyingBuildables(IBuildable buildable)
+	{
+		if (!CanBuild(buildable.GridPosition, buildable.BuildSize))
+		{
+			for (int i = 0; i < bufferBuildCoordinates.Count; i++)
+			{
+				Coordinate coor = bufferBuildCoordinates[i];
+				BuildGridNode buildNode = Grid[coor.x, coor.y];
+				if (buildNode.Occupied)
+				{
+					yield return buildNode.RegisteredBuilding;
+				}
+			}
+		}
+	}
+
+
+	public bool Build(IBuildable buildable)
     {
-        if (CanBuild(position, size))
+		if (CanBuild(buildable.GridPosition, buildable.BuildSize))
         {
             for (int i = 0; i < bufferBuildCoordinates.Count; i++)
             {
                 Coordinate coor = bufferBuildCoordinates [i];
                 BuildGridNode buildNode = Grid [coor.x, coor.y];
-                buildNode.Occupied = true;
+				buildNode.RegisteredBuilding = buildable;
             }
             return true;
         }
         return false;
     }
 
-    public void Unbuild(Coordinate position, int size)
+    public void Unbuild(IBuildable buildable)
     {
-        if (TryGetBuildCoordinates(position, size, bufferBuildCoordinates))
+		if (TryGetBuildCoordinates(buildable.GridPosition, buildable.BuildSize, bufferBuildCoordinates))
         {
             for (int i = 0; i < bufferBuildCoordinates.Count; i++)
             {
                 Coordinate coor = bufferBuildCoordinates [i];
                 BuildGridNode buildNode = Grid [coor.x, coor.y];
+				/*
                 if (buildNode.Occupied == false)
-                    Debug.Log("Not built");
-                buildNode.Occupied = false;
+                    Debug.Log("Not built");*/
+                buildNode.RegisteredBuilding = null;
             }
         } else
         {

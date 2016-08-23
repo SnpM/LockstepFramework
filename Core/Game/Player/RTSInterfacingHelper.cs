@@ -88,7 +88,7 @@ namespace Lockstep
                 {
                     if (Input.GetMouseButtonDown(1))
                     {
-                        LSAgent target;
+                        //LSAgent target;
                         if (RTSInterfacing.MousedAgent.IsNotNull() &&
                         /*PlayerManager.GetAllegiance(RTSInterfacing.MousedAgent) == AllegianceType.Enemy &&*/ 
                         Selector.MainSelectedAgent.GetAbility<Scan>() != null)

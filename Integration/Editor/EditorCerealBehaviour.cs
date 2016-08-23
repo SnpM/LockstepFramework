@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System;
 using UnityEditor;
 using UnityEngine;
-using System;
 
 namespace Lockstep
 {
@@ -11,7 +10,7 @@ namespace Lockstep
     [CustomEditor (typeof(CerealBehaviour), true)]
     public sealed class EditorCerealBehaviour : UnityEditor.Editor
     {
-        static Dictionary<CerealBehaviour,EditorCerealBehaviour> instances = new Dictionary<CerealBehaviour,EditorCerealBehaviour>();
+        //static Dictionary<CerealBehaviour,EditorCerealBehaviour> instances = new Dictionary<CerealBehaviour,EditorCerealBehaviour>();
         private bool inited = false;
         bool useCustomFieldNames;
         List<string> customFieldNames = new List<string>();

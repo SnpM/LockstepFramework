@@ -67,8 +67,11 @@ namespace Lockstep
 						node.Remove (Body.ID);
 					}
 				}
-                if (repartition)
-                PartitionObject (Body, true);
+				if (repartition)
+				{
+					PartitionObject(Body, true);
+				}
+
 			}
 		}
 

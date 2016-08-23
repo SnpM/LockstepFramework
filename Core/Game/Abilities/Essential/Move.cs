@@ -5,13 +5,12 @@ namespace Lockstep
 {
     public class Move : ActiveAbility
     {
-        public const long FormationStop = FixedMath.One / 8;
+        public const long FormationStop = FixedMath.One / 4;
         public const long GroupDirectStop = FixedMath.One;
         public const long DirectStop = FixedMath.One / 8;
         private const int MinimumOtherStopTime = (int)(LockstepManager.FrameRate / 4);
         private const int repathRate = (int)LockstepManager.FrameRate;
         private const int CollisionStopCount = LockstepManager.FrameRate * 2;
-        private const long CollisionStopTreshold = FixedMath.One / 2;
 
         public int GridSize {get {return cachedBody.Radius <= FixedMath.One ?
                 (cachedBody.Radius * 2).CeilToInt() :
@@ -26,7 +25,7 @@ namespace Lockstep
 
         private int RepathRate
         {
-            get { return FixedMath.Create(repathRate).Div(this.Speed).CeilToInt(); }
+			get { return FixedMath.Create(repathRate).Div(this.Speed > FixedMath.One ? this.Speed : FixedMath.One).CeilToInt(); }
         }
 
         private const int straightRepathRate = repathRate * 4;
@@ -53,14 +52,24 @@ namespace Lockstep
         public Vector2d Destination;
         private int repathCount;
 
+		public bool GetFullCanCollisionStop()
+		{
+
+			return CanCollisionStop && TempCanCollisionStop;
+		}
         public bool CanCollisionStop { get; set; }
 
-        public long CollisionStopMultiplier { get; set; }
+		public bool TempCanCollisionStop { get; set;}
+
+        public long StopMultiplier { get; set; }
 
         private bool forcePathfind { get; set; }
 
         private bool collisionTicked;
         private int stuckTick;
+
+        public bool CollisionTicked {  get { return collisionTicked; } }
+        public int StuckTick {  get { return stuckTick; } }
 
         //Has this unit arrived at destination? Default set to false.
         public bool Arrived { get; private set; }
@@ -90,7 +99,6 @@ namespace Lockstep
             }
         }
 
-        private long collisionStopTreshold;
         private long timescaledAcceleration;
 
         [Lockstep (true)]
@@ -150,8 +158,7 @@ namespace Lockstep
             cachedBody.OnContact += HandleCollision;
             CachedTurn = Agent.GetAbility<Turn>();
             CanTurn = _canTurn && CachedTurn != null;
-            collisionStopTreshold = FixedMath.Mul(timescaledSpeed, CollisionStopTreshold);
-            collisionStopTreshold *= collisionStopTreshold;
+
             timescaledAcceleration = Acceleration * 32 / LockstepManager.FrameRate;
             if (timescaledAcceleration > FixedMath.One)
                 timescaledAcceleration = FixedMath.One;
@@ -171,7 +178,8 @@ namespace Lockstep
             IsFormationMoving = false;
             MyMovementGroupID = -1;
             CanCollisionStop = true;
-            CollisionStopMultiplier = DirectStop;
+			TempCanCollisionStop = true;
+            StopMultiplier = DirectStop;
 
             repathCount = RepathRate;
             viableDestination = false;
@@ -321,9 +329,9 @@ namespace Lockstep
 
 					long threshold = this.timescaledSpeed / 4;
 
-					if ((Agent.Body.Position - this.LastPosition).FastMagnitude () < (threshold * threshold)) {
+					if (GetFullCanCollisionStop () && (Agent.Body.Position - this.LastPosition).FastMagnitude () < (threshold * threshold)) {
 						StopTimer++;
-						if (StopTimer >= LockstepManager.FrameRate) {
+						if (StopTimer >= LockstepManager.FrameRate * 2) {
 							StopTimer = 0;
 							this.Arrive ();
 						}
@@ -333,7 +341,7 @@ namespace Lockstep
                 } else
                 {
 					StopTimer = 0;
-                    if (distance < FixedMath.Mul(closingDistance, CollisionStopMultiplier))
+                    if (distance < FixedMath.Mul(closingDistance, StopMultiplier))
                     {
                         Arrive();
                         return;
@@ -348,7 +356,7 @@ namespace Lockstep
 
 
                 if (movingToWaypoint) {
-                    if (distance < FixedMath.Mul(closingDistance, FixedMath.One))
+					if (distance < FixedMath.Mul(closingDistance, FixedMath.Half))
                     {
                         this.pathIndex++;
                     }
@@ -358,8 +366,8 @@ namespace Lockstep
                 cachedBody._velocity += (desiredVelocity - cachedBody._velocity) * timescaledAcceleration;
 
                 cachedBody.VelocityChanged = true;
-               
 
+				TempCanCollisionStop = true;
             } else
             {
                 if (cachedBody.VelocityFastMagnitude > 0)
@@ -380,18 +388,23 @@ namespace Lockstep
             LastCommand = com;
             if (com.ContainsData<Vector2d> ())
             {
-                Agent.StopCast(ID);
-                IsCasting = true;
-                RegisterGroup();
-                if (straightPath)
-                {
-                    repathCount /= 8;
-                } else
-                {
-                    repathCount /= 8;
-                }
+				StartFormalMove(com.GetData<Vector2d>());
             }
         }
+		public void StartFormalMove (Vector2d position)
+		{
+			Agent.StopCast(ID);
+			IsCasting = true;
+			RegisterGroup();
+			if (straightPath)
+			{
+				repathCount /= 8;
+			}
+			else
+			{
+				repathCount /= 8;
+			}
+		}
 
         public void RegisterGroup(bool moveOnProcessed = true)
         {
@@ -464,30 +477,23 @@ namespace Lockstep
 
         public void StartMove(Vector2d destination)
         {
-            if (false && IsMoving == true && destination.x == this.Destination.x && destination.y == this.Destination.y)
-            {
-                //TODO: guard return
-            } else
-            {
-                if (CanTurn)
-                    CachedTurn.StartTurnVector(destination - cachedBody._position);
-                Agent.SetState(AnimState.Moving);
-                hasPath = false;
-                straightPath = false;
-                this.Destination = destination;
-                IsMoving = true;
-                stopTime = 0;
-                Arrived = false;
+            if (CanTurn)
+                CachedTurn.StartTurnVector(destination - cachedBody._position);
+            Agent.SetState(AnimState.Moving);
+            hasPath = false;
+            straightPath = false;
+            this.Destination = destination;
+            IsMoving = true;
+            stopTime = 0;
+            Arrived = false;
 
-                viableDestination = Pathfinder.GetPathNode(this.Destination.x, this.Destination.y, out destinationNode);
+            viableDestination = Pathfinder.GetPathNode(this.Destination.x, this.Destination.y, out destinationNode);
 
-                IsCasting = true;
-                stuckTick = 0;
-                forcePathfind = false;
-                if (onStartMove != null)
-                    onStartMove ();
-
-            }
+            IsCasting = true;
+            stuckTick = 0;
+            forcePathfind = false;
+            if (onStartMove != null)
+                onStartMove();
         }
 
         protected override void OnStopCast()
@@ -516,13 +522,19 @@ namespace Lockstep
             Move otherMover = tempAgent.GetAbility<Move>();
             if (ReferenceEquals(otherMover, null) == false)
             {
-                if (IsMoving && CanCollisionStop)
+				if (IsMoving && (GetFullCanCollisionStop()))
                 {
                     if (otherMover.MyMovementGroupID == MyMovementGroupID)
                     {
-                        if (otherMover.IsMoving == false && otherMover.Arrived && otherMover.stopTime > MinimumOtherStopTime)
+						if (otherMover.IsMoving == false && otherMover.Arrived && otherMover.stopTime > MinimumOtherStopTime)
                         {
-                            Arrive();
+							if (otherMover.CanCollisionStop == false)
+							{
+								TempCanCollisionStop = false;
+							}
+							else {
+								Arrive();
+							}
                         } else if (hasPath && otherMover.hasPath && otherMover.pathIndex > 0 && otherMover.lastTargetPos.SqrDistance(targetPos.x, targetPos.y) < FixedMath.One)
                         {
                             if (movementDirection.Dot(targetDirection.x, targetDirection.y) < 0)

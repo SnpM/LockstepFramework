@@ -62,6 +62,13 @@ namespace Lockstep
                 objectBuffer.Add(obj);
             }
             _environmentObjects = objectBuffer.ToArray();
+			for (int i = 0; i < _environmentObjects.Length; i++)
+			{
+				_environmentObjects[i].Save();
+#if UNITY_EDITOR
+				UnityEditor.EditorUtility.SetDirty(_environmentObjects[i]);
+#endif
+			}
         }
         static bool IsAgent (object obj) {
             MonoBehaviour mb = obj as MonoBehaviour;

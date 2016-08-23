@@ -14,8 +14,11 @@ namespace Lockstep
 
         }
 
-        private static FastList<BehaviourHelper> behaviourHelpers = new FastList<BehaviourHelper>();
-        private static HashSet<Type> createdTypes = new HashSet<Type>();
+        private static FastList<BehaviourHelper> _behaviourHelpers = new FastList<BehaviourHelper>();
+        private static HashSet<Type> _createdTypes = new HashSet<Type>();
+
+        public static FastList<BehaviourHelper> BehaviourHelpers {  get { return _behaviourHelpers; } }
+        public static HashSet<Type> CreatedTypes { get { return _createdTypes; } }
 
         public ushort CachedListenInput { get; private set; }
 

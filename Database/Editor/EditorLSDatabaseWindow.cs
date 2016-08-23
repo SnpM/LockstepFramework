@@ -46,7 +46,7 @@ namespace Lockstep.Data {
         }
         
         Vector2 scrollPos;
-        Rect windowRect = new Rect (0, 0, 500, 500);
+        //Rect windowRect = new Rect (0, 0, 500, 500);
         
         void OnGUI () {
             if (Application.isPlaying) {

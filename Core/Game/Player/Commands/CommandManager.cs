@@ -1,29 +1,30 @@
 ﻿using System;
 using UnityEngine;
-
+using System.Collections.Generic;
 namespace Lockstep
 {
     public static class CommandManager
     {
-        const int defaultSize = 1000;
 
         #region Recording
 
 
         #endregion
 
-        static readonly FastList<Command> outCommands = new FastList<Command>(defaultSize);
         static readonly FastList<byte> bufferedBytes = new FastList<byte>(256);
 
         public static void Initialize()
         {
-            outCommands.FastClear();
         }
 
         public static void Simulate()
         {
             SendOut();
         }
+		public static void Visualize()
+		{
+			SendOut();
+		}
 
         public static void ProcessPacket(byte[] packet)
         {
@@ -36,27 +37,29 @@ namespace Lockstep
 
         public static void ProcessPacket(FastList<byte> packet)
         {
-
+			if (ReplayManager.IsPlayingBack) return;
             if (packet == null || packet.Count < 4)
             {
                 throw new System.Exception("Packet is null or not valid length");
             }
             int frameCount = BitConverter.ToInt32(packet.innerArray, 0);
+
             int index = 4;
 
             Frame frame = new Frame();
 
             if (packet.Count > 4)
             {
-                while (index < packet.Count)
+
+				while (index < packet.Count)
                 {
                     Command com = new Command();
                     index += com.Reconstruct(packet.innerArray, index);
                     frame.AddCommand(com);
                 }
-            }
-            ProcessFrame(frameCount, frame);
 
+			}
+            ProcessFrame(frameCount, frame);
         }
 
         public static void ProcessFrame(int frameCount, Frame frame)
@@ -73,32 +76,25 @@ namespace Lockstep
         /// </summary>
         public static void SendOut()
         {
-            if (outCommands.Count > 0)
-            {
-                bufferedBytes.FastClear();
 
-                for (int i = 0; i < outCommands.Count; i++)
-                {
-                    bufferedBytes.AddRange(outCommands [i].Serialized);
-                }
-                if (bufferedBytes.Count > 0)
-                    ClientManager.Distribute(bufferedBytes.ToArray());
+			if (bufferedBytes.Count > 0)
+			{
+				ClientManager.Distribute(bufferedBytes.ToArray());
+				bufferedBytes.FastClear();
+			}
 
-                outCommands.FastClear();
-            }
+            
         }
-
-        public static void SendCommand(Command com, bool immediate = false)
+		//static FastList<Command> asdf = new FastList<Command>();
+        public static void SendCommand(Command com)
         {
-            if (com == null)
-            {
-                return;
-            }
-            outCommands.Add(com);
-            if (immediate)
-            {
-                SendOut();
-            }
+			if (com == null)
+			{
+				return;
+			}
+
+			bufferedBytes.AddRange(com.Serialized);
+
         }
     }
 

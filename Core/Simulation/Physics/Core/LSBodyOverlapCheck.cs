@@ -17,6 +17,9 @@ namespace Lockstep
         private static FastList<int> potentialEdges = new FastList<int>();
         private static bool calculateIntersections;
 
+        public static long CacheProj {  get { return cacheProj;  } }
+        public static FastList<int> PotentialEdges {  get { return potentialEdges; } }
+
         public static void PrepareAxisCheck(Vector2d p1, Vector2d p2, bool calculateIntersectionPoints = true)
         {
             cacheP1 = p1;
@@ -89,7 +92,7 @@ namespace Lockstep
                         }
                         return overlaps;
                     }
-                    break;
+                    //break;
                 case ColliderType.AABox:
                     {
                       
@@ -195,7 +198,7 @@ namespace Lockstep
                         }
                         return intersected;
                     }
-                    break;
+                    //break;
             }
             return false;
         }

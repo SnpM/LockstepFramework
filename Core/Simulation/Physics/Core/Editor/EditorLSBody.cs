@@ -112,8 +112,8 @@ namespace Lockstep.Integration
                         HalfHeight.Draw();
                     } else if (shape == ColliderType.Polygon)
                     {
-                        EditorGUIUtility.LookLikeControls();
-
+                        EditorGUIUtility.labelWidth = 0;
+                        EditorGUIUtility.fieldWidth = 0;
 
                         Vertices.Draw();
                     }
@@ -141,16 +141,20 @@ namespace Lockstep.Integration
             SerializedObject so = new SerializedObject(target);
             so.Update();
             SerializedProperty Shape = so.FindProperty("_shape");
-            SerializedProperty IsTrigger = so.FindProperty("_isTrigger");
-            SerializedProperty Layer = so.FindProperty("_layer");
             SerializedProperty HalfWidth = so.FindProperty("_halfWidth");
             SerializedProperty HalfHeight = so.FindProperty("_halfHeight");
             SerializedProperty Radius = so.FindProperty("_radius");
+            SerializedProperty Height = so.FindProperty("_height");
+
+            /*
+            //Currently unused
+            SerializedProperty Layer = so.FindProperty("_layer");
+            SerializedProperty IsTrigger = so.FindProperty("_isTrigger");
             SerializedProperty Immovable = so.FindProperty("_immovable");
             SerializedProperty Vertices = so.FindProperty("_vertices");
-            SerializedProperty Height = so.FindProperty("_height");
             SerializedProperty PositionalTransform = so.FindProperty("_positionalTransform");
             SerializedProperty RotationalTransform = so.FindProperty("_rotationalTransform");
+            */
 
             ColliderType shape = (ColliderType)Shape.intValue;
             if (shape == ColliderType.None)
