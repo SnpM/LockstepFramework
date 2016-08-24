@@ -68,6 +68,7 @@ namespace Lockstep
 			return FindClosestAgent(position, bufferAgents);
 		}
 
+        static FastList<FastBucket<LSInfluencer>> bufferBuckets = new FastList<FastBucket<LSInfluencer>>();
 		public static FastList<LSAgent> bufferAgents = new FastList<LSAgent>();
 		public static void ScanAll(Vector2d position, long radius, Func<LSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, FastList<LSAgent> output)
 		{
@@ -90,8 +91,10 @@ namespace Lockstep
 					{
 						if (tempNode.AgentCount > 0)
 						{
-							foreach (FastBucket<LSInfluencer> tempBucket in tempNode.BucketsWithAllegiance(bucketConditional))
+                            tempNode.GetBucketsWithAllegiance(bucketConditional,bufferBuckets);
+                            for (int i = 0; i < bufferBuckets.Count; i++)
 							{
+                                FastBucket<LSInfluencer> tempBucket = bufferBuckets[i];
 								BitArray arrayAllocation = tempBucket.arrayAllocation;
 								for (int j = 0; j < tempBucket.PeakCount; j++)
 								{

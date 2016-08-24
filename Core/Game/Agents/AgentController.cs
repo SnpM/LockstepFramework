@@ -21,8 +21,8 @@ namespace Lockstep
         public static ushort PeakGlobalID { get; private set; }
 
         public const int MaxAgents = 16384;
-        private static readonly Dictionary<string,IAgentData> CodeInterfacerMap = new Dictionary<string, IAgentData>();
-		private static readonly Dictionary<string, LSAgent> CodeTemplateMap = new Dictionary<string, LSAgent>();
+        public static readonly Dictionary<string,IAgentData> CodeInterfacerMap = new Dictionary<string, IAgentData>();
+		public static readonly Dictionary<string, LSAgent> CodeTemplateMap = new Dictionary<string, LSAgent>();
 		public static IAgentData[] AgentData;
 
         public static Dictionary<ushort, FastList<bool>> TypeAgentsActive = new Dictionary<ushort, FastList<bool>>();
