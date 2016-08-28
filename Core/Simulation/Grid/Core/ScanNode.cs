@@ -15,6 +15,7 @@ namespace Lockstep{
         }
         //One bucket for each AC of units that lands on this ScanNode
         private Dictionary<byte,FastBucket<LSInfluencer>> LocatedAgents = new Dictionary<byte,FastBucket<LSInfluencer>> ();
+
 		public int X;
 		public int Y;
 		public int AgentCount;
@@ -25,6 +26,7 @@ namespace Lockstep{
             if (!LocatedAgents.TryGetValue(teamID, out bucket)) {
                 bucket = new FastBucket<LSInfluencer>();
                 LocatedAgents.Add(teamID, bucket);
+                FastIterationBuckets.Add(new KeyValuePair<byte, FastBucket<LSInfluencer>>(teamID,bucket));
             }
             influencer.NodeTicket = bucket.Add(influencer);
 			AgentCount++;
@@ -35,6 +37,17 @@ namespace Lockstep{
 			AgentCount--;
         }
 
+        //Using this for no garbage collection from enumeration
+        private FastList<KeyValuePair<byte,FastBucket<LSInfluencer>>> FastIterationBuckets = new FastList<KeyValuePair<byte,FastBucket<LSInfluencer>>>();
+
+        public void GetBucketsWithAllegiance (Func<byte,bool> bucketConditional, FastList<FastBucket<LSInfluencer>> output) {
+            for (int i = 0; i < FastIterationBuckets.Count; i++) {
+                var pair = FastIterationBuckets[i];
+                if (bucketConditional(pair.Key))
+                    output.Add(pair.Value);
+            }
+        }
+        /*
         public IEnumerable<FastBucket<LSInfluencer>> BucketsWithAllegiance (Func<byte,bool> bucketConditional) {
             foreach (KeyValuePair<byte,FastBucket<LSInfluencer>> pair in LocatedAgents) {
                 if (bucketConditional (pair.Key))
@@ -42,6 +55,6 @@ namespace Lockstep{
                     yield return pair.Value;
                 }
             }
-        }
+        }*/
 	}
 }
