@@ -314,6 +314,7 @@ namespace Lockstep
 		internal static void LateVisualize ()
 		{
 			DefaultMessageRaiser.LateVisualize ();
+			AgentController.LateVisualize();
 
 		}
 
