@@ -91,7 +91,11 @@ namespace Lockstep
 					{
 						if (tempNode.AgentCount > 0)
 						{
+<<<<<<< HEAD
                             bufferBuckets.FastClear();
+=======
+							bufferBuckets.FastClear();
+>>>>>>> origin/Develop
                             tempNode.GetBucketsWithAllegiance(bucketConditional,bufferBuckets);
                             for (int i = 0; i < bufferBuckets.Count; i++)
 							{

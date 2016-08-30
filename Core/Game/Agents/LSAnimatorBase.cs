@@ -20,6 +20,8 @@ namespace Lockstep
 
 		public virtual void Initialize()
 		{
+			animStateChanged = false;
+			lastAnimState = currentAnimState = AnimState.Idling;
 		}
 
 		public virtual void ApplyImpulse(AnimImpulse animImpulse, int rate = 0)
