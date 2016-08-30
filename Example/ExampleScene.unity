@@ -699,13 +699,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Spawns:
   - AgentCode: TestAgent
-    Count: 100
+    Count: 20
     ControllerIndex: 0
     Position:
       x: -655360
       y: 0
   - AgentCode: TestAgent
-    Count: 100
+    Count: 20
     ControllerIndex: 1
     Position:
       x: 1638400
