@@ -2,7 +2,7 @@
 {
 	using UnityEngine;
 	using System.Collections;
-
+    using System.Collections.Generic;
 	public static class TeamManager
 	{
 		const int mapSize = 48;
@@ -61,6 +61,7 @@
 		{
 			
 		}
+
 		#endregion
 		static int nextDistribute;
 

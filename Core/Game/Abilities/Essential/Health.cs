@@ -9,7 +9,7 @@ namespace Lockstep
         [SerializeField, FixedNumber]
         private long _maxHealth = FixedMath.One * 100;
 
-        public long BaseHealth {get {return _maxHealth;}}
+        public long BaseHealth { get { return _maxHealth; } }
 
         public long MaxHealth
         {
@@ -17,15 +17,21 @@ namespace Lockstep
         }
 
         private long _maxHealthModifier;
-        [Lockstep (true)]
-        public long MaxHealthModifier {
-            get {
+
+        [Lockstep(true)]
+        public long MaxHealthModifier
+        {
+            get
+            {
                 return _maxHealthModifier;
             }
-            set {
-                if (value != _maxHealthModifier) {
+            set
+            {
+                if (value != _maxHealthModifier)
+                {
                     long dif = _maxHealthModifier - value;
-                    if (dif > 0) {
+                    if (dif > 0)
+                    {
                         this.TakeDamage(-dif);
                         _maxHealthModifier = value;
                     }
@@ -39,16 +45,21 @@ namespace Lockstep
             set;
         }
 
-		public event Action onHealthChange ;
-		public event Action<long> onHealthDelta;
+        public event Action onHealthChange;
+        public event Action<long> onHealthDelta;
 
-        public bool CanLose {
-            get {
+        public bool CanLose
+        {
+            get
+            {
                 return HealthAmount > 0;
             }
         }
-        public bool CanGain {
-            get {
+
+        public bool CanGain
+        {
+            get
+            {
                 return HealthAmount < MaxHealth;
             }
         }
@@ -64,17 +75,17 @@ namespace Lockstep
             }
             set
             {
-				long delta = value - _currentHealth;
+                long delta = value - _currentHealth;
                 _currentHealth = value;
                 if (onHealthChange != null)
                     onHealthChange();
-				if (onHealthDelta != null)
-					onHealthDelta (delta);
+                if (onHealthDelta != null)
+                    onHealthDelta(delta);
             }
 
         }
 
-		public LSAgent LastDamageSource { get; set;}
+        public LSAgent LastDamageSource { get; set; }
 
         protected override void OnSetup()
         {
@@ -85,7 +96,7 @@ namespace Lockstep
             HealthAmount = MaxHealth;
             OnTakeProjectile = null;
             MaxHealthModifier = 0;
-			LastDamageSource = null;
+            LastDamageSource = null;
         }
 
         public void TakeProjectile(LSProjectile projectile)
@@ -99,14 +110,16 @@ namespace Lockstep
                 TakeDamage(projectile.CheckExclusiveDamage(Agent.Tag));               
             }
         }
+
         public void TakeDamage(long damage, LSAgent source = null)
         {
             if (damage >= 0)
             {
                 damage.Mul(DamageMultiplier);
                 HealthAmount -= damage;
-				if (source != null)
-					LastDamageSource = source;
+                if (source != null)
+                    LastDamageSource = source;
+
                 // don't let the health go below zero
                 if (HealthAmount <= 0)
                 {
@@ -117,24 +130,33 @@ namespace Lockstep
                         Die();
                         return;
                     }
+
                 }
-            }
-            else {
+            } else
+            {
                 HealthAmount -= damage;
-                if (HealthAmount >= this.MaxHealth) {
+                if (HealthAmount >= this.MaxHealth)
+                {
                     HealthAmount = MaxHealth;
                 }
             }
            
         }
 
+        public event Action<Health,LSAgent> onDie;
+
         public void Die()
         {
-            AgentController.DestroyAgent(Agent);
-            if (Agent.Animator.IsNotNull())
+            if (Agent.IsActive)
             {
-                Agent.SetState(AnimState.Dying);
-                Agent.Animator.Visualize();
+                if (onDie != null)
+                    this.onDie(this,this.LastDamageSource);
+                AgentController.DestroyAgent(Agent);
+                if (Agent.Animator.IsNotNull())
+                {
+                    Agent.SetState(AnimState.Dying);
+                    Agent.Animator.Visualize();
+                }
             }
         }
 
