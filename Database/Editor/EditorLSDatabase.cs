@@ -163,6 +163,7 @@ namespace Lockstep.Data
 
         private static void DrawDatabase(DataHelper dataHelper)
         {
+			if (dataHelper == null || dataHelper.DataProperty == null) return;
             dataHelper.serializedObject.Update();
             EditorGUI.BeginChangeCheck();
             LSEditorUtility.ListField(dataHelper.DataProperty, dataHelper.ListFlags);
