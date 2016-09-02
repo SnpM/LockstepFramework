@@ -45,7 +45,7 @@ namespace Lockstep
             }
             catch {
 
-                throw new System.Exception(string.Format("Code '{0}' does not exist in the current database", code));
+                throw new System.Exception(string.Format("Input Code '{0}' does not exist in the current database", code));
             }
         }
         public static string GetIDCode (ushort id) {
