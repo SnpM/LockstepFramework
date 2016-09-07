@@ -35,6 +35,20 @@ namespace Lockstep.Data {
             _currentDatabase = database;
         }
 
+		public static string ToJson (LSDatabase database)
+		{
+			return JsonUtility.ToJson (database);
+		}
+		public static TDatabase FromJson<TDatabase> (string json) where TDatabase : LSDatabase, new()
+		{
+			var database = new TDatabase ();
+			return database;
+		}
+		public static void ApplyJson<TDatabase> (string json) where TDatabase : LSDatabase, new()
+		{
+			_currentDatabase = new TDatabase ();
+			JsonUtility.FromJsonOverwrite (json, _currentDatabase);
+		}
 
         public static void Initialize () {
 
