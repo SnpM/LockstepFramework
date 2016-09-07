@@ -100,6 +100,7 @@ namespace Lockstep.Data
 
         public InformationGatherType InformationGather { get { return _informationGather; } }
 
+
     }
 
 }
