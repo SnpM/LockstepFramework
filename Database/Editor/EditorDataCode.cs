@@ -5,6 +5,7 @@ using UnityEditor;
 namespace Lockstep.Data {
     [CustomPropertyDrawer(typeof(DataCodeAttribute))]
     public class EditorDataCode : PropertyDrawer {
+		
         public override float GetPropertyHeight (SerializedProperty property, GUIContent label) {
             return accumulatedHeight;
         }

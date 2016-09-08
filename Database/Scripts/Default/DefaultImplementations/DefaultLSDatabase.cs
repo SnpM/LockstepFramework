@@ -6,7 +6,7 @@ namespace Lockstep.Data
 	//PROTECTED NOT PRIVATE... private dun serialize in derived class
     [System.Serializable]
 
-    public class DefaultLSDatabase : LSDatabase, IEssentialDataProvider
+    public class DefaultLSDatabase : LSDatabase, IEssentialDataProvider, IUnitConfigDataProvider
     ,IAgentDataProvider
     {
         #region Agents
@@ -82,6 +82,22 @@ namespace Lockstep.Data
 
         public AbilityDataItem[] AbilityData { get { return _abilityData; } }
 
-        #endregion
+		#endregion
+
+		
+		#region Unit Configs
+		[SerializeField, RegisterData ("UnitConfigElements")]
+		protected UnitConfigElementDataItem [] _unitConfigElementData;
+		public UnitConfigElementDataItem [] UnitConfigElementData {
+			get {
+				return _unitConfigElementData;
+			}
+		}
+
+		[SerializeField, RegisterData ("UnitConfigs")]
+		protected UnitConfigDataItem [] _unitConfigData;
+		public IUnitConfigDataItem [] UnitConfigData { get { return _unitConfigData; } }
+		#endregion
+		
     }
 }
