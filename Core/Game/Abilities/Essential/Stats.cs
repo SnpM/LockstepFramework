@@ -40,7 +40,7 @@ namespace Lockstep {
 
         public long DPS {
             get {
-                return cachedScan.Damage * cachedScan.AttackRate / LockstepManager.FrameRate;
+				return cachedScan.Damage.Div(cachedScan.AttackInterval);
             }
         }
 
