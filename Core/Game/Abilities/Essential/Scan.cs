@@ -514,7 +514,7 @@ namespace Lockstep
 					HasTarget = true;
 					targetVersion = Target.SpawnVersion;
 					IsCasting = true;
-					fastRangeToTarget = Range + (Target.Body.IsNotNull() ? Target.Body.Radius : 0);
+					fastRangeToTarget = Range + (Target.Body.IsNotNull() ? Target.Body.Radius : 0) + Agent.Body.Radius;
 					fastRangeToTarget *= fastRangeToTarget;
 				}
 			}
