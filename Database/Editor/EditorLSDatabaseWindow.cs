@@ -50,8 +50,8 @@ namespace Lockstep.Data {
         
         void OnGUI () {
             if (Application.isPlaying) {
-                EditorGUILayout.LabelField ("Cannot modify database during runtime", EditorStyles.boldLabel);
-                return;
+                EditorGUILayout.LabelField ("Do not modify database during runtime", EditorStyles.boldLabel);
+                //return;
             }
             DrawSettings ();
             if (DatabaseEditor != null) {
