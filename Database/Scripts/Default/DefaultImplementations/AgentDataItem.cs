@@ -36,6 +36,20 @@ namespace Lockstep.Data
             return 0;
         }
 
+#if UNITY_EDITOR
+
+		GameObject lastPrefab;
+		protected override void OnManage ()
+		{
+			
+			if (lastPrefab != Prefab) {
+				if (string.IsNullOrEmpty(Name))
+					this._name = Prefab.name;
+				lastPrefab = Prefab;
+			}
+		}
+		
+		#endif
 
 	}
 }

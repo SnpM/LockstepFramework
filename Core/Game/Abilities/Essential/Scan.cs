@@ -59,10 +59,8 @@ namespace Lockstep
 		public long BaseDamage { get { return _damage; } }
 
 
-		public virtual int AttackRate { get { return FixedMath.Create(_attackRate).Div(FixedMath.One + AttackSpeedModifier).CeilToInt(); } }
+		public virtual long AttackInterval { get { return _attackInterval; } }
 		//Frames between each attack
-
-		public long AttackSpeedModifier { get; set; }
 
 		public virtual bool TrackAttackAngle { get { return _trackAttackAngle; } }
 		//Whether or not to require the unit to face the target for attacking
@@ -109,8 +107,8 @@ namespace Lockstep
 		protected long _sight = FixedMath.One * 10;
 		[FixedNumber, SerializeField]
 		protected long _damage = FixedMath.One;
-		[FrameCount, SerializeField]
-		protected int _attackRate = 1 * LockstepManager.FrameRate;
+		[SerializeField, FixedNumber]
+		protected long _attackInterval = 1 * FixedMath.One;
 		[SerializeField, EnumMask]
 		protected AllegianceType _targetAllegiance = AllegianceType.Enemy;
 
@@ -124,12 +122,12 @@ namespace Lockstep
 		protected Vector3d[] _secondaryProjectileOffsets;
 		[SerializeField]
 		private bool _cycleProjectiles;
-		[SerializeField, FrameCount]
-		protected int _windup;
+		[SerializeField, FixedNumber]
+		protected long _windup;
 
 		#endregion
 
-		public int Windup { get { return _windup; } }
+		public long Windup { get { return _windup; } }
 
 		[SerializeField]
 		protected bool _increasePriority = true;
@@ -142,7 +140,6 @@ namespace Lockstep
 		//private long fastRange;
 		private long fastRangeToTarget;
 		private Vector2d Destination;
-		private int attackFrameCount;
 		private Move cachedMove;
 		private Turn cachedTurn;
 
@@ -152,7 +149,7 @@ namespace Lockstep
 		private Health cachedTargetHealth;
 		private uint targetVersion;
 		private int searchCount;
-		private int attackCount;
+		private long attackCount;
 		private bool _hasTarget;
 		private bool isAttackMoving;
 		private bool isFocused;
@@ -165,7 +162,6 @@ namespace Lockstep
 				_sight = Range;
 
 			//fastRange = (Range * Range);
-			attackFrameCount = AttackRate;
 			basePriority = cachedBody.Priority;
 			CanMove = cachedMove.IsNotNull();
 			if (CanMove)
@@ -199,14 +195,13 @@ namespace Lockstep
 			inRange = false;
 			isFocused = false;
 			CycleCount = 0;
-			AttackSpeedModifier = 0;
 			this.Destination = Vector2d.zero;
 		}
 
 		protected override void OnSimulate()
 		{
 
-			attackCount--;
+			attackCount -= FixedMath.One / LockstepManager.FrameRate;
 			if (HasTarget)
 			{
 				BehaveWithTarget();
@@ -219,7 +214,7 @@ namespace Lockstep
 		[Lockstep(true)]
 		public bool IsWindingUp { get; set; }
 
-		int windupCount;
+		long windupCount;
 
 		void StartWindup()
 		{
@@ -261,7 +256,9 @@ namespace Lockstep
 					if (this.AgentConditional(Target))
 					{
 						Fire();
-						this.attackCount = this.attackFrameCount - this.Windup;
+						while (this.attackCount < 0)
+						this.attackCount += (this.AttackInterval);
+						this.attackCount -= Windup;
 						IsWindingUp = false;
 					}
 					else {
@@ -517,7 +514,7 @@ namespace Lockstep
 					HasTarget = true;
 					targetVersion = Target.SpawnVersion;
 					IsCasting = true;
-					fastRangeToTarget = Range + (Target.Body.IsNotNull() ? Target.Body.Radius : 0);
+					fastRangeToTarget = Range + (Target.Body.IsNotNull() ? Target.Body.Radius : 0) + Agent.Body.Radius;
 					fastRangeToTarget *= fastRangeToTarget;
 				}
 			}
