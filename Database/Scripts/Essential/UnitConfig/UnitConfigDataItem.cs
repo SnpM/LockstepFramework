@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using RTS;
-using RTS.Data;
 using Lockstep.Data;
 using Lockstep;
 
