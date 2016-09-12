@@ -62,12 +62,16 @@ namespace Lockstep.Data {
             
             
         }
-        
+		public static bool CanSave {
+			get {
+				return Application.isPlaying == false;
+			}}
         public string DatabasePath {get; private set;}
         bool settingsFoldout = false;
-        
+
+		TextAsset jsonFile;
         void DrawSettings () {
-            settingsFoldout = EditorGUILayout.Foldout (settingsFoldout, "Settings");
+            settingsFoldout = EditorGUILayout.Foldout (settingsFoldout, "Data Settings");
             if (settingsFoldout) {
                 GUILayout.BeginHorizontal ();
                 
@@ -80,8 +84,9 @@ namespace Lockstep.Data {
                 
                 SerializedProperty databaseTypeProp = obj.FindProperty ("_databaseType");
                 EditorGUILayout.PropertyField (databaseTypeProp, new GUIContent ("Database Type"));
-                
-                if (GUILayout.Button ("Load", GUILayout.MaxWidth (50f))) {
+
+				float settingsButtonWidth = 70f;
+                if (GUILayout.Button ("Load", GUILayout.MaxWidth (settingsButtonWidth))) {
                     DatabasePath = EditorUtility.OpenFilePanel ("Database File", Application.dataPath, "asset");
                     if (!string.IsNullOrEmpty (DatabasePath)) {
                         
@@ -91,7 +96,7 @@ namespace Lockstep.Data {
                         }
                     }
                 }
-                if (GUILayout.Button ("Create", GUILayout.MaxWidth (50f))) {
+                if (GUILayout.Button ("Create", GUILayout.MaxWidth (settingsButtonWidth))) {
                     DatabasePath = EditorUtility.SaveFilePanel ("Database File", Application.dataPath, "NewDatabase", "asset");
                     if (!string.IsNullOrEmpty (DatabasePath)) {
                         if (CreateDatabase (DatabasePath)) {
@@ -102,8 +107,21 @@ namespace Lockstep.Data {
                     }
                 }             
                 GUILayout.EndHorizontal ();
-                
-                
+
+				//json stuff
+				GUILayout.BeginHorizontal ();
+				jsonFile = (TextAsset)EditorGUILayout.ObjectField ("Json", jsonFile, typeof (TextAsset));
+				if (GUILayout.Button ("Load", GUILayout.MaxWidth (settingsButtonWidth))) {
+					LSDatabaseManager.ApplyJson (jsonFile.text, Database);
+				}
+				if (GUILayout.Button ("Save", GUILayout.MaxWidth (settingsButtonWidth))) {
+					System.IO.File.WriteAllText (
+						AssetDatabase.GetAssetPath (jsonFile),
+						LSDatabaseManager.ToJson (Database)
+					);
+				}
+				GUILayout.EndHorizontal ();
+				if (CanSave)
                 obj.ApplyModifiedProperties ();
                 
             }

@@ -12,7 +12,7 @@ namespace Lockstep.Data {
 
         private static LSDatabase _currentDatabase;
 
-        private static LSDatabase CurrentDatabase {
+        public static LSDatabase CurrentDatabase {
             get {
                 return _currentDatabase/* ?? (_currentDatabase = (LSDatabase)Resources.Load<LSDatabase> (LSDatabaseManager.DATABASE_NAME))*/;
             }
@@ -37,17 +37,26 @@ namespace Lockstep.Data {
 
 		public static string ToJson (LSDatabase database)
 		{
-			return JsonUtility.ToJson (database);
+			return JsonUtility.ToJson (database, true);
 		}
 		public static TDatabase FromJson<TDatabase> (string json) where TDatabase : LSDatabase, new()
 		{
 			var database = new TDatabase ();
 			return database;
 		}
-		public static void ApplyJson<TDatabase> (string json) where TDatabase : LSDatabase, new()
+		public static void ApplyJson (string json, object database)
 		{
-			_currentDatabase = new TDatabase ();
-			JsonUtility.FromJsonOverwrite (json, _currentDatabase);
+			JsonUtility.FromJsonOverwrite (json, database);
+		}
+		public static void ApplyJson (string json)
+		{
+			ApplyJson (json, _currentDatabase);
+		}
+		public static void ApplyNewJson (string json, Type databaseType)
+		{
+			//todo guard
+			object database = JsonUtility.FromJson (json, databaseType);
+			database.ToString ();
 		}
 
         public static void Initialize () {

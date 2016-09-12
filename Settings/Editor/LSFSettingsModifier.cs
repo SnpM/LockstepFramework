@@ -1,13 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
-namespace Lockstep {
+namespace Lockstep.Data {
     public static class LSFSettingsModifier {
 
         internal static void Save () {
-            EditorUtility.SetDirty (LSFSettingsManager.GetSettings ());
-            AssetDatabase.SaveAssets ();
-            AssetDatabase.Refresh ();
+			if (EditorLSDatabaseWindow.CanSave) {
+				EditorUtility.SetDirty (LSFSettingsManager.GetSettings ());
+				AssetDatabase.SaveAssets ();
+				AssetDatabase.Refresh ();
+			}
         }
     }
 }

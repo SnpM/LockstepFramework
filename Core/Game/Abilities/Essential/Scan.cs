@@ -380,7 +380,8 @@ namespace Lockstep
 		protected virtual void OnHit(LSAgent agent)
 		{
 			Health healther = agent.GetAbility<Health>();
-            healther.TakeDamage(Damage, this.Agent);
+			AttackerInfo info = new AttackerInfo (Agent, this.Agent.Controller);
+			healther.TakeDamage(Damage, info);
 			CallExtraOnHit(agent);
 		}
 
