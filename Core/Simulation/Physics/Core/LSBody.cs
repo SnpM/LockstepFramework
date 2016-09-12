@@ -203,6 +203,8 @@ namespace Lockstep
 
         public int ID { get; private set; }
 
+		private int _dynamicID = -1;
+		internal int DynamicID { get { return _dynamicID; } set { _dynamicID = value; } }
 		
         public int Priority { get; set; }
 
@@ -241,7 +243,7 @@ namespace Lockstep
         [SerializeField]
         private bool _immovable;
 
-        public bool Immovable { get { return _immovable || this.Shape != ColliderType.Circle; } }
+        public bool Immovable { get; private set; }
 
         [SerializeField, FormerlySerializedAs("_priority")]
         private int _basePriority;
@@ -326,6 +328,7 @@ namespace Lockstep
             Setted = true;
 
             Height = _height;
+            Immovable = _immovable || (this.Shape != ColliderType.Circle && this.Shape != ColliderType.None);
         }
 
         private bool OutMoreThanSet { get; set; }
@@ -375,7 +378,7 @@ namespace Lockstep
             }
         }
 
-        public void Initialize(Vector2dHeight StartPosition, Vector2d StartRotation)
+        public void Initialize(Vector3d StartPosition, Vector2d StartRotation, bool isDynamic = true)
         {
             PositionalTransform = _positionalTransform;
             RotationalTransform = _rotationalTransform;
@@ -399,7 +402,7 @@ namespace Lockstep
             Velocity = Vector2d.zero;
             VelocityFastMagnitude = 0;
             LastPosition = _position = StartPosition.ToVector2d();
-            _heightPos = StartPosition.Height;
+			_heightPos = StartPosition.z;
             _rotation = StartRotation;
             ForwardNeedsSet = true;
 
@@ -420,7 +423,7 @@ namespace Lockstep
                 BuildBounds();
             }
 			
-            ID = PhysicsManager.Assimilate(this);
+            ID = PhysicsManager.Assimilate(this, isDynamic);
             Partition.PartitionObject(this);
             if (PositionalTransform != null)
             {
@@ -534,63 +537,27 @@ namespace Lockstep
             }
         }
 
-        public void EarlySimulate()
-        {
-            if (VelocityChanged)
-            {
-                VelocityFastMagnitude = _velocity.FastMagnitude();
-                VelocityChanged = false;
-            }
-            if (VelocityFastMagnitude != 0)
-            {
-
-                _position.x += _velocity.x;
-                _position.y += _velocity.y;
-                PositionChanged = true;
-            }
-			
-            if (PositionChanged || this.PositionChangedBuffer)
-            {
-                Partition.UpdateObject(this);
-            }
-            if (RotationChanged)
-            {
-            } else
-            {
-            }
-        }
 
         public void Simulate()
         {
 
-            if (PositionChanged || RotationChanged)
-            {
-                if (PositionChanged)
-                {
+			if (VelocityChanged) {
+				VelocityFastMagnitude = _velocity.FastMagnitude ();
+				VelocityChanged = false;
+			}
+			if (VelocityFastMagnitude != 0) {
 
-                } else
-                {
-                }
-				
-                if (RotationChanged)
-                {
-                } else
-                {
-                }
-				
-            } else
-            {
-				
-            }
-			
-        }
-
-        public void LateSimulate()
-        {
-
+				_position.x += _velocity.x;
+				_position.y += _velocity.y;
+				PositionChanged = true;
+			}
 
             BuildChangedValues();
 
+
+			if (PositionChanged || this.PositionChangedBuffer) {
+				Partition.UpdateObject (this);
+			}
         }
 
 		
