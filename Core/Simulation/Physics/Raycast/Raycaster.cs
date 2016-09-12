@@ -34,9 +34,9 @@ namespace Lockstep
                     break;
                 }
                 PartitionNode node = Partition.GetNode(indexX, indexY);
-                for (int i = node.ContainedObjects.Count - 1; i >= 0; i--)
+                for (int i = node.ContainedDynamicObjects.Count - 1; i >= 0; i--)
                 {
-                    LSBody body = PhysicsManager.SimObjects [node.ContainedObjects [i]];
+                    LSBody body = PhysicsManager.SimObjects [node.ContainedDynamicObjects [i]];
                     if (body.RaycastVersion != _Version)
                     {
                         if (Conditional.IsNull() || Conditional())

@@ -4,83 +4,94 @@ using System;
 
 namespace Lockstep
 {
-    public class PartitionNode
-    {
-		
-        public readonly FastList<int> ContainedObjects = new FastList<int>();
+	public class PartitionNode
+	{
 
-        public int Count { get { return ContainedObjects.Count; } }
+		public readonly FastList<int> ContainedDynamicObjects = new FastList<int> ();
+		public readonly FastList<int> ContainedImmovableObjects = new FastList<int> ();
 
-        public int PeakCount { get { return ContainedObjects.Count; } }
+        public int DynamicCount { get {return ContainedDynamicObjects.Count;} }
 
-        public void Reset()
-        { 
-            ContainedObjects.FastClear();
-        }
 
-        int activationID;
+		public void Reset ()
+		{
+			ContainedDynamicObjects.FastClear ();
+            ContainedImmovableObjects.FastClear();
+		}
 
-        public void Add(int item)
-        {
-            if (Count == 0)
-            {
-                activationID = Partition.AddNode(this);
-            }
-            ContainedObjects.Add(item);
-        }
+		int activationID;
 
-        public void Remove(int item)
-        {
-            
-            if (ContainedObjects.Remove(item))
-            {
-                if (Count == 0)
-                {
-					Partition.RemoveNode(activationID);
+		public void Add (int item)
+		{
+			if (DynamicCount == 0) {
+				activationID = Partition.AddNode (this);
+			}
+			ContainedDynamicObjects.Add (item);
+		}
+
+		public void AddImmovable (int item)
+		{
+			ContainedImmovableObjects.Add (item);
+
+		}
+
+		public void Remove (int item)
+		{
+
+			//todo get rid of this linear search
+			if (ContainedDynamicObjects.Remove (item)) {
+				if (DynamicCount == 0) {
+					Partition.RemoveNode (activationID);
 					activationID = -1;
-                }
-            }
-        }
-
-        static int id1, id2;
-        static CollisionPair pair;
-
-        public void Distribute()
-        {
-            int nodePeakCount = PeakCount;
-            for (int j = 0; j < nodePeakCount; j++)
-            {
-                id1 = ContainedObjects [j];
-                for (int k = j + 1; k < nodePeakCount; k++)
-                {
-                    id2 = ContainedObjects [k];
-
-                    if (id1 != id2) {
-						
-                        pair = PhysicsManager.GetCollisionPair(id1, id2);
-                        if (System.Object.ReferenceEquals(null, pair) == false && (pair.PartitionVersion != Partition._Version))
-                        {
-                            pair.CheckAndDistributeCollision();
-                            pair.PartitionVersion = Partition._Version;
-    							
-                        }
-                    }
-                }
+				}
+			}
+		}
+		public void RemoveImmovable (int item)
+		{
+			if (ContainedDynamicObjects.Remove (item)) {
 				
-            }
-        }
+			}
+		}
 
-        public int this [int index]
-        {
-            get
-            {
-                return ContainedObjects [index];
-            }
-            set
-            {
-                ContainedObjects [index] = value;
-            }
-        }
+		static int id1, id2;
+		static CollisionPair pair;
 
-    }
+		public void Distribute ()
+		{
+            int nodePeakCount = DynamicCount;
+			int immovableObjectsCount = ContainedImmovableObjects.Count;
+			for (int j = 0; j < nodePeakCount; j++) {
+				id1 = ContainedDynamicObjects [j];
+				for (int k = j + 1; k < nodePeakCount; k++) {
+					id2 = ContainedDynamicObjects [k];
+					if (id1 != id2) {
+						pair = PhysicsManager.GetCollisionPair (id1, id2);
+						if (System.Object.ReferenceEquals (null, pair) == false && (pair.PartitionVersion != Partition._Version)) {
+							pair.CheckAndDistributeCollision ();
+							pair.PartitionVersion = Partition._Version;
+
+						}
+					}
+				}
+				
+				for (int k = 0; k < immovableObjectsCount; k++) {
+					pair = PhysicsManager.GetCollisionPair (id1, this.ContainedImmovableObjects [k]);
+					if (pair.IsNotNull ()) {
+						pair.CheckAndDistributeCollision ();
+					}
+				}
+			}
+			
+		}
+
+		public int this [int index] {
+			get {
+				return ContainedDynamicObjects [index];
+			}
+			set {
+				ContainedDynamicObjects [index] = value;
+			}
+		}
+
+	}
 }

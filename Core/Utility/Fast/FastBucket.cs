@@ -7,11 +7,11 @@ namespace Lockstep
 {
 	public class FastBucket<T> : FastEnumerable<T>
 	{
-		private T[] innerArray;
+		public T[] innerArray;
 
 		public BitArray arrayAllocation { get; private set; }
 
-		private int capacity = 8;
+		private int Capacity = 8;
 
 		public int Count { get; private set; }
 
@@ -23,11 +23,15 @@ namespace Lockstep
 		{
 			Initialize();
 		}
+        public FastBucket (int capacity) {
+            this.Capacity = capacity;
+            Initialize ();
+        }
 
 		private void Initialize()
 		{
-			innerArray = new T[capacity];
-			arrayAllocation = new BitArray(capacity);
+			innerArray = new T[Capacity];
+			arrayAllocation = new BitArray(Capacity);
 			Count = 0;
 			PeakCount = 0;
 		}
@@ -79,15 +83,15 @@ namespace Lockstep
 
 		private void CheckCapacity(int min)
 		{
-			if (min >= capacity)
+			if (min >= Capacity)
 			{
-				capacity *= 2;
-				if (capacity < min)
-					capacity = min;
-				Array.Resize(ref innerArray, capacity);
+				Capacity *= 2;
+				if (Capacity < min)
+					Capacity = min;
+				Array.Resize(ref innerArray, Capacity);
 				arrayAllocation.Length =
-				arrayAllocation.Length >= capacity ?
-				arrayAllocation.Length : capacity;
+				arrayAllocation.Length >= Capacity ?
+				arrayAllocation.Length : Capacity;
 			}
 		}
 
@@ -137,10 +141,8 @@ namespace Lockstep
 			set
 			{
 
-#if DEBUG
 				if (arrayAllocation[index] == false)
 					throw new System.IndexOutOfRangeException();
-#endif
 				innerArray[index] = value;
 			}
 
@@ -148,7 +150,7 @@ namespace Lockstep
 
 		public void Clear()
 		{
-			for (int i = 0; i < capacity; i++)
+			for (int i = 0; i < Capacity; i++)
 			{
 				innerArray[i] = default(T);
 			}

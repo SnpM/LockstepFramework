@@ -257,7 +257,7 @@ namespace Lockstep
 		private readonly FastList<int> TrackedLockstepTickets = new FastList<int>();
 		void Awake()
 		{
-			gameObject.SetActive(false);
+			//gameObject.SetActive(false);
 
 		}
 		public void Setup(IAgentData interfacer)
@@ -352,7 +352,7 @@ namespace Lockstep
 			CachedGameObject.SetActiveIfNot(true);
 			if (Body.IsNotNull())
 			{
-				Body.Initialize(new Vector2dHeight(position), rotation);
+				Body.Initialize(position.ToVector3d(), rotation);
 			}
 
 			if (Triggers.IsNotNull())
