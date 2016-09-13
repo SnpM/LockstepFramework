@@ -709,6 +709,9 @@ namespace Lockstep
 #if UNITY_EDITOR
 		void OnDrawGizmos()
 		{
+			if (Agent.IsActive == false) return;
+			if (Agent.Body == null)
+				Debug.Log (Agent.gameObject);
 			Gizmos.DrawWireSphere(Application.isPlaying ? Agent.Body._visualPosition : this.transform.position, this.Range.ToFloat());
 		}
 #endif

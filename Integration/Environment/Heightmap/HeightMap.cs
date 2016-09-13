@@ -20,7 +20,7 @@ namespace Lockstep
         public long GetHeight (int gridX, int gridY) {
             if (!_map.IsValid(gridX,gridY))
                 return 0;
-            return HeightmapHelper.Uncompress(_map[gridX,gridY]);
+            return HeightmapSaver.Uncompress(_map[gridX,gridY]);
         }
     }
 }

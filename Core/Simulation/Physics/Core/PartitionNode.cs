@@ -10,13 +10,13 @@ namespace Lockstep
 		public readonly FastList<int> ContainedDynamicObjects = new FastList<int> ();
 		public readonly FastList<int> ContainedImmovableObjects = new FastList<int> ();
 
-        public int DynamicCount { get {return ContainedDynamicObjects.Count;} }
+		public int DynamicCount { get { return ContainedDynamicObjects.Count; } }
 
 
 		public void Reset ()
 		{
 			ContainedDynamicObjects.FastClear ();
-            ContainedImmovableObjects.FastClear();
+			ContainedImmovableObjects.FastClear ();
 		}
 
 		int activationID;
@@ -49,7 +49,7 @@ namespace Lockstep
 		public void RemoveImmovable (int item)
 		{
 			if (ContainedDynamicObjects.Remove (item)) {
-				
+
 			}
 		}
 
@@ -58,31 +58,37 @@ namespace Lockstep
 
 		public void Distribute ()
 		{
-            int nodePeakCount = DynamicCount;
+			int nodePeakCount = DynamicCount;
 			int immovableObjectsCount = ContainedImmovableObjects.Count;
 			for (int j = 0; j < nodePeakCount; j++) {
 				id1 = ContainedDynamicObjects [j];
 				for (int k = j + 1; k < nodePeakCount; k++) {
 					id2 = ContainedDynamicObjects [k];
 					if (id1 != id2) {
-						pair = PhysicsManager.GetCollisionPair (id1, id2);
-						if (System.Object.ReferenceEquals (null, pair) == false && (pair.PartitionVersion != Partition._Version)) {
-							pair.CheckAndDistributeCollision ();
-							pair.PartitionVersion = Partition._Version;
-
-						}
+						ProcessPair ();
 					}
 				}
-				
 				for (int k = 0; k < immovableObjectsCount; k++) {
-					pair = PhysicsManager.GetCollisionPair (id1, this.ContainedImmovableObjects [k]);
-					if (pair.IsNotNull ()) {
-						pair.CheckAndDistributeCollision ();
-					}
+					id2 = ContainedImmovableObjects [k];
+					ProcessPair ();
+				}
+
+			}
+
+
+		}
+
+		void ProcessPair ()
+		{
+			long index = PhysicsManager.GetCollisionPairIndex (id1, id2);
+			if (Partition.UsedCollisionIndexes.Add (index)) {
+				if (PhysicsManager.TryGetCollisionPair (id1, id2, out pair)) {
+					pair.CheckAndDistributeCollision ();
+					PhysicsManager.PoolPair (pair);
 				}
 			}
-			
 		}
+
 
 		public int this [int index] {
 			get {

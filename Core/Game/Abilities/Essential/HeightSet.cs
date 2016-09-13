@@ -34,7 +34,7 @@ namespace Lockstep
         public bool ForceUpdate { get; set; }
 
         public void UpdateHeight () {
-            long height = HeightmapHelper.Instance.GetHeight(MapIndex, Agent.Body.Position) + _bonusHeight + Offset;
+            long height = HeightmapSaver.Instance.GetHeight(MapIndex, Agent.Body.Position) + _bonusHeight + Offset;
             Agent.Body.HeightPos = height;
         }
 

@@ -10,9 +10,8 @@ using UnityEngine.Serialization;
 
 namespace Lockstep
 {
-    public sealed partial class LSBody : MonoBehaviour
+    public partial class LSBody : MonoBehaviour
     {
-		
         #region Core deterministic variables
 
         [SerializeField] //For inspector debugging
@@ -197,9 +196,13 @@ namespace Lockstep
 
         public delegate void CollisionFunction(LSBody other);
 
-        public CollisionFunction OnContactEnter;
+
+		public void NotifyContact (LSBody other)
+		{
+			if (OnContact.IsNotNull ())
+				OnContact (other);
+		}
         public CollisionFunction OnContact;
-        public CollisionFunction OnContactExit;
 
         public int ID { get; private set; }
 
@@ -211,7 +214,7 @@ namespace Lockstep
         #region Serialized
 
         [SerializeField, FormerlySerializedAs("Shape")]
-        private ColliderType _shape = ColliderType.None;
+		protected ColliderType _shape = ColliderType.None;
 
         public ColliderType Shape { get { return _shape; } }
 
@@ -236,12 +239,12 @@ namespace Lockstep
         public long HalfHeight { get { return _halfHeight; } }
 
         [SerializeField,FixedNumber, FormerlySerializedAs("Radius")]
-        private long _radius = FixedMath.Half;
+		protected long _radius = FixedMath.Half;
 
         public long Radius { get { return _radius; } }
 
         [SerializeField]
-        private bool _immovable;
+		protected bool _immovable;
 
         public bool Immovable { get; private set; }
 
