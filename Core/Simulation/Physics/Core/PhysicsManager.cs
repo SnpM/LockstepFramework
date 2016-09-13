@@ -68,8 +68,6 @@ namespace Lockstep
 		public static LSBody [] SimObjects = new LSBody [MaxSimObjects];
 		public static FastBucket<LSBody> DynamicSimObjects = new FastBucket<LSBody> (MaxSimObjects / 4);
 
-		private static Dictionary<int, CollisionPair> CollisionPairs = new Dictionary<int, CollisionPair> (MaxSimObjects);
-
 		#endregion
 
 		#region Assignment Variables
@@ -97,8 +95,7 @@ namespace Lockstep
 			PeakCount = 0;
 
 			CachedIDs.FastClear ();
-			//CollisionPairs.Clear ();
-			//SimObjects.Clear ();
+
 			CollisionPair.CurrentCollisionPair = null;
 
 			PeakCount = 0;
@@ -128,7 +125,7 @@ namespace Lockstep
 
 
 			for (int i = 0; i < DynamicSimObjects.PeakCount; i++) {
-                LSBody b1 = DynamicSimObjects.innerArray [i];
+				LSBody b1 = DynamicSimObjects.innerArray [i];
 				if (b1.IsNotNull ()) {
 					b1.Simulate ();
 				}
@@ -138,7 +135,6 @@ namespace Lockstep
 
 		public static void Deactivate ()
 		{
-			CollisionPairs.Clear ();
 			Partition.Deactivate ();
 		}
 
@@ -162,7 +158,7 @@ namespace Lockstep
 			LerpTime = (float)(AccumulatedTime / FixedDeltaTime);
 			if (LerpTime < 1f) {
 				for (int i = 0; i < DynamicSimObjects.PeakCount; i++) {
-                    LSBody b1 = DynamicSimObjects.innerArray [i];
+					LSBody b1 = DynamicSimObjects.innerArray [i];
 
 					if (b1.IsNotNull ()) {
 						b1.Visualize ();
@@ -175,7 +171,7 @@ namespace Lockstep
 
 				if (Simulated) {
 					for (int i = 0; i < DynamicSimObjects.PeakCount; i++) {
-                        LSBody b1 = DynamicSimObjects.innerArray [i];
+						LSBody b1 = DynamicSimObjects.innerArray [i];
 
 						if (b1.IsNotNull ()) {
 							b1.LerpOverReset ();
@@ -188,7 +184,7 @@ namespace Lockstep
 					Simulated = false;
 				} else {
 					for (int i = 0; i < DynamicSimObjects.PeakCount; i++) {
-                        LSBody b1 = DynamicSimObjects.innerArray [i];
+						LSBody b1 = DynamicSimObjects.innerArray [i];
 
 						if (b1.IsNotNull ()) {
 							b1.LerpOverReset ();
@@ -219,22 +215,30 @@ namespace Lockstep
 			}
 			SimObjects [id] = body;
 
-            //Important: If isDynamic is false, PhysicsManager won't check to update the item every frame. When the object is changed, it must be updated manually.
+			//Important: If isDynamic is false, PhysicsManager won't check to update the item every frame. When the object is changed, it must be updated manually.
 			if (isDynamic) {
 				body.DynamicID = DynamicSimObjects.Add (body);
 			}
 			AssimilatedCount++;
 			return id;
 		}
-
+		private static FastStack<CollisionPair> CachedCollisionPairs = new FastStack<CollisionPair> ();
 		private static CollisionPair CreatePair (LSBody body1, LSBody body2)
 		{
-			int pairIndex = GetCollisionPairIndex (body1.ID, body2.ID);
-			CollisionPair pair = new CollisionPair ();
-			CollisionPairs [pairIndex] = pair;
+			CollisionPair pair;
+			if (CachedCollisionPairs.Count > 0) {
+				pair = CachedCollisionPairs.Pop ();
+			} else {
+				pair = new CollisionPair ();
+			}
 			pair.Initialize (body1, body2);
 			return pair;
 
+		}
+		public static void PoolPair (CollisionPair pair)
+		{
+			pair.Deactivate ();
+			CachedCollisionPairs.Add (pair);
 		}
 
 		internal static void Dessimilate (LSBody body)
@@ -249,17 +253,6 @@ namespace Lockstep
 			SimObjects [tid] = null;
 			CachedIDs.Add (tid);
 
-			for (int i = 0; i < PhysicsManager.PeakCount; i++) {
-				if (PhysicsManager.SimObjects [i].IsNotNull ()) {
-					if (i != tid) {
-						int pairIndex = GetCollisionPairIndex (i, tid);
-						CollisionPair pair;
-						if (CollisionPairs.TryGetValue (pairIndex, out pair)) {
-							pair.Deactivate ();
-						}
-					}
-				}
-			}
 
 			if (body.DynamicID >= 0) {
 				DynamicSimObjects.RemoveAt (body.DynamicID);
@@ -267,20 +260,19 @@ namespace Lockstep
 			}
 		}
 
-		public static CollisionPair GetCollisionPair (int ID1, int ID2)
+
+		public static bool TryGetCollisionPair (int ID1, int ID2, out CollisionPair output)
 		{
 			CollisionPair pair;
-			int pairIndex = GetCollisionPairIndex (ID1, ID2);
-			if (SimObjects [ID1].IsNotNull() && SimObjects [ID2].IsNotNull()) {
-				if (CollisionPairs.TryGetValue (pairIndex, out pair) == false) {
-					pair = CreatePair (SimObjects [ID1], SimObjects [ID2]);
-				} else if (pair.Active == false) {
-					pair.Initialize (SimObjects [ID1], SimObjects [ID2]);
-				}
-				return pair;
-
+			LSBody body1;
+			LSBody body2;
+			if ((body1 = SimObjects [ID1]).IsNotNull () && (body2 = SimObjects [ID2]).IsNotNull ()) {
+				pair = CreatePair (body1, body2);
+				output = pair;
+				return true;
 			}
-			return null;
+			output = null;
+			return false;
 		}
 
 		public static int GetCollisionPairIndex (int ID1, int ID2)

@@ -15,10 +15,8 @@ namespace Lockstep
         public LSBody Body2;
         private long CacheSqrDistance;
         private CollisionType LeCollisionType;
-        public bool IsColliding;
         private bool DoPhysics = true;
         public bool Active;
-        public uint PartitionVersion;
         public static long DistX;
         public static long DistY;
         public static long PenetrationX;
@@ -29,18 +27,13 @@ namespace Lockstep
 
         public void Initialize(LSBody b1, LSBody b2)
         {
+            IsValid = true;
+			if (!IsValid)
+				return;
 
-            if (b1 == b2)
-            {
-                Debug.Log("boom: " + b1.ID + ", " + b2.ID);
-            }
-            IsValid = PhysicsManager.RequireCollisionPair(b1, b2);
-
-            PartitionVersion = 0;
-            Body1 = b1;
+			Body1 = b1;
             Body2 = b2;
 
-            IsColliding = false;
             DistX = 0;
             DistY = 0;
             PenetrationX = 0;
@@ -48,8 +41,6 @@ namespace Lockstep
 
             CacheSqrDistance = b1.Radius + b2.Radius;
             CacheSqrDistance *= CacheSqrDistance;
-            if (!IsValid)
-                return;
 
             LeCollisionType = CollisionType.None;
             if (Body1.Shape == ColliderType.None || Body2.Shape == ColliderType.None)
@@ -111,14 +102,11 @@ namespace Lockstep
         private void DistributeCollision()
         {
 
-            if (Body1.OnContact.IsNotNull())
-            {
-                Body1.OnContact(Body2);
-            }
-            if (Body2.OnContact.IsNotNull())
-            {
-                Body2.OnContact(Body1);
-            }
+
+			Body1.NotifyContact(Body2);
+
+			Body2.NotifyContact(Body1);
+            
 
             if (Body1.IsTrigger || Body2.IsTrigger)
                 return;
@@ -252,40 +240,12 @@ namespace Lockstep
             if (CheckCollision())
             {
 
-                if (IsColliding == false)
-                {
-                    if (Body1.OnContactEnter.IsNotNull())
-                    {
-                        Body1.OnContactEnter(Body2);
-                    }
-                    if (Body2.OnContactEnter.IsNotNull())
-                    {
-                        Body2.OnContactEnter(Body1);
-                    }
-                    IsColliding = true;
-                } else
-                {
-
-                }
+               
                 DistributeCollision();
 
             } else
             {
-                if (IsColliding)
-                {
-                    if (Body1.OnContactExit.IsNotNull())
-                    {
-                        Body1.OnContactExit(Body2);
-                    }
-                    if (Body2.OnContactExit.IsNotNull())
-                    {
-                        Body2.OnContactExit(Body1);
-                    }
-                    IsColliding = false;
-                } else
-                {
-
-                }
+  
             }
 
         }
@@ -297,10 +257,6 @@ namespace Lockstep
 
         public bool CheckCollision()
         {
-            if ((Body1.PositionChanged || Body2.PositionChanged || Body1.PositionChangedBuffer || Body2.PositionChangedBuffer) == false)
-            {
-                return IsColliding;
-            }
 
             switch (LeCollisionType)
             {

@@ -184,8 +184,6 @@ namespace Lockstep
 
 			ClientManager.Initialize (MainGameManager.MainNetworkHelper);
 
-			TriggerManager.Initialize ();
-
 			GridManager.Initialize ();
 
 
@@ -249,8 +247,6 @@ namespace Lockstep
 			CoroutineManager.Simulate ();
 			InfluenceManager.Simulate ();
 			ProjectileManager.Simulate ();
-
-			TriggerManager.Simulate ();
 
 			LateSimulate ();
 			FrameCount++;

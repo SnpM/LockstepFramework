@@ -196,9 +196,13 @@ namespace Lockstep
 
         public delegate void CollisionFunction(LSBody other);
 
-        public CollisionFunction OnContactEnter;
+
+		public void NotifyContact (LSBody other)
+		{
+			if (OnContact.IsNotNull ())
+				OnContact (other);
+		}
         public CollisionFunction OnContact;
-        public CollisionFunction OnContactExit;
 
         public int ID { get; private set; }
 
