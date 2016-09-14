@@ -272,6 +272,10 @@ namespace Lockstep
 				lSEffect.Initialize();
 			}
 			this.HitEffect(agent);
+			if (onHitAgent != null)
+			{
+				onHitAgent(agent);
+			}
 		}
 
 	private void ApplyCone(Vector3d center3d, Vector2d forward, long radius, long angle)
@@ -582,35 +586,13 @@ namespace Lockstep
 						break;
 				}
 			}
-			//PAPPS ADDED THIS:
-			if (DoReleaseChildren)
-			{
-				foreach (Transform each in transform)
-				{
-					ParticleSystem ps;
-					if (ps = each.GetComponent<ParticleSystem>())
-					{
-						each.parent = null;
-                        var psEmission = ps.emission;
-                        psEmission.enabled = false;
-						foreach (Transform eachChild in each)
-						{
-							ParticleSystem cps;
-							if (cps = eachChild.GetComponent<ParticleSystem>())
-							{
-                                var cpsEmission = cps.emission;
-								cpsEmission.enabled = false;
-							}
-						}
-					}
-				}
-			}
 		}
 
 		private void ResetHit()
 		{
 			this.ExclusiveTargetType = this._exclusiveTargetType;
 			this.onHit = null;
+			this.onHitAgent = null;
 		}
 
 		private void ResetEffects()
@@ -801,6 +783,7 @@ namespace Lockstep
 		public event Action onDeactivate;
 
 		public event Action onHit;
+		public event Action<LSAgent> onHitAgent;
 
 		public event Action onInitialize;
 
