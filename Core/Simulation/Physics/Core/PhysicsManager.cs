@@ -235,6 +235,8 @@ namespace Lockstep
 			return pair;
 
 		}
+
+
 		public static void PoolPair (CollisionPair pair)
 		{
 			pair.Deactivate ();
@@ -261,18 +263,27 @@ namespace Lockstep
 		}
 
 
-		public static bool TryGetCollisionPair (int ID1, int ID2, out CollisionPair output)
+		public static CollisionPair GetCollisionPair (int ID1, int ID2)
 		{
-			CollisionPair pair;
 			LSBody body1;
 			LSBody body2;
 			if ((body1 = SimObjects [ID1]).IsNotNull () && (body2 = SimObjects [ID2]).IsNotNull ()) {
-				pair = CreatePair (body1, body2);
-				output = pair;
-				return true;
+				if (body1.ID < body2.ID) {
+
+				}
+				else {
+					var temp = body1;
+					body1 = body2;
+					body2 = temp;
+				}
+				CollisionPair pair;
+				if (!body1.CollisionPairs.TryGetValue (body2.ID, out pair)) {
+					pair = CreatePair(body1, body2);
+					body1.CollisionPairs.Add(body2.ID, pair);
+				}
+				return pair;
 			}
-			output = null;
-			return false;
+			return null;
 		}
 
 		public static int GetCollisionPairIndex (int ID1, int ID2)

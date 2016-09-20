@@ -13,6 +13,8 @@ namespace Lockstep.Integration
         SerializedProperty IsTrigger;
         //bool
         SerializedProperty Layer;
+		//int
+		SerializedProperty BasePriority;
         //int
         SerializedProperty HalfWidth;
         //long
@@ -55,6 +57,7 @@ namespace Lockstep.Integration
             Shape = so.FindProperty("_shape");
             IsTrigger = so.FindProperty("_isTrigger");
             Layer = so.FindProperty("_layer");
+			BasePriority = so.FindProperty("_basePriority");
             HalfWidth = so.FindProperty("_halfWidth");
             HalfHeight = so.FindProperty("_halfHeight");
             Radius = so.FindProperty("_radius");
@@ -96,6 +99,7 @@ namespace Lockstep.Integration
                     EditorGUILayout.Space();
                     EditorGUILayout.LabelField("General Collider Settings", EditorStyles.boldLabel);
                     Layer.Draw();
+					BasePriority.Draw();
                     IsTrigger.Draw();
                     if (IsTrigger.boolValue == false)
                         Immovable.Draw();
