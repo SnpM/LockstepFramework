@@ -133,8 +133,18 @@ namespace Lockstep
 			Simulated = true;
 		}
 
-		internal static FastBucket<CollisionPair> RanCollisionPairs = new FastBucket<CollisionPair>();
-		internal static FastQueue<CollisionPair> InactiveCollisionPairs = new FastQueue<CollisionPair>();
+		internal static FastBucket<InstanceCollisionPair> RanCollisionPairs = new FastBucket<InstanceCollisionPair>();
+		internal static FastQueue<InstanceCollisionPair> InactiveCollisionPairs = new FastQueue<InstanceCollisionPair>();
+
+		public struct InstanceCollisionPair
+		{
+			public InstanceCollisionPair(ushort version, CollisionPair pair) {
+				Version = version;
+				Pair = pair;
+			}
+			public ushort Version;
+			public CollisionPair Pair;
+		}
 
 		public static void LateSimulate()
 		{
@@ -145,46 +155,66 @@ namespace Lockstep
 			{
 				if (RanCollisionPairs.arrayAllocation[i])
 				{
-					var pair = RanCollisionPairs[i];
-					if (pair.LastFrame == LockstepManager.FrameCount)
+					var instancePair = RanCollisionPairs[i];
+					var pair = RanCollisionPairs[i].Pair;
+
+					if (instancePair.Version != instancePair.Pair._Version)
 					{
-						
+						RanCollisionPairs.RemoveAt(pair._ranIndex);
+						pair._ranIndex = -1;
+
 					}
 					else
 					{
-						#if false
-						if (!RanCollisionPairs.SafeRemoveAt(pair._ranIndex, pair))
+						if (pair.LastFrame == LockstepManager.FrameCount)
+						{
+
+						}
+						else
+						{
+							#if false
+							if (!RanCollisionPairs.SafeRemoveAt(pair._ranIndex, instancePair))
 						{
 							Debug.Log("Removal Failed");
 						}
-						#else
-						RanCollisionPairs.RemoveAt(pair._ranIndex);
-						#endif
+							#else
+							RanCollisionPairs.RemoveAt(pair._ranIndex);
+							#endif
+							pair._ranIndex = -1;
 
-						InactiveCollisionPairs.Add(pair);
+							InactiveCollisionPairs.Add(instancePair);
+						}
 					}
 				}
 			}
 
 			while (InactiveCollisionPairs.Count > 0)
 			{
-				var pair = InactiveCollisionPairs.Peek();
-				int dif = LockstepManager.FrameCount - pair.LastFrame;
-				if (dif == 0)
+				var instancePair = InactiveCollisionPairs.Peek();
+				var pair = instancePair.Pair;
+				if (instancePair.Version != pair._Version)
 				{
 					InactiveCollisionPairs.Remove();
 				}
 				else
 				{
-					if (dif >= inactiveFrameThreshold)
+					int dif = LockstepManager.FrameCount - pair.LastFrame;
+					if (dif == 0)
 					{
-						DeactivateCollisionPair(pair);
 						InactiveCollisionPairs.Remove();
-						;
 					}
 					else
 					{
-						break;
+						if (dif >= inactiveFrameThreshold)
+						{
+							DeactivateCollisionPair(pair);
+							InactiveCollisionPairs.Remove();
+							;
+						}
+						else
+						{
+							break;
+						}
 					}
 				}
 			}

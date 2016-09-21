@@ -675,6 +675,9 @@ namespace Lockstep
 		public void Deactivate ()
 		{
 			foreach (var collisionPair in CollisionPairs.Values) {
+				if (collisionPair._ranIndex >= 0) {
+					PhysicsManager.RanCollisionPairs.RemoveAt(collisionPair._ranIndex);
+				}
 				PhysicsManager.PoolPair(collisionPair);
 			}
 			CollisionPairs.Clear();

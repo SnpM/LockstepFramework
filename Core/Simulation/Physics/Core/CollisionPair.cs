@@ -25,7 +25,7 @@ namespace Lockstep
 		//-1 = false
 		//-2 = false and changed
 		public sbyte _isColliding;
-
+		public ushort _Version = 1;
 		public bool IsColliding
 		{
 			get
@@ -146,6 +146,7 @@ namespace Lockstep
 
 			}
 			Active = true;
+			_Version++;
 		}
 
 		public void Deactivate()
@@ -296,7 +297,7 @@ namespace Lockstep
 			}
 			if (_ranIndex < 0)
 			{ 
-				_ranIndex = PhysicsManager.RanCollisionPairs.Add(this);
+				_ranIndex = PhysicsManager.RanCollisionPairs.Add(new PhysicsManager.InstanceCollisionPair(_Version,this));
 			}
 			LastFrame = LockstepManager.FrameCount;
 			CurrentCollisionPair = this;
