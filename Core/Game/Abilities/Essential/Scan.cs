@@ -242,7 +242,7 @@ namespace Lockstep
 		void BehaveWithTarget()
 		{
 			if (Target.IsActive == false || Target.SpawnVersion != targetVersion ||
-			    (this.TargetAllegiance & Agent.GetAllegiance(Target)) == 0)
+				(this.TargetAllegiance & Agent.GetAllegiance(Target)) == 0)
 			{
 				StopEngage();
 				BehaveWithNoTarget();
@@ -257,7 +257,7 @@ namespace Lockstep
 					{
 						Fire();
 						while (this.attackCount < 0)
-						this.attackCount += (this.AttackInterval);
+							this.attackCount += (this.AttackInterval);
 						this.attackCount -= Windup;
 						IsWindingUp = false;
 					}
@@ -372,7 +372,7 @@ namespace Lockstep
 		}
 
 		public event Action<LSAgent> ExtraOnHit;
-		protected void CallExtraOnHit(LSAgent agent )
+		protected void CallExtraOnHit(LSAgent agent)
 		{
 			if (ExtraOnHit != null)
 				ExtraOnHit(agent);
@@ -380,7 +380,7 @@ namespace Lockstep
 		protected virtual void OnHit(LSAgent agent)
 		{
 			Health healther = agent.GetAbility<Health>();
-			AttackerInfo info = new AttackerInfo (Agent, this.Agent.Controller);
+			AttackerInfo info = new AttackerInfo(Agent, this.Agent.Controller);
 			healther.TakeDamage(Damage, info);
 			CallExtraOnHit(agent);
 		}
@@ -415,24 +415,30 @@ namespace Lockstep
 				{
 					CycleCount = 0;
 				}
-				FireProjectile(ProjectileOffsets[CycleCount], target);
+				FullFireProjectile(this.ProjCode,ProjectileOffsets[CycleCount], target);
 
 
 			}
 			else {
 				for (int i = 0; i < ProjectileOffsets.Length; i++)
 				{
-					FireProjectile(ProjectileOffsets[i], target);
+					FullFireProjectile(ProjCode,ProjectileOffsets[i], target);
 
 				}
 			}
 
 		}
-		public event Action<LSProjectile> onPrepareProjectile;
-		public LSProjectile FireProjectile(Vector3d projOffset, LSAgent target)
+
+		public LSProjectile FullFireProjectile(string projectileCode, Vector3d projOffset, LSAgent target)
+		{
+			LSProjectile proj = (PrepareProjectile(projectileCode, projOffset, target));
+			FireProjectile(proj);
+			return proj;
+		}
+		public LSProjectile PrepareProjectile(string projectileCode, Vector3d projOffset, LSAgent target)
 		{
 			LSProjectile currentProjectile = ProjectileManager.Create(
-				ProjCode,
+				projectileCode,
 				this.Agent,
 				projOffset,
 				this.TargetAllegiance,
@@ -460,16 +466,13 @@ namespace Lockstep
 					throw new System.Exception("Not implemented yet.");
 					//break;
 			}
-			if (onPrepareProjectile != null)
-				onPrepareProjectile(currentProjectile);
-			ProjectileManager.Fire(currentProjectile);
+			OnPrepareProjectile(currentProjectile);
 			return currentProjectile;
 		}
-		public LSProjectile FireProjectile(string projCode, Vector3d projOffset, Vector3d targetPos)
+		public LSProjectile PrepareProjectile(string projectileCode, Vector3d projOffset, Vector3d targetPos)
 		{
-			
 			LSProjectile currentProjectile = ProjectileManager.Create(
-				projCode,
+				projectileCode,
 				this.Agent,
 				projOffset,
 				this.TargetAllegiance,
@@ -494,11 +497,16 @@ namespace Lockstep
 					throw new System.Exception("Not implemented yet.");
 					//break;
 			}
-			if (onPrepareProjectile != null)
 
-				onPrepareProjectile(currentProjectile);
-			ProjectileManager.Fire(currentProjectile);
 			return currentProjectile;
+		}
+		protected virtual void OnPrepareProjectile(LSProjectile projectile)
+		{
+
+		}
+		public void FireProjectile(LSProjectile projectile)
+		{
+			ProjectileManager.Fire(projectile);
 		}
 
 		public void Engage(LSAgent other)

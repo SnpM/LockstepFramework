@@ -46,6 +46,7 @@ namespace Lockstep
 				}
 			}
 		}
+
 		public void RemoveImmovable (int item)
 		{
 			if (ContainedDynamicObjects.Remove (item)) {
@@ -80,13 +81,15 @@ namespace Lockstep
 
 		void ProcessPair ()
 		{
-			long index = PhysicsManager.GetCollisionPairIndex (id1, id2);
-			if (Partition.UsedCollisionIndexes.Add (index)) {
-				if (PhysicsManager.TryGetCollisionPair (id1, id2, out pair)) {
+
+			pair = PhysicsManager.GetCollisionPair (id1, id2);
+			if (pair.IsNotNull ()) {
+				if (pair.PartitionVersion != Partition._Version) {
+					pair.PartitionVersion = Partition._Version;
 					pair.CheckAndDistributeCollision ();
-					PhysicsManager.PoolPair (pair);
 				}
 			}
+
 		}
 
 

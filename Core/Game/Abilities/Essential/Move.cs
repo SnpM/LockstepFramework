@@ -155,7 +155,7 @@ namespace Lockstep
         protected override void OnSetup()
         {
             cachedBody = Agent.Body;
-            cachedBody.OnContact += HandleCollision;
+            cachedBody.onContact += HandleCollision;
             CachedTurn = Agent.GetAbility<Turn>();
             CanTurn = _canTurn && CachedTurn != null;
 

@@ -33,14 +33,23 @@ namespace Lockstep {
         }
 
         public T Pop() {
-            //TODO: Throw exception if popping empty queue
-            T ret = innerArray[head++];
+            T ret = innerArray[head];
+			innerArray[head] = default(T);
+			head++;
             if (head == Capacity) {
                 head = 0;
             }
             Count--;
             return ret;
         }
+		public void Remove () {
+			innerArray[head] = default(T);
+			head++;
+			if (head == Capacity) {
+				head = 0;
+			}
+			Count--;
+		}
         public T Peek () {
             return innerArray[head];
         }
@@ -71,7 +80,10 @@ namespace Lockstep {
                 innerArray = newArray;
             }
         }
-
+		public void FullClear () {
+			innerArray.Clear();
+			FastClear();
+		}
         public void FastClear() {
             Count = 0;
             tail = 0;

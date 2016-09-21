@@ -28,7 +28,6 @@ namespace Lockstep
 		public static Array2D<PartitionNode> Nodes = new Array2D<PartitionNode> (DefaultCount, DefaultCount);
 		private static readonly FastBucket<PartitionNode> ActivatedNodes = new FastBucket<PartitionNode> ();
 		private static readonly FastList<PartitionNode> AllocatedNodes = new FastList<PartitionNode> ();
-		public static HashSet<long> UsedCollisionIndexes = new HashSet<long> ();
 
 		public static void Setup ()
 		{
@@ -48,7 +47,6 @@ namespace Lockstep
 
 			ActivatedNodes.FastClear ();
 			AllocatedNodes.FastClear ();
-			UsedCollisionIndexes.Clear ();
 		}
 
 		public static void Deactivate ()
@@ -224,7 +222,6 @@ namespace Lockstep
 
 		public static void CheckAndDistributeCollisions ()
 		{
-			UsedCollisionIndexes.Clear ();
 			_Version++;
 			for (int i = ActivatedNodes.PeakCount - 1; i >= 0; i--) {
 				if (ActivatedNodes.arrayAllocation [i]) {

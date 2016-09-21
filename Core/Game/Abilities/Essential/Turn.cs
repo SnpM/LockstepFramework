@@ -29,7 +29,7 @@ namespace Lockstep
 			turnCos = _turnRate.x;
 			collisionTurnThreshold = cachedBody.Radius / LockstepManager.FrameRate;
 			collisionTurnThreshold *= collisionTurnThreshold;
-			cachedBody.OnContact += HandleContact;
+			cachedBody.onContact += HandleContact;
 		}
 
 		protected override void OnInitialize ()

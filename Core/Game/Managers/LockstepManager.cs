@@ -299,7 +299,6 @@ namespace Lockstep
 			DefaultMessageRaiser.EarlyVisualize ();
 			PlayerManager.Visualize ();
 			BehaviourHelperManager.Visualize ();
-			PhysicsManager.Visualize ();
 			AgentController.Visualize ();
 			ProjectileManager.Visualize ();
 			EffectManager.Visualize ();
@@ -311,7 +310,7 @@ namespace Lockstep
 		{
 			DefaultMessageRaiser.LateVisualize ();
 			AgentController.LateVisualize();
-
+			PhysicsManager.LateVisualize();
 		}
 
 		internal static void DrawGUI ()

@@ -44,6 +44,8 @@ namespace Lockstep
                 CachedAgents = new Dictionary<string,FastStack<LSAgent>>(AgentData.Length);
 
                 OrganizerObject = LSUtility.CreateEmpty().transform;
+				OrganizerObject.gameObject.name = "OrganizerObject";
+				OrganizerObject.gameObject.SetActive(false);
                 for (int i = 0; i < AgentData.Length; i++)
                 {
                     IAgentData interfacer = AgentData [i];
