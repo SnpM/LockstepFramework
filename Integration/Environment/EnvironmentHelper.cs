@@ -28,6 +28,7 @@ namespace Lockstep
             foreach (EnvironmentSaver saver in Savers) {
                 saver.Save();
 				UnityEditor.EditorUtility.SetDirty(saver);
+				UnityEditor.EditorUtility.SetDirty(this);
             }
         }
 
