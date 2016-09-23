@@ -613,7 +613,6 @@ namespace Lockstep
 				dir.Normalize();
 
 				circle.Position = corner + dir * circle.Radius;
-				Debug.Log("1");
 			}
 			else
 			{
