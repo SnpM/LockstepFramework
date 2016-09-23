@@ -264,7 +264,7 @@ namespace Lockstep
         public void CalculateHeuristic()
         {
 
-			
+
 			#if true
 			//manhattan
 			if (gridX > HeuristicTargetX)
@@ -277,7 +277,7 @@ namespace Lockstep
 				dstY = HeuristicTargetY - gridY;
 
 			hCost = (dstX + dstY) * 100;
-			#elif false
+			#elif true
             //octile
             if (gridX > HeuristicTargetX)
                 dstX = gridX - HeuristicTargetX;
@@ -303,7 +303,7 @@ namespace Lockstep
 			hCost = (int)(d * 100);
 			#endif
 
-            fCost = gCost + hCost;
+			fCost = gCost +  hCost;
 			
         }
 
