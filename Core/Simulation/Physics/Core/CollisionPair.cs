@@ -613,6 +613,7 @@ namespace Lockstep
 				dir.Normalize();
 
 				circle.Position = corner + dir * circle.Radius;
+				Debug.Log("1");
 			}
 			else
 			{
@@ -620,14 +621,20 @@ namespace Lockstep
 				{
 					PenetrationX = 0;
 					//if (yAbs < circle.Radius) PenetrationY = PenetrationY * yAbs / circle.Radius;
+					if (PenetrationY > 0 == yMore)
+						PenetrationY = -PenetrationY;
 
 				}
 				else
 				{
 					PenetrationY = 0;
 					//if (xAbs < circle.Radius) PenetrationX = PenetrationX * xAbs / circle.Radius;
-
+					if (PenetrationX > 0 == xMore)
+						PenetrationX = -PenetrationX;
 				}
+
+
+
 				//Resolving
 				circle._position.x -= PenetrationX;
 				circle._position.y -= PenetrationY;
