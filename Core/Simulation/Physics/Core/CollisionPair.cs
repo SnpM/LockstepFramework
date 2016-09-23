@@ -25,19 +25,11 @@ namespace Lockstep
 		public bool IsColliding {
 			get {return _isColliding;}
 			set {
-				if (_isColliding != value) {
-					_isColliding = value;
-					IsCollidingChanged = true;
-				}
+				_isColliding = value;
 			}
 		}
 
 		static bool IsCollidingChanged;
-
-		static void SetNotChanged()
-		{
-			IsCollidingChanged = false;
-		}
 
 		public int LastFrame;
 
@@ -292,23 +284,23 @@ namespace Lockstep
 			LastFrame = LockstepManager.FrameCount;
 			CurrentCollisionPair = this;
     
-			this.SetNotChanged();
+			IsCollidingChanged = false;
 			if (CheckHeight())
 			{
 				bool result = CheckCollision();
 				if (result != IsColliding)
 				{
 					IsColliding = result;
+					IsCollidingChanged = true;
 				}
 				if (CheckCollision())
 				{
 					DistributeCollision();
 				} 
-				Body1.NotifyContact(Body2, IsColliding, IsCollidingChanged);
-
-				Body2.NotifyContact(Body1, IsColliding, IsCollidingChanged);
 			}
+			Body1.NotifyContact(Body2, IsColliding, IsCollidingChanged);
 
+			Body2.NotifyContact(Body1, IsColliding, IsCollidingChanged);
 		}
 
 		public bool CheckHeight()
