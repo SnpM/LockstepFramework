@@ -18,38 +18,18 @@ namespace Lockstep
 		private bool DoPhysics = true;
 		public bool Active;
 		public uint PartitionVersion;
-		//More efficient data storage
-		//0 = null
-		//1 = true
-		//2 = true and changed
-		//-1 = false
-		//-2 = false and changed
-		public sbyte _isColliding;
+
 		public ushort _Version = 1;
-		public bool IsColliding
-		{
-			get
-			{
-				return _isColliding > 0;
-			}
-			set
-			{
-				_isColliding = value ? (sbyte)2 : (sbyte)-2;
+		public bool _isColliding;
+
+		public bool IsColliding {
+			get {return _isColliding;}
+			set {
+				_isColliding = value;
 			}
 		}
 
-		public bool IsCollidingChanged
-		{
-			get
-			{
-				return (_isColliding & 1) == 0;
-			}
-		}
-
-		void SetNotChanged()
-		{
-			_isColliding /= 2;
-		}
+		static bool IsCollidingChanged;
 
 		public int LastFrame;
 
@@ -80,7 +60,8 @@ namespace Lockstep
 
 			_ranIndex = -1;
 			;
-			_isColliding = 0;
+			_isColliding = false;
+
 			DistX = 0;
 			DistY = 0;
 			PenetrationX = 0;
@@ -151,6 +132,10 @@ namespace Lockstep
 
 		public void Deactivate()
 		{
+			if (IsColliding) {
+				Body1.NotifyContact(Body2, false, true);
+				Body2.NotifyContact(Body1, false, true);
+			}
 			Active = false;
 		}
 
@@ -160,9 +145,6 @@ namespace Lockstep
 		{
 
 
-			Body1.NotifyContact(Body2, IsColliding, IsCollidingChanged);
-
-			Body2.NotifyContact(Body1, IsColliding, IsCollidingChanged);
 
 			if (Body1.IsTrigger || Body2.IsTrigger)
 				return;
@@ -302,21 +284,23 @@ namespace Lockstep
 			LastFrame = LockstepManager.FrameCount;
 			CurrentCollisionPair = this;
     
-			this.SetNotChanged();
+			IsCollidingChanged = false;
 			if (CheckHeight())
 			{
 				bool result = CheckCollision();
 				if (result != IsColliding)
 				{
 					IsColliding = result;
+					IsCollidingChanged = true;
 				}
 				if (CheckCollision())
 				{
 					DistributeCollision();
 				} 
-
 			}
+			Body1.NotifyContact(Body2, IsColliding, IsCollidingChanged);
 
+			Body2.NotifyContact(Body1, IsColliding, IsCollidingChanged);
 		}
 
 		public bool CheckHeight()
@@ -328,8 +312,7 @@ namespace Lockstep
 		{
 			if (!Body1.PositionChangedBuffer && !Body2.PositionChangedBuffer && !Body1.RotationChangedBuffer && !Body2.RotationChangedBuffer)
 			{
-				if (_isColliding != 0)
-					return IsColliding;
+				return IsColliding;
 			}
 			switch (LeCollisionType)
 			{
@@ -630,6 +613,7 @@ namespace Lockstep
 				dir.Normalize();
 
 				circle.Position = corner + dir * circle.Radius;
+				Debug.Log("1");
 			}
 			else
 			{
@@ -637,14 +621,20 @@ namespace Lockstep
 				{
 					PenetrationX = 0;
 					//if (yAbs < circle.Radius) PenetrationY = PenetrationY * yAbs / circle.Radius;
+					if (PenetrationY > 0 == yMore)
+						PenetrationY = -PenetrationY;
 
 				}
 				else
 				{
 					PenetrationY = 0;
 					//if (xAbs < circle.Radius) PenetrationX = PenetrationX * xAbs / circle.Radius;
-
+					if (PenetrationX > 0 == xMore)
+						PenetrationX = -PenetrationX;
 				}
+
+
+
 				//Resolving
 				circle._position.x -= PenetrationX;
 				circle._position.y -= PenetrationY;

@@ -160,7 +160,7 @@ namespace Lockstep
 
 					if (instancePair.Version != instancePair.Pair._Version)
 					{
-						RanCollisionPairs.RemoveAt(pair._ranIndex);
+						RanCollisionPairs.RemoveAt(i);
 						pair._ranIndex = -1;
 
 					}

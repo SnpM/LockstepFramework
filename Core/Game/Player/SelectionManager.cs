@@ -196,14 +196,19 @@ namespace Lockstep
 				if (IsGathering == false && Input.GetMouseButtonDown(0))
 				{
 					_checkBoxDistance = true;
-					Boxing = true;
-					BoxingTime = 0f;
-					BoxStart = MousePosition;
-					BoxEnd = MousePosition;
+					StartBoxing (MousePosition);
+
 				}
 
 			}
 
+		}
+
+		public static void StartBoxing (Vector2 boxStart) {
+			Boxing = true;
+			BoxingTime = 0f;
+			BoxStart = MousePosition;
+			BoxEnd = MousePosition;
 		}
 
 		public static void QuickSelect()
@@ -218,7 +223,6 @@ namespace Lockstep
 
 			if (agent.IsNotNull())
 			{
-				agent.IsSelected = true;
 				Selector.Add(agent);
 			}
 		}
@@ -227,7 +231,6 @@ namespace Lockstep
 		{
 			if (agent.IsNotNull())
 			{
-				agent.IsSelected = false;
 				Selector.Remove(agent);
 			}
 		}
@@ -249,7 +252,6 @@ namespace Lockstep
 
 		private static void SelectBoxedAgents()
 		{
-
 			for (int i = 0; i < BoxedAgents.Count; i++)
 			{
 				SelectAgent(BoxedAgents.innerArray[i]);
