@@ -162,31 +162,32 @@ namespace Lockstep
 					} else {
 						//0-3 = sides, 4-7 = diagonals
 						if (i < 4) {
-							//newMovementCostToNeighbor = currentNode.gCost + 100;
+							newMovementCostToNeighbor = currentNode.gCost + 100;
 						} else {
 							if (i == 4) {
 								if (!GridManager.UseDiagonalConnections)
 									break;
 							}
-							//newMovementCostToNeighbor = currentNode.gCost + 141;
+							newMovementCostToNeighbor = currentNode.gCost + 141;
 						}
 
 						if (!GridHeap.Contains (neighbor)) {
-							//neighbor.gCost = newMovementCostToNeighbor;
+							neighbor.gCost = newMovementCostToNeighbor;
 						
 							//Optimized heuristic calculation
 							neighbor.CalculateHeuristic ();
 							neighbor.parent = currentNode;
 						
 							GridHeap.Add (neighbor);
-						}/* else if (newMovementCostToNeighbor < neighbor.gCost) {
-							//neighbor.gCost = newMovementCostToNeighbor;
+						} else if (newMovementCostToNeighbor < neighbor.gCost) {
+							neighbor.gCost = newMovementCostToNeighbor;
+
 							//Optimized heuristic calculation
 							neighbor.CalculateHeuristic ();
 							neighbor.parent = currentNode;
 
 							GridHeap.UpdateItem (neighbor);
-						}*/
+						}
 					}
 				}
 			}
