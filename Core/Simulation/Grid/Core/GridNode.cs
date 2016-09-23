@@ -82,7 +82,7 @@ namespace Lockstep
         public int gridY;
         public int gridIndex;
 
-		public int gCost;
+		//public int gCost;
         public int hCost;
         public int fCost;
         public GridNode parent;
@@ -303,7 +303,7 @@ namespace Lockstep
 			hCost = (int)(d * 100);
 			#endif
 
-            fCost = gCost + hCost;
+            fCost = hCost;
 			
         }
 
