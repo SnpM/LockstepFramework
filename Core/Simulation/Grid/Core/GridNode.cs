@@ -82,19 +82,7 @@ namespace Lockstep
         public int gridY;
         public int gridIndex;
 
-        public int gCost
-        {
-            get
-            {
-                return _gCost;
-            }
-            set
-            {
-                _gCost = value;
-            }
-        }
-
-        private int _gCost;
+		public int gCost;
         public int hCost;
         public int fCost;
         public GridNode parent;
@@ -275,14 +263,10 @@ namespace Lockstep
 
         public void CalculateHeuristic()
         {
-            
-            //Euclidian
-            dstX = HeuristicTargetX - gridX;
-            dstY = HeuristicTargetY - gridY;
-            hCost = (dstX * dstX + dstY * dstY);
 
 			
-            /*
+			#if true
+			//manhattan
 			if (gridX > HeuristicTargetX)
 				dstX = gridX - HeuristicTargetX;
 			else
@@ -293,10 +277,8 @@ namespace Lockstep
 				dstY = HeuristicTargetY - gridY;
 
 			hCost = (dstX + dstY) * 100;
-			fCost = gCost + hCost;
-			*/
-			
-            /*
+			#elif false
+            //octile
             if (gridX > HeuristicTargetX)
                 dstX = gridX - HeuristicTargetX;
             else
@@ -311,7 +293,16 @@ namespace Lockstep
                 this.hCost = dstY * 141 + (dstX - dstY) * 100;
             else
                 this.hCost = dstX * 141 + (dstY - dstX) * 100;
-            */
+            
+			#elif false
+			//euclidean
+			dstX = HeuristicTargetX - gridX;
+			dstY = HeuristicTargetY - gridY;
+			double d = dstX * dstX + dstY * dstY;
+			d = Math.Sqrt(d);
+			hCost = (int)(d * 100);
+			#endif
+
             fCost = gCost + hCost;
 			
         }
