@@ -142,7 +142,9 @@ namespace Lockstep
 			GridNode.PrepareUnpassableCheck (unitSize); //Prepare Unpassable check optimizations
 			while (GridHeap.Count > 0) {
 				currentNode = GridHeap.RemoveFirst ();
+				#if false
 				Gizmos.DrawCube(currentNode.WorldPos.ToVector3(), Vector3.one);
+				#endif
 				GridClosedSet.Add (currentNode);
 				
 				if (currentNode.gridIndex == endNode.gridIndex) {
