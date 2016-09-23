@@ -69,6 +69,7 @@ namespace Lockstep
 			_ranIndex = -1;
 			;
 			_isColliding = false;
+
 			DistX = 0;
 			DistY = 0;
 			PenetrationX = 0;
@@ -139,6 +140,10 @@ namespace Lockstep
 
 		public void Deactivate()
 		{
+			if (IsColliding) {
+				Body1.NotifyContact(Body2, false, true);
+				Body2.NotifyContact(Body1, false, true);
+			}
 			Active = false;
 		}
 
@@ -147,9 +152,7 @@ namespace Lockstep
 		private void DistributeCollision()
 		{
 
-			Body1.NotifyContact(Body2, IsColliding, IsCollidingChanged);
 
-			Body2.NotifyContact(Body1, IsColliding, IsCollidingChanged);
 
 			if (Body1.IsTrigger || Body2.IsTrigger)
 				return;
@@ -301,7 +304,9 @@ namespace Lockstep
 				{
 					DistributeCollision();
 				} 
+				Body1.NotifyContact(Body2, IsColliding, IsCollidingChanged);
 
+				Body2.NotifyContact(Body1, IsColliding, IsCollidingChanged);
 			}
 
 		}
