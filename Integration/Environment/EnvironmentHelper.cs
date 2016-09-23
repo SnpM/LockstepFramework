@@ -29,6 +29,7 @@ namespace Lockstep
                 saver.Save();
 				UnityEditor.EditorUtility.SetDirty(saver);
 				UnityEditor.EditorUtility.SetDirty(this);
+				UnityEditor.EditorUtility.SetDirty(this.gameObject);
             }
         }
 
