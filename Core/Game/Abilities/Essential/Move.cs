@@ -9,8 +9,8 @@ namespace Lockstep
 		public const long GroupDirectStop = FixedMath.One;
 		public const long DirectStop = FixedMath.One / 8;
 		private const int MinimumOtherStopTime = (int)(LockstepManager.FrameRate / 4);
-		private const int StopTimeThreshold = LockstepManager.FrameRate * 2;
-		private const int StopRepathTries = 3;
+		private const int StopTimeThreshold = LockstepManager.FrameRate / 2;
+		private const int StopRepathTries = 4;
 
 		public int GridSize { get { return cachedBody.Radius <= FixedMath.One ?
 				(cachedBody.Radius * 2).CeilToInt () :
