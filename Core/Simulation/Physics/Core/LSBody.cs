@@ -392,7 +392,7 @@ namespace Lockstep
 			PositionChangedBuffer = true;
 			RotationChangedBuffer = true;
 			
-			Priority = _basePriority;
+			Priority = BasePriority;
 			Velocity = Vector2d.zero;
 			VelocityFastMagnitude = 0;
 			LastPosition = _position = StartPosition.ToVector2d ();

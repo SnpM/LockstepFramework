@@ -186,7 +186,7 @@ namespace Lockstep
 
 		protected override void OnInitialize()
 		{
-			cachedBody.Priority = basePriority;
+			basePriority = Agent.Body.Priority;
 			searchCount = LSUtility.GetRandom(SearchRate) + 1;
 			attackCount = 0;
 			HasTarget = false;
