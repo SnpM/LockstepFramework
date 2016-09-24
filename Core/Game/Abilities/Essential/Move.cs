@@ -354,7 +354,7 @@ namespace Lockstep
 			Agent.StopCast (ID);
 			IsCasting = true;
 			RegisterGroup ();
-			DoPathfind = true;
+
 		}
 
 		public void RegisterGroup (bool moveOnProcessed = true)
@@ -425,6 +425,7 @@ namespace Lockstep
 		{
 			if (CanTurn)
 				CachedTurn.StartTurnVector (destination - cachedBody._position);
+			DoPathfind = true;
 			Agent.SetState (AnimState.Moving);
 			hasPath = false;
 			straightPath = false;
