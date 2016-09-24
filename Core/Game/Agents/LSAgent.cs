@@ -463,10 +463,8 @@ namespace Lockstep
 		private void _Deactivate()
 		{
 			this.StopCast();
-			IsActive = false;
 
 			IsSelected = false;
-			SpawnVersion++;
 
 			abilityManager.Deactivate();
 
@@ -475,6 +473,9 @@ namespace Lockstep
 			{
 				Influencer.Deactivate();
 			}
+
+			SpawnVersion++;
+			IsActive = false;
 
 		}
 		int deathingIndex;

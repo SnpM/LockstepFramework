@@ -133,8 +133,8 @@ namespace Lockstep
 		public void Deactivate()
 		{
 			if (IsColliding) {
-				Body1.NotifyContact(Body2, false, true);
-				Body2.NotifyContact(Body1, false, true);
+				Body1.NotifyContact(Body2, false, IsColliding);
+				Body2.NotifyContact(Body1, false, IsColliding);
 			}
 			Active = false;
 		}
