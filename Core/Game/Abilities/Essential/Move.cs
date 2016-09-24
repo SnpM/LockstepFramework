@@ -423,8 +423,7 @@ namespace Lockstep
 
 		public void StartMove (Vector2d destination)
 		{
-			if (CanTurn)
-				CachedTurn.StartTurnVector (destination - cachedBody._position);
+
 			DoPathfind = true;
 			Agent.SetState (AnimState.Moving);
 			hasPath = false;
