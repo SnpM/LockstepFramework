@@ -208,7 +208,7 @@ namespace Lockstep
 					{
 						if (dif >= inactiveFrameThreshold)
 						{
-							DeactivateCollisionPair(pair);
+							FullDeactivateCollisionPair(pair);
 							InactiveCollisionPairs.Remove();
 							;
 						}
@@ -356,12 +356,26 @@ namespace Lockstep
 			return pair;
 
 		}
-
+		public static void RemovePairReferences (CollisionPair pair) {
+			pair.Body1.CollisionPairs.Remove(pair.Body2.ID);
+			pair.Body2.CollisionPairHolders.Remove(pair.Body1.ID);
+		}
+		public static void FullDeactivateCollisionPair (CollisionPair pair) {
+			if (pair.Active) {
+				DeactivateCollisionPair(pair);
+				RemovePairReferences (pair);
+			}
+		}
 		public static void DeactivateCollisionPair(CollisionPair pair)
 		{
 			if (pair.Active)
 			{
-				pair.Body1.CollisionPairs.Remove(pair.Body2.ID);
+				if (pair._ranIndex >= 0)
+				{
+					PhysicsManager.RanCollisionPairs.RemoveAt (pair._ranIndex);
+					pair._ranIndex = -1;
+				}
+
 				PoolPair(pair);
 			}
 		}
@@ -415,6 +429,7 @@ namespace Lockstep
 				{
 					pair = CreatePair(body1, body2);
 					body1.CollisionPairs.Add(body2.ID, pair);
+					body2.CollisionPairHolders.Add(body1.ID);
 				}
 				return pair;
 			}
