@@ -149,7 +149,7 @@ namespace Lockstep
 		public static void LateSimulate()
 		{
 			//2 seconds before turning off
-			int inactiveFrameThreshold = LockstepManager.FrameRate * 2;
+			int inactiveFrameThreshold = 0;
 
 			for (int i = 0; i < RanCollisionPairs.PeakCount; i++)
 			{
@@ -210,7 +210,6 @@ namespace Lockstep
 						{
 							FullDeactivateCollisionPair(pair);
 							InactiveCollisionPairs.Remove();
-							;
 						}
 						else
 						{
@@ -365,6 +364,7 @@ namespace Lockstep
 				DeactivateCollisionPair(pair);
 				RemovePairReferences (pair);
 			}
+
 		}
 		public static void DeactivateCollisionPair(CollisionPair pair)
 		{

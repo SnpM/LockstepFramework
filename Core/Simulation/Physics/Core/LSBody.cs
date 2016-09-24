@@ -678,25 +678,35 @@ namespace Lockstep
 			_rotation = new Vector2d (x, y);
 			RotationChanged = true;
 		}
-		static void DeactivatePair (CollisionPair collisionPair) {
-			PhysicsManager.DeactivateCollisionPair(collisionPair);
+
+		static void DeactivatePair (CollisionPair collisionPair)
+		{
+			PhysicsManager.DeactivateCollisionPair (collisionPair);
 		}
+
 		public void Deactivate ()
 		{
 			foreach (var collisionPair in CollisionPairs.Values) {
+				collisionPair.Body2.CollisionPairHolders.Remove (ID);
 				DeactivatePair (collisionPair);
-				collisionPair.Body1.CollisionPairHolders.Remove(ID);
+
 			}
 			CollisionPairs.Clear ();
 			foreach (var id in CollisionPairHolders) {
-				LSBody other = PhysicsManager.SimObjects[id];
+				LSBody other = PhysicsManager.SimObjects [id];
 				if (other.IsNotNull ()) {
-					CollisionPair collisionPair = other.CollisionPairs [this.ID];
-					DeactivatePair(collisionPair);
-					other.CollisionPairs.Remove(this.ID);
+					CollisionPair collisionPair;
+					if (other.CollisionPairs.TryGetValue (ID, out collisionPair)) {
+						other.CollisionPairs.Remove (this.ID);
+						DeactivatePair (collisionPair);
+
+					}
+					else {
+						Debug.Log("nope " + ID);
+					}
 				}
 			}
-			CollisionPairHolders.Clear();
+			CollisionPairHolders.Clear ();
 				
 			Partition.UpdateObject (this, false);
 			PhysicsManager.Dessimilate (this);
