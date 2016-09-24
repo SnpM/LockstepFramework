@@ -100,7 +100,6 @@ namespace Lockstep
 		private GridNode currentNode;
 		private GridNode destinationNode;
 		private Vector2d movementDirection;
-		private Vector2d lastMovementDirection;
 		private long distance;
 		private long closingDistance;
 		private long stuckTolerance;
@@ -183,7 +182,6 @@ namespace Lockstep
 			stuckTick = 0;
 
 			forcePathfind = false;
-			lastMovementDirection = Vector2d.up;
 
 			Arrived = true;
 			LastPosition = Agent.Body.Position;
@@ -276,11 +274,10 @@ namespace Lockstep
 				bool movingToWaypoint = (this.hasPath && this.pathIndex < myPath.Count - 1);
 				if (distance > closingDistance || movingToWaypoint) {
 					desiredVelocity = (movementDirection);
-					if (movementDirection.Cross (lastMovementDirection.x, lastMovementDirection.y).AbsMoreThan (FixedMath.One / 4)) {
-						lastMovementDirection = movementDirection;
+
 						if (CanTurn)
 							CachedTurn.StartTurnDirection (movementDirection);
-					}
+					
 
 					long threshold = this.timescaledSpeed / 4;
 
