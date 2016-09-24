@@ -170,7 +170,7 @@ namespace Lockstep
 						{
 
 						}
-						else
+						else if (pair._ranIndex >= 0)
 						{
 							#if false
 							if (!RanCollisionPairs.SafeRemoveAt(pair._ranIndex, instancePair))
@@ -180,6 +180,7 @@ namespace Lockstep
 							#else
 							RanCollisionPairs.RemoveAt(pair._ranIndex);
 							#endif
+
 							pair._ranIndex = -1;
 
 							InactiveCollisionPairs.Add(instancePair);
