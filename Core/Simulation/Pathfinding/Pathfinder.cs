@@ -154,9 +154,11 @@ namespace Lockstep
 					return true;
 				}
 
+
+				/*
 				for (i = 0; i < 8; i++) {
 					neighbor = currentNode.NeighborNodes [i];
-					if (neighbor.IsNull () || currentNode.Unpassable () || GridClosedSet.Contains (neighbor)) {
+					if (CheckNeighborInvalid ()) {
 						//continue;
 						//microoptimization... continue is more expensive than letting the loop pass at the end
 					} else {
@@ -171,28 +173,92 @@ namespace Lockstep
 							newMovementCostToNeighbor = currentNode.gCost + 141;
 						}
 
-						if (!GridHeap.Contains (neighbor)) {
-							neighbor.gCost = newMovementCostToNeighbor;
-						
-							//Optimized heuristic calculation
-							neighbor.CalculateHeuristic ();
-							neighbor.parent = currentNode;
-						
-							GridHeap.Add (neighbor);
-						} else if (newMovementCostToNeighbor < neighbor.gCost) {
-							neighbor.gCost = newMovementCostToNeighbor;
-
-							//Optimized heuristic calculation
-							neighbor.CalculateHeuristic ();
-							neighbor.parent = currentNode;
-
-							GridHeap.UpdateItem (neighbor);
-						}
+						AnalyzeNode();
 					}
 				}
+				*/
+				for (int i = 0; i < 4; i++) {
+					neighbor = currentNode.NeighborNodes [i];
+					if (!CheckNeighborInvalid ()) {
+						newMovementCostToNeighbor = currentNode.gCost + 100;
+						AnalyzeNode ();
+					}
+				}
+
+				const int maxCornerObstructions = 1;
+				#region inlining diagonals
+				neighbor = currentNode.NeighborNodes [4];
+				if (!CheckNeighborInvalid ()) {
+					if (GetObstructionCount (0, 1) <= maxCornerObstructions) {
+						newMovementCostToNeighbor = currentNode.gCost + 100;
+						AnalyzeNode ();
+					}
+				}
+
+				neighbor = currentNode.NeighborNodes [5];
+				if (!CheckNeighborInvalid ()) {
+					if (GetObstructionCount (0, 2) <= maxCornerObstructions) {
+						newMovementCostToNeighbor = currentNode.gCost + 100;
+						AnalyzeNode ();
+					}
+				}
+				neighbor = currentNode.NeighborNodes [6];
+				if (!CheckNeighborInvalid ()) {
+					if (GetObstructionCount (3, 1) <= maxCornerObstructions) {
+						newMovementCostToNeighbor = currentNode.gCost + 100;
+						AnalyzeNode ();
+					}
+				}
+				neighbor = currentNode.NeighborNodes [7];
+				if (!CheckNeighborInvalid ()) {
+					if (GetObstructionCount (3, 2)  <= maxCornerObstructions) {
+						newMovementCostToNeighbor = currentNode.gCost + 100;
+						AnalyzeNode ();
+					}
+				}
+				#endregion
 			}
 			#endregion
 			return false;
+		}
+
+		static int GetObstructionCount (int index1, int index2)
+		{
+			if (currentNode.NeighborNodes [index1].Unpassable ()) {
+				if (currentNode.NeighborNodes [index2].Unpassable ()) {
+					return 2;
+				}
+				return 1;
+			}
+			if (currentNode.NeighborNodes [index2].Unpassable ())
+				return 1;
+			return 0;
+		}
+
+		static bool CheckNeighborInvalid ()
+		{
+			return neighbor.IsNull () || neighbor.Unpassable () || GridClosedSet.Contains (neighbor);
+		}
+
+		static void AnalyzeNode ()
+		{
+			if (!GridHeap.Contains (neighbor)) {
+				neighbor.gCost = newMovementCostToNeighbor;
+
+				//Optimized heuristic calculation
+				neighbor.CalculateHeuristic ();
+				neighbor.parent = currentNode;
+
+				GridHeap.Add (neighbor);
+			} else if (newMovementCostToNeighbor < neighbor.gCost) {
+				neighbor.gCost = newMovementCostToNeighbor;
+
+				//Optimized heuristic calculation
+				neighbor.CalculateHeuristic ();
+				neighbor.parent = currentNode;
+
+				GridHeap.UpdateItem (neighbor);
+			}
 		}
 
 		private static void DestinationReached ()

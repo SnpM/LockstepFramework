@@ -153,6 +153,7 @@ namespace Lockstep
 
         public bool Unpassable()
         {
+			//todo: clearance values
             if (this._unwalkable)
                 return true;
             if (CachedSize <= 2)
@@ -219,7 +220,14 @@ namespace Lockstep
         private void GenerateNeighbors()
         {
             //0-3 = sides, 4-7 = diagonals
-
+			//0 = (-1, 0)
+			//1 = (0,-1)
+			//2 = (0,1)
+			//3 = (1,0)
+			//4 = (-1,-1)
+			//5 = (-1,1)
+			//6 = (1,-1)
+			//7 = (1,1)
             int sideIndex = 0;
             int diagonalIndex = 4; //I learned how to spell [s]diagnal[/s] diagonal!!!
 
