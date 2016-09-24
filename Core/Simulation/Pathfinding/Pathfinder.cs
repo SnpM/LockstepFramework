@@ -37,6 +37,7 @@ namespace Lockstep
 		static int StartNodeIndex;
 		static bool FindStraight;
 		static bool LastIsObstructed;
+		static bool hasInvalidEdge;
 
 		#endregion
 
@@ -177,46 +178,62 @@ namespace Lockstep
 					}
 				}
 				*/
+				hasInvalidEdge = false;
 				for (int i = 0; i < 4; i++) {
 					neighbor = currentNode.NeighborNodes [i];
+					if (CheckNeighborInvalid ()) {
+						hasInvalidEdge = true;
+					} else {
+						newMovementCostToNeighbor = currentNode.gCost + 100;
+						AnalyzeNode ();
+					}
+				}
+
+				if (hasInvalidEdge) {
+					const int maxCornerObstructions = 1;
+					#region inlining diagonals
+					neighbor = currentNode.NeighborNodes [4];
 					if (!CheckNeighborInvalid ()) {
-						newMovementCostToNeighbor = currentNode.gCost + 100;
-						AnalyzeNode ();
+						if (GetObstructionCount (0, 1) <= maxCornerObstructions) {
+							newMovementCostToNeighbor = currentNode.gCost + 141;
+							AnalyzeNode ();
+						}
 					}
-				}
 
-				const int maxCornerObstructions = 1;
-				#region inlining diagonals
-				neighbor = currentNode.NeighborNodes [4];
-				if (!CheckNeighborInvalid ()) {
-					if (GetObstructionCount (0, 1) <= maxCornerObstructions) {
-						newMovementCostToNeighbor = currentNode.gCost + 100;
-						AnalyzeNode ();
+					neighbor = currentNode.NeighborNodes [5];
+					if (!CheckNeighborInvalid ()) {
+						if (GetObstructionCount (0, 2) <= maxCornerObstructions) {
+							newMovementCostToNeighbor = currentNode.gCost + 141;
+							AnalyzeNode ();
+						}
+					}
+					neighbor = currentNode.NeighborNodes [6];
+					if (!CheckNeighborInvalid ()) {
+						if (GetObstructionCount (3, 1) <= maxCornerObstructions) {
+							newMovementCostToNeighbor = currentNode.gCost + 141;
+							AnalyzeNode ();
+						}
+					}
+					neighbor = currentNode.NeighborNodes [7];
+					if (!CheckNeighborInvalid ()) {
+						if (GetObstructionCount (3, 2) <= maxCornerObstructions) {
+							newMovementCostToNeighbor = currentNode.gCost + 141;
+							AnalyzeNode ();
+						}
+					}
+					#endregion
+				}
+				else {
+					//no need for specific stuff when edges are all valid
+					for (int i = 4; i < 8; i++) {
+						neighbor = currentNode.NeighborNodes [i];
+						if (CheckNeighborInvalid ()) {
+						} else {
+							newMovementCostToNeighbor = currentNode.gCost + 141;
+							AnalyzeNode ();
+						}
 					}
 				}
-
-				neighbor = currentNode.NeighborNodes [5];
-				if (!CheckNeighborInvalid ()) {
-					if (GetObstructionCount (0, 2) <= maxCornerObstructions) {
-						newMovementCostToNeighbor = currentNode.gCost + 100;
-						AnalyzeNode ();
-					}
-				}
-				neighbor = currentNode.NeighborNodes [6];
-				if (!CheckNeighborInvalid ()) {
-					if (GetObstructionCount (3, 1) <= maxCornerObstructions) {
-						newMovementCostToNeighbor = currentNode.gCost + 100;
-						AnalyzeNode ();
-					}
-				}
-				neighbor = currentNode.NeighborNodes [7];
-				if (!CheckNeighborInvalid ()) {
-					if (GetObstructionCount (3, 2)  <= maxCornerObstructions) {
-						newMovementCostToNeighbor = currentNode.gCost + 100;
-						AnalyzeNode ();
-					}
-				}
-				#endregion
 			}
 			#endregion
 			return false;
@@ -224,15 +241,20 @@ namespace Lockstep
 
 		static int GetObstructionCount (int index1, int index2)
 		{
-			if (currentNode.NeighborNodes [index1].Unpassable ()) {
-				if (currentNode.NeighborNodes [index2].Unpassable ()) {
+			if (CheckInvalid (currentNode.NeighborNodes [index1])) {
+				if (CheckInvalid (currentNode.NeighborNodes [index2])) {
 					return 2;
 				}
 				return 1;
 			}
-			if (currentNode.NeighborNodes [index2].Unpassable ())
+			if (CheckInvalid (currentNode.NeighborNodes [index2]))
 				return 1;
 			return 0;
+		}
+
+		static bool CheckInvalid (GridNode gridNode)
+		{
+			return gridNode.IsNull () || gridNode.Unpassable () || GridClosedSet.Contains (gridNode);
 		}
 
 		static bool CheckNeighborInvalid ()
