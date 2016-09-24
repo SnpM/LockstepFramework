@@ -195,10 +195,10 @@ namespace Lockstep
 			return System.Object.ReferenceEquals (obj, other);
 		}
 		public static bool IsNull (this System.Object obj){
-			return obj.RefEquals (null);
+			return System.Object.ReferenceEquals (obj, null);
 		}
 		public static bool IsNotNull (this System.Object obj) {
-			return obj.RefEquals (null) == false;
+			return System.Object.ReferenceEquals (obj, null) == false;
 		}
 
 		public static float V3SqrDistance (this Vector3 vec, Vector3 other) {
