@@ -159,7 +159,7 @@ namespace Lockstep
 			cachedTurn = Agent.GetAbility<Turn>();
 			cachedMove = Agent.GetAbility<Move>();
 			if (Sight < Range)
-				_sight = Range;
+				_sight = Range + FixedMath.One * 5;
 
 			//fastRange = (Range * Range);
 			basePriority = cachedBody.Priority;
