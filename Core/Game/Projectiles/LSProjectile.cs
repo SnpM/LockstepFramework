@@ -316,7 +316,7 @@ namespace Lockstep
 			return CheckCollision(Target.Body);
 		}
 
-		private bool CheckCollision(LSBody_ target)
+		private bool CheckCollision(LSBody target)
 		{
 			return target._position.FastDistance(Position.x, Position.y) <= target.FastRadius;
 		}
@@ -453,9 +453,9 @@ namespace Lockstep
 			Direction = forward.ToVector3d();
 		}
 
-		Func<LSBody_, bool> BodyConditional;
+		Func<LSBody, bool> BodyConditional;
 
-		public void InitializeFree(Vector3d direction, Func<LSBody_, bool> bodyConditional, bool useGravity = false)
+		public void InitializeFree(Vector3d direction, Func<LSBody, bool> bodyConditional, bool useGravity = false)
 		{
 			this.BodyConditional = bodyConditional;
 			this.Direction = direction;
@@ -644,7 +644,7 @@ namespace Lockstep
 			}
 		}
 
-		private FastList<LSBody_> HitBodies = new FastList<LSBody_>();
+		private FastList<LSBody> HitBodies = new FastList<LSBody>();
 
 		public void Simulate()
 		{
@@ -738,7 +738,7 @@ namespace Lockstep
 			Vector3d nextPosition = this.Position;
 			nextPosition.Add(ref delta);
 			HitBodies.FastClear();
-			foreach (LSBody_ body in Raycaster.RaycastAll(this.Position, nextPosition))
+			foreach (LSBody body in Raycaster.RaycastAll(this.Position, nextPosition))
 			{
 				if (this.BodyConditional(body))
 				{

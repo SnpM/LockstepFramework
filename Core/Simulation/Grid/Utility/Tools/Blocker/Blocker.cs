@@ -3,7 +3,7 @@ using System.Collections;
 using Lockstep;
 
 //Blocker for static environment pieces in a scene.
-[RequireComponent (typeof (LSBody_))]
+[RequireComponent (typeof (LSBody))]
 public class Blocker : EnvironmentObject
 {
     static readonly FastList<Vector2d> bufferCoordinates = new FastList<Vector2d>();
@@ -13,13 +13,13 @@ public class Blocker : EnvironmentObject
     public bool BlockPathfinding {get {return _blockPathfinding;}}
 
 
-    public LSBody_ CachedBody {get; private set;}
+    public LSBody CachedBody {get; private set;}
 
     protected override void OnLateInitialize()
     {
         base.OnInitialize();
 
-        CachedBody = this.GetComponent<LSBody_> ();
+        CachedBody = this.GetComponent<LSBody> ();
 
         if (this.BlockPathfinding) {
             const long gridSpacing = FixedMath.One;

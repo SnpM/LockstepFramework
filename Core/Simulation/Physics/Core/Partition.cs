@@ -55,7 +55,7 @@ namespace Lockstep
 
 		static int GridXMin, GridXMax, GridYMin, GridYMax;
 
-		public static void UpdateObject (LSBody_ Body, bool repartition = true)
+		public static void UpdateObject (LSBody Body, bool repartition = true)
 		{
 
 			GetGridBounds (Body);
@@ -79,7 +79,7 @@ namespace Lockstep
 			}
 		}
 
-		private static void GetGridBounds (LSBody_ Body)
+		private static void GetGridBounds (LSBody Body)
 		{
 			GridXMin = GetGridX (Body.XMin);
 			GridXMax = GetGridX (Body.XMax);
@@ -98,7 +98,7 @@ namespace Lockstep
 			}
 		}
 
-		public static void PartitionObject (LSBody_ Body, bool gridBoundsCalculated = false)
+		public static void PartitionObject (LSBody Body, bool gridBoundsCalculated = false)
 		{
 			if (gridBoundsCalculated == false)
 				GetGridBounds (Body);
