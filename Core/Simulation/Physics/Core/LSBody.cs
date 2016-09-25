@@ -11,7 +11,8 @@ using System.Collections.Generic;
 
 namespace Lockstep
 {
-	public partial class LSBody : MonoBehaviour
+	[System.Serializable]
+	public partial class LSBody
 	{
 		#region Core deterministic variables
 
@@ -145,6 +146,7 @@ namespace Lockstep
 		public long VelocityFastMagnitude { get; private set; }
 
 
+		public bool Active {get; private set;}
 
 		private void AddChild (LSBody child)
 		{
@@ -230,32 +232,32 @@ namespace Lockstep
 
 		#region Serialized
 
-		[SerializeField, FormerlySerializedAs ("Shape")]
+		[SerializeField]
 		protected ColliderType _shape = ColliderType.None;
 
 		public ColliderType Shape { get { return _shape; } }
 
-		[SerializeField, FormerlySerializedAs ("IsTrigger")]
+		[SerializeField]
 		private bool _isTrigger;
 
 		public bool IsTrigger { get { return _isTrigger; } }
 
-		[SerializeField, FormerlySerializedAs ("Layer")]
+		[SerializeField]
 		private int _layer;
 
 		public int Layer { get { return _layer; } }
 
-		[SerializeField,FixedNumber, FormerlySerializedAs ("HalfWidth")]
+		[SerializeField,FixedNumber]
 		private long _halfWidth = FixedMath.Half;
 
 		public long HalfWidth { get { return _halfWidth; } }
 
-		[SerializeField,FixedNumber, FormerlySerializedAs ("HalfHeight")]
+		[SerializeField,FixedNumber]
 		public long _halfHeight = FixedMath.Half;
 
 		public long HalfHeight { get { return _halfHeight; } }
 
-		[SerializeField,FixedNumber, FormerlySerializedAs ("Radius")]
+		[SerializeField,FixedNumber]
 		protected long _radius = FixedMath.Half;
 
 		public long Radius { get { return _radius; } }
@@ -265,12 +267,12 @@ namespace Lockstep
 
 		public bool Immovable { get; private set; }
 
-		[SerializeField, FormerlySerializedAs ("_priority")]
+		[SerializeField]
 		private int _basePriority;
 
 		public int BasePriority { get { return _basePriority; } }
 
-		[SerializeField, FormerlySerializedAs ("Vertices")]
+		[SerializeField]
 		private Vector2d[] _vertices;
 
 		public Vector2d[] Vertices { get { return _vertices; } }
@@ -278,13 +280,26 @@ namespace Lockstep
 		[SerializeField, FixedNumber]
 		private long _height = FixedMath.One;
 
-		[Lockstep (true)]
-		public long Height { get {return _height;}}
+		public long Height { get {return _height;} }
+
 
 		[SerializeField]
 		private Transform _positionalTransform;
 
 		public Transform PositionalTransform { get ; set; }
+
+
+		[SerializeField]
+		private Transform _rotationalTransform;
+
+		public Vector3 _rotationOffset;
+
+		public Transform RotationalTransform { get; set; }
+
+
+		#endregion
+
+		#region Runtime Values
 
 		private bool _canSetVisualPosition;
 
@@ -296,13 +311,6 @@ namespace Lockstep
 				_canSetVisualPosition = value && PositionalTransform != null;
 			}
 		}
-
-		[SerializeField]
-		private Transform _rotationalTransform;
-
-		public Vector3 _rotationOffset;
-
-		public Transform RotationalTransform { get; set; }
 
 		private bool _canSetVisualRotation;
 
@@ -320,14 +328,24 @@ namespace Lockstep
 				return this.Position.ToVector3d (this.HeightPos);
 			}
 		}
-
-		#endregion
+		public Transform transform {get; internal set;}
 
 		private Vector2d[] RotatedPoints;
 
+		#endregion
 		public void Setup (LSAgent agent)
 		{
 
+			if (Shape == ColliderType.Polygon) {
+			}
+			if (Shape != ColliderType.None) {
+				GeneratePoints ();
+				GenerateBounds ();
+			}
+			Agent = agent;
+			Setted = true;
+
+			Immovable = _immovable || (this.Shape != ColliderType.Circle && this.Shape != ColliderType.None);
 		}
 
 		private bool OutMoreThanSet { get; set; }
@@ -336,17 +354,103 @@ namespace Lockstep
 
 		public void GeneratePoints ()
 		{
-
+			if (Shape != ColliderType.Polygon) {
+				return;
+			}
+			RotatedPoints = new Vector2d[Vertices.Length];
+			RealPoints = new Vector2d[Vertices.Length];
+			Edges = new Vector2d[Vertices.Length];
+			EdgeNorms = new Vector2d[Vertices.Length];
 		}
 
 		public void GenerateBounds ()
 		{
-			
+			if (Shape == ColliderType.Circle) {
+				_radius = Radius;
+			} else if (Shape == ColliderType.AABox) {
+				if (HalfHeight == HalfWidth) {
+					_radius = FixedMath.Sqrt ((HalfHeight * HalfHeight * 2) >> FixedMath.SHIFT_AMOUNT);
+				} else {
+					_radius = FixedMath.Sqrt ((HalfHeight * HalfHeight + HalfWidth * HalfWidth) >> FixedMath.SHIFT_AMOUNT);
+				}
+
+			} else if (Shape == ColliderType.Polygon) {
+				long BiggestSqrRadius = Vertices [0].SqrMagnitude ();
+				for (int i = 1; i < Vertices.Length; i++) {
+					long sqrRadius = Vertices [i].SqrMagnitude ();
+					if (sqrRadius > BiggestSqrRadius) {
+						BiggestSqrRadius = sqrRadius;
+					}
+				}
+				_radius = FixedMath.Sqrt (BiggestSqrRadius);
+				FastRadius = this.Radius * this.Radius;
+			}
 		}
 
 		public void Initialize (Vector3d StartPosition, Vector2d StartRotation, bool isDynamic = true)
 		{
+			Active = true;
+			PositionalTransform = _positionalTransform;
+			RotationalTransform = _rotationalTransform;
+			if (!Setted) {
+				this.Setup (null);
+			}
+			this.RaycastVersion = 0;
+
+			this.HeightPosChanged = true;
+
+			CheckVariables ();
+
+			PositionChanged = true;
+			RotationChanged = true;
+			VelocityChanged = true;
+			PositionChangedBuffer = true;
+			RotationChangedBuffer = true;
 			
+			Priority = BasePriority;
+			Velocity = Vector2d.zero;
+			VelocityFastMagnitude = 0;
+			LastPosition = _position = StartPosition.ToVector2d ();
+			_heightPos = StartPosition.z;
+			_rotation = StartRotation;
+			ForwardNeedsSet = true;
+
+			XMin = 0;
+			XMax = 0;
+			YMin = 0;
+			YMax = 0;
+			
+			
+			PastGridXMin = int.MaxValue;
+			PastGridXMax = int.MaxValue;
+			PastGridYMin = int.MaxValue;
+			PastGridYMax = int.MaxValue;
+			
+			if (Shape != ColliderType.None) {
+				BuildPoints ();
+				BuildBounds ();
+			}
+			
+			ID = PhysicsManager.Assimilate (this, isDynamic);
+			Partition.PartitionObject (this);
+			if (PositionalTransform != null) {
+				CanSetVisualPosition = true;
+				_visualPosition = _position.ToVector3 (HeightPos.ToFloat ());
+				lastVisualPos = _visualPosition;
+				PositionalTransform.position = _visualPosition;
+			} else {
+				CanSetVisualPosition = false;
+			}
+			if (RotationalTransform != null) {
+				CanSetVisualRotation = true;
+//                visualRot = Quaternion.LookRotation(Forward.ToVector3(0f) + _rotationOffset);
+//				_rotationOffset = transform.GetComponent<InvasionDay.GeoHandler>()._eulerOffset;
+				visualRot = Quaternion.Euler (Quaternion.LookRotation (Forward.ToVector3 (0f)).eulerAngles + _rotationOffset);
+				lastVisualRot = visualRot;
+				RotationalTransform.rotation = visualRot;
+			} else {
+				CanSetVisualRotation = false;
+			}
 		}
 
 		void CheckVariables ()
@@ -356,42 +460,171 @@ namespace Lockstep
 
 		public void BuildPoints ()
 		{
+			if (Shape != ColliderType.Polygon) {
+				return;
+			}
+			int VertLength = Vertices.Length;
 			
+			if (RotationChanged) {
+				for (int i = 0; i < VertLength; i++) {
+					RotatedPoints [i] = Vertices [i];
+					RotatedPoints [i].Rotate (_rotation.x, _rotation.y);
+				}
+				for (int i = VertLength - 1; i >= 0; i--) {
+					int nextIndex = i + 1 < VertLength ? i + 1 : 0;
+					Vector2d point = RotatedPoints [nextIndex];
+					point.Subtract (ref RotatedPoints [i]);
+					point.Normalize ();
+					Edges [i] = point;
+					point.RotateRight ();
+					EdgeNorms [i] = point;
+				}
+				if (!OutMoreThanSet) {
+					OutMoreThanSet = true;
+					long dot = Edges [0].Cross (Edges [1]);
+					this.OutMoreThan = dot < 0;
+				}
+			}
+			for (int i = 0; i < VertLength; i++) {
+				RealPoints [i].x = RotatedPoints [i].x + _position.x;
+				RealPoints [i].y = RotatedPoints [i].y + _position.y;
+			}
 		}
 
 		public void BuildBounds ()
 		{
-
+			HeightMin = HeightPos;
+			HeightMax = HeightPos + Height;
+			if (Shape == ColliderType.Circle) {
+				XMin = -Radius + _position.x;
+				XMax = Radius + _position.x;
+				YMin = -Radius + _position.y;
+				YMax = Radius + _position.y;
+			} else if (Shape == ColliderType.AABox) {
+				XMin = -HalfWidth + _position.x;
+				XMax = HalfWidth + _position.x;
+				YMin = -HalfHeight + _position.y;
+				YMax = HalfHeight + _position.y;
+			} else if (Shape == ColliderType.Polygon) {
+				XMin = _position.x;
+				XMax = _position.x;
+				YMin = _position.y;
+				YMax = _position.y;
+				for (int i = 0; i < Vertices.Length; i++) {
+					Vector2d vec = RealPoints [i];
+					if (vec.x < XMin) {
+						XMin = vec.x;
+					} else if (vec.x > XMax) {
+						XMax = vec.x;
+					}
+					
+					if (vec.y < YMin) {
+						YMin = vec.y;
+					} else if (vec.y > YMax) {
+						YMax = vec.y;
+					}
+				}
+			}
 		}
 
 
 		public void Simulate ()
-		{}
+		{
+
+			if (VelocityChanged) {
+				VelocityFastMagnitude = _velocity.FastMagnitude ();
+				VelocityChanged = false;
+			}
+			if (VelocityFastMagnitude != 0) {
+
+				_position.x += _velocity.x;
+				_position.y += _velocity.y;
+				PositionChanged = true;
+			}
+
+			BuildChangedValues ();
+
+
+			if (PositionChanged || this.PositionChangedBuffer) {
+				Partition.UpdateObject (this);
+			}
+		}
 
 		
 		public void BuildChangedValues ()
 		{
+			if (PositionChanged || RotationChanged) {
+				BuildPoints ();
+				BuildBounds ();
+			}
+			if (PositionChanged || this.HeightPosChanged) {
+				LastPosition = _position;
+				PositionChangedBuffer = true;
+				PositionChanged = false;
+				this.SetVisualPosition = true;
+				this.HeightPosChanged = false;
+			} else {
+				PositionChangedBuffer = false;
+				this.SetVisualPosition = false;
+			}
 			
+			if (RotationChanged) {
+				_rotation.Normalize ();
+				RotationChangedBuffer = true;
+				RotationChanged = false;
+				this.SetVisualRotation = true;
+			} else {
+				RotationChangedBuffer = false;
+				this.SetVisualRotation = false;
+
+			}
 		}
 
 		public void SetVisuals ()
 		{
 
+
+
+			if (this.SetVisualPosition) {
+				DoSetVisualPosition (
+					_position.ToVector3 (HeightPos.ToFloat ())
+				);
+			}
+			
+			if (this.SetVisualRotation) {
+				this.DoSetVisualRotation (_rotation);
+			}
 		}
 
 		private void DoSetVisualPosition (Vector3 pos)
 		{
-	
+			lastVisualPos = _visualPosition;
+			_visualPosition = pos;
+			SetPositionBuffer = true;
 		}
 
 		private void DoSetVisualRotation (Vector2d rot)
 		{
-
+			lastVisualRot = visualRot;
+			visualRot = Quaternion.Euler (Quaternion.LookRotation (Forward.ToVector3 (0f)).eulerAngles + _rotationOffset);
+//            visualRot = Quaternion.LookRotation(Forward.ToVector3(0f));
+			SetRotationBuffer = true;
 		}
 
 		public void SetExtrapolatedVisuals ()
 		{
             
+			if (this.SetVisualPosition) {
+				Vector3 lastPos = this.lastVisualPos;
+				Vector3 curPos = this._position.ToVector3 (_heightPos.ToFloat ());
+				Vector3 delta = curPos - lastPos;
+				Vector3 prediction = lastPos + delta;
+				DoSetVisualPosition (prediction);
+			}
+			if (this.SetVisualRotation) {
+				this.DoSetVisualRotation (_rotation);
+			}
+
 		}
 
 		Vector3 lastVisualPos;
@@ -400,28 +633,230 @@ namespace Lockstep
 
 		public void Visualize ()
 		{
+			if (CanSetVisualPosition) {
+				if (SetPositionBuffer) {
+					//Interpolates between the current position and the interpolation between the last lockstep position and the current lockstep position
+					//LerpTime = time passed since last simulation frame
+					//LerpDamping = special value calculated based on Time.deltaTime for the extra layer of interpolation
+					PositionalTransform.position = 
+                        Vector3.Lerp (lastVisualPos, _visualPosition, PhysicsManager.LerpTime);
+                
+				}
+			}
+			//const float rotationLerpDamping = 1f;
+			if (CanSetVisualRotation && RotationalTransform != null) {
+				if (SetRotationBuffer) {
+					RotationalTransform.rotation =
+
+                            Quaternion.Lerp (lastVisualRot, visualRot, PhysicsManager.LerpTime);
+					SetRotationBuffer = PhysicsManager.LerpTime < 1f;
+
+				}
+			}
 		}
 
 		public void LerpOverReset ()
 		{
             
+			if (CanSetVisualRotation) {
+				if (SetRotationBuffer) {
+					RotationalTransform.rotation = visualRot;
+					SetRotationBuffer = false;
+				}
+			}
+			if (this.CanSetVisualPosition) {
+				if (this.SetPositionBuffer) {
+					PositionalTransform.position = this._visualPosition;
+					SetPositionBuffer = false;
+				}
+			}
 		}
 
 	
 		
-	
+		public void Rotate (long cos, long sin)
+		{
 
+			_rotation.Rotate (cos, sin);
+			RotationChanged = true;
+		}
 
-		void Reset ()
+		public void SetRotation (long x, long y)
+		{
+			_rotation = new Vector2d (x, y);
+			RotationChanged = true;
+		}
+
+		static void DeactivatePair (CollisionPair collisionPair)
+		{
+			PhysicsManager.DeactivateCollisionPair (collisionPair);
+		}
+
+		public void Deactivate ()
 		{
 			
+			foreach (var collisionPair in CollisionPairs.Values) {
+				collisionPair.Body2.CollisionPairHolders.Remove (ID);
+				DeactivatePair (collisionPair);
+
+			}
+			CollisionPairs.Clear ();
+			foreach (var id in CollisionPairHolders) {
+				LSBody other = PhysicsManager.SimObjects [id];
+				if (other.IsNotNull ()) {
+					CollisionPair collisionPair;
+					if (other.CollisionPairs.TryGetValue (ID, out collisionPair)) {
+						other.CollisionPairs.Remove (this.ID);
+						DeactivatePair (collisionPair);
+
+					}
+					else {
+						Debug.Log("nope " + ID);
+					}
+				}
+			}
+			CollisionPairHolders.Clear ();
+				
+			Partition.UpdateObject (this, false);
+			PhysicsManager.Dessimilate (this);
+			Active = false;
+		}
+
+		public bool HeightOverlaps (long heightPos)
+		{
+			return heightPos >= HeightMin && heightPos <= HeightMax;
+		}
+
+		public bool HeightOverlaps (long heightMin, long heightMax)
+		{
+			return heightMax >= HeightMin && heightMin <= HeightMax;
+		}
+
+
+
+
+		long GetCeiledSnap (long f, long snap)
+		{
+			return (f + snap - 1) / snap * snap;
+		}
+
+		long GetFlooredSnap (long f, long snap)
+		{
+			return (f / snap) * snap;
+		}
+
+		public void GetCoveredSnappedPositions (long snapSpacing, FastList<Vector2d> output)
+		{
+			//long referenceX = 0,
+			//referenceY = 0;
+			long xmin = GetFlooredSnap (this.XMin - FixedMath.Half, snapSpacing);
+			long ymin = GetFlooredSnap (this.YMin - FixedMath.Half, snapSpacing);
+
+			long xmax = GetCeiledSnap (this.XMax + FixedMath.Half - xmin, snapSpacing) + xmin;
+			long ymax = GetCeiledSnap (this.YMax + FixedMath.Half - ymin, snapSpacing) + ymin;
+			//Used for getting snapped positions this body covered
+			for (long x = xmin; x < xmax; x += snapSpacing) {
+				for (long y = ymin; y < ymax; y += snapSpacing) {
+					Vector2d checkPos = new Vector2d (x, y);
+					if (IsPositionCovered (checkPos)) {
+						output.Add (checkPos);
+					}
+				}
+			}
+		}
+
+		public bool IsPositionCovered (Vector2d position)
+		{
+			//Checks if this body covers a position
+
+			//Different techniques for different shapes
+			switch (this.Shape) {
+			case ColliderType.Circle:
+				long maxDistance = this.Radius + FixedMath.Half;
+				maxDistance *= maxDistance;
+				if ((this._position - position).FastMagnitude () > maxDistance)
+					return false;
+				goto case ColliderType.AABox;
+			case ColliderType.AABox:
+				return position.x + FixedMath.Half > this.XMin && position.x - FixedMath.Half < this.XMax
+				&& position.y + FixedMath.Half > this.YMin && position.y - FixedMath.Half < this.YMax;
+			//break;
+			case ColliderType.Polygon:
+				for (int i = this.EdgeNorms.Length - 1; i >= 0; i--) {
+					Vector2d norm = this.EdgeNorms [i];
+					long posProj = norm.Dot (position);
+					long polyMin, polyMax;
+					CollisionPair.ProjectPolygon (norm.x, norm.y, this, out polyMin, out polyMax);
+					if (posProj >= polyMin && posProj <= polyMax) {
+
+					} else {
+						return false;
+					}
+				}
+				return true;
+			//break;
+			}
+
+
+			return false;
+		}
+			
+
+		internal void Reset ()
+		{
+			this._positionalTransform = this.transform;
+			this._rotationalTransform = this.transform;
 		}
 
 		void OnDrawGizmos ()
 		{
+			//return;
+			//Don't draw gizmos before initialization
+			if (Application.isPlaying == false)
+				return;
+			switch (this.Shape) {
+			case ColliderType.Circle:
+				Gizmos.DrawWireSphere (this._position.ToVector3 (this.HeightPos.ToFloat ()), this.Radius.ToFloat ());
+				break;
+			case ColliderType.AABox:
+				Gizmos.DrawWireCube (
+					this._position.ToVector3 (this.HeightPos.ToFloat () + this.Height.ToFloat () / 2),
+					new Vector3 (this.HalfWidth.ToFloat () * 2, this.Height.ToFloat (), this.HalfHeight.ToFloat () * 2));
+				break;
+			case ColliderType.Polygon:
+				if (RealPoints.Length > 1) {
+					for (int i = 0; i < this.RealPoints.Length; i++) {
+						Gizmos.DrawLine (this.RealPoints [i].ToVector3 (), this.RealPoints [i + 1 < RealPoints.Length ? i + 1 : 0].ToVector3 ());
+					}
+				}
+				break;
+			}
 		}
 
+		/// <summary>
+		/// Returns 0 if not implemented or invalid.
+		/// </summary>
+		/// <value>The size of the grid square.</value>
+		public long SquareSize {
+			get {
+				switch (this.Shape) {
+				case ColliderType.Circle:
+					return this.Radius * 2;
+				//break;
+				case ColliderType.AABox:
+					if (this.HalfWidth > this.HalfHeight)
+						return HalfWidth * 2;
+					else
+						return HalfHeight * 2;
+				//break;
+				}
+				return 0;
+			}
+		}
+
+
 	}
+
 
 	public enum ColliderType : byte
 	{

@@ -143,7 +143,7 @@ namespace Lockstep
 		private Move cachedMove;
 		private Turn cachedTurn;
 
-		protected LSBody_ cachedBody { get { return Agent.Body; } }
+		protected LSBody cachedBody { get { return Agent.Body; } }
 
 		private int basePriority;
 		private Health cachedTargetHealth;

@@ -11,8 +11,8 @@ namespace Lockstep
 {
 	public class CollisionPair
 	{
-		public LSBody_ Body1;
-		public LSBody_ Body2;
+		public LSBody Body1;
+		public LSBody Body2;
 		private long CacheSqrDistance;
 		private CollisionType LeCollisionType;
 		private bool DoPhysics = true;
@@ -41,7 +41,7 @@ namespace Lockstep
 
 		bool IsValid { get; set; }
 
-		public void Initialize(LSBody_ b1, LSBody_ b2)
+		public void Initialize(LSBody b1, LSBody b2)
 		{
 			IsValid = true;
 			if (!IsValid)
@@ -259,7 +259,7 @@ namespace Lockstep
 
 		}
 
-		void DistributeCircle_Poly(LSBody_ circle, LSBody_ poly)
+		void DistributeCircle_Poly(LSBody circle, LSBody poly)
 		{
 			Vector2d edgeAxis = ClosestAxis.rotatedRight;
 			long horProjection = circle._position.Dot(edgeAxis.x, edgeAxis.y);
@@ -469,7 +469,7 @@ namespace Lockstep
 			return false;
 		}
 
-		public static bool CheckBox_Poly(LSBody_ box, LSBody_ poly)
+		public static bool CheckBox_Poly(LSBody box, LSBody poly)
 		{
 			bool Right = poly._position.x > box._position.x;
 			bool Top = poly._position.y > box._position.y;
@@ -525,7 +525,7 @@ namespace Lockstep
 		private static long ClosestAxisProjection;
 
 
-		public static bool CheckCircle_Poly(LSBody_ circle, LSBody_ poly)
+		public static bool CheckCircle_Poly(LSBody circle, LSBody poly)
 		{
 			int EdgeCount = poly.EdgeNorms.Length;
 			ClosestDist = long.MaxValue;
@@ -577,7 +577,7 @@ namespace Lockstep
 		static bool Collided;
 		static long xAbs, yAbs;
 
-		public void DistributeCircle_Box(LSBody_ box, LSBody_ circle)
+		public void DistributeCircle_Box(LSBody box, LSBody circle)
 		{
 			xMore = circle._position.x > box._position.x;
 			yMore = circle._position.y > box._position.y;
@@ -646,7 +646,7 @@ namespace Lockstep
 			circle.BuildBounds();
 		}
 
-		public static bool CheckCircle_Box(LSBody_ box, LSBody_ circle)
+		public static bool CheckCircle_Box(LSBody box, LSBody circle)
 		{
 			Collided = false;
 
@@ -714,7 +714,7 @@ namespace Lockstep
 			return Collided;
 		}
 
-		public static bool CheckPoly_Poly(LSBody_ poly1, LSBody_ poly2)
+		public static bool CheckPoly_Poly(LSBody poly1, LSBody poly2)
 		{
 			int Poly1EdgeCount = poly1.EdgeNorms.Length;
 			int EdgeCount = Poly1EdgeCount + poly2.EdgeNorms.Length;
@@ -743,7 +743,7 @@ namespace Lockstep
 			return true;
 		}
 
-		public static void ProjectPolygon(long AxisX, long AxisY, LSBody_ Poly, out long Min, out long Max)
+		public static void ProjectPolygon(long AxisX, long AxisY, LSBody Poly, out long Min, out long Max)
 		{
 			Min = Poly.RealPoints[0].Dot(AxisX, AxisY);
 			Max = Min;

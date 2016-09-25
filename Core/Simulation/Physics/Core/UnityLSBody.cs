@@ -13,12 +13,12 @@ namespace Lockstep
 	public class UnityLSBody : MonoBehaviour
 	{
 		[SerializeField]
-		private LSBody_ _internalBody;
-		public LSBody_ InternalBody {get {return _internalBody;}}
+		private LSBody _internalBody;
+		public LSBody InternalBody {get {return _internalBody;}}
 		public void Initialize(Vector3d StartPosition, Vector2d StartRotation, bool isDynamic = true)
 		{
 			if (_internalBody.IsNull())
-				_internalBody = new LSBody_();
+				_internalBody = new LSBody();
 			InternalBody.Initialize (StartPosition,StartRotation,isDynamic);
 		}
 

@@ -28,7 +28,7 @@ namespace Lockstep
 
         public GridNode LocatedNode { get; private set; }
 
-        public LSBody_ Body { get; private set; }
+        public LSBody Body { get; private set; }
 
         public LSAgent Agent { get; private set; }
 

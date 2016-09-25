@@ -9,7 +9,7 @@ namespace Lockstep
     {
         static readonly FastList<Vector2d> bufferCoordinates = new FastList<Vector2d>();
 
-        LSBody_ CachedBody;
+        LSBody CachedBody;
 
         protected override void OnInitialize()
         {

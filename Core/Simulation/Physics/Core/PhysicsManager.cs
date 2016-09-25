@@ -77,8 +77,8 @@ namespace Lockstep
 			}
 		}
 
-		public static LSBody_[] SimObjects = new LSBody_ [MaxSimObjects];
-		public static FastBucket<LSBody_> DynamicSimObjects = new FastBucket<LSBody_>(MaxSimObjects / 4);
+		public static LSBody[] SimObjects = new LSBody [MaxSimObjects];
+		public static FastBucket<LSBody> DynamicSimObjects = new FastBucket<LSBody>(MaxSimObjects / 4);
 
 		#endregion
 
@@ -96,7 +96,7 @@ namespace Lockstep
 
 		public static void Setup()
 		{
-			SimObjects = new LSBody_ [MaxSimObjects];
+			SimObjects = new LSBody [MaxSimObjects];
 			Partition.Setup();
 		}
 
@@ -220,7 +220,7 @@ namespace Lockstep
 			}
 			for (int i = 0; i < DynamicSimObjects.PeakCount; i++)
 			{
-				LSBody_ b1 = DynamicSimObjects.innerArray[i];
+				LSBody b1 = DynamicSimObjects.innerArray[i];
 				if (b1.IsNotNull())
 				{
 					b1.Simulate();
@@ -258,7 +258,7 @@ namespace Lockstep
 			{
 				for (int i = 0; i < DynamicSimObjects.PeakCount; i++)
 				{
-					LSBody_ b1 = DynamicSimObjects.innerArray[i];
+					LSBody b1 = DynamicSimObjects.innerArray[i];
 
 					if (b1.IsNotNull())
 					{
@@ -276,7 +276,7 @@ namespace Lockstep
 				{
 					for (int i = 0; i < DynamicSimObjects.PeakCount; i++)
 					{
-						LSBody_ b1 = DynamicSimObjects.innerArray[i];
+						LSBody b1 = DynamicSimObjects.innerArray[i];
 
 						if (b1.IsNotNull())
 						{
@@ -293,7 +293,7 @@ namespace Lockstep
 				{
 					for (int i = 0; i < DynamicSimObjects.PeakCount; i++)
 					{
-						LSBody_ b1 = DynamicSimObjects.innerArray[i];
+						LSBody b1 = DynamicSimObjects.innerArray[i];
 
 						if (b1.IsNotNull())
 						{
@@ -314,9 +314,9 @@ namespace Lockstep
 
 
 		static int id;
-		static LSBody_ other;
+		static LSBody other;
 
-		internal static int Assimilate(LSBody_ body, bool isDynamic)
+		internal static int Assimilate(LSBody body, bool isDynamic)
 		{
 			if (CachedIDs.Count > 0)
 			{
@@ -340,7 +340,7 @@ namespace Lockstep
 
 		private static FastStack<CollisionPair> CachedCollisionPairs = new FastStack<CollisionPair>();
 
-		private static CollisionPair CreatePair(LSBody_ body1, LSBody_ body2)
+		private static CollisionPair CreatePair(LSBody body1, LSBody body2)
 		{
 			CollisionPair pair;
 			if (CachedCollisionPairs.Count > 0)
@@ -386,7 +386,7 @@ namespace Lockstep
 			CachedCollisionPairs.Add(pair);
 		}
 
-		internal static void Dessimilate(LSBody_ body)
+		internal static void Dessimilate(LSBody body)
 		{
 			int tid = body.ID;
 
@@ -410,8 +410,8 @@ namespace Lockstep
 
 		public static CollisionPair GetCollisionPair(int ID1, int ID2)
 		{
-			LSBody_ body1;
-			LSBody_ body2;
+			LSBody body1;
+			LSBody body2;
 			if ((body1 = SimObjects[ID1]).IsNotNull() && (body2 = SimObjects[ID2]).IsNotNull())
 			{
 				if (body1.ID < body2.ID)
@@ -450,7 +450,7 @@ namespace Lockstep
 
 
 
-		public static bool RequireCollisionPair(LSBody_ body1, LSBody_ body2)
+		public static bool RequireCollisionPair(LSBody body1, LSBody body2)
 		{
 			if (
 				Physics2D.GetIgnoreLayerCollision(body1.Layer, body2.Layer) == false &&

@@ -130,7 +130,7 @@ namespace Lockstep
 		}
 
 
-		private void HandleContact (LSBody_ other)
+		private void HandleContact (LSBody other)
 		{
 			if (targetReached == true && Agent.IsCasting == false && !(Agent.Body.Immovable || Agent.Body.IsTrigger)) {
 				Vector2d delta = this.Agent.Body._position - this.Agent.Body.LastPosition;
