@@ -5,10 +5,12 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 
+#if UNITY_EDITOR
+
 using UnityEngine;
 using UnityEngine.Serialization;
 using System.Collections.Generic;
-
+using UnityEditor;
 namespace Lockstep.Legacy
 {
 	public partial class LSBody : MonoBehaviour
@@ -421,13 +423,69 @@ namespace Lockstep.Legacy
 		{
 		}
 
+		public void Replace () {
+			if (this.gameObject.GetComponent<UnityLSBody>() != null) {
+				return;
+			}
+			var uBody = this.gameObject.AddComponent<UnityLSBody>();
+			var body = uBody.InternalBody;
+			UnityEditor.SerializedObject so = new UnityEditor.SerializedObject(uBody);
+			SerializedProperty Shape;
+			//Enum
+			SerializedProperty IsTrigger;
+			//bool
+			SerializedProperty Layer;
+			//int
+			SerializedProperty BasePriority;
+			//int
+			SerializedProperty HalfWidth;
+			//long
+			SerializedProperty HalfHeight;
+			//long
+			SerializedProperty Radius;
+			//long
+			SerializedProperty Immovable;
+			//bool
+			SerializedProperty Vertices;
+			//Vector2d[]
+			SerializedProperty Height;
+			//long
+			SerializedProperty PositionalTransform;
+			//transform
+			SerializedProperty RotationalTransform;
+			#region fold
+			Shape = so.FindProperty("_internalBody").FindPropertyRelative("_shape");
+			IsTrigger = so.FindProperty("_internalBody").FindPropertyRelative("_isTrigger");
+			Layer = so.FindProperty("_internalBody").FindPropertyRelative("_layer");
+			BasePriority = so.FindProperty("_internalBody").FindPropertyRelative("_basePriority");
+			HalfWidth = so.FindProperty("_internalBody").FindPropertyRelative("_halfWidth");
+			HalfHeight = so.FindProperty("_internalBody").FindPropertyRelative("_halfHeight");
+			Radius = so.FindProperty("_internalBody").FindPropertyRelative("_radius");
+			Immovable = so.FindProperty("_internalBody").FindPropertyRelative("_immovable");
+			Vertices = so.FindProperty("_internalBody").FindPropertyRelative("_vertices");
+			Height = so.FindProperty("_internalBody").FindPropertyRelative("_height");
+			PositionalTransform = so.FindProperty("_internalBody").FindPropertyRelative("_positionalTransform");
+			RotationalTransform = so.FindProperty("_internalBody").FindPropertyRelative("_rotationalTransform");
+			#endregion
+
+			Shape.enumValueIndex = (int)this.Shape;
+			IsTrigger.boolValue = (bool)this.IsTrigger;
+			Layer.intValue = (int)this.Layer;
+			BasePriority.intValue = (int)this.BasePriority;
+			HalfWidth.longValue = (long)this.HalfWidth;
+			HalfHeight.longValue = (long)this.HalfHeight;
+			Radius.longValue = (long)this.Radius;
+			Immovable.boolValue = (bool)this.Immovable;
+			//Vertices hard to carry over
+			Height.longValue = (long)this.Height;
+			PositionalTransform.objectReferenceValue = this.PositionalTransform;
+			RotationalTransform.objectReferenceValue = this.RotationalTransform;
+			so.ApplyModifiedProperties();
+			EditorUtility.SetDirty(uBody);
+		}
+
 	}
 
-	public enum ColliderType : byte
-	{
-		None,
-		Circle,
-		AABox,
-		Polygon
-	}
+
 }
+#endif

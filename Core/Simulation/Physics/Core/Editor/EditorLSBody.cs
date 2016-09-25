@@ -6,7 +6,7 @@ using Lockstep;
 namespace Lockstep.Integration
 {
     [CustomEditor(typeof(UnityLSBody), true),UnityEditor.CanEditMultipleObjects]
-	public class EditorLSBody_ : Editor
+	public class EditorLSBody : Editor
     {
 
         SerializedProperty Shape;
