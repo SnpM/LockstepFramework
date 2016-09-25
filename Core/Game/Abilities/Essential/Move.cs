@@ -12,9 +12,7 @@ namespace Lockstep
 		private const int StopTimeThreshold = LockstepManager.FrameRate / 2;
 		private const int StopRepathTries = 4;
 
-		public int GridSize { get { return cachedBody.Radius <= FixedMath.One ?
-				(cachedBody.Radius * 2).CeilToInt () :
-				(cachedBody.Radius * 2).CeilToInt (); } }
+		public int GridSize { get { return (cachedBody.Radius * 2).RoundToInt(); } }
 
 
 		public Vector2d Position { get { return cachedBody._position; } }

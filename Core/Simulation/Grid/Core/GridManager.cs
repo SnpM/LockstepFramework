@@ -35,6 +35,11 @@ namespace Lockstep
                 _useDiagonalConnections = value;
             }
         }
+		public static void NotifyGridChanged () {
+
+		}
+		public static bool GridChanged {get; private set;}
+		public static uint GridVersion {get; private set;}
 
         private static bool _settingsChanged = true;
 
@@ -129,6 +134,7 @@ namespace Lockstep
 
 		public static void Initialize ()
 		{
+
             if (_settingsChanged) {
                 if (_settings == null)
                     _settings = DefaultSettings;
@@ -146,6 +152,12 @@ namespace Lockstep
                     Grid[i].FastInitialize();
                 }
             }
+			GridVersion = 1;
+		}
+
+		public static void LateSimulate () {
+			if (GridChanged)
+				GridVersion++;
 		}
 
 		public static GridNode GetNode (int xGrid, int yGrid)

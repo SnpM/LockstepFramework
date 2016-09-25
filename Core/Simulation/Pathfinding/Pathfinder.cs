@@ -52,6 +52,7 @@ namespace Lockstep
 		#endregion
 
 
+		//todo: implement this with SmoothPath
 		public static bool FindPath (Vector2d Start, Vector2d End, FastList<Vector2d> outputVectorPath, int unitSize = 1)
 		{
 			if (!GetPathNodes (Start.x, Start.y, End.x, End.y, out node1, out node2))
@@ -67,27 +68,44 @@ namespace Lockstep
 			}
 			return false;
 		}
+		public static void SmoothPath (FastList<GridNode> nodePath, Vector2d End, FastList<Vector2d> outputVectorPath, int unitSize) {
+			outputVectorPath.FastClear ();
+			length = nodePath.Count - 1;
+			//culling out unneded nodes
 
+			outputVectorPath.Add (nodePath[0].WorldPos);
+			for (i = 1; i < length; i++) {
+
+				GridNode node = nodePath[i];
+
+				bool important = false;
+				if (unitSize <= 1)
+				{
+					important = !node.Clearance;
+				}
+				else if (unitSize <= 3){
+					important = !node.ExtraClearance;
+				}
+				else {
+					important = true;
+				}
+				if (important) {
+					outputVectorPath.Add (node.WorldPos);
+				}
+			}
+			outputVectorPath.Add (End);
+		}
 		public static bool FindPath (Vector2d End, GridNode startNode, GridNode endNode, FastList<Vector2d> outputVectorPath, int unitSize = 1)
 		{
 
 			if (FindPath (startNode, endNode, OutputPath, unitSize)) {
-				outputVectorPath.FastClear ();
-				length = OutputPath.Count - 1;
-				for (i = 0; i < length; i++) {
-					outputVectorPath.Add (OutputPath [i].WorldPos);
-				}
-				outputVectorPath.Add (End);
+				SmoothPath (OutputPath, End, outputVectorPath, unitSize);
 
 				return true;
 			}
 			return false;
 		}
 
-		static GridNode startNode;
-		static GridNode endNode;
-		static FastList<GridNode> outputPath;
-		static int unitSize;
 
 		public class Test
 		{
@@ -98,7 +116,13 @@ namespace Lockstep
 
 		}
 
-		/// <summary>
+		#region method sharing variables
+		static GridNode startNode;
+		static GridNode endNode;
+		static FastList<GridNode> outputPath;
+		static int unitSize;
+		#endregion
+		/// <summary>                        
 		/// Finds a path and outputs it to <c>outputPath</c>. Note: outputPath is unpredictably changed.
 		/// </summary>
 		/// <returns>
@@ -109,7 +133,6 @@ namespace Lockstep
 		/// <param name="outputPath">Return path.</param>
 		public static bool FindPath (GridNode _startNode, GridNode _endNode, FastList<GridNode> _outputPath, int _unitSize = 1)
 		{
-
 			startNode = _startNode;
 			endNode = _endNode;
 			outputPath = _outputPath;
@@ -222,8 +245,7 @@ namespace Lockstep
 						}
 					}
 					#endregion
-				}
-				else {
+				} else {
 					//no need for specific stuff when edges are all valid
 					for (int i = 4; i < 8; i++) {
 						neighbor = currentNode.NeighborNodes [i];
