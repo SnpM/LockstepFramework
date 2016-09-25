@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Lockstep.Legacy
+namespace Lockstep
 {
 	public class LSBody : MonoBehaviour
 	{
@@ -70,8 +70,6 @@ namespace Lockstep.Legacy
 
 		[Lockstep (true)]
 		public long Height { get; private set; }
-
-		public Transform transform {get; internal set;}
 
 		[SerializeField]
 		private Transform _positionalTransform;

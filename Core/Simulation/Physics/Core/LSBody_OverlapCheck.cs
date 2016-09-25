@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Lockstep
 {
-    public partial class LSBody
+    public partial class LSBody_
     {
         private static Vector2d cacheAxis;
         private static Vector2d cacheAxisNormal;
@@ -161,7 +161,7 @@ namespace Lockstep
 
                                 if (normProj >= normLineMin && normProj <= normLineMax)
                                 {
-                                    long revProj1 = pivot.Dot(LSBody.cacheAxisNormal);
+                                    long revProj1 = pivot.Dot(LSBody_.cacheAxisNormal);
                                     long revProj2 = nextPoint.Dot(cacheAxisNormal);
 
                                     long revMin;
@@ -176,10 +176,10 @@ namespace Lockstep
                                         revMax = revProj1;
                                     }
 
-                                    if (LSBody.cacheProjPerp >= revMin && LSBody.cacheProjPerp <= revMax)
+                                    if (LSBody_.cacheProjPerp >= revMin && LSBody_.cacheProjPerp <= revMax)
                                     {
                                         intersected = true;
-                                        if (LSBody.calculateIntersections)
+                                        if (LSBody_.calculateIntersections)
                                         {
                                             
                                             long fraction = normLineProj1.Abs().Div(normLineMax - normLineMin);

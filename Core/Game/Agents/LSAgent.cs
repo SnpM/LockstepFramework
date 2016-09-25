@@ -104,7 +104,7 @@ namespace Lockstep
 		//[SerializeField]
 		private UnityLSBody _unityBody;
 		public UnityLSBody UnityBody {get {return _unityBody;}}
-		public LSBody Body { get; set;}
+		public LSBody_ Body { get; set;}
 		//[SerializeField]
 		private LSAnimatorBase _animator;
 		public LSAnimatorBase Animator { get { return _animator; } }

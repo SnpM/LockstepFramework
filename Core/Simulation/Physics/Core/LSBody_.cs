@@ -12,7 +12,7 @@ using System.Collections.Generic;
 namespace Lockstep
 {
 	[System.Serializable]
-	public partial class LSBody
+	public partial class LSBody_
 	{
 		#region Core deterministic variables
 
@@ -148,19 +148,19 @@ namespace Lockstep
 
 		public bool Active {get; private set;}
 
-		private void AddChild (LSBody child)
+		private void AddChild (LSBody_ child)
 		{
 			if (Children == null)
-				Children = new FastBucket<LSBody> ();
+				Children = new FastBucket<LSBody_> ();
 			Children.Add (child);
 		}
 
-		private void RemoveChild (LSBody child)
+		private void RemoveChild (LSBody_ child)
 		{
 			Children.Remove (child);
 		}
 
-		private FastBucket<LSBody> Children;
+		private FastBucket<LSBody_> Children;
 		public Vector2d[] RealPoints;
 		public Vector2d[] Edges;
 		public Vector2d[] EdgeNorms;
@@ -183,7 +183,7 @@ namespace Lockstep
 
 		public long HeightMax { get; private set; }
 
-		public delegate void CollisionFunction (LSBody other);
+		public delegate void CollisionFunction (LSBody_ other);
 
 		private Dictionary<int,CollisionPair> _collisionPairs;
 		private HashSet<int> _collisionPairHolders;
@@ -200,7 +200,7 @@ namespace Lockstep
 			}
 		}
 
-		internal void NotifyContact (LSBody other, bool isColliding, bool isChanged)
+		internal void NotifyContact (LSBody_ other, bool isColliding, bool isChanged)
 		{
 			if (isColliding) {
 				if (isChanged) {
@@ -280,10 +280,8 @@ namespace Lockstep
 		[SerializeField, FixedNumber]
 		private long _height = FixedMath.One;
 
-		[Lockstep (true)]
-		public long Height { get; private set; }
+		public long Height { get {return _height;} }
 
-		public Transform transform {get; internal set;}
 
 		[SerializeField]
 		private Transform _positionalTransform;
@@ -330,6 +328,7 @@ namespace Lockstep
 				return this.Position.ToVector3d (this.HeightPos);
 			}
 		}
+		public Transform transform {get; internal set;}
 
 		private Vector2d[] RotatedPoints;
 
@@ -346,7 +345,6 @@ namespace Lockstep
 			Agent = agent;
 			Setted = true;
 
-			Height = _height;
 			Immovable = _immovable || (this.Shape != ColliderType.Circle && this.Shape != ColliderType.None);
 		}
 
@@ -704,7 +702,7 @@ namespace Lockstep
 			}
 			CollisionPairs.Clear ();
 			foreach (var id in CollisionPairHolders) {
-				LSBody other = PhysicsManager.SimObjects [id];
+				LSBody_ other = PhysicsManager.SimObjects [id];
 				if (other.IsNotNull ()) {
 					CollisionPair collisionPair;
 					if (other.CollisionPairs.TryGetValue (ID, out collisionPair)) {
@@ -802,12 +800,7 @@ namespace Lockstep
 
 			return false;
 		}
-
-		public void SetHeight (long newHeight)
-		{
-			Height = newHeight;
-			this.HeightPosChanged = true;
-		}
+			
 
 		internal void Reset ()
 		{

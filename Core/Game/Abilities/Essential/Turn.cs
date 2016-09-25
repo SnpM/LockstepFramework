@@ -10,7 +10,7 @@ namespace Lockstep
 		private Vector2d
 		_turnRate = Vector2d.CreateRotation (FixedMath.One / 8);
 		#endregion
-		private LSBody Agent.Body;
+		private LSBody_ Agent.Body;
 		private bool targetReached;
 		private Vector2d targetRotation;
 		private long turnSin;
@@ -131,7 +131,7 @@ namespace Lockstep
 		}
 
 
-		private void HandleContact (LSBody other)
+		private void HandleContact (LSBody_ other)
 		{
 			if (targetReached == true && Agent.IsCasting == false && !(Agent.Body.Immovable || Agent.Body.IsTrigger)) {
 				Vector2d delta = this.Agent.Body._position - this.Agent.Body.LastPosition;

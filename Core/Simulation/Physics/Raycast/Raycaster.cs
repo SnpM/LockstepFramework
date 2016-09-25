@@ -20,10 +20,10 @@ namespace Lockstep
         public static Func<bool> Conditional { get; set; }
 
 
-        public static IEnumerable<LSBody> RaycastAll(Vector2d start, Vector2d end)
+        public static IEnumerable<LSBody_> RaycastAll(Vector2d start, Vector2d end)
         {
             _Version++;
-            LSBody.PrepareAxisCheck(start, end);
+            LSBody_.PrepareAxisCheck(start, end);
             foreach (FractionalLineAlgorithm.Coordinate coor in
                 GetRelevantNodeCoordinates (start,end))
             {
@@ -36,7 +36,7 @@ namespace Lockstep
                 PartitionNode node = Partition.GetNode(indexX, indexY);
                 for (int i = node.ContainedDynamicObjects.Count - 1; i >= 0; i--)
                 {
-                    LSBody body = PhysicsManager.SimObjects [node.ContainedDynamicObjects [i]];
+                    LSBody_ body = PhysicsManager.SimObjects [node.ContainedDynamicObjects [i]];
                     if (body.RaycastVersion != _Version)
                     {
                         if (Conditional.IsNull() || Conditional())
@@ -55,9 +55,9 @@ namespace Lockstep
         }
 
 
-        public static LSBody CurBody { get; private set; }
+        public static LSBody_ CurBody { get; private set; }
 
-        public static IEnumerable<LSBody> RaycastAll(Vector3d start3d, Vector3d end3d)
+        public static IEnumerable<LSBody_> RaycastAll(Vector3d start3d, Vector3d end3d)
         {
             long startHeight = start3d.z;
             long dist2d = (end3d.ToVector2d() - start3d.ToVector2d()).Magnitude();
@@ -73,7 +73,7 @@ namespace Lockstep
                 } else
                 {
                     //TODO: return bodies based on hit order
-                    foreach (LSBody body in RaycastAll(start,end))
+                    foreach (LSBody_ body in RaycastAll(start,end))
                     {
                         bool heightIntersects = false;
                         bool mined = false;

@@ -72,7 +72,7 @@ namespace Lockstep
 		public event Action OnStopMove;
 
 
-		private LSBody cachedBody { get; set; }
+		private LSBody_ cachedBody { get; set; }
 
 		private Turn CachedTurn { get; set; }
 
@@ -450,7 +450,7 @@ namespace Lockstep
 
 		static LSAgent tempAgent;
 
-		private void HandleCollision (LSBody other)
+		private void HandleCollision (LSBody_ other)
 		{
 
 			if (!CanMove) {
