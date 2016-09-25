@@ -267,12 +267,12 @@ namespace Lockstep
 
 		public bool Immovable { get; private set; }
 
-		[SerializeField, FormerlySerializedAs ("_priority")]
+		[SerializeField]
 		private int _basePriority;
 
 		public int BasePriority { get { return _basePriority; } }
 
-		[SerializeField, FormerlySerializedAs ("Vertices")]
+		[SerializeField]
 		private Vector2d[] _vertices;
 
 		public Vector2d[] Vertices { get { return _vertices; } }
@@ -290,6 +290,19 @@ namespace Lockstep
 
 		public Transform PositionalTransform { get ; set; }
 
+
+		[SerializeField]
+		private Transform _rotationalTransform;
+
+		public Vector3 _rotationOffset;
+
+		public Transform RotationalTransform { get; set; }
+
+
+		#endregion
+
+		#region Runtime Values
+
 		private bool _canSetVisualPosition;
 
 		public bool CanSetVisualPosition {
@@ -300,13 +313,6 @@ namespace Lockstep
 				_canSetVisualPosition = value && PositionalTransform != null;
 			}
 		}
-
-		[SerializeField]
-		private Transform _rotationalTransform;
-
-		public Vector3 _rotationOffset;
-
-		public Transform RotationalTransform { get; set; }
 
 		private bool _canSetVisualRotation;
 
@@ -325,10 +331,9 @@ namespace Lockstep
 			}
 		}
 
-		#endregion
-
 		private Vector2d[] RotatedPoints;
 
+		#endregion
 		public void Setup (LSAgent agent)
 		{
 
