@@ -68,8 +68,7 @@ namespace Lockstep
 		[SerializeField, FixedNumber]
 		private long _height = FixedMath.One;
 
-		[Lockstep (true)]
-		public long Height { get; private set; }
+		public long Height { get {return _height;}}
 
 		[SerializeField]
 		private Transform _positionalTransform;

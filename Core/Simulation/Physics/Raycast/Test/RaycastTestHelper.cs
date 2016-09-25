@@ -19,7 +19,7 @@ namespace Lockstep.Test
             if (testBodies)TestBodies ();
             Gizmos.DrawLine(startPos.ToVector3(0),endPos.ToVector3(0));
         }
-        FastList<LSBody_> lastBodies = new FastList<LSBody_>();
+        //FastList<LSBody_> lastBodies = new FastList<LSBody_>();
         void TestBodies () {
             /*if (Application.isPlaying == false) return;
             for (int i = 0; i < lastBodies.Count; i++) {

@@ -854,7 +854,6 @@ namespace Lockstep
 			}
 		}
 
-		FastList<UnityEngine.Coroutine> flashRoutines = new FastList<UnityEngine.Coroutine> ();
 
 	}
 
