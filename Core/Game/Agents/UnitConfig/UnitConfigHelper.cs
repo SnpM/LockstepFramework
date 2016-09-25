@@ -8,9 +8,13 @@ namespace Lockstep
 {
 	public class UnitConfigHelper : BehaviourHelper
 	{
+		static bool setted = false;
 		protected override void OnInitialize ()
 		{
+			if (!setted) {
 			SetupConfigs ();
+				setted = true;
+			}
 		}
 		UnitConfigElementDataItem [] ConfigElementData;
 		IUnitConfigDataItem [] ConfigData;
