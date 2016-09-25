@@ -857,11 +857,12 @@ namespace Lockstep
 
 	}
 
+	/*
 	public enum ColliderType : byte
 	{
 		None,
 		Circle,
 		AABox,
 		Polygon
-	}
+	}*/
 }

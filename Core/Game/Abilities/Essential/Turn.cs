@@ -10,7 +10,6 @@ namespace Lockstep
 		private Vector2d
 		_turnRate = Vector2d.CreateRotation (FixedMath.One / 8);
 		#endregion
-		private LSBody_ Agent.Body;
 		private bool targetReached;
 		private Vector2d targetRotation;
 		private long turnSin;

@@ -11,13 +11,12 @@ using System.Collections.Generic;
 
 namespace Lockstep
 {
-	[System.Serializable]
 	public partial class LSBody : MonoBehaviour
 	{
 		#region Core deterministic variables
 
 		[SerializeField] //For inspector debugging
-		internal Vector2d _position;
+        internal Vector2d _position;
 		[SerializeField]
 		internal Vector2d _rotation = Vector2d.up;
 		[SerializeField, FixedNumber]
@@ -35,9 +34,6 @@ namespace Lockstep
 			get { return _forwardNeedsSet; }
 			set { _forwardNeedsSet = value; }
 		}
-
-
-
 
 		private Vector2d _forward;
 
@@ -133,7 +129,7 @@ namespace Lockstep
 		public bool SetPositionBuffer { get; private set; }
 		//ND
 
-
+		
 		public bool RotationChangedBuffer { get; private set; }
 		//D
 		private bool SetRotationBuffer { get; set; }
@@ -145,30 +141,29 @@ namespace Lockstep
 
 		private bool Setted { get; set; }
 
-
+		
 		public long VelocityFastMagnitude { get; private set; }
 
 
-		public bool Active {get; private set;}
 
-		private void AddChild (LSBody_ child)
+		private void AddChild (LSBody child)
 		{
 			if (Children == null)
-				Children = new FastBucket<LSBody_> ();
+				Children = new FastBucket<LSBody> ();
 			Children.Add (child);
 		}
 
-		private void RemoveChild (LSBody_ child)
+		private void RemoveChild (LSBody child)
 		{
 			Children.Remove (child);
 		}
 
-		private FastBucket<LSBody_> Children;
+		private FastBucket<LSBody> Children;
 		public Vector2d[] RealPoints;
 		public Vector2d[] Edges;
 		public Vector2d[] EdgeNorms;
 
-
+        
 		public long XMin { get; private set; }
 
 		public long XMax { get; private set; }
@@ -186,7 +181,7 @@ namespace Lockstep
 
 		public long HeightMax { get; private set; }
 
-		public delegate void CollisionFunction (LSBody_ other);
+		public delegate void CollisionFunction (LSBody other);
 
 		private Dictionary<int,CollisionPair> _collisionPairs;
 		private HashSet<int> _collisionPairHolders;
@@ -203,7 +198,7 @@ namespace Lockstep
 			}
 		}
 
-		internal void NotifyContact (LSBody_ other, bool isColliding, bool isChanged)
+		internal void NotifyContact (LSBody other, bool isColliding, bool isChanged)
 		{
 			if (isColliding) {
 				if (isChanged) {
@@ -212,7 +207,7 @@ namespace Lockstep
 				}
 				if (onContact != null)
 					onContact (other);
-
+				
 			} else {
 				if (isChanged) {
 					if (onContactExit != null)
@@ -235,32 +230,32 @@ namespace Lockstep
 
 		#region Serialized
 
-		[SerializeField]
+		[SerializeField, FormerlySerializedAs ("Shape")]
 		protected ColliderType _shape = ColliderType.None;
 
 		public ColliderType Shape { get { return _shape; } }
 
-		[SerializeField]
+		[SerializeField, FormerlySerializedAs ("IsTrigger")]
 		private bool _isTrigger;
 
 		public bool IsTrigger { get { return _isTrigger; } }
 
-		[SerializeField]
+		[SerializeField, FormerlySerializedAs ("Layer")]
 		private int _layer;
 
 		public int Layer { get { return _layer; } }
 
-		[SerializeField,FixedNumber]
+		[SerializeField,FixedNumber, FormerlySerializedAs ("HalfWidth")]
 		private long _halfWidth = FixedMath.Half;
 
 		public long HalfWidth { get { return _halfWidth; } }
 
-		[SerializeField,FixedNumber]
+		[SerializeField,FixedNumber, FormerlySerializedAs ("HalfHeight")]
 		public long _halfHeight = FixedMath.Half;
 
 		public long HalfHeight { get { return _halfHeight; } }
 
-		[SerializeField,FixedNumber]
+		[SerializeField,FixedNumber, FormerlySerializedAs ("Radius")]
 		protected long _radius = FixedMath.Half;
 
 		public long Radius { get { return _radius; } }
@@ -270,12 +265,12 @@ namespace Lockstep
 
 		public bool Immovable { get; private set; }
 
-		[SerializeField]
+		[SerializeField, FormerlySerializedAs ("_priority")]
 		private int _basePriority;
 
 		public int BasePriority { get { return _basePriority; } }
 
-		[SerializeField]
+		[SerializeField, FormerlySerializedAs ("Vertices")]
 		private Vector2d[] _vertices;
 
 		public Vector2d[] Vertices { get { return _vertices; } }
@@ -283,26 +278,13 @@ namespace Lockstep
 		[SerializeField, FixedNumber]
 		private long _height = FixedMath.One;
 
-		public long Height { get {return _height;} }
-
+		[Lockstep (true)]
+		public long Height { get {return _height;}}
 
 		[SerializeField]
 		private Transform _positionalTransform;
 
 		public Transform PositionalTransform { get ; set; }
-
-
-		[SerializeField]
-		private Transform _rotationalTransform;
-
-		public Vector3 _rotationOffset;
-
-		public Transform RotationalTransform { get; set; }
-
-
-		#endregion
-
-		#region Runtime Values
 
 		private bool _canSetVisualPosition;
 
@@ -314,6 +296,13 @@ namespace Lockstep
 				_canSetVisualPosition = value && PositionalTransform != null;
 			}
 		}
+
+		[SerializeField]
+		private Transform _rotationalTransform;
+
+		public Vector3 _rotationOffset;
+
+		public Transform RotationalTransform { get; set; }
 
 		private bool _canSetVisualRotation;
 
@@ -332,11 +321,113 @@ namespace Lockstep
 			}
 		}
 
+		#endregion
+
 		private Vector2d[] RotatedPoints;
 
+		public void Setup (LSAgent agent)
+		{
 
-		#endregion
+		}
+
+		private bool OutMoreThanSet { get; set; }
+
+		public bool OutMoreThan { get; private set; }
+
+		public void GeneratePoints ()
+		{
+
+		}
+
+		public void GenerateBounds ()
+		{
+			
+		}
+
+		public void Initialize (Vector3d StartPosition, Vector2d StartRotation, bool isDynamic = true)
+		{
+			
+		}
+
+		void CheckVariables ()
+		{
+
+		}
+
+		public void BuildPoints ()
+		{
+			
+		}
+
+		public void BuildBounds ()
+		{
+
+		}
+
+
+		public void Simulate ()
+		{}
+
+		
+		public void BuildChangedValues ()
+		{
+			
+		}
+
+		public void SetVisuals ()
+		{
+
+		}
+
+		private void DoSetVisualPosition (Vector3 pos)
+		{
+	
+		}
+
+		private void DoSetVisualRotation (Vector2d rot)
+		{
+
+		}
+
+		public void SetExtrapolatedVisuals ()
+		{
+            
+		}
+
+		Vector3 lastVisualPos;
+		Quaternion lastVisualRot;
+		Quaternion visualRot = Quaternion.identity;
+
+		public void Visualize ()
+		{
+		}
+
+		public void LerpOverReset ()
+		{
+            
+		}
+
+	
+		
+	
+
+
+		void Reset ()
+		{
+			
+		}
+
+		void OnDrawGizmos ()
+		{
+		}
 
 	}
 
+	public enum ColliderType : byte
+	{
+		None,
+		Circle,
+		AABox,
+		Polygon
+	}
 }
