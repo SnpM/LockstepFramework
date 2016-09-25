@@ -166,7 +166,7 @@ namespace Lockstep.Integration
             if (shape == ColliderType.None)
                 return;
             Handles.color = Color.blue;
-			LSBody Body = ((UnityLSBody)target).InternalBody;
+			LSBody_ Body = ((UnityLSBody)target).InternalBody;
 			Transform transform = ((UnityLSBody)target).transform;
             Vector3 targetPos = transform.position;
             const int ImprecisionLimit = 100000;
