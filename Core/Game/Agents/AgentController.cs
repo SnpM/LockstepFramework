@@ -45,6 +45,8 @@ namespace Lockstep
 				OrganizerObject = LSUtility.CreateEmpty ().transform;
 				OrganizerObject.gameObject.name = "OrganizerObject";
 				OrganizerObject.gameObject.SetActive (false);
+
+				GameObject.DontDestroyOnLoad(OrganizerObject);
 				for (int i = 0; i < AgentData.Length; i++) {
 					IAgentData interfacer = AgentData [i];
 					string agentCode = interfacer.Name;
