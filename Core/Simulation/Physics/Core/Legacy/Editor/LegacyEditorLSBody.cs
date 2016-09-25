@@ -52,7 +52,7 @@ namespace Lockstep.Legacy.Integration
 				var legacy = fab.GetComponent<LSBody> ();
 				legacy.Replace ();
 				DestroyImmediate (legacy);
-				PrefabUtility.ReplacePrefab(fab, source);
+				PrefabUtility.MergeAllPrefabInstances(source);
 				GameObject.DestroyImmediate(fab);
 			}
 
