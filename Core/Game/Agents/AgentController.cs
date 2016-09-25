@@ -271,7 +271,10 @@ namespace Lockstep
 
 		public static void CacheAgent (LSAgent agent)
 		{
+			if (LockstepManager.PoolingEnabled)
 			CachedAgents [agent.MyAgentCode].Add (agent);
+			else
+			GameObject.Destroy(agent.gameObject);
 		}
 
 		private static void UpdateDiplomacy (AgentController newCont)
@@ -304,10 +307,6 @@ namespace Lockstep
 					operationToggle++;
 					if (operationToggle >= 2) {
 						operationToggle = 0;
-					}
-					if (agent.Body.IsNotNull ()) {
-						hash ^= agent.Body._position.GetStateHash ();
-						hash ^= agent.Body._position.GetStateHash ();
 					}
 				}
 			}

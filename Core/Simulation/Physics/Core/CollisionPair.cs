@@ -59,7 +59,7 @@ namespace Lockstep
 			}
 
 			_ranIndex = -1;
-			;
+
 			_isColliding = false;
 
 			DistX = 0;
@@ -146,7 +146,7 @@ namespace Lockstep
 
 
 
-			if (Body1.IsTrigger || Body2.IsTrigger)
+			if (!DoPhysics)
 				return;
 			
 			switch (LeCollisionType)

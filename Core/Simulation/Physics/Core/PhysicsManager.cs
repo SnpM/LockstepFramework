@@ -103,9 +103,28 @@ namespace Lockstep
 
 		public static void Initialize()
 		{
+
+
+
+
+
+
+			if (SettingsChanged)
+			{
+				SettingsChanged = false;
+			}
+
+
+			ResetVars();
+		}
+
+		static void ResetVars () {
+			for (int i = 0; i < PeakCount; i++) {
+				SimObjects[i] = null;
+			}
+			DynamicSimObjects.FastClear();
 			Raycaster._Version = 0;
 			PeakCount = 0;
-
 			CachedIDs.FastClear();
 
 			CollisionPair.CurrentCollisionPair = null;
@@ -114,12 +133,8 @@ namespace Lockstep
 			AssimilatedCount = 0;
 
 			Partition.Initialize();
-
-			if (SettingsChanged)
-			{
-				SettingsChanged = false;
-			}
-
+			RanCollisionPairs.FastClear();
+			InactiveCollisionPairs.FastClear();
 			AccumulatedTime = 0;
 			LastTime = 0;
 		}
@@ -232,6 +247,7 @@ namespace Lockstep
 		public static void Deactivate()
 		{
 			Partition.Deactivate();
+
 		}
 
 		public static float LerpTime { get; private set; }
@@ -383,6 +399,7 @@ namespace Lockstep
 		public static void PoolPair(CollisionPair pair)
 		{
 			pair.Deactivate();
+			if (LockstepManager.PoolingEnabled)
 			CachedCollisionPairs.Add(pair);
 		}
 

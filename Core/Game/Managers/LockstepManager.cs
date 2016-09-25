@@ -57,6 +57,8 @@ namespace Lockstep
 
 		public static bool Loaded { get; private set; }
 
+		//for testing purposes
+		public const bool PoolingEnabled = true;
 		private static GameManager _mainGameManager;
 
 		public static event Action onSetup;

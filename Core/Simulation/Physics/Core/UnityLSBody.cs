@@ -19,8 +19,6 @@ namespace Lockstep
 		{
 			if (_internalBody.IsNull())
 				_internalBody = new LSBody();
-			InternalBody.transform = transform;
-			InternalBody.Reset();
 			InternalBody.Initialize (StartPosition,StartRotation,isDynamic);
 		}
 

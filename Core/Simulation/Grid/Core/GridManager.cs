@@ -135,7 +135,8 @@ namespace Lockstep
 		public static void Initialize ()
 		{
 			GridVersion = 1;
-
+			if (!LockstepManager.PoolingEnabled)
+				_settingsChanged = true;
             if (_settingsChanged) {
                 if (_settings == null)
                     _settings = DefaultSettings;
