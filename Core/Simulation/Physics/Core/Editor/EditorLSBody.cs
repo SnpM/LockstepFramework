@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
-
+using Lockstep;
+#if true
 namespace Lockstep.Integration
 {
-    [CustomEditor(typeof(LSBody), true),UnityEditor.CanEditMultipleObjects]
+    [CustomEditor(typeof(UnityLSBody), true),UnityEditor.CanEditMultipleObjects]
     public class EditorLSBody : Editor
     {
 
@@ -33,7 +34,7 @@ namespace Lockstep.Integration
         SerializedProperty RotationalTransform;
         //transform
 
-        SerializedObject so { get { return base.serializedObject; } }
+		SerializedObject so { get {return this.serializedObject;}}
 
         bool MoreThanOne;
 
@@ -54,18 +55,18 @@ namespace Lockstep.Integration
         void OnEnable()
         {
             MoreThanOne = targets.Length > 1;
-            Shape = so.FindProperty("_shape");
-            IsTrigger = so.FindProperty("_isTrigger");
-            Layer = so.FindProperty("_layer");
-			BasePriority = so.FindProperty("_basePriority");
-            HalfWidth = so.FindProperty("_halfWidth");
-            HalfHeight = so.FindProperty("_halfHeight");
-            Radius = so.FindProperty("_radius");
-            Immovable = so.FindProperty("_immovable");
-            Vertices = so.FindProperty("_vertices");
-            Height = so.FindProperty("_height");
-            PositionalTransform = so.FindProperty("_positionalTransform");
-            RotationalTransform = so.FindProperty("_rotationalTransform");
+            Shape = so.FindProperty("_internalBody").FindPropertyRelative("_shape");
+            IsTrigger = so.FindProperty("_internalBody").FindPropertyRelative("_isTrigger");
+            Layer = so.FindProperty("_internalBody").FindPropertyRelative("_layer");
+			BasePriority = so.FindProperty("_internalBody").FindPropertyRelative("_basePriority");
+            HalfWidth = so.FindProperty("_internalBody").FindPropertyRelative("_halfWidth");
+            HalfHeight = so.FindProperty("_internalBody").FindPropertyRelative("_halfHeight");
+            Radius = so.FindProperty("_internalBody").FindPropertyRelative("_radius");
+            Immovable = so.FindProperty("_internalBody").FindPropertyRelative("_immovable");
+            Vertices = so.FindProperty("_internalBody").FindPropertyRelative("_vertices");
+            Height = so.FindProperty("_internalBody").FindPropertyRelative("_height");
+            PositionalTransform = so.FindProperty("_internalBody").FindPropertyRelative("_positionalTransform");
+            RotationalTransform = so.FindProperty("_internalBody").FindPropertyRelative("_rotationalTransform");
         }
 
         public override void OnInspectorGUI()
@@ -79,8 +80,9 @@ namespace Lockstep.Integration
                     for (int i = 0; i < targets.Length; i++)
                     {
                         SerializedObject ser = new SerializedObject(targets [i]);
-                        ser.FindProperty("_positionalTransform").objectReferenceValue = ((LSBody)targets [i]).transform;
-                        ser.FindProperty("_rotationalTransform").objectReferenceValue = ((LSBody)targets [i]).transform;
+
+                        ser.FindProperty("_internalBody").FindPropertyRelative("_positionalTransform").objectReferenceValue = ((UnityLSBody)targets [i]).transform;
+                        ser.FindProperty("_internalBody").FindPropertyRelative("_rotationalTransform").objectReferenceValue = ((UnityLSBody)targets [i]).transform;
                         ser.ApplyModifiedProperties();
                     }
                     so.Update();
@@ -142,31 +144,31 @@ namespace Lockstep.Integration
                 return;
 
             //Have to reinitialize everything because can't apply modified properties on base.serializedObject
-            SerializedObject so = new SerializedObject(target);
+			SerializedObject so = new SerializedObject(target);
             so.Update();
-            SerializedProperty Shape = so.FindProperty("_shape");
-            SerializedProperty HalfWidth = so.FindProperty("_halfWidth");
-            SerializedProperty HalfHeight = so.FindProperty("_halfHeight");
-            SerializedProperty Radius = so.FindProperty("_radius");
-            SerializedProperty Height = so.FindProperty("_height");
+            SerializedProperty Shape = so.FindProperty("_internalBody").FindPropertyRelative("_shape");
+            SerializedProperty HalfWidth = so.FindProperty("_internalBody").FindPropertyRelative("_halfWidth");
+            SerializedProperty HalfHeight = so.FindProperty("_internalBody").FindPropertyRelative("_halfHeight");
+            SerializedProperty Radius = so.FindProperty("_internalBody").FindPropertyRelative("_radius");
+            SerializedProperty Height = so.FindProperty("_internalBody").FindPropertyRelative("_height");
 
             /*
             //Currently unused
-            SerializedProperty Layer = so.FindProperty("_layer");
-            SerializedProperty IsTrigger = so.FindProperty("_isTrigger");
-            SerializedProperty Immovable = so.FindProperty("_immovable");
-            SerializedProperty Vertices = so.FindProperty("_vertices");
-            SerializedProperty PositionalTransform = so.FindProperty("_positionalTransform");
-            SerializedProperty RotationalTransform = so.FindProperty("_rotationalTransform");
+            SerializedProperty Layer = so.FindProperty("_internalBody").FindPropertyRelative("_layer");
+            SerializedProperty IsTrigger = so.FindProperty("_internalBody").FindPropertyRelative("_isTrigger");
+            SerializedProperty Immovable = so.FindProperty("_internalBody").FindPropertyRelative("_immovable");
+            SerializedProperty Vertices = so.FindProperty("_internalBody").FindPropertyRelative("_vertices");
+            SerializedProperty PositionalTransform = so.FindProperty("_internalBody").FindPropertyRelative("_positionalTransform");
+            SerializedProperty RotationalTransform = so.FindProperty("_internalBody").FindPropertyRelative("_rotationalTransform");
             */
 
             ColliderType shape = (ColliderType)Shape.intValue;
             if (shape == ColliderType.None)
                 return;
             Handles.color = Color.blue;
-            LSBody Body = (LSBody)target;
-
-            Vector3 targetPos = Body.transform.position;
+			LSBody Body = ((UnityLSBody)target).InternalBody;
+			Transform transform = ((UnityLSBody)target).transform;
+            Vector3 targetPos = transform.position;
             const int ImprecisionLimit = 100000;
             if (Mathf.Abs(targetPos.x) >= ImprecisionLimit ||
                 Mathf.Abs(targetPos.y) >= ImprecisionLimit ||
@@ -286,10 +288,12 @@ namespace Lockstep.Integration
                 xModifier = 0;//halfWidth;
             } else if (shape == ColliderType.Polygon)
             {
-                float yRot = Body.transform.eulerAngles.y * Mathf.Deg2Rad;
+                float yRot = transform.eulerAngles.y * Mathf.Deg2Rad;
 
                 Vector2d rotation = Vector2d.CreateRotation(yRot);
                 bool changed = false;
+
+
                 Vector3[] draws = new Vector3[Body.Vertices.Length + 1];
                     
                 for (int i = 0; i < Body.Vertices.Length; i++)
@@ -361,3 +365,4 @@ namespace Lockstep.Integration
         }
     }
 }
+#endif

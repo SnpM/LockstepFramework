@@ -7,7 +7,7 @@ namespace Lockstep
     public class EnvironmentBodyInfo
     {
         public EnvironmentBodyInfo (
-            LSBody body,
+            UnityLSBody body,
             Vector3d position,
             Vector2d rotation
         )
@@ -17,7 +17,7 @@ namespace Lockstep
             this.Rotation = rotation;
         }
 
-        public LSBody Body;
+        public UnityLSBody Body;
         public Vector3d Position;
         public Vector2d Rotation;
     }

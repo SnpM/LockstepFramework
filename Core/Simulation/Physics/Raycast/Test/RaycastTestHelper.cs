@@ -21,15 +21,15 @@ namespace Lockstep.Test
         }
         FastList<LSBody> lastBodies = new FastList<LSBody>();
         void TestBodies () {
-            if (Application.isPlaying == false) return;
+            /*if (Application.isPlaying == false) return;
             for (int i = 0; i < lastBodies.Count; i++) {
                 lastBodies[i].GetComponentInChildren<Renderer>().material.color = Color.white;
             }
             lastBodies.FastClear();
-            foreach (LSBody body in Raycaster.RaycastAll (startPos, endPos)) {
+            foreach (_LSBody body in Raycaster.RaycastAll (startPos, endPos)) {
                 body.GetComponentInChildren<Renderer>().material.color = Color.red;
                 lastBodies.Add(body);
-            }
+            }*/
         }
         void TestPartitions () {
             int width = Partition.Nodes.Width;

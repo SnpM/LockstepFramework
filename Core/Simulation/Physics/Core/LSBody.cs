@@ -11,7 +11,8 @@ using System.Collections.Generic;
 
 namespace Lockstep
 {
-	public partial class LSBody : MonoBehaviour
+	[System.Serializable]
+	public partial class LSBody
 	{
 		#region Core deterministic variables
 
@@ -145,6 +146,7 @@ namespace Lockstep
 		public long VelocityFastMagnitude { get; private set; }
 
 
+		public bool Active {get; private set;}
 
 		private void AddChild (LSBody child)
 		{
@@ -230,7 +232,7 @@ namespace Lockstep
 
 		#region Serialized
 
-		[SerializeField, FormerlySerializedAs ("Shape")]
+		[SerializeField]
 		protected ColliderType _shape = ColliderType.None;
 
 		public ColliderType Shape { get { return _shape; } }
@@ -280,6 +282,8 @@ namespace Lockstep
 
 		[Lockstep (true)]
 		public long Height { get; private set; }
+
+		public Transform transform {get; internal set;}
 
 		[SerializeField]
 		private Transform _positionalTransform;
@@ -382,6 +386,7 @@ namespace Lockstep
 
 		public void Initialize (Vector3d StartPosition, Vector2d StartRotation, bool isDynamic = true)
 		{
+			Active = true;
 			PositionalTransform = _positionalTransform;
 			RotationalTransform = _rotationalTransform;
 			if (!Setted) {
@@ -686,6 +691,7 @@ namespace Lockstep
 
 		public void Deactivate ()
 		{
+			
 			foreach (var collisionPair in CollisionPairs.Values) {
 				collisionPair.Body2.CollisionPairHolders.Remove (ID);
 				DeactivatePair (collisionPair);
@@ -710,6 +716,7 @@ namespace Lockstep
 				
 			Partition.UpdateObject (this, false);
 			PhysicsManager.Dessimilate (this);
+			Active = false;
 		}
 
 		public bool HeightOverlaps (long heightPos)
@@ -797,7 +804,7 @@ namespace Lockstep
 			this.HeightPosChanged = true;
 		}
 
-		void Reset ()
+		internal void Reset ()
 		{
 			this._positionalTransform = this.transform;
 			this._rotationalTransform = this.transform;
@@ -851,31 +858,6 @@ namespace Lockstep
 
 		FastList<UnityEngine.Coroutine> flashRoutines = new FastList<UnityEngine.Coroutine> ();
 
-		public void TestFlash ()
-		{
-			flashRoutines.Add (base.StartCoroutine (_TestFlash ()));
-		}
-
-		private System.Collections.IEnumerator _TestFlash ()
-		{
-			foreach (UnityEngine.Coroutine co in flashRoutines) {
-				if (co != null)
-					base.StopCoroutine (co);
-			}
-			flashRoutines.Clear ();
-
-
-			Renderer ren = this.GetComponentInChildren<Renderer> ();
-
-			if (ren != null) {
-				Color col = Color.white;
-				ren.material.color = Color.red;
-				yield return null;
-				yield return new WaitForSeconds (.08f);
-				ren.material.color = col;
-			}
-			yield break;
-		}
 	}
 
 	public enum ColliderType : byte

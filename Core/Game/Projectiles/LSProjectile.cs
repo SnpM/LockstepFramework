@@ -560,7 +560,7 @@ namespace Lockstep
 				switch (this.HitBehavior)
 				{
 					case HitType.Single:
-						this.HitBodies[0].TestFlash();
+						//todo: Implement
 						break;
 				}
 			}

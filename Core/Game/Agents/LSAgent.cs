@@ -16,7 +16,7 @@ using UnityEditor;
 #endif
 namespace Lockstep
 {
-	[RequireComponent(typeof(LSBody))]
+	[RequireComponent(typeof(UnityLSBody))]
 	/// <summary>
 	/// LSAgents manage abilities and interpret commands.
 	/// </summary>
@@ -102,8 +102,9 @@ namespace Lockstep
 		private Ability[] _attachedAbilities;
 		public Ability[] AttachedAbilities { get { return _attachedAbilities; } }
 		//[SerializeField]
-		private LSBody _body;
-		public LSBody Body { get { return _body; } }
+		private UnityLSBody _unityBody;
+		public UnityLSBody UnityBody {get {return _unityBody;}}
+		public LSBody Body { get; set;}
 		//[SerializeField]
 		private LSAnimatorBase _animator;
 		public LSAnimatorBase Animator { get { return _animator; } }
@@ -280,12 +281,15 @@ namespace Lockstep
 				Animator.Setup();
 			}
 
-
+			Body = UnityBody.InternalBody;
+			Body.Setup(this);
 			abilityManager.Setup(this);
 
 
 			Influencer.Setup(this);
-			Body.Setup(this);
+
+
+
 
 			SelectionRadiusSquared = SelectionRadius * SelectionRadius;
 
@@ -540,7 +544,7 @@ namespace Lockstep
 		{
 			_cachedTransform = base.transform;
 			_cachedGameObject = base.gameObject;
-			_body = GetComponent<LSBody>();
+			_unityBody = GetComponent<UnityLSBody>();
 			_animator = GetComponent<LSAnimatorBase>();
 			_attachedAbilities = GetComponents<Ability>();
 		}
