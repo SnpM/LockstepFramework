@@ -37,9 +37,5 @@ namespace Lockstep
             }
 				
         }
-            protected override void OnDeactivate ()
-		{
-			iteration++;
-		}
     }
 }
