@@ -134,6 +134,7 @@ namespace Lockstep
 
 		public static void Initialize ()
 		{
+			GridVersion = 1;
 
             if (_settingsChanged) {
                 if (_settings == null)
@@ -152,7 +153,6 @@ namespace Lockstep
                     Grid[i].FastInitialize();
                 }
             }
-			GridVersion = 1;
 		}
 
 		public static void LateSimulate () {

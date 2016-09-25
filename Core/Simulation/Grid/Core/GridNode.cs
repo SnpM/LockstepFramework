@@ -56,7 +56,7 @@ namespace Lockstep
 			this.ClosedSetVersion = 0;
 			this.HeapIndex = 0;
 			this.HeapVersion = 0;
-			UpdateValues ();
+			this.GridVersion = 0;
 		}
 
 		#endregion

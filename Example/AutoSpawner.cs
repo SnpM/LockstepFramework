@@ -54,7 +54,7 @@ namespace Lockstep
 			Command com = new Command(Lockstep.Data.AbilityDataItem.FindInterfacer<Scan>().ListenInputID);
 			com.Add<Vector2d>(battlePos);
 
-			PlayerManager.SendCommand(com);
+			//PlayerManager.SendCommand(com);
 
 			Selector.Clear();
 		}
