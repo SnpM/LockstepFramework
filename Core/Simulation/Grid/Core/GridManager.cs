@@ -31,7 +31,7 @@ namespace Lockstep
             get {
                 return _useDiagonalConnections;
             }
-            set {
+            private set {
                 _useDiagonalConnections = value;
             }
         }
@@ -86,6 +86,7 @@ namespace Lockstep
                 int min = Grid.Length;
                 CachedGridNodes.EnsureCapacity (min);
                 for (int i = min - 1; i >= 0; i--) {
+					if (LockstepManager.PoolingEnabled)
                     CachedGridNodes.Add (Grid[i]);
                 }
             }
@@ -95,6 +96,7 @@ namespace Lockstep
                 int min = ScanGrid.Length;
                 CachedScanNodes.EnsureCapacity(min);
                 for (int i = min - 1; i >= 0; i--) {
+					if (LockstepManager.PoolingEnabled);
                     CachedScanNodes.Add(ScanGrid[i]);
                 }
             }
@@ -135,6 +137,7 @@ namespace Lockstep
 		public static void Initialize ()
 		{
 			GridVersion = 1;
+			GridChanged = false;
 			if (!LockstepManager.PoolingEnabled)
 				_settingsChanged = true;
             if (_settingsChanged) {

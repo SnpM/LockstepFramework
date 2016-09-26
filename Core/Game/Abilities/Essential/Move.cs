@@ -49,14 +49,11 @@ namespace Lockstep
 
 		public long StopMultiplier { get; set; }
 
-		private bool forcePathfind { get; set; }
 
 		private bool collisionTicked;
-		private int stuckTick;
 
 		public bool CollisionTicked { get { return collisionTicked; } }
 
-		public int StuckTick { get { return stuckTick; } }
 
 		//Has this unit arrived at destination? Default set to false.
 		public bool Arrived { get; private set; }
@@ -177,9 +174,9 @@ namespace Lockstep
 			hasPath = false;
 			IsMoving = false;
 			collisionTicked = false;
-			stuckTick = 0;
+			StopTimer = 0;
+			RepathTries = 0;
 
-			forcePathfind = false;
 
 			Arrived = true;
 			LastPosition = Agent.Body.Position;
@@ -203,7 +200,7 @@ namespace Lockstep
 						if (viableDestination) {
 							if (Pathfinder.GetPathNode (cachedBody._position.x, cachedBody._position.y, out currentNode)) {
 								if (straightPath) {
-									if (forcePathfind || Pathfinder.NeedsPath (currentNode, destinationNode, this.GridSize)) {
+									if (Pathfinder.NeedsPath (currentNode, destinationNode, this.GridSize)) {
 										if (Pathfinder.FindPath (Destination, currentNode, destinationNode, myPath, 
 											GridSize)) {
 											hasPath = true;
@@ -218,7 +215,7 @@ namespace Lockstep
 									} else {
 									}
 								} else {
-									if (forcePathfind || Pathfinder.NeedsPath (currentNode, destinationNode, this.GridSize)) {
+									if (Pathfinder.NeedsPath (currentNode, destinationNode, this.GridSize)) {
 										if (Pathfinder.FindPath (Destination, currentNode, destinationNode, myPath,
 											GridSize)) {
 											hasPath = true;
@@ -382,7 +379,6 @@ namespace Lockstep
 		public void StopMove ()
 		{
 			if (IsMoving) {
-				forcePathfind = false;
 
 				if (MyMovementGroup.IsNotNull ()) {
 					MyMovementGroup.Remove (this);
@@ -392,7 +388,6 @@ namespace Lockstep
 				StoppedTime = 0;
 
 				IsCasting = false;
-				stuckTick = 0;
 				if (OnStopMove.IsNotNull ()) {
 					OnStopMove ();
 				}
@@ -430,9 +425,9 @@ namespace Lockstep
 
 			viableDestination = Pathfinder.GetPathNode (this.Destination.x, this.Destination.y, out destinationNode);
 
+			StopTimer = 0;
+			RepathTries = 0;
 			IsCasting = true;
-			stuckTick = 0;
-			forcePathfind = false;
 			if (onStartMove != null)
 				onStartMove ();
 		}
