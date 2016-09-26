@@ -51,6 +51,12 @@ namespace Lockstep {
             }
         }
 
+		public static void LateVisualize () {
+			foreach ( var helper in Helpers) {
+				helper.LateVisualize();
+			}
+		}
+
         public static void Deactivate () {
             foreach (BehaviourHelper helper in Helpers) {
                 helper.Deactivate ();

@@ -313,6 +313,7 @@ namespace Lockstep
 			DefaultMessageRaiser.LateVisualize ();
 			AgentController.LateVisualize();
 			PhysicsManager.LateVisualize();
+			BehaviourHelperManager.LateVisualize();
 		}
 
 		internal static void DrawGUI ()

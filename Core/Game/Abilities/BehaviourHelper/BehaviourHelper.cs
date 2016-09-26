@@ -76,6 +76,12 @@ namespace Lockstep
         protected virtual void OnVisualize()
         {
         }
+		public void LateVisualize () {
+			OnLateVisualize ();
+		}
+		protected virtual void OnLateVisualize () {
+
+		}
 
         public void GlobalExecute(Command com)
         {

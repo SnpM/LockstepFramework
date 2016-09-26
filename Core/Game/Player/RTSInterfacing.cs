@@ -75,6 +75,14 @@ namespace Lockstep
 
 		public static bool CachedDidHit { get; private set; }
 
+		public static Vector2d GetWorldPosHeight (Vector2 screenPos, float height = 0) {
+			Ray ray = Camera.main.ScreenPointToRay (screenPos);
+			RaycastHit hit;
+
+			Vector3 hitPoint = ray.origin - ray.direction * ((ray.origin.y - height) / ray.direction.y);
+			//return new Vector2d(hitPoint.x * LockstepManager.InverseWorldScale, hitPoint.z * LockstepManager.InverseWorldScale);
+			return new Vector2d (hitPoint.x, hitPoint.z);
+		}
 		public static Vector2d GetWorldPosD (Vector2 screenPos)
 		{
             Ray ray = Camera.main.ScreenPointToRay (screenPos);
