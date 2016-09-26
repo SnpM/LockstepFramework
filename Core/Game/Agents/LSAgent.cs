@@ -344,8 +344,6 @@ namespace Lockstep
 			Vector2d rotation = default(Vector2d))
 		{
 
-
-
 			IsActive = true;
 			CheckCasting = true;
 
@@ -452,7 +450,6 @@ namespace Lockstep
 				this.onDeactivate(this);
 			_Deactivate();
 
-			//Immediate = true; // TODO: Why ?
 			if (Immediate == false)
 			{
 				if (Animator.IsNotNull())
