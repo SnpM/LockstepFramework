@@ -83,9 +83,17 @@ namespace Lockstep
             }
         }
 
-        public bool IsValid (int w, int h) {
+        public bool IsValidIndex (int w, int h) {
             return w >= 0 && w < this.Width && h >= 0 && h < this.Height;
         }
+		public bool IsValidX(int x)
+		{
+			return x >= 0 && x < Width;
+		}
+		public bool IsValidY(int y)
+		{
+			return y >= 0 && y < Height;
+		}
 
         public static Array2D<T> Clone (T[,] source) {
             Array2D<T> array = new Array2D<T>(source.GetLength(0),source.GetLength(1));
