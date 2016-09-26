@@ -8,13 +8,18 @@ namespace Lockstep
 	public class TestHelper : BehaviourHelper
 	{
 		[SerializeField]
+		private bool _enabled;
+
+		[SerializeField]
 		private int _checkFrameInterval = 4;
 		int ticker;
 
 		protected override void OnLateInitialize ()
 		{
-			ClientManager.NetworkHelper.OnTestData += HandleOnTestData;
-			ticker = 0;
+			if (_enabled) {
+				ClientManager.NetworkHelper.OnTestData += HandleOnTestData;
+				ticker = 0;
+			}
 		}
 
 		Dictionary<int,List<int>> frameHashes = new Dictionary<int, List<int>> ();
@@ -42,6 +47,8 @@ namespace Lockstep
 
 		protected override void OnSimulate ()
 		{
+			if (!_enabled)
+				return;
 			ticker++;
 			if (ticker >= _checkFrameInterval) {
 				ticker = 0;
