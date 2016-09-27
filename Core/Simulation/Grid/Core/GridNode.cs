@@ -274,7 +274,7 @@ namespace Lockstep
 		{
 
 
-			#if false
+			#if true
 			//manhattan
 			if (gridX > HeuristicTargetX)
 				dstX = gridX - HeuristicTargetX;
