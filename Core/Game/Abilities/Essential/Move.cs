@@ -9,8 +9,8 @@ namespace Lockstep
 		public const long GroupDirectStop = FixedMath.One;
 		public const long DirectStop = FixedMath.One / 8;
 		private const int MinimumOtherStopTime = (int)(LockstepManager.FrameRate / 4);
-		private const int StopTimeThreshold = LockstepManager.FrameRate / 2;
-		private const int StopRepathTries = 4;
+		private const int StuckTimeThreshold = LockstepManager.FrameRate;
+		private const int StuckRepathTries = 4;
 
 		public int GridSize { get { return (cachedBody.Radius * 2).RoundToInt(); } }
 
@@ -174,7 +174,7 @@ namespace Lockstep
 			hasPath = false;
 			IsMoving = false;
 			collisionTicked = false;
-			StopTimer = 0;
+			StuckTime = 0;
 			RepathTries = 0;
 
 
@@ -183,7 +183,7 @@ namespace Lockstep
 			DoPathfind = false;
 		}
 
-		private int StopTimer;
+		private int StuckTime;
 		private int RepathTries;
 
 		bool DoPathfind;
@@ -277,9 +277,9 @@ namespace Lockstep
 					long threshold = this.timescaledSpeed / 4;
 
 					if (GetFullCanCollisionStop () && (Agent.Body.Position - this.LastPosition).FastMagnitude () < (threshold * threshold)) {
-						StopTimer++;
-						if (StopTimer > StopTimeThreshold) {
-							if (RepathTries < StopRepathTries) {
+						StuckTime++;
+						if (StuckTime > StuckTimeThreshold) {
+							if (RepathTries < StuckRepathTries) {
 								DoPathfind = true;
 								RepathTries++;
 							}
@@ -287,15 +287,15 @@ namespace Lockstep
 								RepathTries = 0;
 								this.Arrive ();
 							}
-							StopTimer = 0;
+							StuckTime = 0;
 
 						}
 					} else {
-						StopTimer = 0;
+						StuckTime = 0;
 						RepathTries = 0;
 					}
 				} else {
-					StopTimer = 0;
+					StuckTime = 0;
 					if (distance < FixedMath.Mul (closingDistance, StopMultiplier)) {
 						Arrive ();
 						return;
@@ -425,7 +425,7 @@ namespace Lockstep
 
 			viableDestination = Pathfinder.GetPathNode (this.Destination.x, this.Destination.y, out destinationNode);
 
-			StopTimer = 0;
+			StuckTime = 0;
 			RepathTries = 0;
 			IsCasting = true;
 			if (onStartMove != null)
