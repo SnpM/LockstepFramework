@@ -14,6 +14,7 @@ namespace Lockstep
 	[System.Serializable]
 	public partial class LSBody
 	{
+
 		#region Core deterministic variables
 
 		[SerializeField] //For inspector debugging
@@ -854,6 +855,28 @@ namespace Lockstep
 			}
 		}
 
+		public LSBody Clone()
+		{
+			return Clone<LSBody>();
+		}
+		public TLSBody Clone<TLSBody>() where TLSBody : LSBody, new()
+		{
+			TLSBody body = new TLSBody();
+			body._shape = this._shape;
+			body._isTrigger = this._isTrigger;
+			body._layer = this._layer;
+			body._halfWidth = this._halfWidth;
+			body._halfHeight = this._halfHeight;
+			body._radius = this._radius;
+			body._immovable = this._immovable;
+			body._basePriority = this._basePriority;
+			body._vertices = this._vertices;
+			body._height = this._height;
+			body._positionalTransform = this._positionalTransform;
+			body._rotationalTransform = this._rotationalTransform;
+
+			return body;
+		}
 
 	}
 
