@@ -33,13 +33,6 @@ namespace Lockstep
 	//TODO: Set up default functions to implement LSManager
 	public static class LockstepManager
 	{
-		public static readonly System.Diagnostics.Stopwatch SimulationTimer = new System.Diagnostics.Stopwatch ();
-
-		/// <summary>
-		/// Seconds since start if the last session.
-		/// </summary>
-		/// <value>The seconds.</value>
-		public static double Seconds { get { return SimulationTimer.ElapsedTicks / (double)System.TimeSpan.TicksPerSecond; } }
 
 		public static MonoBehaviour UnityInstance { get; private set; }
 
@@ -171,9 +164,7 @@ namespace Lockstep
 
 
 			DefaultMessageRaiser.EarlyInitialize ();
-			SimulationTimer.Stop ();
-			SimulationTimer.Reset ();
-			SimulationTimer.Start ();
+
 			LSDatabaseManager.Initialize ();
 			LSUtility.Initialize (1);
 			InfluenceCount = 0;
