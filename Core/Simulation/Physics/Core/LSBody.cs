@@ -346,7 +346,7 @@ namespace Lockstep
 			Agent = agent;
 			Setted = true;
 
-			Immovable = _immovable || (this.Shape != ColliderType.Circle && this.Shape != ColliderType.None);
+			Immovable = _immovable || (this.Shape != ColliderType.Circle) || this.Shape == ColliderType.None;
 		}
 
 		private bool OutMoreThanSet { get; set; }
