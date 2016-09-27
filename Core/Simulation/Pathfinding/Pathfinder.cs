@@ -58,12 +58,7 @@ namespace Lockstep
 			if (!GetPathNodes(Start.x, Start.y, End.x, End.y, out node1, out node2))
 				return false;
 			if (FindPath(node1, node2, OutputPath, unitSize)) {
-				outputVectorPath.FastClear();
-				length = OutputPath.Count - 1;
-				for (i = 0; i < length; i++) {
-					outputVectorPath.Add(OutputPath[i].WorldPos);
-				}
-				outputVectorPath.Add(End);
+				SmoothPath(OutputPath, End, outputVectorPath, unitSize);
 				return true;
 			}
 			return false;
