@@ -271,10 +271,22 @@ namespace Lockstep
 		{
 			return f1 <= f2 ? f1 : f2;
 		}
+		public static long Min(long f1, long f2, long f3, long f4)
+		{
+			f1 = Min(f1, f2);
+			f3 = Min(f3, f4);
+			return Min(f1, f3);
+		}
 
 		public static long Max(this long f1, long f2)
 		{
 			return f1 >= f2 ? f1 : f2;
+		}
+		public static long Max(long f1, long f2, long f3, long f4)
+		{
+			f1 = Max(f1, f2);
+			f3 = Max(f3, f4);
+			return Max(f1, f3);
 		}
 		public static long Clamp(this long f1, long min, long max)
 		{

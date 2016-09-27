@@ -302,15 +302,15 @@ namespace Lockstep
 				this.hCost = dstY * 141 + (dstX - dstY) * 100;
 			else
 				this.hCost = dstX * 141 + (dstY - dstX) * 100;
-            
-			#elif false
+
+#elif false
 			//euclidean
 			dstX = HeuristicTargetX - gridX;
 			dstY = HeuristicTargetY - gridY;
 			double d = dstX * dstX + dstY * dstY;
 			d = Math.Sqrt(d);
 			hCost = (int)(d * 100);
-			#endif
+#endif
 
 			fCost = gCost + hCost;
 			

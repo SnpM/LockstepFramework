@@ -349,15 +349,15 @@ namespace Lockstep
 		/// Note: Not deterministic. Use only for serialization and sending in Commands.
 		/// </summary>
 		/// <returns>The from angle.</returns>
-		/// <param name="angle">Angle.</param>
-		public static Vector2d CreateRotation(double angle)
+		/// <param name="angleRadians">Angle.</param>
+		public static Vector2d CreateRotation(double angleRadians)
 		{
-			return new Vector2d(Math.Cos(angle), Math.Sin(angle));
+			return new Vector2d(Math.Cos(angleRadians), Math.Sin(angleRadians));
 		}
 
-		public static Vector2d CreateRotation(float angle)
+		public static Vector2d CreateRotation(float angleRadians)
 		{
-			return CreateRotation((double)angle);
+			return CreateRotation((double)angleRadians);
 		}
 
 		/// <summary>

@@ -62,7 +62,7 @@ namespace Lockstep
 
 		#region Simulation Variables
 
-		public const int DefaultMaxSimObjects = 200 * 200;
+		public const int DefaultMaxSimObjects = 2048;
 		private static int _maxSimObjects = DefaultMaxSimObjects;
 
 		public static int MaxSimObjects
@@ -342,6 +342,10 @@ namespace Lockstep
 			{
 				id = PeakCount;
 				PeakCount++;
+				if (PeakCount == SimObjects.Length) {
+					//very very expensive
+					Array.Resize(ref SimObjects, SimObjects.Length * 2);
+				}
 			}
 			SimObjects[id] = body;
 

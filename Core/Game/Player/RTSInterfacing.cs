@@ -6,11 +6,10 @@ namespace Lockstep
 {
 	public static class RTSInterfacing
 	{
-		public static Camera mainCamera { get; private set; }
+		public static Camera mainCamera { get { return Camera.main; } }
 
 		public static void Initialize ()
 		{
-			mainCamera = Camera.main;
 			CachedDidHit = false;
 		}
 
@@ -76,6 +75,7 @@ namespace Lockstep
 		public static bool CachedDidHit { get; private set; }
 
 		public static Vector2d GetWorldPosHeight (Vector2 screenPos, float height = 0) {
+			if (Camera.main == null) return Vector2d.zero;
 			Ray ray = Camera.main.ScreenPointToRay (screenPos);
 			RaycastHit hit;
 

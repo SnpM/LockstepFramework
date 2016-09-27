@@ -30,10 +30,13 @@ namespace Lockstep
         {
             //this._mapCenter = new Vector2d(transform.position);
         }
+
         protected override void OnApply()
         {
             GridManager.Settings = new GridSettings(this.MapWidth,this.MapHeight,this.Offset.x,this.Offset.y, this.UseDiagonalConnetions);
         }
+
+
 
         #if UNITY_EDITOR
         public bool Show;

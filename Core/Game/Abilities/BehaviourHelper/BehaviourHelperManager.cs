@@ -8,11 +8,14 @@ namespace Lockstep {
         public static void Initialize (BehaviourHelper[] helpers) {
             Helpers = helpers;
             foreach (BehaviourHelper helper in Helpers) {
-                helper.Initialize ();
+                helper.EarlyInitialize ();
             }
         }
 
         public static void LateInitialize () {
+			foreach (BehaviourHelper helper in Helpers) {
+				helper.Initialize();
+			}
             foreach (BehaviourHelper helper in Helpers) {
                 helper.LateInitialize();
             }

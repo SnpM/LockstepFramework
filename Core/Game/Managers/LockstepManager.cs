@@ -183,6 +183,7 @@ namespace Lockstep
 
 			FrameCount = 0;
 			InfluenceFrameCount = 0;
+			InitializeHelpers();
 
 			ClientManager.Initialize (MainGameManager.MainNetworkHelper);
 
@@ -203,7 +204,6 @@ namespace Lockstep
 			ProjectileManager.Initialize ();
 
 			DefaultMessageRaiser.LateInitialize ();
-			InitializeHelpers ();
 			BehaviourHelperManager.LateInitialize ();
 			if (onInitialize != null)
 				onInitialize ();

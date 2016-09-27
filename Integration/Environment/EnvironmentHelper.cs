@@ -57,7 +57,7 @@ namespace Lockstep
         private EnvironmentSaver[] _savers;
         public EnvironmentSaver[] Savers { get {return _savers;}}
 
-        protected override void OnInitialize()
+        protected override void OnEarlyInitialize()
         {
             foreach (EnvironmentSaver saver in Savers) {
                 saver.Apply ();
