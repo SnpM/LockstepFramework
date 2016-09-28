@@ -223,10 +223,13 @@ namespace Lockstep
 		public static bool Simulated { get; private set;}
 		public static double AccumulatedTime { get; private set; }
 		public static float LerpTime { get; private set;}
+		public static bool LastLerpOver { get; private set;}
 		public static void LateVisualize()
 		{
 			if (Simulated)
+			{
 				AccumulatedTime = Time.deltaTime;
+			}
 			else
 				AccumulatedTime += Time.deltaTime;
 			LerpTime = (float)(AccumulatedTime / PhysicsManager.FixedDeltaTime);
@@ -240,6 +243,8 @@ namespace Lockstep
 				}
 			}
 
+			if (Simulated)
+				Simulated = false;
 		}
 
 		public static float ElapsedTime;
