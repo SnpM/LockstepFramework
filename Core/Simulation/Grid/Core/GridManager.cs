@@ -31,10 +31,15 @@ namespace Lockstep
             get {
                 return _useDiagonalConnections;
             }
-            set {
+            private set {
                 _useDiagonalConnections = value;
             }
         }
+		public static void NotifyGridChanged () {
+
+		}
+		public static bool GridChanged {get; private set;}
+		public static uint GridVersion {get; private set;}
 
         private static bool _settingsChanged = true;
 
@@ -81,6 +86,7 @@ namespace Lockstep
                 int min = Grid.Length;
                 CachedGridNodes.EnsureCapacity (min);
                 for (int i = min - 1; i >= 0; i--) {
+					if (LockstepManager.PoolingEnabled)
                     CachedGridNodes.Add (Grid[i]);
                 }
             }
@@ -90,6 +96,7 @@ namespace Lockstep
                 int min = ScanGrid.Length;
                 CachedScanNodes.EnsureCapacity(min);
                 for (int i = min - 1; i >= 0; i--) {
+					if (LockstepManager.PoolingEnabled);
                     CachedScanNodes.Add(ScanGrid[i]);
                 }
             }
@@ -129,6 +136,10 @@ namespace Lockstep
 
 		public static void Initialize ()
 		{
+			GridVersion = 1;
+			GridChanged = false;
+			if (!LockstepManager.PoolingEnabled)
+				_settingsChanged = true;
             if (_settingsChanged) {
                 if (_settings == null)
                     _settings = DefaultSettings;
@@ -148,10 +159,15 @@ namespace Lockstep
             }
 		}
 
+		public static void LateSimulate () {
+			if (GridChanged)
+				GridVersion++;
+		}
+
 		public static GridNode GetNode (int xGrid, int yGrid)
 		{
             if (xGrid < 0 || xGrid >= Grid.Length || yGrid < 0 || yGrid >= Grid.Length) 
-            Debug.Log(xGrid + ", " + yGrid);
+				return null;
 			return Grid [GetGridIndex (xGrid, yGrid)];
 		}
 		

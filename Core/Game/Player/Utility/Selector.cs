@@ -76,6 +76,7 @@ namespace Lockstep
 			}
 			MainSelectedAgent = null;
 			onClear ();
+
 		}
 	}
 

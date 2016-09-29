@@ -125,6 +125,7 @@ namespace Lockstep
                     {
                         com.ControllerID = cont.ControllerID;
 
+						#if false
                         if (cont.SelectionChanged)
                         {
                             com.SetData<Selection>(new Selection(cont.SelectedAgents));
@@ -134,6 +135,11 @@ namespace Lockstep
                         {
                             com.ClearData<Selection>();
                         }
+						#else
+						//we always sending selection data
+						com.SetData<Selection>(new Selection(cont.SelectedAgents));
+						cont.SelectionChanged = false;
+						#endif
                         CommandManager.SendCommand(com);
                     }
                 }

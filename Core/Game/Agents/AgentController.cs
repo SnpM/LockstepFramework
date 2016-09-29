@@ -45,6 +45,8 @@ namespace Lockstep
 				OrganizerObject = LSUtility.CreateEmpty ().transform;
 				OrganizerObject.gameObject.name = "OrganizerObject";
 				OrganizerObject.gameObject.SetActive (false);
+
+				GameObject.DontDestroyOnLoad(OrganizerObject);
 				for (int i = 0; i < AgentData.Length; i++) {
 					IAgentData interfacer = AgentData [i];
 					string agentCode = interfacer.Name;
@@ -269,7 +271,10 @@ namespace Lockstep
 
 		public static void CacheAgent (LSAgent agent)
 		{
+			if (LockstepManager.PoolingEnabled)
 			CachedAgents [agent.MyAgentCode].Add (agent);
+			else
+			GameObject.Destroy(agent.gameObject);
 		}
 
 		private static void UpdateDiplomacy (AgentController newCont)
@@ -302,10 +307,6 @@ namespace Lockstep
 					operationToggle++;
 					if (operationToggle >= 2) {
 						operationToggle = 0;
-					}
-					if (agent.Body.IsNotNull ()) {
-						hash ^= agent.Body._position.GetStateHash ();
-						hash ^= agent.Body._position.GetStateHash ();
 					}
 				}
 			}

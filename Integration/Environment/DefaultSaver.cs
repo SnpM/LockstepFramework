@@ -37,9 +37,9 @@ namespace Lockstep
         }
 
         void SaveBodies () {
-            LSBody[] allBodies = GameObject.FindObjectsOfType<LSBody> ();
+            UnityLSBody[] allBodies = GameObject.FindObjectsOfType<UnityLSBody> ();
             FastList<EnvironmentBodyInfo> bodiesBuffer = new FastList<EnvironmentBodyInfo>();
-            foreach (LSBody body in allBodies) {
+            foreach (UnityLSBody body in allBodies) {
                 if (IsAgent(body)) continue;
                 Vector3d pos = new Vector3d(body.transform.position);
                 Vector2d rot = Vector2d.CreateRotation(body.transform.eulerAngles.y * Mathf.Deg2Rad);

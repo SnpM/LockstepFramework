@@ -19,7 +19,7 @@ public class Blocker : EnvironmentObject
     {
         base.OnInitialize();
 
-        CachedBody = this.GetComponent<LSBody> ();
+		CachedBody = this.GetComponent<UnityLSBody> ().InternalBody;
 
         if (this.BlockPathfinding) {
             const long gridSpacing = FixedMath.One;

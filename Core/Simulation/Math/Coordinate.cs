@@ -17,6 +17,25 @@ namespace Lockstep
             y = Y;
         }
 
+		public static Coordinate FloorToCoordinate (Vector2d v2) {
+			Coordinate coor;
+			coor.x = v2.x.ToInt();
+			coor.y = v2.y.ToInt();
+			return coor;
+		}
+		public static Coordinate RoundToCoordinate (Vector2d v2) {
+			Coordinate coor;
+			coor.x = v2.x.RoundToInt();
+			coor.y = v2.y.RoundToInt();
+			return coor;
+		}
+		public static Coordinate CeilToCoordinate (Vector2d v2) {
+			Coordinate coor;
+			coor.x = v2.x.CeilToInt();
+			coor.y = v2.y.CeilToInt();
+			return coor;
+		}
+
         public override string ToString()
         {
             return "(" + x.ToString() + ", " + y.ToString() + ")";

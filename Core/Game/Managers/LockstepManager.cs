@@ -33,13 +33,6 @@ namespace Lockstep
 	//TODO: Set up default functions to implement LSManager
 	public static class LockstepManager
 	{
-		public static readonly System.Diagnostics.Stopwatch SimulationTimer = new System.Diagnostics.Stopwatch ();
-
-		/// <summary>
-		/// Seconds since start if the last session.
-		/// </summary>
-		/// <value>The seconds.</value>
-		public static double Seconds { get { return SimulationTimer.ElapsedTicks / (double)System.TimeSpan.TicksPerSecond; } }
 
 		public static MonoBehaviour UnityInstance { get; private set; }
 
@@ -57,6 +50,8 @@ namespace Lockstep
 
 		public static bool Loaded { get; private set; }
 
+		//for testing purposes
+		public const bool PoolingEnabled = true;
 		private static GameManager _mainGameManager;
 
 		public static event Action onSetup;
@@ -169,9 +164,7 @@ namespace Lockstep
 
 
 			DefaultMessageRaiser.EarlyInitialize ();
-			SimulationTimer.Stop ();
-			SimulationTimer.Reset ();
-			SimulationTimer.Start ();
+
 			LSDatabaseManager.Initialize ();
 			LSUtility.Initialize (1);
 			InfluenceCount = 0;
@@ -181,6 +174,7 @@ namespace Lockstep
 
 			FrameCount = 0;
 			InfluenceFrameCount = 0;
+			InitializeHelpers();
 
 			ClientManager.Initialize (MainGameManager.MainNetworkHelper);
 
@@ -201,7 +195,6 @@ namespace Lockstep
 			ProjectileManager.Initialize ();
 
 			DefaultMessageRaiser.LateInitialize ();
-			InitializeHelpers ();
 			BehaviourHelperManager.LateInitialize ();
 			if (onInitialize != null)
 				onInitialize ();
@@ -311,6 +304,7 @@ namespace Lockstep
 			DefaultMessageRaiser.LateVisualize ();
 			AgentController.LateVisualize();
 			PhysicsManager.LateVisualize();
+			BehaviourHelperManager.LateVisualize();
 		}
 
 		internal static void DrawGUI ()

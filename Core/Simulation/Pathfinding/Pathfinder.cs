@@ -22,8 +22,8 @@ namespace Lockstep
 		static GridNode node1;
 		static GridNode node2;
 		static int IndexX, IndexY;
-		static FastList<GridNode> TracePath = new FastList<GridNode> ();
-		static FastList<GridNode> OutputPath = new FastList<GridNode> ();
+		static FastList<GridNode> TracePath = new FastList<GridNode>();
+		static FastList<GridNode> OutputPath = new FastList<GridNode>();
 		static int length;
 
 		#endregion
@@ -37,6 +37,7 @@ namespace Lockstep
 		static int StartNodeIndex;
 		static bool FindStraight;
 		static bool LastIsObstructed;
+		static bool hasInvalidEdge;
 
 		#endregion
 
@@ -51,53 +52,101 @@ namespace Lockstep
 		#endregion
 
 
-		public static bool FindPath (Vector2d Start, Vector2d End, FastList<Vector2d> outputVectorPath, int unitSize = 1)
+		//todo: implement this with SmoothPath
+		public static bool FindPath(Vector2d Start, Vector2d End, FastList<Vector2d> outputVectorPath, int unitSize = 1)
 		{
-			if (!GetPathNodes (Start.x, Start.y, End.x, End.y, out node1, out node2))
+			if (!GetPathNodes(Start.x, Start.y, End.x, End.y, out node1, out node2))
 				return false;
-			if (FindPath (node1, node2, OutputPath, unitSize)) {
-				outputVectorPath.FastClear ();
-				length = OutputPath.Count - 1;
-				for (i = 0; i < length; i++) {
-					outputVectorPath.Add (OutputPath [i].WorldPos);
-				}
-				outputVectorPath.Add (End);
+			if (FindPath(node1, node2, OutputPath, unitSize)) {
+				SmoothPath(OutputPath, End, outputVectorPath, unitSize);
 				return true;
 			}
 			return false;
 		}
+		public static void SmoothPath(FastList<GridNode> nodePath, Vector2d End, FastList<Vector2d> outputVectorPath, int unitSize)
+		{
+			outputVectorPath.FastClear();
+			length = nodePath.Count - 1;
+			//culling out unneded nodes
 
-		public static bool FindPath (Vector2d End, GridNode startNode, GridNode endNode, FastList<Vector2d> outputVectorPath, int unitSize = 1)
+
+			var StartNode = nodePath[0];
+			outputVectorPath.Add(StartNode.WorldPos);
+			GridNode oldNode = StartNode;
+			long oldX = 0;
+			long oldY = 0;
+			long newX = 0;
+			long newY = 0;
+			for (i = 1; i < length; i++) {
+
+				GridNode node = nodePath[i];
+
+				bool important = false;
+				if (unitSize <= 1) {
+					important = !node.Clearance;
+				} else if (unitSize <= 3) {
+					important = !node.ExtraClearance;
+				} else {
+					important = true;
+				}
+				//important = true;
+				if (important) {
+
+					newX = node.gridX - oldNode.gridX;
+					newY = node.gridY - oldNode.gridY;
+					if (
+						(newX <= 1 && newX >= -1) &&
+						(newY <= 1 && newY >= -1)
+					) {
+						if (newX == oldX && newY == oldY) {
+							if (oldX != 0 || oldY != 0) {
+								outputVectorPath.RemoveAt(outputVectorPath.Count - 1);
+							}
+						} else {
+							oldX = newX;
+							oldY = newY;
+						}
+					} else {
+						oldX = 0;
+						oldY = 0;
+					}
+					outputVectorPath.Add(node.WorldPos);
+
+					oldNode = node;
+
+				}
+			}
+			outputVectorPath.Add(End);
+
+		}
+		public static bool FindPath(Vector2d End, GridNode startNode, GridNode endNode, FastList<Vector2d> outputVectorPath, int unitSize = 1)
 		{
 
-			if (FindPath (startNode, endNode, OutputPath, unitSize)) {
-				outputVectorPath.FastClear ();
-				length = OutputPath.Count - 1;
-				for (i = 0; i < length; i++) {
-					outputVectorPath.Add (OutputPath [i].WorldPos);
-				}
-				outputVectorPath.Add (End);
+			if (FindPath(startNode, endNode, OutputPath, unitSize)) {
+				SmoothPath(OutputPath, End, outputVectorPath, unitSize);
 
 				return true;
 			}
 			return false;
 		}
 
-		static GridNode startNode;
-		static GridNode endNode;
-		static FastList<GridNode> outputPath;
-		static int unitSize;
 
 		public class Test
 		{
-			public bool test ()
+			public bool test()
 			{
 				return false;
 			}
 
 		}
 
-		/// <summary>
+		#region method sharing variables
+		static GridNode startNode;
+		static GridNode endNode;
+		static FastList<GridNode> outputPath;
+		static int unitSize;
+		#endregion
+		/// <summary>                        
 		/// Finds a path and outputs it to <c>outputPath</c>. Note: outputPath is unpredictably changed.
 		/// </summary>
 		/// <returns>
@@ -106,9 +155,8 @@ namespace Lockstep
 		/// <param name="startNode">Start node.</param>
 		/// <param name="endNode">End node.</param>
 		/// <param name="outputPath">Return path.</param>
-		public static bool FindPath (GridNode _startNode, GridNode _endNode, FastList<GridNode> _outputPath, int _unitSize = 1)
+		public static bool FindPath(GridNode _startNode, GridNode _endNode, FastList<GridNode> _outputPath, int _unitSize = 1)
 		{
-
 			startNode = _startNode;
 			endNode = _endNode;
 			outputPath = _outputPath;
@@ -122,41 +170,43 @@ namespace Lockstep
 			if (startNode.Unwalkable) {
 				return false;
 			}
-			
-			outputPath.FastClear ();
 
-			if (System.Object.ReferenceEquals (startNode, endNode)) {
-				outputPath.Add (endNode);
+			outputPath.FastClear();
+
+			if (System.Object.ReferenceEquals(startNode, endNode)) {
+				outputPath.Add(endNode);
 				return true;
 			}
 
-			GridHeap.FastClear ();
-			GridClosedSet.FastClear ();
+			GridHeap.FastClear();
+			GridClosedSet.FastClear();
 			#endregion
-			
+
 			#region AStar Algorithm
-			GridHeap.Add (startNode);
+			GridHeap.Add(startNode);
 			GridNode.HeuristicTargetX = endNode.gridX;
 			GridNode.HeuristicTargetY = endNode.gridY;
 
-			GridNode.PrepareUnpassableCheck (unitSize); //Prepare Unpassable check optimizations
+			GridNode.PrepareUnpassableCheck(unitSize); //Prepare Unpassable check optimizations
 			while (GridHeap.Count > 0) {
-				currentNode = GridHeap.RemoveFirst ();
-				#if false
+				currentNode = GridHeap.RemoveFirst();
+#if false
 				Gizmos.DrawCube(currentNode.WorldPos.ToVector3(), Vector3.one);
-				#endif
-				GridClosedSet.Add (currentNode);
-				
+#endif
+				GridClosedSet.Add(currentNode);
+
 				if (currentNode.gridIndex == endNode.gridIndex) {
 					//Retraces the path then outputs it into outputPath
 					//Also Simplifies the path
-					DestinationReached ();
+					DestinationReached();
 					return true;
 				}
 
+
+				/*
 				for (i = 0; i < 8; i++) {
 					neighbor = currentNode.NeighborNodes [i];
-					if (neighbor.IsNull () || currentNode.Unpassable () || GridClosedSet.Contains (neighbor)) {
+					if (CheckNeighborInvalid ()) {
 						//continue;
 						//microoptimization... continue is more expensive than letting the loop pass at the end
 					} else {
@@ -171,22 +221,62 @@ namespace Lockstep
 							newMovementCostToNeighbor = currentNode.gCost + 141;
 						}
 
-						if (!GridHeap.Contains (neighbor)) {
-							neighbor.gCost = newMovementCostToNeighbor;
-						
-							//Optimized heuristic calculation
-							neighbor.CalculateHeuristic ();
-							neighbor.parent = currentNode;
-						
-							GridHeap.Add (neighbor);
-						} else if (newMovementCostToNeighbor < neighbor.gCost) {
-							neighbor.gCost = newMovementCostToNeighbor;
+						AnalyzeNode();
+					}
+				}
+				*/
+				hasInvalidEdge = false;
+				for (int i = 0; i < 4; i++) {
+					neighbor = currentNode.NeighborNodes[i];
+					if (CheckNeighborInvalid()) {
+						hasInvalidEdge = true;
+					} else {
+						newMovementCostToNeighbor = currentNode.gCost + 100;
+						AnalyzeNode();
+					}
+				}
 
-							//Optimized heuristic calculation
-							neighbor.CalculateHeuristic ();
-							neighbor.parent = currentNode;
+				if (hasInvalidEdge) {
+					const int maxCornerObstructions = 1;
+					#region inlining diagonals
+					neighbor = currentNode.NeighborNodes[4];
+					if (!CheckNeighborInvalid()) {
+						if (GetObstructionCount(0, 1) <= maxCornerObstructions) {
+							newMovementCostToNeighbor = currentNode.gCost + 141;
+							AnalyzeNode();
+						}
+					}
 
-							GridHeap.UpdateItem (neighbor);
+					neighbor = currentNode.NeighborNodes[5];
+					if (!CheckNeighborInvalid()) {
+						if (GetObstructionCount(0, 2) <= maxCornerObstructions) {
+							newMovementCostToNeighbor = currentNode.gCost + 141;
+							AnalyzeNode();
+						}
+					}
+					neighbor = currentNode.NeighborNodes[6];
+					if (!CheckNeighborInvalid()) {
+						if (GetObstructionCount(3, 1) <= maxCornerObstructions) {
+							newMovementCostToNeighbor = currentNode.gCost + 141;
+							AnalyzeNode();
+						}
+					}
+					neighbor = currentNode.NeighborNodes[7];
+					if (!CheckNeighborInvalid()) {
+						if (GetObstructionCount(3, 2) <= maxCornerObstructions) {
+							newMovementCostToNeighbor = currentNode.gCost + 141;
+							AnalyzeNode();
+						}
+					}
+					#endregion
+				} else {
+					//no need for specific stuff when edges are all valid
+					for (int i = 4; i < 8; i++) {
+						neighbor = currentNode.NeighborNodes[i];
+						if (CheckNeighborInvalid()) {
+						} else {
+							newMovementCostToNeighbor = currentNode.gCost + 141;
+							AnalyzeNode();
 						}
 					}
 				}
@@ -195,46 +285,77 @@ namespace Lockstep
 			return false;
 		}
 
-		private static void DestinationReached ()
+		static int GetObstructionCount(int index1, int index2)
 		{
-            
-			outputPath.FastClear ();
-			TracePath.FastClear ();
+			if (CheckInvalid(currentNode.NeighborNodes[index1])) {
+				if (CheckInvalid(currentNode.NeighborNodes[index2])) {
+					return 2;
+				}
+				return 1;
+			}
+			if (CheckInvalid(currentNode.NeighborNodes[index2]))
+				return 1;
+			return 0;
+		}
+
+		static bool CheckInvalid(GridNode gridNode)
+		{
+			return gridNode.IsNull() || gridNode.Unpassable() || GridClosedSet.Contains(gridNode);
+		}
+
+		static bool CheckNeighborInvalid()
+		{
+			return neighbor.IsNull() || neighbor.Unpassable() || GridClosedSet.Contains(neighbor);
+		}
+
+		static void AnalyzeNode()
+		{
+			if (!GridHeap.Contains(neighbor)) {
+				neighbor.gCost = newMovementCostToNeighbor;
+
+				//Optimized heuristic calculation
+				neighbor.CalculateHeuristic();
+				neighbor.parent = currentNode;
+
+				GridHeap.Add(neighbor);
+			} else if (newMovementCostToNeighbor < neighbor.gCost) {
+				neighbor.gCost = newMovementCostToNeighbor;
+
+				//Optimized heuristic calculation
+				neighbor.CalculateHeuristic();
+				neighbor.parent = currentNode;
+
+				GridHeap.UpdateItem(neighbor);
+			}
+		}
+
+		private static void DestinationReached()
+		{
+
+			outputPath.FastClear();
+			TracePath.FastClear();
 
 			currentNode = endNode;
 
+			GridNode oldNode = null;
+
 			StartNodeIndex = startNode.gridIndex;
 			while (currentNode.gridIndex != StartNodeIndex) {
-				TracePath.Add (currentNode);
+				TracePath.Add(currentNode);
 				oldNode = currentNode;
 				currentNode = currentNode.parent;
 
 			}
-			#if true
-			oldX = 0;
-			oldY = 0;
-			currentNode = TracePath [TracePath.Count - 1];
+
+			currentNode = TracePath[TracePath.Count - 1];
 			for (i = TracePath.Count - 2; i >= 0; i--) {
 				oldNode = currentNode;
-				currentNode = TracePath.innerArray [i];
-				newX = currentNode.gridX - oldNode.gridX;
-				newY = currentNode.gridY - oldNode.gridY;
-
-				#if true
-				if (newX != oldX || newY != oldY) {
-
-					outputPath.Add (oldNode);
-					oldX = newX;
-					oldY = newY;
-				}
-				#else
-                outputPath.Add (currentNode);
-				#endif
+				currentNode = TracePath.innerArray[i];
+				outputPath.Add(currentNode);
 			}
-			#endif
 		}
 
-		public static bool NeedsPath (GridNode startNode, GridNode endNode, int unitSize)
+		public static bool NeedsPath(GridNode startNode, GridNode endNode, int unitSize)
 		{
 			//Tests if there is a direct path. If there is, no need to run AStar.
 			x0 = startNode.gridX;
@@ -267,27 +388,27 @@ namespace Lockstep
 				y1 = t;
 			}
 			dx = x1 - x0;
-				
+
 			dy = (y1 - y0);
 			if (dy < 0)
 				dy = -dy;
-				
+
 			error = dx / 2;
 			ystep = (y0 < y1) ? 1 : -1;
 			y = y0;
-			GridNode.PrepareUnpassableCheck (unitSize);
+			GridNode.PrepareUnpassableCheck(unitSize);
 
 			for (x = x0; x <= x1; x++) {
 				retX = (steep ? y : x);
 				retY = (steep ? x : y);
-					
-				currentNode = GridManager.Grid [GridManager.GetGridIndex (retX, retY)];
-				if (currentNode != null && currentNode.Unpassable ()) {
+
+				currentNode = GridManager.Grid[GridManager.GetGridIndex(retX, retY)];
+				if (currentNode != null && currentNode.Unpassable()) {
 					break;
 				} else if (x == x1) {
 					return false;
 				}
-					
+
 				error = error - dy;
 				if (error < 0) {
 					y += ystep;
@@ -297,13 +418,13 @@ namespace Lockstep
 			return true;
 		}
 
-		public static bool GetPathNodes (long StartX, long StartY, long EndX, long EndY, out GridNode startNode, out GridNode endNode)
+		public static bool GetPathNodes(long StartX, long StartY, long EndX, long EndY, out GridNode startNode, out GridNode endNode)
 		{
-			startNode = GridManager.GetNode (StartX, StartY);
+			startNode = GridManager.GetNode(StartX, StartY);
 			if (startNode.Unwalkable) {
 				for (i = 0; i < 8; i++) {
-					currentNode = startNode.NeighborNodes [i];
-					if (System.Object.ReferenceEquals (currentNode, null) == false && currentNode.Unwalkable == false) {
+					currentNode = startNode.NeighborNodes[i];
+					if (System.Object.ReferenceEquals(currentNode, null) == false && currentNode.Unwalkable == false) {
 						startNode = currentNode;
 						break;
 					}
@@ -313,11 +434,11 @@ namespace Lockstep
 					return false;
 				}
 			}
-			endNode = GridManager.GetNode (EndX, EndY);
+			endNode = GridManager.GetNode(EndX, EndY);
 			if (endNode.Unwalkable) {
 				for (i = 0; i < 8; i++) {
-					currentNode = endNode.NeighborNodes [i];
-					if (System.Object.ReferenceEquals (currentNode, null) == false && currentNode.Unwalkable == false) {
+					currentNode = endNode.NeighborNodes[i];
+					if (System.Object.ReferenceEquals(currentNode, null) == false && currentNode.Unwalkable == false) {
 						endNode = currentNode;
 						break;
 					}
@@ -330,18 +451,21 @@ namespace Lockstep
 
 		static int xSign, ySign;
 
-		public static bool GetPathNode (long X, long Y, out GridNode returnNode)
+		public static bool GetPathNode(long X, long Y, out GridNode returnNode)
 		{
-			returnNode = GridManager.GetNode (X, Y);
+			returnNode = GridManager.GetNode(X, Y);
+			if (returnNode == null) {
+				return false;
+			}
 			if (returnNode.Unwalkable) {
 				xSign = X > returnNode.WorldPos.x ? 1 : -1;
 				ySign = Y > returnNode.WorldPos.y ? 1 : -1;
 
-				currentNode = GridManager.GetNode (returnNode.gridX + xSign, returnNode.gridY);
+				currentNode = GridManager.GetNode(returnNode.gridX + xSign, returnNode.gridY);
 				if (currentNode == null || currentNode.Unwalkable) {
-					currentNode = GridManager.GetNode (returnNode.gridX, returnNode.gridY + ySign);
+					currentNode = GridManager.GetNode(returnNode.gridX, returnNode.gridY + ySign);
 					if (currentNode == null || currentNode.Unwalkable) {
-						currentNode = GridManager.GetNode (returnNode.gridX + xSign, returnNode.gridY + ySign);
+						currentNode = GridManager.GetNode(returnNode.gridX + xSign, returnNode.gridY + ySign);
 						if (currentNode == null || currentNode.Unwalkable) {
 							return false;
 						}
@@ -352,8 +476,7 @@ namespace Lockstep
 			return true;
 		}
 
-		static int oldX, oldY;
-		static int newX, newY;
-		static GridNode oldNode;
+
+
 	}
 }

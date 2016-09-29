@@ -159,7 +159,7 @@ namespace Lockstep
 			cachedTurn = Agent.GetAbility<Turn>();
 			cachedMove = Agent.GetAbility<Move>();
 			if (Sight < Range)
-				_sight = Range;
+				_sight = Range + FixedMath.One * 5;
 
 			//fastRange = (Range * Range);
 			basePriority = cachedBody.Priority;
@@ -186,7 +186,7 @@ namespace Lockstep
 
 		protected override void OnInitialize()
 		{
-			cachedBody.Priority = basePriority;
+			basePriority = Agent.Body.Priority;
 			searchCount = LSUtility.GetRandom(SearchRate) + 1;
 			attackCount = 0;
 			HasTarget = false;
@@ -573,14 +573,13 @@ namespace Lockstep
 			StopEngage(true);
 		}
 
-		protected override void OnExecute(Command com)
+		public void StartAttackMove(Vector2d position, bool isFormal = true)
 		{
 			Agent.StopCast(this.ID);
-			Vector2d pos;
-			DefaultData target;
-			if (com.TryGetData<Vector2d>(out pos) && CanMove)
-			{
 
+			//if formal (going through normal Execute routes), do the group stuff
+			if (isFormal)
+			{
 				if (HasTarget)
 				{
 					cachedMove.RegisterGroup(false);
@@ -588,9 +587,21 @@ namespace Lockstep
 				else {
 					cachedMove.RegisterGroup();
 				}
+			}
+			else {
+				cachedMove.StartMove(position);
+			}
+			isAttackMoving = true;
+			isFocused = false;
+		}
+		protected override void OnExecute(Command com)
+		{
+			Vector2d pos;
+			DefaultData target;
+			if (com.TryGetData<Vector2d>(out pos) && CanMove)
+			{
 
-				isAttackMoving = true;
-				isFocused = false;
+				StartAttackMove(pos);
 
 			}
 			else if (com.TryGetData<DefaultData>(out target) && target.Is(DataType.UShort))

@@ -59,7 +59,7 @@ namespace Lockstep
 			}
 
 			_ranIndex = -1;
-			;
+
 			_isColliding = false;
 
 			DistX = 0;
@@ -133,8 +133,8 @@ namespace Lockstep
 		public void Deactivate()
 		{
 			if (IsColliding) {
-				Body1.NotifyContact(Body2, false, true);
-				Body2.NotifyContact(Body1, false, true);
+				Body1.NotifyContact(Body2, false, IsColliding);
+				Body2.NotifyContact(Body1, false, IsColliding);
 			}
 			Active = false;
 		}
@@ -146,7 +146,7 @@ namespace Lockstep
 
 
 
-			if (Body1.IsTrigger || Body2.IsTrigger)
+			if (!DoPhysics)
 				return;
 			
 			switch (LeCollisionType)
@@ -182,7 +182,7 @@ namespace Lockstep
 					bool applyVelocity = false;
 
                     //Resolving collision
-					if (Body1.Immovable && Body1.isActiveAndEnabled || (Body2.Immovable == false && Body1.Priority > Body2.Priority))
+					if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority))
 					{
 						Body2._position.x -= DistX;
 						Body2._position.y -= DistY;

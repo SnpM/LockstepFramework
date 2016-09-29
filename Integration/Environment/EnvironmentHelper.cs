@@ -24,13 +24,15 @@ namespace Lockstep
                 Debug.Log ("Please assign 'Saver Object'");
                 return;
             }
+			UnityEditor.Undo.RecordObject(this, "Save environment");
+
             InitializeEnvironmentFromObject();
             foreach (EnvironmentSaver saver in Savers) {
+				UnityEditor.Undo.RecordObject(saver, "Save " + saver.name);
                 saver.Save();
 				UnityEditor.EditorUtility.SetDirty(saver);
-				UnityEditor.EditorUtility.SetDirty(this);
-				UnityEditor.EditorUtility.SetDirty(this.gameObject);
             }
+			UnityEditor.EditorUtility.SetDirty(this);
         }
 
         protected void Awake()
@@ -55,7 +57,7 @@ namespace Lockstep
         private EnvironmentSaver[] _savers;
         public EnvironmentSaver[] Savers { get {return _savers;}}
 
-        protected override void OnInitialize()
+        protected override void OnEarlyInitialize()
         {
             foreach (EnvironmentSaver saver in Savers) {
                 saver.Apply ();
