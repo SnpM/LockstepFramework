@@ -17,6 +17,9 @@ namespace Lockstep
 {
 	public static class Pathfinder
 	{
+		public const int SmallSize = 2;
+		public const int MediumSize = 3;
+
 		#region Wrapper Variables
 
 		static GridNode node1;
@@ -82,9 +85,9 @@ namespace Lockstep
 				GridNode node = nodePath[i];
 
 				bool important = false;
-				if (unitSize <= 1) {
+				if (unitSize <= SmallSize) {
 					important = !node.Clearance;
-				} else if (unitSize <= 3) {
+				} else if (unitSize <= MediumSize) {
 					important = !node.ExtraClearance;
 				} else {
 					important = true;

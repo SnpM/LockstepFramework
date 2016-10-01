@@ -114,6 +114,8 @@ namespace Lockstep
         {
             VariableContainer.Reset();
             IsCasting = false;
+			IsFirstFrame = true;
+
             OnInitialize();
         }
 
@@ -121,8 +123,21 @@ namespace Lockstep
         {
         }
 
+		bool IsFirstFrame = true;
+		private void FirstFrame()
+		{
+			
+		}
+		protected virtual void OnFirstFrame()
+		{
+
+		}
         internal void Simulate()
         {
+			if (IsFirstFrame)
+			{
+				FirstFrame();
+			}
             TemplateSimulate ();
 
             OnSimulate();
