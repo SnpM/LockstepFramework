@@ -635,7 +635,7 @@ namespace Lockstep
 			if (CanSetVisualRotation && RotationalTransform != null) {
 				if (SetRotationBuffer) {
 					RotationalTransform.rotation =
-										   Quaternion.Lerp(lastVisualRot, visualRot, PhysicsManager.LerpTime);
+										   Quaternion.Lerp(lastVisualRot, visualRot, lerpTime);
 					SetRotationBuffer = lerpTime < 1f;
 
 				}

@@ -191,6 +191,10 @@ namespace Lockstep
 			GridNode.HeuristicTargetY = endNode.gridY;
 
 			GridNode.PrepareUnpassableCheck(unitSize); //Prepare Unpassable check optimizations
+			if (_endNode.Unpassable())
+			{
+				return false;
+			}
 			while (GridHeap.Count > 0) {
 				currentNode = GridHeap.RemoveFirst();
 #if false
