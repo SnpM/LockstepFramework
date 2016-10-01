@@ -126,7 +126,7 @@ namespace Lockstep
 		bool IsFirstFrame = true;
 		private void FirstFrame()
 		{
-			
+			OnFirstFrame();	
 		}
 		protected virtual void OnFirstFrame()
 		{
