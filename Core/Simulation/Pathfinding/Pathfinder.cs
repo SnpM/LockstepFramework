@@ -344,19 +344,19 @@ namespace Lockstep
 
 			currentNode = endNode;
 
-			GridNode oldNode = null;
+			//GridNode oldNode = null;
 
 			StartNodeIndex = startNode.gridIndex;
 			while (currentNode.gridIndex != StartNodeIndex) {
 				TracePath.Add(currentNode);
-				oldNode = currentNode;
+				//oldNode = currentNode;
 				currentNode = currentNode.parent;
 
 			}
 
 			currentNode = TracePath[TracePath.Count - 1];
 			for (i = TracePath.Count - 2; i >= 0; i--) {
-				oldNode = currentNode;
+				//oldNode = currentNode;
 				currentNode = TracePath.innerArray[i];
 				outputPath.Add(currentNode);
 			}
