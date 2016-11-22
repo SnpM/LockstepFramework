@@ -38,7 +38,7 @@ namespace Lockstep
             {
                 float scaler = (float)(ForeSight);
                 scaler -= 0;
-                scaler /= 16;
+                scaler /= 32;
                 Time.timeScale = 1 + scaler;
             } else
             {

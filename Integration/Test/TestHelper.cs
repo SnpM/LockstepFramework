@@ -47,7 +47,7 @@ namespace Lockstep
 
 		protected override void OnSimulate ()
 		{
-			if (!_enabled)
+			if (_enabled)
 				return;
 			ticker++;
 			if (ticker >= _checkFrameInterval) {

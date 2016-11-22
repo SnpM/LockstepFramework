@@ -17,6 +17,9 @@ namespace Lockstep
 {
 	public static class Pathfinder
 	{
+		public const int SmallSize = 2;
+		public const int MediumSize = 3;
+
 		#region Wrapper Variables
 
 		static GridNode node1;
@@ -82,9 +85,9 @@ namespace Lockstep
 				GridNode node = nodePath[i];
 
 				bool important = false;
-				if (unitSize <= 1) {
+				if (unitSize <= SmallSize) {
 					important = !node.Clearance;
-				} else if (unitSize <= 3) {
+				} else if (unitSize <= MediumSize) {
 					important = !node.ExtraClearance;
 				} else {
 					important = true;
@@ -188,6 +191,10 @@ namespace Lockstep
 			GridNode.HeuristicTargetY = endNode.gridY;
 
 			GridNode.PrepareUnpassableCheck(unitSize); //Prepare Unpassable check optimizations
+			if (_endNode.Unpassable())
+			{
+				return false;
+			}
 			while (GridHeap.Count > 0) {
 				currentNode = GridHeap.RemoveFirst();
 #if false
@@ -337,19 +344,19 @@ namespace Lockstep
 
 			currentNode = endNode;
 
-			GridNode oldNode = null;
+			//GridNode oldNode = null;
 
 			StartNodeIndex = startNode.gridIndex;
 			while (currentNode.gridIndex != StartNodeIndex) {
 				TracePath.Add(currentNode);
-				oldNode = currentNode;
+				//oldNode = currentNode;
 				currentNode = currentNode.parent;
 
 			}
 
 			currentNode = TracePath[TracePath.Count - 1];
 			for (i = TracePath.Count - 2; i >= 0; i--) {
-				oldNode = currentNode;
+				//oldNode = currentNode;
 				currentNode = TracePath.innerArray[i];
 				outputPath.Add(currentNode);
 			}

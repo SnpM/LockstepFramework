@@ -398,7 +398,7 @@ namespace Lockstep.Legacy
 
 		Vector3 lastVisualPos;
 		Quaternion lastVisualRot;
-		Quaternion visualRot = Quaternion.identity;
+		//Quaternion visualRot = Quaternion.identity;
 
 		public void Visualize ()
 		{
@@ -428,7 +428,7 @@ namespace Lockstep.Legacy
 				return;
 			}
 			var uBody = this.gameObject.AddComponent<UnityLSBody>();
-			var body = uBody.InternalBody;
+			//var body = uBody.InternalBody;
 			UnityEditor.SerializedObject so = new UnityEditor.SerializedObject(uBody);
 			SerializedProperty Shape;
 			//Enum
@@ -446,7 +446,7 @@ namespace Lockstep.Legacy
 			//long
 			SerializedProperty Immovable;
 			//bool
-			SerializedProperty Vertices;
+			//SerializedProperty Vertices;
 			//Vector2d[]
 			SerializedProperty Height;
 			//long
@@ -462,7 +462,7 @@ namespace Lockstep.Legacy
 			HalfHeight = so.FindProperty("_internalBody").FindPropertyRelative("_halfHeight");
 			Radius = so.FindProperty("_internalBody").FindPropertyRelative("_radius");
 			Immovable = so.FindProperty("_internalBody").FindPropertyRelative("_immovable");
-			Vertices = so.FindProperty("_internalBody").FindPropertyRelative("_vertices");
+			//Vertices = so.FindProperty("_internalBody").FindPropertyRelative("_vertices");
 			Height = so.FindProperty("_internalBody").FindPropertyRelative("_height");
 			PositionalTransform = so.FindProperty("_internalBody").FindPropertyRelative("_positionalTransform");
 			RotationalTransform = so.FindProperty("_internalBody").FindPropertyRelative("_rotationalTransform");

@@ -600,9 +600,11 @@ namespace Lockstep
 		private void DoSetVisualPosition(Vector3 pos)
 		{
 			if (this.CanSetVisualPosition) {
+
 				lastVisualPos = PositionalTransform.position;
 				_visualPosition = pos;
 				SetPositionBuffer = true;
+
 			}
 		}
 
@@ -621,18 +623,20 @@ namespace Lockstep
 
 		public void Visualize()
 		{
+			float lerpTime = PhysicsManager.LerpTime;
 			if (CanSetVisualPosition) {
 				if (SetPositionBuffer) {
-					PositionalTransform.position = Vector3.LerpUnclamped (lastVisualPos, _visualPosition, PhysicsManager.LerpTime);
-
+					
+					PositionalTransform.position = Vector3.Lerp (lastVisualPos, _visualPosition, lerpTime);
+					SetPositionBuffer = lerpTime < 1f;
 				}
 			}
 			//const float rotationLerpDamping = 1f;
 			if (CanSetVisualRotation && RotationalTransform != null) {
 				if (SetRotationBuffer) {
 					RotationalTransform.rotation =
-										   Quaternion.LerpUnclamped(lastVisualRot, visualRot, PhysicsManager.LerpTime);
-					SetRotationBuffer = PhysicsManager.LerpTime < 1f;
+										   Quaternion.Lerp(lastVisualRot, visualRot, lerpTime);
+					SetRotationBuffer = lerpTime < 1f;
 
 				}
 			}

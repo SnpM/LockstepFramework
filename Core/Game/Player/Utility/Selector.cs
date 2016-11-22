@@ -38,7 +38,6 @@ namespace Lockstep
 
 		public static void Add (LSAgent agent)
 		{
-
 			if (agent.IsSelected == false) {
 				agent.Controller.AddToSelection (agent);
 				agent.IsSelected = true;

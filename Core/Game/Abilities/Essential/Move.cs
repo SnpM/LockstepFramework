@@ -12,7 +12,7 @@ namespace Lockstep
 		private const int StuckTimeThreshold = LockstepManager.FrameRate;
 		private const int StuckRepathTries = 4;
 
-		public int GridSize { get { return (cachedBody.Radius * 2).RoundToInt(); } }
+		public int GridSize { get { return (cachedBody.Radius * 2).ToInt(); } }
 
 
 		public Vector2d Position { get { return cachedBody._position; } }

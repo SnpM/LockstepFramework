@@ -186,8 +186,8 @@ namespace Lockstep
 
 		internal bool Unpassable ()
 		{
-			if (CachedUnpassableCheckSize > 1) {
-				if (CachedUnpassableCheckSize > 3) {
+			if (CachedUnpassableCheckSize > Pathfinder.SmallSize) {
+				if (CachedUnpassableCheckSize > Pathfinder.MediumSize) {
 					return !ExtraClearance;
 				}
 				return !Clearance;
