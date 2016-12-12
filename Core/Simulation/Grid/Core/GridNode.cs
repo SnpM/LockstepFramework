@@ -8,7 +8,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
-
+using Lockstep.Pathfinding;
 namespace Lockstep
 {
 	public class GridNode
