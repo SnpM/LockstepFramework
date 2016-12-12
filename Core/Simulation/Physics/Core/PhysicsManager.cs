@@ -353,6 +353,10 @@ namespace Lockstep
 					body1 = body2;
 					body2 = temp;
 				}
+
+				if (!RequireCollisionPair(body1, body2))
+					return null;
+				
 				CollisionPair pair;
 				if (!body1.CollisionPairs.TryGetValue(body2.ID, out pair)) {
 					pair = CreatePair(body1, body2);
