@@ -175,10 +175,10 @@ namespace Lockstep
 
 		public long YMax { get; private set; }
 
-		public int PastGridXMin;
-		public int PastGridXMax;
-		public int PastGridYMin;
-		public int PastGridYMax;
+		public int PastGridXMin { get; set; }
+		public int PastGridXMax { get; set; }
+		public int PastGridYMin { get; set; }
+		public int PastGridYMax { get; set; }
 
 		public long HeightMin { get; private set; }
 
@@ -626,8 +626,8 @@ namespace Lockstep
 			float lerpTime = PhysicsManager.LerpTime;
 			if (CanSetVisualPosition) {
 				if (SetPositionBuffer) {
-					
-					PositionalTransform.position = Vector3.Lerp (lastVisualPos, _visualPosition, lerpTime);
+
+					PositionalTransform.position = Vector3.Lerp(lastVisualPos, _visualPosition, lerpTime);
 					SetPositionBuffer = lerpTime < 1f;
 				}
 			}

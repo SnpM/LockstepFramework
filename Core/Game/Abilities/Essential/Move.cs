@@ -9,7 +9,7 @@ namespace Lockstep
 		public const long GroupDirectStop = FixedMath.One;
 		public const long DirectStop = FixedMath.One / 8;
 		private const int MinimumOtherStopTime = (int)(LockstepManager.FrameRate / 4);
-		private const int StuckTimeThreshold = LockstepManager.FrameRate;
+		private const int StuckTimeThreshold = LockstepManager.FrameRate / 4;
 		private const int StuckRepathTries = 4;
 
 		public int GridSize { get { return (cachedBody.Radius * 2).ToInt(); } }
@@ -199,35 +199,41 @@ namespace Lockstep
 						DoPathfind = false;
 						if (viableDestination) {
 							if (Pathfinder.GetPathNode (cachedBody._position.x, cachedBody._position.y, out currentNode)) {
-								if (straightPath) {
-									if (Pathfinder.NeedsPath (currentNode, destinationNode, this.GridSize)) {
-										if (Pathfinder.FindPath (Destination, currentNode, destinationNode, myPath, 
-											GridSize)) {
-											hasPath = true;
-											pathIndex = 0;
-										} else {
-											if (IsFormationMoving) {
-												StartMove (MyMovementGroup.Destination);
-												IsFormationMoving = false;
-											}
-										}
-										straightPath = false;
-									} else {
+								if (currentNode.DoesEqual(this.destinationNode)) {
+									if (this.RepathTries >= 1) {
+										this.Arrive();
 									}
 								} else {
-									if (Pathfinder.NeedsPath (currentNode, destinationNode, this.GridSize)) {
-										if (Pathfinder.FindPath (Destination, currentNode, destinationNode, myPath,
-											GridSize)) {
-											hasPath = true;
-											pathIndex = 0;
-										} else {
-											if (IsFormationMoving) {
-												StartMove (MyMovementGroup.Destination);
-												IsFormationMoving = false;
+									if (straightPath) {
+										if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize)) {
+											if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath,
+												GridSize)) {
+												hasPath = true;
+												pathIndex = 0;
+											} else {
+												if (IsFormationMoving) {
+													StartMove(MyMovementGroup.Destination);
+													IsFormationMoving = false;
+												}
 											}
+											straightPath = false;
+										} else {
 										}
 									} else {
-										straightPath = true;
+										if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize)) {
+											if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath,
+												GridSize)) {
+												hasPath = true;
+												pathIndex = 0;
+											} else {
+												if (IsFormationMoving) {
+													StartMove(MyMovementGroup.Destination);
+													IsFormationMoving = false;
+												}
+											}
+										} else {
+											straightPath = true;
+										}
 									}
 								}
 							} else {

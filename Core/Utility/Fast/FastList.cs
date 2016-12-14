@@ -17,7 +17,7 @@ namespace Lockstep
 		public T[] innerArray;
         public int Count {get; private set;} //Also the index of the next element to be added
 		public int Capacity = DefaultCapacity;
-		 
+		public bool IsValueType { get; private set;}
 		public FastList (FastList<T> CopyList)
 		{
 			innerArray = (T[])CopyList.innerArray.Clone ();
@@ -35,17 +35,21 @@ namespace Lockstep
 		public FastList (int StartCapacity)
 		{
 			Capacity = StartCapacity;
+			innerArray = new T[Capacity];
+
 			Initialize ();
 		}
 		public FastList ()
 		{
+			innerArray = new T[Capacity];
 			Initialize ();
 		}
 
 		private void Initialize ()
 		{
-			innerArray = new T[Capacity];
+			
 			Count = 0;
+			this.IsValueType = typeof(T).IsValueType;
 		}
 
 		public void Add (T item)
@@ -152,9 +156,12 @@ namespace Lockstep
 
 		public void Clear ()
 		{
-			for (int i = 0; i < Capacity; i++)
-			{
-				innerArray[i] = default(T);
+			if (this.IsValueType) {
+				FastClear();
+			} else {
+				for (int i = 0; i < Capacity; i++) {
+					innerArray[i] = default(T);
+				}
 			}
 			Count = 0;
 		}

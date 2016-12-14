@@ -46,11 +46,6 @@ namespace Lockstep.Pathfinding
 
 		#region Broadphase variables
 
-		static int x0, y0, x1, y1;
-		static int dx, dy, error, ystep, x, y, t;
-		static int compare1, compare2;
-		static int retX, retY;
-		static bool steep;
 
 		#endregion
 
@@ -60,7 +55,7 @@ namespace Lockstep.Pathfinding
 		{
 			if (!GetPathNodes(Start.x, Start.y, End.x, End.y, out node1, out node2))
 				return false;
-			if (FindPath(node1, node2, OutputPath, unitSize)) {
+			if (FindRawPath(node1, node2, OutputPath, unitSize)) {
 				SmoothPath(OutputPath, End, outputVectorPath, unitSize);
 				return true;
 			}
@@ -125,7 +120,7 @@ namespace Lockstep.Pathfinding
 		public static bool FindPath(Vector2d End, GridNode startNode, GridNode endNode, FastList<Vector2d> outputVectorPath, int unitSize = 1)
 		{
 
-			if (FindPath(startNode, endNode, OutputPath, unitSize)) {
+			if (FindRawPath(startNode, endNode, OutputPath, unitSize)) {
 				SmoothPath(OutputPath, End, outputVectorPath, unitSize);
 
 				return true;
@@ -158,7 +153,7 @@ namespace Lockstep.Pathfinding
 		/// <param name="startNode">Start node.</param>
 		/// <param name="endNode">End node.</param>
 		/// <param name="outputPath">Return path.</param>
-		public static bool FindPath(GridNode _startNode, GridNode _endNode, FastList<GridNode> _outputPath, int _unitSize = 1)
+		public static bool FindRawPath(GridNode _startNode, GridNode _endNode, FastList<GridNode> _outputPath, int _unitSize = 1)
 		{
 			startNode = _startNode;
 			endNode = _endNode;
@@ -191,7 +186,7 @@ namespace Lockstep.Pathfinding
 			GridNode.HeuristicTargetY = endNode.gridY;
 
 			GridNode.PrepareUnpassableCheck(unitSize); //Prepare Unpassable check optimizations
-			if (_endNode.Unpassable())
+			if (_endNode.Unwalkable)
 			{
 				return false;
 			}
@@ -200,7 +195,6 @@ namespace Lockstep.Pathfinding
 #if false
 				Gizmos.DrawCube(currentNode.WorldPos.ToVector3(), Vector3.one);
 #endif
-				GridClosedSet.Add(currentNode);
 
 				if (currentNode.gridIndex == endNode.gridIndex) {
 					//Retraces the path then outputs it into outputPath
@@ -287,6 +281,8 @@ namespace Lockstep.Pathfinding
 						}
 					}
 				}
+				GridClosedSet.Add(currentNode);
+
 			}
 			#endregion
 			return false;
@@ -307,12 +303,12 @@ namespace Lockstep.Pathfinding
 
 		static bool CheckInvalid(GridNode gridNode)
 		{
-			return gridNode.IsNull() || gridNode.Unpassable() || GridClosedSet.Contains(gridNode);
+			return gridNode.IsNull() ||  GridClosedSet.Contains(gridNode) || gridNode.Unpassable();
 		}
 
 		static bool CheckNeighborInvalid()
 		{
-			return neighbor.IsNull() || neighbor.Unpassable() || GridClosedSet.Contains(neighbor);
+			return neighbor.IsNull() || GridClosedSet.Contains(neighbor) || neighbor.Unpassable();
 		}
 
 		static void AnalyzeNode()
@@ -364,6 +360,12 @@ namespace Lockstep.Pathfinding
 
 		public static bool NeedsPath(GridNode startNode, GridNode endNode, int unitSize)
 		{
+			int dx, dy, error, ystep, x, y, t;
+			int x0, y0, x1, y1;
+			int compare1, compare2;
+			int retX, retY;
+			bool steep;
+
 			//Tests if there is a direct path. If there is, no need to run AStar.
 			x0 = startNode.gridX;
 			y0 = startNode.gridY;
@@ -458,29 +460,55 @@ namespace Lockstep.Pathfinding
 
 		static int xSign, ySign;
 
-		public static bool GetPathNode(long X, long Y, out GridNode returnNode)
+		public static bool GetPathNode(long x, long y, out GridNode returnNode)
 		{
-			returnNode = GridManager.GetNode(X, Y);
-			if (returnNode == null) {
-				return false;
-			}
-			if (returnNode.Unwalkable) {
-				xSign = X > returnNode.WorldPos.x ? 1 : -1;
-				ySign = Y > returnNode.WorldPos.y ? 1 : -1;
+			pathNodeX = x;
+			pathNodeY = y;
+			returnNode = GridManager.GetNode(x, y);
 
-				currentNode = GridManager.GetNode(returnNode.gridX + xSign, returnNode.gridY);
-				if (currentNode == null || currentNode.Unwalkable) {
-					currentNode = GridManager.GetNode(returnNode.gridX, returnNode.gridY + ySign);
-					if (currentNode == null || currentNode.Unwalkable) {
-						currentNode = GridManager.GetNode(returnNode.gridX + xSign, returnNode.gridY + ySign);
-						if (currentNode == null || currentNode.Unwalkable) {
-							return false;
-						}
-					}
+			if (returnNode == null || returnNode.Unwalkable) {
+				int xGrid, yGrid;
+				GridManager.GetCoordinates(x, y, out xGrid, out yGrid);
+				const int maxTestDistance = 3;
+				closestNode = null;
+
+				//raycast on grid in 4 direction: Left, right, up, and down
+				for (int i = xGrid - 1; i >= xGrid - maxTestDistance; i--) {
+					CheckPathNode(GridManager.GetNode(i, yGrid));
 				}
-				returnNode = currentNode;
+
+				for (int i = xGrid + 1; i <= xGrid + maxTestDistance; i++) {
+					CheckPathNode(GridManager.GetNode(i, yGrid));
+				}
+				for (int i = yGrid + 1; i <= yGrid + maxTestDistance; i++) {
+					CheckPathNode(GridManager.GetNode(xGrid, i));
+				}
+
+				for (int i = yGrid - 1; i >= yGrid - maxTestDistance; i--) {
+					CheckPathNode(GridManager.GetNode(xGrid, i));
+				}
+
+				if (closestNode == null) {
+					return false;
+				}
+				returnNode = closestNode;
 			}
+
 			return true;
+		}
+		static long pathNodeX, pathNodeY;
+		static GridNode closestNode;
+		static long closestSqrDistance;
+		static bool castNodeFound ;
+		static void CheckPathNode(GridNode node)
+		{
+			if (node != null && node.Unwalkable == false) {
+				long distance = node.WorldPos.SqrDistance(pathNodeX, pathNodeY);
+				if (closestNode == null || distance < closestSqrDistance) {
+					closestNode = node;
+					closestSqrDistance = distance;
+				}
+			}
 		}
 
 
