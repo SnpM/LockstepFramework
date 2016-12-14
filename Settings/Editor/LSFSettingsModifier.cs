@@ -7,7 +7,12 @@ namespace Lockstep.Data {
         internal static void Save () {
 			if (EditorLSDatabaseWindow.CanSave) {
 				EditorUtility.SetDirty (LSFSettingsManager.GetSettings ());
-                EditorApplication.SaveAssets ();
+
+				#if UNITY_5_5_OR_NEWER
+				AssetDatabase.SaveAssets ();
+				#else
+				EditorApplication.SaveAssets ();
+				#endif
 				AssetDatabase.Refresh ();
 			}
         }
