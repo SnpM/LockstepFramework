@@ -311,7 +311,14 @@ namespace Lockstep
 			temp2 *= temp2;
 			return (temp1 + temp2);
 		}
-
+		public long FastDistance(Vector2d other)
+		{
+			temp1 = this.x - other.x;
+			temp1 *= temp1;
+			temp2 = this.y - other.y;
+			temp2 *= temp2;
+			return (temp1 + temp2);
+		}
 		public bool NotZero()
 		{
 			return x.MoreThanEpsilon() || y.MoreThanEpsilon();

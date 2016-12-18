@@ -186,8 +186,7 @@ namespace Lockstep.Pathfinding
 			GridNode.HeuristicTargetY = endNode.gridY;
 
 			GridNode.PrepareUnpassableCheck(unitSize); //Prepare Unpassable check optimizations
-			if (_endNode.Unwalkable)
-			{
+			if (_endNode.Unwalkable) {
 				return false;
 			}
 			while (GridHeap.Count > 0) {
@@ -238,7 +237,7 @@ namespace Lockstep.Pathfinding
 				}
 
 				if (hasInvalidEdge) {
-					const int maxCornerObstructions = 1;
+					const int maxCornerObstructions = 2;
 					#region inlining diagonals
 					neighbor = currentNode.NeighborNodes[4];
 					if (!CheckNeighborInvalid()) {
@@ -303,7 +302,7 @@ namespace Lockstep.Pathfinding
 
 		static bool CheckInvalid(GridNode gridNode)
 		{
-			return gridNode.IsNull() ||  GridClosedSet.Contains(gridNode) || gridNode.Unpassable();
+			return gridNode.IsNull() || GridClosedSet.Contains(gridNode) || gridNode.Unpassable();
 		}
 
 		static bool CheckNeighborInvalid()
@@ -475,17 +474,22 @@ namespace Lockstep.Pathfinding
 				//raycast on grid in 4 direction: Left, right, up, and down
 				for (int i = xGrid - 1; i >= xGrid - maxTestDistance; i--) {
 					CheckPathNode(GridManager.GetNode(i, yGrid));
+					if (castNodeFound) break;
 				}
 
 				for (int i = xGrid + 1; i <= xGrid + maxTestDistance; i++) {
 					CheckPathNode(GridManager.GetNode(i, yGrid));
+					if (castNodeFound) break;
+
 				}
 				for (int i = yGrid + 1; i <= yGrid + maxTestDistance; i++) {
 					CheckPathNode(GridManager.GetNode(xGrid, i));
+					if (castNodeFound) break;
 				}
 
 				for (int i = yGrid - 1; i >= yGrid - maxTestDistance; i--) {
 					CheckPathNode(GridManager.GetNode(xGrid, i));
+					if (castNodeFound) break;
 				}
 
 				if (closestNode == null) {
@@ -498,15 +502,18 @@ namespace Lockstep.Pathfinding
 		}
 		static long pathNodeX, pathNodeY;
 		static GridNode closestNode;
-		static long closestSqrDistance;
-		static bool castNodeFound ;
+		static long closestDistance;
+		static bool castNodeFound;
 		static void CheckPathNode(GridNode node)
 		{
 			if (node != null && node.Unwalkable == false) {
-				long distance = node.WorldPos.SqrDistance(pathNodeX, pathNodeY);
-				if (closestNode == null || distance < closestSqrDistance) {
+				long distance = node.WorldPos.FastDistance(pathNodeX, pathNodeY);
+				if (closestNode == null || distance < closestDistance) {
 					closestNode = node;
-					closestSqrDistance = distance;
+					closestDistance = distance;
+					castNodeFound = true;
+				} else {
+					castNodeFound = false;
 				}
 			}
 		}
