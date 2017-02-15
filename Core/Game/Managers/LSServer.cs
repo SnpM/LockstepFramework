@@ -25,6 +25,7 @@ namespace Lockstep
             InitedPlayerCount = 0;
 			InfluenceFrameCount = 0;
 			GameStarted = false;
+			bufferBytes.EnsureCapacity(4096);
 		}
 
 		public static void Deactivate()
