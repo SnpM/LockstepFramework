@@ -333,6 +333,8 @@ namespace Lockstep
 
 		private Vector2d[] RotatedPoints;
 
+		private Vector3 velocityPosition;
+
 		#endregion
 		public void Setup(LSAgent agent)
 		{
@@ -452,6 +454,7 @@ namespace Lockstep
 			} else {
 				CanSetVisualRotation = false;
 			}
+			velocityPosition = Vector3.zero;
 		}
 
 		void CheckVariables()
@@ -590,11 +593,14 @@ namespace Lockstep
 				DoSetVisualPosition(
 					_position.ToVector3(HeightPos.ToFloat())
 				);
+				PositionalTransform.position = Vector3.SmoothDamp(lastVisualPos, _visualPosition, ref velocityPosition, 0.032f);
 			}
 
 			if (this.SetVisualRotation) {
 				this.DoSetVisualRotation(_rotation);
+				RotationalTransform.rotation = Quaternion.Slerp(lastVisualRot, visualRot, 1f/0.032f * Time.deltaTime);
 			}
+
 		}
 
 		private void DoSetVisualPosition(Vector3 pos)
@@ -621,26 +627,26 @@ namespace Lockstep
 		Quaternion lastVisualRot;
 		Quaternion visualRot = Quaternion.identity;
 
-		public void Visualize()
-		{
-			float lerpTime = PhysicsManager.LerpTime;
-			if (CanSetVisualPosition) {
-				if (SetPositionBuffer) {
-
-					PositionalTransform.position = Vector3.Lerp(lastVisualPos, _visualPosition, lerpTime);
-					SetPositionBuffer = lerpTime < 1f;
-				}
-			}
-			//const float rotationLerpDamping = 1f;
-			if (CanSetVisualRotation && RotationalTransform != null) {
-				if (SetRotationBuffer) {
-					RotationalTransform.rotation =
-										   Quaternion.Lerp(lastVisualRot, visualRot, lerpTime);
-					SetRotationBuffer = lerpTime < 1f;
-
-				}
-			}
-		}
+//		public void Visualize()
+//		{
+//			float lerpTime = PhysicsManager.LerpTime;
+//			if (CanSetVisualPosition) {
+//				if (SetPositionBuffer) {
+//
+//					PositionalTransform.position = Vector3.Lerp(lastVisualPos, _visualPosition, lerpTime);
+//					SetPositionBuffer = lerpTime < 1f;
+//				}
+//			}
+//			//const float rotationLerpDamping = 1f;
+//			if (CanSetVisualRotation && RotationalTransform != null) {
+//				if (SetRotationBuffer) {
+//					RotationalTransform.rotation =
+//										   Quaternion.Lerp(lastVisualRot, visualRot, lerpTime);
+//					SetRotationBuffer = lerpTime < 1f;
+//
+//				}
+//			}
+//		}
 
 		public void LerpOverReset()
 		{
