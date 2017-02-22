@@ -16,6 +16,10 @@ MonoBehaviour:
     _description: 
     _icon: {fileID: 0}
     _prefab: {fileID: 100310, guid: 7adf26d256267454bb6f9b55470051d7, type: 2}
+  - _name: AppleBus
+    _description: 
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1876718346873872, guid: 99c20989c0b364d5091d8aa7e96dc231, type: 2}
   _inputData:
   - _name: Special1
   - _name: Special2
