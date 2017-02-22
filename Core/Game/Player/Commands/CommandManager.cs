@@ -43,7 +43,6 @@ namespace Lockstep
                 throw new System.Exception("Packet is null or not valid length");
             }
             int frameCount = BitConverter.ToInt32(packet.innerArray, 0);
-
             int index = 4;
 
             Frame frame = new Frame();

@@ -105,6 +105,7 @@ namespace Lockstep
 
         public static Command GetProcessInterfacer(AbilityDataItem facer)
         {
+
             if (facer == null)
             {
                 Debug.LogError("Boom");
@@ -114,7 +115,8 @@ namespace Lockstep
             {
                 case InformationGatherType.Position:
                     curCom = new Command(facer.ListenInputID);
-                    curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
+					curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
+				CommandManager.SendCommand (curCom);
                     break;
                 case InformationGatherType.Target:
                     curCom = new Command(facer.ListenInputID);

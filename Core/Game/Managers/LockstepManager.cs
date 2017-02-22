@@ -31,7 +31,7 @@ using System;
 namespace Lockstep
 {
 	//TODO: Set up default functions to implement LSManager
-	public static class LockstepManager
+	public static class  LockstepManager
 	{
 
 		public static MonoBehaviour UnityInstance { get; private set; }

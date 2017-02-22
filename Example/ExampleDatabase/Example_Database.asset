@@ -29,6 +29,7 @@ MonoBehaviour:
   - _name: Item2
   - _name: Item3
   - _name: Item4
+  - _name: Spawn
   _projectileData:
   - _name: TestBullet
     _description: 
@@ -62,6 +63,13 @@ MonoBehaviour:
     _icon: {fileID: 0}
     _script:
       _classRef: Lockstep.DurationAbility, Assembly-CSharp
+    _listenInputCode: 
+    _informationGather: 0
+  - _name: newability
+    _description: 
+    _icon: {fileID: 0}
+    _script:
+      _classRef: newability, Assembly-CSharp
     _listenInputCode: 
     _informationGather: 0
   _unitConfigElementData: []
