@@ -116,7 +116,6 @@ namespace Lockstep
                 case InformationGatherType.Position:
                     curCom = new Command(facer.ListenInputID);
 					curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
-				CommandManager.SendCommand (curCom);
                     break;
                 case InformationGatherType.Target:
                     curCom = new Command(facer.ListenInputID);
