@@ -309,7 +309,7 @@ MonoBehaviour:
     RealPoints: []
     Edges: []
     EdgeNorms: []
-    _shape: 0
+    _shape: 1
     _isTrigger: 0
     _layer: 0
     _halfWidth: 32768
@@ -318,7 +318,7 @@ MonoBehaviour:
     _immovable: 0
     _basePriority: 0
     _vertices: []
-    _height: 65536
+    _height: 78643
     _positionalTransform: {fileID: 4808829632288560}
     _rotationalTransform: {fileID: 4808829632288560}
     _rotationOffset: {x: 0, y: 0, z: 0}
