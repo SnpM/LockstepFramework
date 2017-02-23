@@ -47,9 +47,8 @@ namespace Lockstep
 
             Frame frame = new Frame();
 
-            if (packet.Count > 4)
+            if (packet.Count > 4 && packet.Count > 5)
             {
-
 				while (index < packet.Count)
                 {
                     Command com = new Command();
