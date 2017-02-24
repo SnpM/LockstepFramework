@@ -47,8 +47,8 @@ namespace Lockstep
 
             Frame frame = new Frame();
 
-			// packet.Count > 5 is a guard for random byte bug with DarkRift
-            if (packet.Count > 4 && packet.Count > 5)
+			// packet.Count > 6 is a guard for random extra bytes bug with DarkRift implementation
+            if (packet.Count > 4 && packet.Count > 6)
             {
 				while (index < packet.Count)
                 {
