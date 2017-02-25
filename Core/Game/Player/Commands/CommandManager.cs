@@ -79,7 +79,6 @@ namespace Lockstep
 			if (bufferedBytes.Count > 0)
 			{
 				ClientManager.Distribute(bufferedBytes.ToArray());
-				Debug.Log ("sent: " + bufferedBytes.PrintAll ());
 
 				bufferedBytes.FastClear();
 			}
