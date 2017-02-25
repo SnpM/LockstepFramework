@@ -57,7 +57,7 @@ namespace Lockstep
 					CodeIndexMap.Add (agentCode, (ushort)i);
 				}
 			} else {
-				Debug.Log ("Database does no provide AgentData. Make sure it implements IAgentDataProvider.");
+				Debug.Log ("Database does not provide AgentData. Make sure it implements IAgentDataProvider.");
 			}
 		}
 
