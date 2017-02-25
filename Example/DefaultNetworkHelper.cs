@@ -2,7 +2,7 @@
 using System.Collections;
 
 namespace Lockstep.NetworkHelpers {
-    public class ExampleNetworkHelper : NetworkHelper {
+    public class DefaultNetworkHelper : NetworkHelper {
         public override void Connect (string ip) {
 
         }
