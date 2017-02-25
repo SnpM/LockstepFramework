@@ -2,6 +2,7 @@
 using System.Collections;
 using Lockstep;
 using System.Collections.Generic;
+using Lockstep.Data;
 namespace Lockstep
 {
     public class DefaultSaver : EnvironmentSaver
@@ -13,10 +14,19 @@ namespace Lockstep
         private EnvironmentObject[] _environmentObjects;
         public EnvironmentObject[] EnvironmentObjects {get {return _environmentObjects;}}
 
+		[SerializeField]
+		private EnvironmentAgentInfo [] _environmentAgents;
+		public EnvironmentAgentInfo [] EnvironmentAgents {
+			get {
+				return _environmentAgents;
+			}
+		}
 
         protected override void OnSave () {
             SaveBodies ();
             SaveObjects ();
+			SaveAgents ();
+
         }
 
         protected override void OnApply () {
@@ -34,6 +44,12 @@ namespace Lockstep
             foreach (EnvironmentObject obj in EnvironmentObjects) {
                 obj.LateInitialize();
             }
+			foreach (var agentInfo in EnvironmentAgents) {
+				AgentController.DefaultController.AddAgent (agentInfo.Agent);
+				agentInfo.Agent.Setup (AgentController.GetAgentInterfacer (agentInfo.AgentCode));
+				agentInfo.Agent.Initialize (agentInfo.Position.ToVector2d(), agentInfo.Rotation);
+				agentInfo.Agent.Body.HeightPos = agentInfo.Position.z;
+			}
         }
 
         void SaveBodies () {
@@ -70,6 +86,45 @@ namespace Lockstep
 #endif
 			}
         }
+
+		void SaveAgents ()
+		{
+			#if UNITY_EDITOR
+			LSAgent [] allAgents = GameObject.FindObjectsOfType<LSAgent> ();
+			FastList<EnvironmentAgentInfo> agentsBuffer = new FastList<EnvironmentAgentInfo> ();
+			
+			IAgentDataProvider database;
+
+			if (LSDatabaseManager.TryGetDatabase<IAgentDataProvider> (out database)) {
+				var agentData = database.AgentData;
+				Dictionary<GameObject, string> prefabCodeMap = new Dictionary<GameObject, string> ();
+				foreach (var item in agentData) {
+					prefabCodeMap.Add (item.GetAgent ().gameObject, item.Name);
+				}
+				foreach (var agent in allAgents) {
+					GameObject prefab = UnityEditor.PrefabUtility.GetPrefabParent (agent.gameObject) as GameObject;
+					string agentCode;
+					if (prefabCodeMap.TryGetValue (prefab, out agentCode)) {
+					
+						Vector3d pos = new Vector3d (agent.transform.position);
+						Vector2d rot = Vector2d.CreateRotation (agent.transform.eulerAngles.y * Mathf.Deg2Rad);
+						EnvironmentAgentInfo agentInfo = new EnvironmentAgentInfo (
+							agentCode,
+							agent,
+							pos,
+							rot
+						);
+						agentsBuffer.Add (agentInfo);
+					} else {
+						Debug.LogError (agent + " does not exist in 'Agents' database");
+					}
+				}
+				this._environmentAgents = agentsBuffer.ToArray ();
+			} else {
+				Debug.LogError ("No database");
+			}
+			#endif
+		}
         static bool IsAgent (object obj) {
             MonoBehaviour mb = obj as MonoBehaviour;
             if (mb.IsNull()) return false;

@@ -14,7 +14,10 @@ namespace Lockstep.Data {
 
         public static LSDatabase CurrentDatabase {
             get {
-                return _currentDatabase/* ?? (_currentDatabase = (LSDatabase)Resources.Load<LSDatabase> (LSDatabaseManager.DATABASE_NAME))*/;
+				if (_currentDatabase == null) {
+					Setup ();
+				}
+				return _currentDatabase;
             }
         }
 

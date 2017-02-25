@@ -42,6 +42,7 @@ namespace Lockstep
 
         static void Setup()
         {
+
             QuickPos = AbilityDataItem.FindInterfacer("Move");
             QuickTarget = AbilityDataItem.FindInterfacer("Scan");
 
@@ -90,8 +91,7 @@ namespace Lockstep
                     {
                         //LSAgent target;
                         if (RTSInterfacing.MousedAgent.IsNotNull() &&
-                        /*PlayerManager.GetAllegiance(RTSInterfacing.MousedAgent) == AllegianceType.Enemy &&*/ 
-                        Selector.MainSelectedAgent.GetAbility<Scan>() != null)
+						    Selector.MainSelectedAgent.GetAbility<Scan>() != null)
                         {
                             ProcessInterfacer((QuickTarget));
                         } else
@@ -108,7 +108,7 @@ namespace Lockstep
 
             if (facer == null)
             {
-                Debug.LogError("Boom");
+                Debug.LogError("Interfacer does not exist. Can't generate command.");
                 return null;
             }
             switch (facer.InformationGather)

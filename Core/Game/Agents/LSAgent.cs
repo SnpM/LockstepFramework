@@ -295,6 +295,7 @@ namespace Lockstep
 
 			this.RegisterLockstep();
 
+			Setuped = true;
 
 		}
 		private void RegisterLockstep()
@@ -339,6 +340,7 @@ namespace Lockstep
 			this.GlobalID = globalID;
 		}
 
+		bool Setuped;
 		public void Initialize(
 			Vector2d position = default(Vector2d),
 			Vector2d rotation = default(Vector2d))

@@ -107,6 +107,8 @@ namespace Lockstep
 				}
 			}
             
+						AgentController.DefaultController = AgentController.Create ();
+
 		}
 
 		internal static FastBucket<LSAgent> DeathingAgents = new FastBucket<LSAgent> ();
@@ -315,6 +317,7 @@ namespace Lockstep
 			return hash;
 		}
 
+		public static AgentController DefaultController { get; private set;}
 		public static FastList<AgentController> InstanceManagers = new FastList<AgentController> ();
 		public readonly FastBucket<LSAgent> SelectedAgents = new FastBucket<LSAgent> ();
 

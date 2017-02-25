@@ -21,18 +21,8 @@ MonoBehaviour:
     _icon: {fileID: 0}
     _prefab: {fileID: 1876718346873872, guid: 99c20989c0b364d5091d8aa7e96dc231, type: 2}
   _inputData:
-  - _name: Special1
-  - _name: Special2
-  - _name: Special3
-  - _name: Special4
-  - _name: Core1
-  - _name: Core2
-  - _name: Core3
-  - _name: Core4
-  - _name: Item1
-  - _name: Item2
-  - _name: Item3
-  - _name: Item4
+  - _name: Attack
+  - _name: Move
   - _name: Spawn
   _projectileData:
   - _name: TestBullet
@@ -46,14 +36,14 @@ MonoBehaviour:
     _icon: {fileID: 0}
     _script:
       _classRef: Lockstep.Move, Assembly-CSharp
-    _listenInputCode: Core3
+    _listenInputCode: Move
     _informationGather: 1
   - _name: Scan
     _description: 
     _icon: {fileID: 0}
     _script:
       _classRef: Lockstep.Scan, Assembly-CSharp
-    _listenInputCode: Core1
+    _listenInputCode: Attack
     _informationGather: 3
   - _name: Stop
     _description: 
@@ -67,13 +57,6 @@ MonoBehaviour:
     _icon: {fileID: 0}
     _script:
       _classRef: Lockstep.DurationAbility, Assembly-CSharp
-    _listenInputCode: 
-    _informationGather: 0
-  - _name: newability
-    _description: 
-    _icon: {fileID: 0}
-    _script:
-      _classRef: newability, Assembly-CSharp
     _listenInputCode: 
     _informationGather: 0
   _unitConfigElementData: []
