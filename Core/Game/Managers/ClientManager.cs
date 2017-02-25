@@ -59,6 +59,7 @@ namespace Lockstep
 			NetworkHelper = networkHelper;
 			NetworkHelper.OnFrameData += HandleFrameData;
 			NetworkHelper.OnInitData += HandleInitData;
+			NetworkHelper.Initialize ();
 
 			LSServer.Initialize();
 			GameStarted = false;
