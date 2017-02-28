@@ -77,8 +77,11 @@ namespace Lockstep
 		{
 			SendMessageToServer(MessageType.Register, new byte[1]);
 		}
+		static System.DateTime lastReceivedTime;
 		public static void HandleFrameData(byte[] data)
 		{
+			var cur = System.DateTime.Now;
+			lastReceivedTime = cur;
 			if (GameStarted)
 			{
 				CommandManager.ProcessPacket((byte[])data);

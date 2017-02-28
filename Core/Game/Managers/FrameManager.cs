@@ -32,14 +32,34 @@ namespace Lockstep
                 _adjustFramerate = value;
             }
         }
+
+		static float jitterFactor = 0f;
+		static float lastScaler = 1f;
+		/// <summary>
+		/// Tweaks how fast to run frames based on network quality.
+		/// </summary>
         public static void TweakFramerate()
         {
+			const int rate = LockstepManager.FrameRate;
             if (AdjustFramerate)
             {
                 float scaler = (float)(ForeSight);
-                scaler -= 0;
-                scaler /= 32;
-                Time.timeScale = 1 + scaler;
+				if (Mathf.Abs (scaler - lastScaler) > 0)
+					jitterFactor = Mathf.Lerp (jitterFactor, Mathf.Abs (scaler - lastScaler), .1f);
+				else
+					jitterFactor = Mathf.Lerp (jitterFactor, 0, .04f);
+				Debug.Log ("jitter: " + jitterFactor.ToString());
+				lastScaler = scaler;
+
+				if (scaler < rate / 4) {
+					float jitterEffect = Mathf.Max (jitterFactor, 0);
+					jitterEffect *= rate / 4;
+					Debug.Log (jitterEffect);
+					scaler -= jitterEffect;
+				}
+				
+                scaler /= rate;
+				Time.timeScale = 1 + scaler;
             } else
             {
                 //Time.timeScale = 1f;
