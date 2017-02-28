@@ -52,7 +52,6 @@ namespace Lockstep
 				lastScaler = scaler;
 
 					float jitterEffect = Mathf.Max (jitterFactor, 0);
-					jitterEffect *= rate / 4;
 					Debug.Log (jitterEffect);
 					scaler -= jitterEffect;
 				
