@@ -51,15 +51,14 @@ namespace Lockstep
 				Debug.Log ("jitter: " + jitterFactor.ToString());
 				lastScaler = scaler;
 
-				if (scaler < rate / 4) {
 					float jitterEffect = Mathf.Max (jitterFactor, 0);
 					jitterEffect *= rate / 4;
 					Debug.Log (jitterEffect);
 					scaler -= jitterEffect;
-				}
+				
 				
                 scaler /= rate;
-				Time.timeScale = 1 + scaler;
+				Time.timeScale = Mathf.Lerp (Time.timeScale, 1 + scaler, 1 / (float)rate);
             } else
             {
                 //Time.timeScale = 1f;
