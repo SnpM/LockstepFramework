@@ -593,7 +593,7 @@ namespace Lockstep
 				DoSetVisualPosition(
 					_position.ToVector3(HeightPos.ToFloat())
 				);
-				PositionalTransform.position = Vector3.SmoothDamp (lastVisualPos, _visualPosition, ref velocityPosition,  Time.fixedDeltaTime);
+				PositionalTransform.position = Vector3.SmoothDamp (lastVisualPos, _visualPosition, ref velocityPosition, PhysicsManager.LerpTime);
 			}
 
 			if (this.SetVisualRotation) {
