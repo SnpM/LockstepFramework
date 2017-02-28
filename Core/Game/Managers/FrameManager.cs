@@ -47,7 +47,7 @@ namespace Lockstep
 				if (Mathf.Abs (scaler - lastScaler) > 0)
 					jitterFactor = Mathf.Lerp (jitterFactor, Mathf.Abs (scaler - lastScaler), .1f);
 				else
-					jitterFactor = Mathf.Lerp (jitterFactor, 0, .04f);
+					jitterFactor = Mathf.Lerp (jitterFactor, 0, .001f);
 				Debug.Log ("jitter: " + jitterFactor.ToString());
 				lastScaler = scaler;
 
