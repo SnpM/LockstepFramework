@@ -6,7 +6,15 @@ namespace Lockstep
 	[System.Serializable]
 	public class LSNetworkSettings
 	{
-		public static LSNetworkSettings Settings { get; set; }
+		private static LSNetworkSettings _settings;
+		public static LSNetworkSettings Settings {
+			get {
+				return _settings ?? (_settings = new LSNetworkSettings ());
+			}
+			set {
+				_settings = value;
+			}
+		}
 		public JitterSettings JitterSettings = new JitterSettings (2f, .1f, .004f);
 				
 
