@@ -687,6 +687,7 @@ namespace Lockstep
 
 		public void Deactivate()
 		{
+			Partition.UpdateObject (this, false);
 
 			foreach (var collisionPair in CollisionPairs.Values) {
 				collisionPair.Body2.CollisionPairHolders.Remove(ID);
@@ -709,7 +710,6 @@ namespace Lockstep
 			}
 			CollisionPairHolders.Clear();
 
-			Partition.UpdateObject(this, false);
 			PhysicsManager.Dessimilate(this);
 			Active = false;
 		}

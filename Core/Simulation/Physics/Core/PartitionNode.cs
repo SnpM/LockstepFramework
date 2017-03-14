@@ -37,19 +37,20 @@ namespace Lockstep
 
 		public void Remove (int item)
 		{
-
 			//todo get rid of this linear search
 			if (ContainedDynamicObjects.Remove (item)) {
 				if (DynamicCount == 0) {
 					Partition.RemoveNode (activationID);
 					activationID = -1;
 				}
+			} else {
+				Debug.LogError ("Item not removed");
 			}
 		}
 
 		public void RemoveImmovable (int item)
 		{
-			if (ContainedDynamicObjects.Remove (item)) {
+			if (ContainedImmovableObjects.Remove (item)) {
 
 			}
 		}
@@ -81,7 +82,7 @@ namespace Lockstep
 
 		void ProcessPair ()
 		{
-
+			Partition.count++;
 			pair = PhysicsManager.GetCollisionPair (id1, id2);
 			if (pair.IsNotNull ()) {
 				if (pair.PartitionVersion != Partition._Version) {

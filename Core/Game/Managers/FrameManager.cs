@@ -53,7 +53,6 @@ namespace Lockstep
 					lastScaler = scaler;
 
 					float jitterEffect = jitterFactor * jitterCompensation;
-					Debug.Log (jitterEffect);
 					scaler -= jitterEffect;
 				}
 
