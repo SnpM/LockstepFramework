@@ -236,7 +236,7 @@ namespace Lockstep
 					node.Distribute ();
 				}
 			}
-			Debug.Log (count + " pairs checked");
+			//Debug.Log (count + " pairs checked");
 		}
 
 		public static int AddNode (PartitionNode node)
