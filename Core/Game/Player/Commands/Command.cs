@@ -24,22 +24,22 @@ namespace Lockstep
 
 		static void RegisterDefaults ()
 		{
-			#if UNITY_IOS
+//			#if UNITY_IOS
 				Register<DefaultData> ();
 				Register<EmptyData> ();
 				Register<Coordinate> ();
 				Register<Selection> ();
 				Register<Vector2d> ();
 				Register<Vector3d> ();
-			#else
-				foreach (Type t in Assembly.GetCallingAssembly().GetTypes())
-				{
-					if (t.GetInterface("ICommandData") != null)
-					{
-						Register (t);
-					} 
-				}
-			#endif
+//			#else
+//				foreach (Type t in Assembly.GetCallingAssembly().GetTypes())
+//				{
+//					if (t.GetInterface("ICommandData") != null)
+//					{
+//						Register (t);
+//					} 
+//				}
+//			#endif
 		}
 
         private static void Register<TData>() where TData : ICommandData
