@@ -9,14 +9,14 @@ namespace Lockstep.Legacy.Integration
 	[CustomEditor (typeof(Legacy.LSBody), true),UnityEditor.CanEditMultipleObjects]
 	public class EditorLSBody : Editor
 	{
-		static int boom = 0;
+		static int guardTimer = 0;
 
 		public override void OnInspectorGUI ()
 		{
-			boom--;
+			guardTimer--;
 			if (GUILayout.Button ("Update LSBody")) {
-				if (boom <= 0) {
-					boom = 10;
+				if (guardTimer <= 0) {
+					guardTimer = 10;
 					ReplaceLegacy ();
 				}
 			}
@@ -24,12 +24,13 @@ namespace Lockstep.Legacy.Integration
 
 		void ReplaceLegacy ()
 		{
-			//special thanks to hpjohn <3
+			//thanks hpjohn <3
 			//http://forum.unity3d.com/threads/editor-want-to-check-all-prefabs-in-a-project-for-an-attached-monobehaviour.253149/
 			string[] allPrefabs = GetAllPrefabs ();
 			List<string> listResult = new List<string> ();
 			MonoScript targetScript = null;
 
+            //todo2: cache
 			foreach (var monoScript in Resources.FindObjectsOfTypeAll<MonoScript>()) {
 				if (monoScript.GetClass () == typeof(LSBody)) {
 					targetScript = monoScript;
@@ -56,6 +57,13 @@ namespace Lockstep.Legacy.Integration
 				GameObject.DestroyImmediate(fab);
 			}
 
+            //Now replace legacy LSBodys on in-game objects
+            foreach (var legacy in GameObject.FindObjectsOfType<LSBody> ())
+            {
+                legacy.Replace();
+                DestroyImmediate(legacy);
+
+            }
 		}
 
 		public static string[] GetAllPrefabs ()

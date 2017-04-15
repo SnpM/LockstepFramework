@@ -441,6 +441,7 @@ namespace Lockstep.Legacy
 
         #if UNITY_EDITOR
         public void Replace () {
+            Debug.Log("1");
 			if (this.gameObject.GetComponent<UnityLSBody>() != null) {
 				return;
 			}
