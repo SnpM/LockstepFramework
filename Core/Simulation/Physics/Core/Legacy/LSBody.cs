@@ -5,19 +5,29 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 
-#if UNITY_EDITOR
 
 using UnityEngine;
 using UnityEngine.Serialization;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 namespace Lockstep.Legacy
 {
 	public partial class LSBody : MonoBehaviour
 	{
-		#region Core deterministic variables
 
-		[SerializeField] //For inspector debugging
+        private void Awake()
+        {
+            if (Application.isEditor == false)
+            {
+                throw new System.Exception("Legacy.LSBody on the object '" + this.gameObject + "' should not be in a build. It should automatically replace itself with UnityLSBody in the eidtor.");
+            }
+        }
+
+        #region Core deterministic variables
+
+        [SerializeField] //For inspector debugging
         internal Vector2d _position;
 		[SerializeField]
 		internal Vector2d _rotation = Vector2d.up;
@@ -26,11 +36,12 @@ namespace Lockstep.Legacy
 		[SerializeField]
 		public Vector2d _velocity;
 
-		#endregion
+        #endregion
 
-		#region Lockstep variables
 
-		private bool _forwardNeedsSet = false;
+        #region Lockstep variables
+
+        private bool _forwardNeedsSet = false;
 
 		private bool ForwardNeedsSet {
 			get { return _forwardNeedsSet; }
@@ -116,9 +127,11 @@ namespace Lockstep.Legacy
 
 		internal uint RaycastVersion { get; set; }
 
-		#endregion
+        #endregion
 
-		internal Vector3 _visualPosition;
+
+        #region Other variables
+        internal Vector3 _visualPosition;
 
 		public Vector3 VisualPosition { get { return _visualPosition; } }
 
@@ -146,9 +159,10 @@ namespace Lockstep.Legacy
 		
 		public long VelocityFastMagnitude { get; private set; }
 
-
-
-		private void AddChild (LSBody child)
+        #endregion
+        
+        #region Extra Processes
+        private void AddChild (LSBody child)
 		{
 			if (Children == null)
 				Children = new FastBucket<LSBody> ();
@@ -423,7 +437,10 @@ namespace Lockstep.Legacy
 		{
 		}
 
-		public void Replace () {
+#endregion
+
+        #if UNITY_EDITOR
+        public void Replace () {
 			if (this.gameObject.GetComponent<UnityLSBody>() != null) {
 				return;
 			}
@@ -483,9 +500,9 @@ namespace Lockstep.Legacy
 			so.ApplyModifiedProperties();
 			EditorUtility.SetDirty(uBody);
 		}
+        #endif
 
-	}
+    }
 
 
 }
-#endif

@@ -15,6 +15,7 @@ namespace Lockstep
         static LSFSettingsManager()
         {
             LSFSettings settings = Resources.Load<LSFSettings>(SETTINGS_NAME);
+
 #if UNITY_EDITOR
             if (settings == null)
             {
@@ -30,7 +31,6 @@ namespace Lockstep
                 
                 } else
                 {
-                    settings = Resources.Load<LSFSettings>(DEFAULT_SETTINGS_NAME);
                 }
             }
 #endif
@@ -38,7 +38,8 @@ namespace Lockstep
             MainSettings = settings;
             if (MainSettings == null)
             {
-                throw new System.NullReferenceException("No LockstepFrameworkSettings detected. Make sure there is one in the root directory of a Resources folder");
+                settings = Resources.Load<LSFSettings>(DEFAULT_SETTINGS_NAME);
+                Debug.Log("No settings found. Loading default settings.");
             }
 
         }
