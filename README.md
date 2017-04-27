@@ -26,16 +26,10 @@ Quick Setup
 
 Note: The example only shows the basic functionality of the framework. Comprehensive examples will be added close to the end of core development.
 
-TODO:
--------
-These are high priority issues that are significantly big or complicated. Any help on these aspects (as well as on any other lacking parts of the framework) would be very appreciated.
-- (After Lockstep Variables are fully tested) Lockstep Variable integration. Currently, no abilities use Lockstep Variables which are used to track determinism and also reset values upon re-initialization of the unit. A lot of work must be done to mark as many value-type deterministic variables as possible [Lockstep] and move their initialization to Setup () since LSVariables automatically handle resetting.
-- Safe and scalable coding patterns. Anywhere you see something that might cause problems for a large-scale project, fixing it or raising an issue would be a big help. LSF started as a work of curiosity and passion. While it's introduced me to helpful experiences, I didn't always see the flaw in using statics everywhere. If there are any significantly limiting problems with a component's design, I'll do my best to fix it.
-
 Road Map
 ---------
-- Deterministic fog of war
 - DOCUMENTATION - Tutorials for the major features of LS and descriptions of important methods and variables
+- Deterministic fog of war
 
 License
 --------
