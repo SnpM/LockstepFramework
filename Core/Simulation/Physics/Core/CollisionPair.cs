@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 
 namespace Lockstep
 {

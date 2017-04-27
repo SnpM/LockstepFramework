@@ -3,6 +3,7 @@ using Lockstep;
 using System.IO;
 using System;
 using UnityEngine;
+using FastCollections;
 
 namespace Lockstep
 {

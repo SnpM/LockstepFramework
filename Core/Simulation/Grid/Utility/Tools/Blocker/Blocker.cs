@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using Lockstep;
 
 //Blocker for static environment pieces in a scene.

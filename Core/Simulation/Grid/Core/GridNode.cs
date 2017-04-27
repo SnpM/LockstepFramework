@@ -6,7 +6,7 @@
 //=======================================================================
 
 using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System;
 using Lockstep.Pathfinding;
 namespace Lockstep

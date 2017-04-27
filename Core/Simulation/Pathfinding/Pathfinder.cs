@@ -10,7 +10,7 @@
 //AStar Algorithm Template: Sebastian Lague (Source: https://www.youtube.com/watch?v=-L-WgKMFuhE)
 using UnityEngine;
 using System;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System.Collections.Generic;
 
 namespace Lockstep.Pathfinding

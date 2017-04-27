@@ -9,6 +9,7 @@
 using UnityEngine;
 using UnityEngine.Serialization;
 using System.Collections.Generic;
+using FastCollections;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif

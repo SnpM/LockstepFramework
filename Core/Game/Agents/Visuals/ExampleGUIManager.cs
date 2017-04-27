@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 
 public class ExampleGUIManager : GUIManager {
     public override bool CameraChanged {

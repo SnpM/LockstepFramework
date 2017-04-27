@@ -28,6 +28,7 @@ using UnityEngine;
 using Lockstep.Data;
 using System;
 
+using FastCollections;
 namespace Lockstep
 {
 	//TODO: Set up default functions to implement LSManager

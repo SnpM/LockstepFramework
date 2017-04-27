@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using FastCollections;
 namespace Lockstep {
 public class MovementGroup
 {       

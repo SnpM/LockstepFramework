@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using Lockstep.Data;
 using System.Collections.Generic;
+using FastCollections;
 
 #if UNITY_EDITOR
 using UnityEditor;

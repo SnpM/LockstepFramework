@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Lockstep.UI;
 using Lockstep.Data;
+using FastCollections;
 
 #if UNITY_EDITOR
 using UnityEditor;

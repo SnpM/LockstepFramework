@@ -2,7 +2,7 @@
 
 using System;
 using Lockstep;
-using System.Collections;
+using System.Collections; using FastCollections;
 
 using System.Collections.Generic;
 using System.Reflection;

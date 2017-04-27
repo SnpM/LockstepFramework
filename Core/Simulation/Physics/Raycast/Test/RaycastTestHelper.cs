@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using PanLineAlgorithm;
 using CCoordinate = PanLineAlgorithm.FractionalLineAlgorithm.Coordinate;
 namespace Lockstep.Test

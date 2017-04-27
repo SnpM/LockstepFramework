@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using Lockstep.Pathfinding;
+using FastCollections;
 namespace Lockstep
 {
 	public class Move : ActiveAbility

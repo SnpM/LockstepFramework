@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.Reflection;
+using FastCollections;
 namespace Lockstep
 {
     public partial class Command

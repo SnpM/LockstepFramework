@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 
 public abstract class GUIManager {
     public abstract bool CanInteract {get;}

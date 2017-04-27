@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using Lockstep.Data;
+using FastCollections;
 namespace Lockstep
 {
     public class MovementGroupHelper : BehaviourHelper

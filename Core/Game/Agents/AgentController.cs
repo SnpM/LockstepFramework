@@ -4,7 +4,7 @@ using UnityEngine;
 using Lockstep.Data;
 using System.Collections.Generic;
 using System.Linq;
-
+using FastCollections;
 namespace Lockstep
 {
 	public sealed class AgentController

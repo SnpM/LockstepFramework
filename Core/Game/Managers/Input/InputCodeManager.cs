@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System.Collections; using FastCollections;
 using System.Collections.Generic;
 using Lockstep.Data;
 using UnityEngine;
