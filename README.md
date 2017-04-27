@@ -14,7 +14,7 @@ __________
 - Lockstep variables - know when and where desyncs happen
 - Size-based pathfinding (big units won't get stuck in those narrow gaps)
 - Customizable database system
-- Support for Forge Networking (DarkRift and Photon coming soon)
+- Support for DakrRift and Photon Networking (Forge Networking support deprecated but let me know if you need it)
 - 3D Raycasting
 
 Quick Setup
