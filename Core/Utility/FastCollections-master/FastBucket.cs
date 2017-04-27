@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-namespace Lockstep
+namespace FastCollections
 {
 	public class FastBucket<T> : FastEnumerable<T>
 	{
@@ -56,7 +56,7 @@ namespace Lockstep
 				if (index < PeakCount)
 				{
 					int indexIndex = Array.BinarySearch<int>(OpenSlots.innerArray, index);
-					OpenSlots.innerArray.Shift(indexIndex, OpenSlots.innerArray.Length, -1);
+					Shortcuts.Shift(OpenSlots.innerArray,indexIndex, OpenSlots.innerArray.Length, -1);
 				}
 				else if (index >= PeakCount)
 				{

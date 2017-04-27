@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System;
-namespace Lockstep {
+namespace FastCollections
+{
 	public class FastStack<T>
 	{
 		private const int DefaultCapacity = 8;

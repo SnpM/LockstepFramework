@@ -450,7 +450,7 @@ namespace Lockstep
 			StoppedTime = 0;
 			Arrived = false;
 
-			viableDestination = Pathfinder.GetPathNode(this.Destination.x, this.Destination.y, out destinationNode);
+			viableDestination = Pathfinder.GetClosestViableNode(Agent.Body.Position, destination, this.GridSize, out destinationNode);
 
 			StuckTime = 0;
 			RepathTries = 0;

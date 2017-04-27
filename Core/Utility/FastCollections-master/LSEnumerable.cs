@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Lockstep
+namespace FastCollections
 {
 	public interface FastEnumerable<T>
 	{

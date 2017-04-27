@@ -519,6 +519,57 @@ namespace Lockstep.Pathfinding
 		}
 
 
-
-	}
+        public static bool GetClosestViableNode(Vector2d from, Vector2d dest, int pathingSize, out GridNode returnNode)
+        {
+            returnNode = GridManager.GetNode(dest.x, dest.y);
+            if (returnNode.Unwalkable)
+            {
+                bool valid = false;
+                PanLineAlgorithm.FractionalLineAlgorithm.Coordinate cacheCoord = new PanLineAlgorithm.FractionalLineAlgorithm.Coordinate();
+                bool validTriggered = false;
+                pathingSize = (pathingSize + 1) / 2;
+                int minSqrMag = pathingSize * pathingSize;
+                minSqrMag *= 2;
+                foreach (var coordinate in PanLineAlgorithm.FractionalLineAlgorithm.Trace(dest.x.ToDouble(), dest.y.ToDouble(), from.x.ToDouble(), from.y.ToDouble()))
+                {
+                    currentNode = GridManager.GetNode(FixedMath.Create(coordinate.X), FixedMath.Create(coordinate.Y));
+                    if (!validTriggered)
+                    {
+                        if (currentNode != null && currentNode.Unwalkable == false)
+                        {
+                            validTriggered = true;
+                        }
+                        else
+                            cacheCoord = coordinate;
+                    }
+                    if (validTriggered)
+                    {
+                        if (currentNode == null || currentNode.Unwalkable)
+                        {
+                        }
+                        else
+                        {
+                            //calculate sqrMag to last invalid node
+                            int testMag = coordinate.X - cacheCoord.X;
+                            testMag *= testMag;
+                            int buffer = coordinate.Y - cacheCoord.Y;
+                            buffer *= buffer;
+                            testMag += buffer;
+                            if (testMag >= minSqrMag)
+                            {
+                                valid = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (!valid)
+                {
+                    return false;
+                }
+                returnNode = currentNode;
+            }
+            return true;
+        }
+    }
 }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Lockstep
+namespace FastCollections
 {
 /// <summary>
 /// Experimenting with dictionary. Not yet functional.
@@ -31,14 +31,14 @@ namespace Lockstep
 			if (ForceStop)
 				return false;
 			GenerateIndexes (hashCode);
-			if (bucketAllocation [bigIndex].GetBitTrue (smallIndex)) {
+			if (Shortcuts.GetBit (bucketAllocation[bigIndex],smallIndex)) {
 				if (bucketHashes [leIndex] == hashCode) {
 					return false;
 				}
 				//Resolve collision
 				return _Add (hashCode * CollisionResolver, item);
 			}
-			LSUtility.SetBitTrue (ref bucketAllocation [bigIndex], smallIndex);
+			Shortcuts.SetBitTrue (ref bucketAllocation [bigIndex], smallIndex);
 			bucketValues [leIndex] = item;
 			bucketHashes [leIndex] = hashCode;
 			return true;
@@ -55,7 +55,7 @@ namespace Lockstep
 			if (ForceStop)
 				return false;
 			if (ConfirmSlot (hashCode)) {
-				LSUtility.SetBitFalse (ref bucketAllocation [bigIndex], smallIndex);
+				Shortcuts.SetBitFalse (ref bucketAllocation [bigIndex], smallIndex);
 				return true;
 			}
 			return _Remove (hashCode * CollisionResolver);
@@ -134,7 +134,7 @@ namespace Lockstep
 		private bool ConfirmSlot (int hashCode)
 		{
 			GenerateIndexes (hashCode);
-			if (bucketAllocation [bigIndex].GetBitTrue (smallIndex)) {
+			if (Shortcuts.GetBit (bucketAllocation[bigIndex],smallIndex)) {
 				if (bucketHashes [leIndex] == hashCode) {
 					return true;
 				}

@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-namespace Lockstep
+namespace FastCollections
 {
 	/// <summary>
 	/// List that sorts its elements, adds from the optimal end, and has O(1) popping.

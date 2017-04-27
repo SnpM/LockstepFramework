@@ -1,6 +1,7 @@
 ﻿using System;
 
-namespace Lockstep {
+namespace FastCollections
+{
     public class FastQueue<T> {
         private T[] innerArray;
         private int head;
@@ -81,7 +82,7 @@ namespace Lockstep {
             }
         }
 		public void FullClear () {
-			innerArray.Clear();
+			Shortcuts.ClearArray(innerArray);
 			FastClear();
 		}
         public void FastClear() {

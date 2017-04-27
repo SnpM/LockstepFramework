@@ -9,7 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-namespace Lockstep
+namespace FastCollections
 {
 	public class FastList<T> : FastEnumerable<T>, IEnumerable<T>
 	{
