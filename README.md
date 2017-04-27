@@ -2,7 +2,7 @@ Lockstep Framework
 ------------------------
 The Lockstep Framework (LSF) is a framework designed for games that especially need lockstep simulations. It includes a deterministic 2D physics engine, pathfinding, behavior system, and more. LSF is integrated with Unity.
 
-Special thanks to Liv Games (http://www.livgames.com) and 360 Studio (http://www.360studio.me) for supporting the development of Lockstep Framework.
+Special thanks to Liv Games (http://www.livgames.com), 360 Studio (http://www.360studio.me), and Thoopid (http://www.thoopid.com/) for supporting the development of Lockstep Framework.
 
 Features
 __________
@@ -27,15 +27,13 @@ Note: The example only shows the basic functionality of the framework. Comprehen
 TODO:
 -------
 These are high priority issues that are significantly big or complicated. Any help on these aspects (as well as on any other lacking parts of the framework) would be very appreciated.
-- Interpolation. Through a combination of interpolation and extrapolation on unexpectedly late simulation frames, interpolation works correctly without another layer so the unit will always only be 1 frame behind the actual position. For some reason, there's still some smooth stuttering when VSync is turned off in the editor. The brunt of the interpolation code stems from PhysicsManager.Visualize().
 - (After Lockstep Variables are fully tested) Lockstep Variable integration. Currently, no abilities use Lockstep Variables which are used to track determinism and also reset values upon re-initialization of the unit. A lot of work must be done to mark as many value-type deterministic variables as possible [Lockstep] and move their initialization to Setup () since LSVariables automatically handle resetting.
 - Safe and scalable coding patterns. Anywhere you see something that might cause problems for a large-scale project, fixing it or raising an issue would be a big help. LSF started as a work of curiosity and passion. While it's introduced me to helpful experiences, I didn't always see the flaw in using statics everywhere. If there are any significantly limiting problems with a component's design, I'll do my best to fix it.
-- Implement and test polygon colliders.
-- Deterministic heightmap system with possibly multiple layers
 
 Road Map
 ---------
-- Gamestate syncing... probably need to flesh out Lockstep Variables for this.
+- Deterministic fog of war
+- DOCUMENTATION - Tutorials for the major features of LS and descriptions of important methods and variables
 
 License
 --------
