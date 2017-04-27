@@ -4,8 +4,6 @@ The Lockstep Framework (LSF) is a framework designed for games that especially n
 
 Special thanks to Liv Games (http://www.livgames.com) and 360 Studio (http://www.360studio.me) for supporting the development of Lockstep Framework.
 
-Under development by [John Pan](https://github.com/SnpM), Lam Pham (https://github.com/LamPham), and GladFox (https://github.com/GladFox).
-
 Features
 __________
 - Deterministic math library and simulation logic
