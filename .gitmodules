@@ -1,6 +1,3 @@
 [submodule "Database/Newtonsoft.Json"]
 	path = Database/Newtonsoft.Json
 	url = ../../JamesNK/Newtonsoft.Json.git
-[submodule "RTS-Fog"]
-	path = RTS-Fog
-	url = ../RTS-Fog.git
