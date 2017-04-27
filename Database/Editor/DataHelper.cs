@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System;
 using System.Collections.Generic;
 using UnityEditor;

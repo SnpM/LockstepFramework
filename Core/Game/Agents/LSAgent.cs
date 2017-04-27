@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Lockstep.UI;
 using Lockstep.Data;
+using FastCollections;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -295,6 +296,7 @@ namespace Lockstep
 
 			this.RegisterLockstep();
 
+			Setuped = true;
 
 		}
 		private void RegisterLockstep()
@@ -339,6 +341,7 @@ namespace Lockstep
 			this.GlobalID = globalID;
 		}
 
+		bool Setuped;
 		public void Initialize(
 			Vector2d position = default(Vector2d),
 			Vector2d rotation = default(Vector2d))

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.Reflection;
+using FastCollections;
 namespace Lockstep
 {
     public partial class Command
@@ -22,22 +23,25 @@ namespace Lockstep
 
         private static BiDictionary<Type, ushort> RegisteredData = new BiDictionary<Type, ushort>();
 
-        static void RegisterDefaults () {
-            /*Register<DefaultData> ();
-            Register<Vector2d> ();
-            Register<Selection> ();
-            Register<Vector2dHeight> ();
-            Register<Coordinate> ();
-            Register<Vector3d>();
-            Register<EmptyData> ();*/
-            foreach (Type t in Assembly.GetCallingAssembly().GetTypes())
-            {
-                if (t.GetInterface("ICommandData") != null)
-                {
-                    Register (t);
-                } 
-            }
-        }
+		static void RegisterDefaults ()
+		{
+//			#if UNITY_IOS
+				Register<DefaultData> ();
+				Register<EmptyData> ();
+				Register<Coordinate> ();
+				Register<Selection> ();
+				Register<Vector2d> ();
+				Register<Vector3d> ();
+//			#else
+//				foreach (Type t in Assembly.GetCallingAssembly().GetTypes())
+//				{
+//					if (t.GetInterface("ICommandData") != null)
+//					{
+//						Register (t);
+//					} 
+//				}
+//			#endif
+		}
 
         private static void Register<TData>() where TData : ICommandData
         {

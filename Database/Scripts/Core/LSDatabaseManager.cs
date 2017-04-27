@@ -2,7 +2,7 @@
 
 using System;
 using Lockstep;
-using System.Collections;
+using System.Collections; using FastCollections;
 
 using System.Collections.Generic;
 using System.Reflection;
@@ -14,7 +14,10 @@ namespace Lockstep.Data {
 
         public static LSDatabase CurrentDatabase {
             get {
-                return _currentDatabase/* ?? (_currentDatabase = (LSDatabase)Resources.Load<LSDatabase> (LSDatabaseManager.DATABASE_NAME))*/;
+				if (_currentDatabase == null) {
+					Setup ();
+				}
+				return _currentDatabase;
             }
         }
 

@@ -1,7 +1,7 @@
 ﻿//Thanks to Sebastian Lague's tutorial: https://www.youtube.com/watch?v=3Dw5d7PlcTM
 
 using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System;
 
 namespace Lockstep

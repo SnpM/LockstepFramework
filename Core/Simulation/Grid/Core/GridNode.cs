@@ -6,9 +6,9 @@
 //=======================================================================
 
 using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System;
-
+using Lockstep.Pathfinding;
 namespace Lockstep
 {
 	public class GridNode
@@ -186,8 +186,8 @@ namespace Lockstep
 
 		internal bool Unpassable ()
 		{
-			if (CachedUnpassableCheckSize > 1) {
-				if (CachedUnpassableCheckSize > 3) {
+			if (CachedUnpassableCheckSize > Pathfinder.SmallSize) {
+				if (CachedUnpassableCheckSize > Pathfinder.MediumSize) {
 					return !ExtraClearance;
 				}
 				return !Clearance;

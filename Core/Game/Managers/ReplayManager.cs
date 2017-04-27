@@ -3,7 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 
 namespace Lockstep
 {

@@ -4,7 +4,7 @@ using UnityEngine;
 using Lockstep.Data;
 using System.Collections.Generic;
 using System.Linq;
-
+using FastCollections;
 namespace Lockstep
 {
 	public sealed class AgentController
@@ -57,7 +57,7 @@ namespace Lockstep
 					CodeIndexMap.Add (agentCode, (ushort)i);
 				}
 			} else {
-				Debug.Log ("Database does no provide AgentData. Make sure it implements IAgentDataProvider.");
+				Debug.Log ("Database does not provide AgentData. Make sure it implements IAgentDataProvider.");
 			}
 		}
 
@@ -107,6 +107,8 @@ namespace Lockstep
 				}
 			}
             
+						AgentController.DefaultController = AgentController.Create ();
+
 		}
 
 		internal static FastBucket<LSAgent> DeathingAgents = new FastBucket<LSAgent> ();
@@ -315,6 +317,7 @@ namespace Lockstep
 			return hash;
 		}
 
+		public static AgentController DefaultController { get; private set;}
 		public static FastList<AgentController> InstanceManagers = new FastList<AgentController> ();
 		public readonly FastBucket<LSAgent> SelectedAgents = new FastBucket<LSAgent> ();
 

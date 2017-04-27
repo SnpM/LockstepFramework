@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System;
 
 namespace Lockstep.NetworkHelpers {
@@ -19,11 +19,11 @@ namespace Lockstep.NetworkHelpers {
         public Action<byte[]> OnMatchmakingData; //Matchmaking data NU
         public Action<byte[]> OnRegisterData; //For registering clients NU
         public Action<byte[]> OnTestData; //For test purposes
-        
-        public NetworkHelper () {
 
-        }
-
+		public virtual void Initialize ()
+		{
+			
+		}
         /// <summary>
         /// Connecting to a server with IP address of ip. Note: Not all NetworkHelpers will require Connect.
         /// </summary>

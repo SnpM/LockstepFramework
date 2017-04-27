@@ -2,6 +2,8 @@ using Lockstep;
 using System;
 using UnityEngine;
 using System.Linq;
+using FastCollections;
+
 namespace Lockstep
 {
     public class DeterminismTester : BehaviourHelper

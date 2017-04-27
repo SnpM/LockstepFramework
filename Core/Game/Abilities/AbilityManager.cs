@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Lockstep.Data;
 using System.Collections.Generic;
+using FastCollections;
 using System;
 namespace Lockstep {
     public class AbilityManager {

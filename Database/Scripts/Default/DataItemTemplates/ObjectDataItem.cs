@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif

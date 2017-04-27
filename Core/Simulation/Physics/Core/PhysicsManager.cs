@@ -6,7 +6,7 @@
 //=======================================================================
 
 using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System.Collections.Generic;
 using System.Timers;
 using System;
@@ -93,7 +93,6 @@ namespace Lockstep
 
 		public static void Initialize()
 		{
-
 
 
 
@@ -220,31 +219,39 @@ namespace Lockstep
 		}
 
 
-		public static bool Simulated { get; private set;}
+		public static bool Simulated { get; private set; }
 		public static double AccumulatedTime { get; private set; }
-		public static float LerpTime { get; private set;}
-		public static bool LastLerpOver { get; private set;}
+		public static float LerpTime { get; private set; }
 		public static void LateVisualize()
 		{
-			if (Simulated)
-			{
-				AccumulatedTime = Time.deltaTime;
-			}
-			else
-				AccumulatedTime += Time.deltaTime;
-			LerpTime = (float)(AccumulatedTime / PhysicsManager.FixedDeltaTime);
+			//			bool doSetVisuals = false;
+			//			if (AccumulatedTime >= PhysicsManager.FixedDeltaTime && Simulated) {
+			//				AccumulatedTime = Time.deltaTime + (LerpTime % PhysicsManager.FixedDeltaTime);
+			//				doSetVisuals = true;
+			//				Simulated = false;
+			//			} else {
+			//				AccumulatedTime += Time.deltaTime;
+			//			}
+			//			LerpTime = (float)(AccumulatedTime / PhysicsManager.FixedDeltaTime);
+			//			if (LerpTime > 1f) LerpTime = 1f;
+			//			for (int i = 0; i < DynamicSimObjects.PeakCount; i++) {
+			//				LSBody b1 = DynamicSimObjects.innerArray[i];
+			//
+			//				if (b1.IsNotNull()) {
+			//					if (doSetVisuals) {
+			//						b1.SetVisuals();
+			//					}
+			//					b1.Visualize();
+			//				}
+			//			}
+
+			LerpTime = (float)PhysicsManager.FixedDeltaTime / (float)Time.timeScale;
 			for (int i = 0; i < DynamicSimObjects.PeakCount; i++) {
 				LSBody b1 = DynamicSimObjects.innerArray[i];
-
 				if (b1.IsNotNull()) {
-					if (Simulated)
-						b1.SetVisuals();
-					b1.Visualize();
+					b1.SetVisuals();
 				}
 			}
-
-			if (Simulated)
-				Simulated = false;
 		}
 
 		public static float ElapsedTime;
@@ -353,6 +360,10 @@ namespace Lockstep
 					body1 = body2;
 					body2 = temp;
 				}
+
+				if (!RequireCollisionPair(body1, body2))
+					return null;
+				
 				CollisionPair pair;
 				if (!body1.CollisionPairs.TryGetValue(body2.ID, out pair)) {
 					pair = CreatePair(body1, body2);

@@ -5,7 +5,7 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System.Collections.Generic;
 
 namespace Lockstep
@@ -87,7 +87,7 @@ namespace Lockstep
                 CachedGridNodes.EnsureCapacity (min);
                 for (int i = min - 1; i >= 0; i--) {
 					if (LockstepManager.PoolingEnabled)
-                    CachedGridNodes.Add (Grid[i]);
+						CachedGridNodes.Add (Grid[i]);
                 }
             }
 
@@ -96,8 +96,8 @@ namespace Lockstep
                 int min = ScanGrid.Length;
                 CachedScanNodes.EnsureCapacity(min);
                 for (int i = min - 1; i >= 0; i--) {
-					if (LockstepManager.PoolingEnabled);
-                    CachedScanNodes.Add(ScanGrid[i]);
+					if (LockstepManager.PoolingEnabled)
+						CachedScanNodes.Add(ScanGrid[i]);
                 }
             }
         #endregion

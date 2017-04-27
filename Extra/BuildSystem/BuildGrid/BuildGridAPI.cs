@@ -1,6 +1,6 @@
 ﻿
 using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using Lockstep;
 using Lockstep.Utility;
 using Lockstep.Abilities;

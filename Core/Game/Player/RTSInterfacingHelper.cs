@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using Lockstep.UI;
 using Lockstep.Data;
 
@@ -42,6 +42,7 @@ namespace Lockstep
 
         static void Setup()
         {
+
             QuickPos = AbilityDataItem.FindInterfacer("Move");
             QuickTarget = AbilityDataItem.FindInterfacer("Scan");
 
@@ -90,8 +91,7 @@ namespace Lockstep
                     {
                         //LSAgent target;
                         if (RTSInterfacing.MousedAgent.IsNotNull() &&
-                        /*PlayerManager.GetAllegiance(RTSInterfacing.MousedAgent) == AllegianceType.Enemy &&*/ 
-                        Selector.MainSelectedAgent.GetAbility<Scan>() != null)
+						    Selector.MainSelectedAgent.GetAbility<Scan>() != null)
                         {
                             ProcessInterfacer((QuickTarget));
                         } else
@@ -105,16 +105,17 @@ namespace Lockstep
 
         public static Command GetProcessInterfacer(AbilityDataItem facer)
         {
+
             if (facer == null)
             {
-                Debug.LogError("Boom");
+                Debug.LogError("Interfacer does not exist. Can't generate command.");
                 return null;
             }
             switch (facer.InformationGather)
             {
                 case InformationGatherType.Position:
                     curCom = new Command(facer.ListenInputID);
-                    curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
+					curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
                     break;
                 case InformationGatherType.Target:
                     curCom = new Command(facer.ListenInputID);

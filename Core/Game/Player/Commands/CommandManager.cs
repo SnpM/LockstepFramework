@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using FastCollections;
 namespace Lockstep
 {
     public static class CommandManager
@@ -43,14 +44,13 @@ namespace Lockstep
                 throw new System.Exception("Packet is null or not valid length");
             }
             int frameCount = BitConverter.ToInt32(packet.innerArray, 0);
-
             int index = 4;
 
             Frame frame = new Frame();
 
-            if (packet.Count > 4)
+			// packet.Count > 6 is a guard for random extra bytes bug with DarkRift implementation
+            if (packet.Count > 4 && packet.Count > 6)
             {
-
 				while (index < packet.Count)
                 {
                     Command com = new Command();
@@ -80,9 +80,9 @@ namespace Lockstep
 			if (bufferedBytes.Count > 0)
 			{
 				ClientManager.Distribute(bufferedBytes.ToArray());
+
 				bufferedBytes.FastClear();
 			}
-
             
         }
 		//static FastList<Command> asdf = new FastList<Command>();

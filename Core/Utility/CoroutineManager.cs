@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 

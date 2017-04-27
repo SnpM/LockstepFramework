@@ -6,7 +6,7 @@
 //=======================================================================
 
 using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System.Collections.Generic;
 using System;
 namespace Lockstep
@@ -59,17 +59,22 @@ namespace Lockstep
 		{
 
 			GetGridBounds (Body);
-			if (Body.PastGridXMin != GridXMin ||
+
+			if (
+				repartition == false ||
+				(Body.PastGridXMin != GridXMin ||
 				Body.PastGridXMax != GridXMax ||
 				Body.PastGridYMin != GridYMin ||
-				Body.PastGridYMax != GridYMax) {
+			     Body.PastGridYMax != GridYMax)) {
+
 				for (int o = Body.PastGridXMin; o <= Body.PastGridXMax; o++) {
 					for (int p = Body.PastGridYMin; p <= Body.PastGridYMax; p++) {
 						PartitionNode node = GetNode (o, p);
-						if (Body.Immovable)
+						if (Body.Immovable) {
 							node.RemoveImmovable (Body.ID);
-						else
+						} else {
 							node.Remove (Body.ID);
+						}
 					}
 				}
 				if (repartition) {
@@ -220,8 +225,10 @@ namespace Lockstep
 			return node;
 		}
 
+		public static int count;
 		public static void CheckAndDistributeCollisions ()
 		{
+			count = 0;
 			_Version++;
 			for (int i = ActivatedNodes.PeakCount - 1; i >= 0; i--) {
 				if (ActivatedNodes.arrayAllocation [i]) {
@@ -229,6 +236,7 @@ namespace Lockstep
 					node.Distribute ();
 				}
 			}
+			//Debug.Log (count + " pairs checked");
 		}
 
 		public static int AddNode (PartitionNode node)

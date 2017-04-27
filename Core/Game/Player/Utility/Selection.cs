@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
+using System.Collections; using FastCollections;
 using UnityEngine;
 using Stopwatch = System.Diagnostics.Stopwatch;
 namespace Lockstep {

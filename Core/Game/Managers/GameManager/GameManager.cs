@@ -1,7 +1,7 @@
 ﻿using Lockstep;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System;
 using Lockstep.NetworkHelpers;
 
@@ -29,7 +29,7 @@ namespace Lockstep
                     if (_mainNetworkHelper == null)
                     {
                         Debug.Log("NetworkHelper not found on this GameManager's GameObject. Defaulting to ExampleNetworkHelper...");
-                        _mainNetworkHelper = base.gameObject.AddComponent<ExampleNetworkHelper>();
+                        _mainNetworkHelper = base.gameObject.AddComponent<DefaultNetworkHelper>();
                     }
                 }
                 return _mainNetworkHelper;

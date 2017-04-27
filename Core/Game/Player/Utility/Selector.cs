@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using FastCollections;
 
 namespace Lockstep
 {
@@ -38,7 +39,6 @@ namespace Lockstep
 
 		public static void Add (LSAgent agent)
 		{
-
 			if (agent.IsSelected == false) {
 				agent.Controller.AddToSelection (agent);
 				agent.IsSelected = true;

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using Lockstep.Data;
 using System.Collections.Generic;
 using System;

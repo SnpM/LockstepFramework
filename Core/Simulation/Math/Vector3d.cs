@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 
 namespace Lockstep
 {
@@ -8,10 +8,19 @@ namespace Lockstep
     public struct Vector3d : Lockstep.ICommandData
     {
         [FixedNumber]
+		/// <summary>
+		/// Horizontal
+		/// </summary>
         public long x;
         [FixedNumber]
+		/// <summary>
+		/// Forward/Backward
+		/// </summary>
         public long y;
         [FixedNumber]
+		/// <summary>
+		/// Up/Down
+		/// </summary>
         public long z; //Height
         public Vector3d (Vector3 vec3) {
             this.x = FixedMath.Create(vec3.x);

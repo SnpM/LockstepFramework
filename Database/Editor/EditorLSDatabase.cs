@@ -1,6 +1,6 @@
 ﻿#if true
 using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using UnityEditor;
 using System;
 using System.Reflection;

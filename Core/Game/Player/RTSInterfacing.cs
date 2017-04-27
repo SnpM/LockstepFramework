@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System;
 using UnityEngine.EventSystems;
 namespace Lockstep
@@ -77,7 +77,7 @@ namespace Lockstep
 		public static Vector2d GetWorldPosHeight (Vector2 screenPos, float height = 0) {
 			if (Camera.main == null) return Vector2d.zero;
 			Ray ray = Camera.main.ScreenPointToRay (screenPos);
-			RaycastHit hit;
+			//RaycastHit hit;
 
 			Vector3 hitPoint = ray.origin - ray.direction * ((ray.origin.y - height) / ray.direction.y);
 			//return new Vector2d(hitPoint.x * LockstepManager.InverseWorldScale, hitPoint.z * LockstepManager.InverseWorldScale);

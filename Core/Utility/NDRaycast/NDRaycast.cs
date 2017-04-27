@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 
 public static class NDRaycast {
 	public static bool Raycast (Ray ray, out RaycastHit hit) {

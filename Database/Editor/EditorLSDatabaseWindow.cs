@@ -110,7 +110,7 @@ namespace Lockstep.Data {
 
 				//json stuff
 				GUILayout.BeginHorizontal ();
-				jsonFile = (TextAsset)EditorGUILayout.ObjectField ("Json", jsonFile, typeof (TextAsset));
+				jsonFile = (TextAsset)EditorGUILayout.ObjectField ("Json", jsonFile, typeof (TextAsset), false);
 				if (GUILayout.Button ("Load", GUILayout.MaxWidth (settingsButtonWidth))) {
 					LSDatabaseManager.ApplyJson (jsonFile.text, Database);
 				}

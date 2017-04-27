@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System.Collections.Generic;
 using PanLineAlgorithm;
 using System;
@@ -37,7 +37,7 @@ namespace Lockstep
                 for (int i = node.ContainedDynamicObjects.Count - 1; i >= 0; i--)
                 {
                     LSBody body = PhysicsManager.SimObjects [node.ContainedDynamicObjects [i]];
-                    if (body.RaycastVersion != _Version)
+					if (body.IsNotNull() && body.RaycastVersion != _Version)
                     {
                         if (Conditional.IsNull() || Conditional())
                         {

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; using FastCollections;
 using System.Runtime.Serialization.Formatters.Binary;
 using System;
 using System.Runtime.Serialization;

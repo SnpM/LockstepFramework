@@ -8,6 +8,7 @@
 using UnityEngine;
 using UnityEngine.Serialization;
 using System.Collections.Generic;
+using FastCollections;
 
 namespace Lockstep
 {
@@ -175,10 +176,10 @@ namespace Lockstep
 
 		public long YMax { get; private set; }
 
-		public int PastGridXMin;
-		public int PastGridXMax;
-		public int PastGridYMin;
-		public int PastGridYMax;
+		public int PastGridXMin { get; set; }
+		public int PastGridXMax { get; set; }
+		public int PastGridYMin { get; set; }
+		public int PastGridYMax { get; set; }
 
 		public long HeightMin { get; private set; }
 
@@ -333,6 +334,8 @@ namespace Lockstep
 
 		private Vector2d[] RotatedPoints;
 
+		private Vector3 velocityPosition;
+
 		#endregion
 		public void Setup(LSAgent agent)
 		{
@@ -452,6 +455,7 @@ namespace Lockstep
 			} else {
 				CanSetVisualRotation = false;
 			}
+			velocityPosition = Vector3.zero;
 		}
 
 		void CheckVariables()
@@ -590,11 +594,14 @@ namespace Lockstep
 				DoSetVisualPosition(
 					_position.ToVector3(HeightPos.ToFloat())
 				);
+				PositionalTransform.position = Vector3.SmoothDamp (lastVisualPos, _visualPosition, ref velocityPosition, PhysicsManager.LerpTime);
 			}
 
 			if (this.SetVisualRotation) {
 				this.DoSetVisualRotation(_rotation);
+				RotationalTransform.rotation = Quaternion.Slerp(lastVisualRot, visualRot, 1f/Time.fixedDeltaTime);
 			}
+
 		}
 
 		private void DoSetVisualPosition(Vector3 pos)
@@ -621,26 +628,26 @@ namespace Lockstep
 		Quaternion lastVisualRot;
 		Quaternion visualRot = Quaternion.identity;
 
-		public void Visualize()
-		{
-			float lerpTime = PhysicsManager.LerpTime;
-			if (CanSetVisualPosition) {
-				if (SetPositionBuffer) {
-					
-					PositionalTransform.position = Vector3.Lerp (lastVisualPos, _visualPosition, lerpTime);
-					SetPositionBuffer = lerpTime < 1f;
-				}
-			}
-			//const float rotationLerpDamping = 1f;
-			if (CanSetVisualRotation && RotationalTransform != null) {
-				if (SetRotationBuffer) {
-					RotationalTransform.rotation =
-										   Quaternion.Lerp(lastVisualRot, visualRot, PhysicsManager.LerpTime);
-					SetRotationBuffer = lerpTime < 1f;
-
-				}
-			}
-		}
+//		public void Visualize()
+//		{
+//			float lerpTime = PhysicsManager.LerpTime;
+//			if (CanSetVisualPosition) {
+//				if (SetPositionBuffer) {
+//
+//					PositionalTransform.position = Vector3.Lerp(lastVisualPos, _visualPosition, lerpTime);
+//					SetPositionBuffer = lerpTime < 1f;
+//				}
+//			}
+//			//const float rotationLerpDamping = 1f;
+//			if (CanSetVisualRotation && RotationalTransform != null) {
+//				if (SetRotationBuffer) {
+//					RotationalTransform.rotation =
+//										   Quaternion.Lerp(lastVisualRot, visualRot, lerpTime);
+//					SetRotationBuffer = lerpTime < 1f;
+//
+//				}
+//			}
+//		}
 
 		public void LerpOverReset()
 		{
@@ -681,6 +688,7 @@ namespace Lockstep
 
 		public void Deactivate()
 		{
+			Partition.UpdateObject (this, false);
 
 			foreach (var collisionPair in CollisionPairs.Values) {
 				collisionPair.Body2.CollisionPairHolders.Remove(ID);
@@ -703,7 +711,6 @@ namespace Lockstep
 			}
 			CollisionPairHolders.Clear();
 
-			Partition.UpdateObject(this, false);
 			PhysicsManager.Dessimilate(this);
 			Active = false;
 		}

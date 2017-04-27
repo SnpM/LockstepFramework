@@ -28,10 +28,11 @@ using UnityEngine;
 using Lockstep.Data;
 using System;
 
+using FastCollections;
 namespace Lockstep
 {
 	//TODO: Set up default functions to implement LSManager
-	public static class LockstepManager
+	public static class  LockstepManager
 	{
 
 		public static MonoBehaviour UnityInstance { get; private set; }
@@ -51,7 +52,7 @@ namespace Lockstep
 		public static bool Loaded { get; private set; }
 
 		//for testing purposes
-		public const bool PoolingEnabled = true;
+		public static bool PoolingEnabled = true;
 		private static GameManager _mainGameManager;
 
 		public static event Action onSetup;
