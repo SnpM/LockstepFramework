@@ -14,7 +14,42 @@ namespace Lockstep
 		{
 		}
 
-		protected override void OnGameStart ()
+        protected override void OnVisualize()
+        {
+            if (Input.GetKeyDown (KeyCode.M))
+            {
+                for (int i = 0; i < Spawns.Length; i++)
+                {
+                    SpawnInfo info = Spawns[i];
+                    while (AgentController.InstanceManagers.Count <= info.ControllerIndex)
+                    {
+
+                        AgentController cont = AgentController.Create();
+                        PlayerManager.AddController(cont);
+                        for (int j = 0; j < AgentController.InstanceManagers.Count; j++)
+                        {
+                            AgentController ac = AgentController.InstanceManagers[j];
+                            if (ac != cont)
+                            {
+                                cont.SetAllegiance(ac, AllegianceType.Enemy);
+                                ac.SetAllegiance(cont, AllegianceType.Enemy);
+                            }
+                        }
+
+                    }
+
+                    AgentController controller = AgentController.InstanceManagers[info.ControllerIndex];
+
+                    for (int j = 0; j < info.Count; j++)
+                    {
+                        LSAgent agent = controller.CreateAgent(info.AgentCode, info.Position);
+                        if (AutoCommand)
+                            Selector.Add(agent);
+                    }
+                }
+            }
+        }
+        protected override void OnGameStart ()
 		{
 
 
