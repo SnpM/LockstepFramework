@@ -250,7 +250,7 @@ namespace Lockstep
 			}
 			if (IsWindingUp)
 			{
-				windupCount--;
+                windupCount -= FixedMath.One / LockstepManager.FrameRate;
 				if (windupCount < 0)
 				{
 					if (this.AgentConditional(Target))
@@ -259,14 +259,15 @@ namespace Lockstep
 						while (this.attackCount < 0)
 							this.attackCount += (this.AttackInterval);
 						this.attackCount -= Windup;
-						IsWindingUp = false;
 					}
 					else {
 						StopEngage();
 						this.ScanAndEngage();
 					}
-				}
-			}
+                    IsWindingUp = false;
+
+                }
+            }
 			else {
 				Vector2d targetDirection = Target.Body._position - cachedBody._position;
 				long fastMag = targetDirection.FastMagnitude();
