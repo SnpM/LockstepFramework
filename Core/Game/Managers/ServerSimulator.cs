@@ -17,7 +17,7 @@ namespace Lockstep
 
 		private static int InfluenceFrameCount;
 		public static void Setup () {
-			CoroutineManager.StartUnityCoroutine (Tick ());
+			UnityInstance.Instance.StartCoroutine (Tick ());
 		}
 		public static void Initialize ()
 		{
@@ -31,7 +31,7 @@ namespace Lockstep
 
 		public static void Receive (byte[] data)
 		{
-			CoroutineManager.StartUnityCoroutine(receive (data));
+			UnityInstance.Instance.StartCoroutine(receive (data));
 		}
 		static IEnumerator receive (byte[] data)
 		{
@@ -40,7 +40,7 @@ namespace Lockstep
 			yield break;
 		}
 		static void Send (byte[] data) {
-			CoroutineManager.StartUnityCoroutine (send (data));
+			UnityInstance.Instance.StartCoroutine (send (data));
 
 		}
 		static IEnumerator send (byte[] data) {
