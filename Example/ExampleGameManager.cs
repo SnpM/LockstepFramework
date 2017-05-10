@@ -1,15 +1,20 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
-using System.Collections; using FastCollections;
-using Lockstep.Data;
-using TypeReferences;
-using System;
 
 namespace Lockstep.Example
 {
     public class ExampleGameManager : GameManager
     {
         static Replay LastSave = new Replay();
+
+		//        public static void LoadLevel (string levelName) {
+		//            LockstepManager.Deactivate ();
+		//            SceneManager.LoadScene(levelName);
+		//        }
+		//		public static void LoadLevel(int levelName)
+		//		{
+		//			LockstepManager.Deactivate();
+		//            SceneManager.LoadScene(levelName);
+		//		}
 
         void OnGUI()
         {
@@ -20,13 +25,13 @@ namespace Lockstep.Example
             if (GUILayout.Button("Restart"))
             {
                 ReplayManager.Stop();
-                LSUtility.LoadLevel(SceneManager.GetActiveScene().name);
+//                LSUtility.LoadLevel(SceneManager.GetActiveScene().name);
             }
 
             if (GUILayout.Button("Playback"))
             {
                 LastSave = ReplayManager.SerializeCurrent();
-                LSUtility.LoadLevel(SceneManager.GetActiveScene().name);
+//                LSUtility.LoadLevel(SceneManager.GetActiveScene().name);
                 ReplayManager.Play(LastSave);
 
             }

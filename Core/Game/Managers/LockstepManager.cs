@@ -4,6 +4,7 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
+using Lockstep.NetworkHelpers;
 
 #if UNITY_EDITOR
 #pragma warning disable 0168 // variable declared but not used.
@@ -50,25 +51,15 @@ namespace Lockstep
 
 		//for testing purposes
 		public static bool PoolingEnabled = true;
-		private static GameManager _mainGameManager;
 
 		public static event Action onSetup;
 		public static event Action onInitialize;
 
-		public static GameManager MainGameManager {
-			get {
-				if (_mainGameManager == null)
-					throw new System.Exception ("MainGameManager has exploded!");
-				return _mainGameManager;
-			}
-			private set {
-				_mainGameManager = value;
-			}
-		}
-
 		public static int PauseCount { get; private set; }
 
 		public static bool IsPaused { get { return PauseCount > 0; } }
+
+		public static NetworkHelper MainNetworkHelper;
 
 		public static void Pause ()
 		{
@@ -80,11 +71,11 @@ namespace Lockstep
 			PauseCount--;
 		}
 
-		public static void Reset ()
-		{
-			LockstepManager.Deactivate ();
-			GameObject.Instantiate (MainGameManager.gameObject);
-		}
+//		public static void Reset ()
+//		{
+//			LockstepManager.Deactivate ();
+//			GameObject.Instantiate (MainGameManager.gameObject);
+//		}
 
 		internal static void Setup ()
 		{
@@ -143,11 +134,10 @@ namespace Lockstep
 			}
 		}
 
-		internal static void Initialize (GameManager gameManager)
+		internal static void Initialize (BehaviourHelper[] helpers, NetworkHelper networkHelper)
 		{
 			PlayRate = FixedMath.One;
 			//PauseCount = 0;
-			MainGameManager = gameManager;
 
 			if (!Loaded) {
 				Setup ();
@@ -167,9 +157,10 @@ namespace Lockstep
 
 			FrameCount = 0;
 			InfluenceFrameCount = 0;
-			InitializeHelpers();
+			MainNetworkHelper = networkHelper;
 
-			ClientManager.Initialize (MainGameManager.MainNetworkHelper);
+			BehaviourHelperManager.Initialize (helpers);
+			ClientManager.Initialize (MainNetworkHelper);
 
 			GridManager.Initialize ();
 
@@ -193,18 +184,11 @@ namespace Lockstep
 				onInitialize ();
 		}
 
-		static void InitializeHelpers ()
-		{
-			FastList<BehaviourHelper> helpers = new FastList<BehaviourHelper> ();
-			MainGameManager.GetBehaviourHelpers (helpers);
-			BehaviourHelperManager.Initialize (helpers.ToArray ());
-		}
-
 		static bool Stalled;
 
 		internal static void Simulate ()
 		{
-			MainGameManager.MainNetworkHelper.Simulate ();
+			MainNetworkHelper.Simulate ();
 			DefaultMessageRaiser.EarlySimulate ();
 			if (InfluenceCount == 0) {
 				InfluenceSimulate ();
@@ -243,7 +227,6 @@ namespace Lockstep
 		{
 			BehaviourHelperManager.GameStart ();
 			GameStarted = true;
-
 		}
 
 		private static void LateSimulate ()
@@ -300,11 +283,6 @@ namespace Lockstep
 			BehaviourHelperManager.LateVisualize();
 		}
 
-		internal static void DrawGUI ()
-		{
-
-		}
-
 		internal static void Deactivate ()
 		{
 			DefaultMessageRaiser.EarlyDeactivate ();
@@ -324,9 +302,6 @@ namespace Lockstep
 			LSServer.Deactivate ();
 			DefaultMessageRaiser.LateDeactivate ();
 			CoroutineManager.Deactivate();
-
-			if (MainGameManager.gameObject != null)
-				GameObject.Destroy (MainGameManager.gameObject);
 		}
 
 		public static void Quit ()
