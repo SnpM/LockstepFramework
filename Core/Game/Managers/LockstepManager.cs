@@ -34,9 +34,6 @@ namespace Lockstep
 	//TODO: Set up default functions to implement LSManager
 	public static class  LockstepManager
 	{
-
-		public static MonoBehaviour UnityInstance { get; private set; }
-
 		public const int FrameRate = 32;
 		public const int InfluenceResolution = 2;
 		public const float BaseDeltaTime = (float)(1d / FrameRate);
@@ -95,11 +92,6 @@ namespace Lockstep
 
 			LSDatabaseManager.Setup ();
 			Command.Setup ();
-
-			UnityInstance = GameObject.CreatePrimitive (PrimitiveType.Sphere).AddComponent<FillerComponent> ();
-			GameObject.Destroy (UnityInstance.GetComponent<Collider> ());
-			UnityInstance.GetComponent<Renderer> ().enabled = false;
-			GameObject.DontDestroyOnLoad (UnityInstance.gameObject);
 
 			GridManager.Setup ();
 			AbilityDataItem.Setup ();
@@ -352,9 +344,5 @@ namespace Lockstep
 			hash += 1;
 			return hash;
 		}
-	}
-	public class FillerComponent : MonoBehaviour
-	{
-
 	}
 }

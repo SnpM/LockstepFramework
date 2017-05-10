@@ -56,13 +56,6 @@ namespace Lockstep
 		{
 			Coroutines.Clear();
 		}
-
-		#region ND coroutines
-		public static UnityEngine.Coroutine StartUnityCoroutine(IEnumerator enumerator)
-		{
-			return LockstepManager.UnityInstance.StartCoroutine(enumerator);
-		}
-		#endregion
 	}
 
 	public class Coroutine

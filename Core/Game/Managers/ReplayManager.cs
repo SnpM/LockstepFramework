@@ -148,13 +148,13 @@ namespace Lockstep
 		private static void StartStreaming (Replay replay)
 		{
 			StopStreaming ();
-			streamer = CoroutineManager.StartUnityCoroutine (StreamPlayback (replay));
+			streamer = UnityInstance.Instance.StartCoroutine(StreamPlayback(replay));
 		}
 
 		private static void StopStreaming ()
 		{
 			if (streamer .IsNotNull ()) {
-				LockstepManager.UnityInstance.StopCoroutine (streamer);
+				UnityInstance.Instance.StopCoroutine (streamer);
 				streamer = null;
 			}
 		}

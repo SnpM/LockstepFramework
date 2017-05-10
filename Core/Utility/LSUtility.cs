@@ -216,7 +216,7 @@ namespace Lockstep
 		}
 
 		public static UnityEngine.Coroutine WaitRealTime (float wait) {
-			return CoroutineManager.StartUnityCoroutine(waitRealTime (wait));
+			return UnityInstance.Instance.StartCoroutine(waitRealTime (wait));
 		}
 		private static IEnumerator waitRealTime (float wait) {
 			float accumulator = 0f;
