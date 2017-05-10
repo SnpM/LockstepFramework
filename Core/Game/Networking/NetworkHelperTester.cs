@@ -11,7 +11,7 @@ namespace Lockstep
         void OnGUI () {
 			GUILayout.Label("State Hash: " + AgentController.GetStateHash());
 
-			if (GameManager.Instance != null && GameManager.Instance.MainNetworkHelper.IsConnected)
+			if (LockstepManager.MainNetworkHelper != null && LockstepManager.MainNetworkHelper.IsConnected)
             {
                 return;
             }

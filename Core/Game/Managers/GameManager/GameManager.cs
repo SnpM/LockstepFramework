@@ -1,106 +1,61 @@
 ﻿using Lockstep;
 using UnityEngine;
-using UnityEngine.UI;
-using System.Collections; using FastCollections;
-using System;
+using FastCollections;
 using Lockstep.NetworkHelpers;
+using System;
 
 namespace Lockstep
 {
-    public class GameManager : MonoBehaviour
-    {
+	public class GameManager : MonoBehaviour
+	{
+		public static GameManager Instance { get; private set; }
 
-        BehaviourHelper[] _helpers;
+		void Awake()
+		{
+			Instance = this;
 
-        BehaviourHelper[] Helpers { get { return _helpers; } }
+			NetworkHelper networkHelper = gameObject.GetComponent<NetworkHelper>();
+			if (networkHelper == null)
+				networkHelper = gameObject.AddComponent<DefaultNetworkHelper>();
+			
 
+			//Currently deterministic but not guaranteed by Unity
+			// may be add as serialized Array as property?  [SerializeField] private BehaviourHelper[] helpers; ?
+ 			BehaviourHelper[] helpers = this.gameObject.GetComponents<BehaviourHelper>();
+			LockstepManager.Initialize(helpers, networkHelper);
+		}
 
-        public static GameManager Instance { get; private set; }
-
-        private NetworkHelper _mainNetworkHelper;
-
-        public virtual NetworkHelper MainNetworkHelper
-        {
-            get
-            {
-                if (_mainNetworkHelper == null)
-                {
-                    _mainNetworkHelper = GetComponent<NetworkHelper>();
-                    if (_mainNetworkHelper == null)
-                    {
-                        Debug.Log("NetworkHelper not found on this GameManager's GameObject. Defaulting to ExampleNetworkHelper...");
-                        _mainNetworkHelper = base.gameObject.AddComponent<DefaultNetworkHelper>();
-                    }
-                }
-                return _mainNetworkHelper;
-            }
-        }
-
-
-        public void ScanForHelpers()
-        {
-            //Currently deterministic but not guaranteed by Unity
-            _helpers = this.gameObject.GetComponents<BehaviourHelper>();
-        }
-
-        public void GetBehaviourHelpers(FastList<BehaviourHelper> output)
-        {
-            //if (Helpers == null)
-            ScanForHelpers();
-            if (Helpers != null)
-            {
-                for (int i = 0; i < Helpers.Length; i++)
-                {
-                    output.Add(Helpers [i]);
-                }
-            }
-        }
-
-        protected void Start()
-        {
-            Instance = this;
-            LockstepManager.Initialize(this);
-        }
-            
-
-        protected virtual void FixedUpdate()
-        {
+		void FixedUpdate()
+		{
 			LockstepManager.Simulate();
-        }
+		}
 
-        private float timeToNextSimulate;
+		void Update()
+		{
+			LockstepManager.Visualize();
+		}
 
-		protected virtual void Update()
-        {
-            timeToNextSimulate -= Time.smoothDeltaTime * Time.timeScale;
-            if (timeToNextSimulate <= float.Epsilon)
-            {
-                timeToNextSimulate = LockstepManager.BaseDeltaTime;
-            }
-            LockstepManager.Visualize();
-        }
+		void LateUpdate()
+		{
+			LockstepManager.LateVisualize();
+		}
 
+		bool Quited = false;
 
-
-		protected void LateUpdate()
-        {
-            LockstepManager.LateVisualize();
-        }
-            
-        bool Quited = false;
-        void OnDisable ()
-        {
+		void OnDisable()
+		{
 			Instance = null;
-            if (Quited) return;
-            LockstepManager.Deactivate();
-        }
+			if (Quited)
+				return;
+			LockstepManager.Deactivate();
+		}
 
-        void OnApplicationQuit()
-        {
+		void OnApplicationQuit()
+		{
 			Instance = null;
-            Quited = true;
-            LockstepManager.Quit();
-        }
+			Quited = true;
+			LockstepManager.Quit();
+		}
 
-    }
+	}
 }

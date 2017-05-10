@@ -100,15 +100,7 @@ namespace Lockstep
 		public static GameObject ResourceLoadGO (string path) {
 			return Resources.Load<GameObject> (path);
 		}
-        public static void LoadLevel (string levelName) {
-            LockstepManager.Deactivate ();
-            SceneManager.LoadScene(levelName);
-        }
-		public static void LoadLevel(int levelName)
-		{
-			LockstepManager.Deactivate();
-            SceneManager.LoadScene(levelName);
-		}
+
 		#region BitMask Manipulation
 		//ulong mask
 		public static void SetBitTrue (ref ulong mask, int bitIndex) 
