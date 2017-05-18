@@ -536,12 +536,16 @@ namespace Lockstep
 		public void Simulate()
 		{
 
-			if (VelocityChanged) {
+			if (VelocityChanged)
+			{
 				VelocityFastMagnitude = _velocity.FastMagnitude();
 				VelocityChanged = false;
 			}
-			if (VelocityFastMagnitude != 0) {
 
+			LastPosition = _position;
+
+			if (VelocityFastMagnitude != 0)
+			{
 				_position.x += _velocity.x;
 				_position.y += _velocity.y;
 				PositionChanged = true;
@@ -549,26 +553,30 @@ namespace Lockstep
 
 			BuildChangedValues();
 
-
-			if (PositionChanged || this.PositionChangedBuffer) {
+			if (PositionChanged || this.PositionChangedBuffer)
+			{
 				Partition.UpdateObject(this);
 			}
 		}
 
 
-		public void BuildChangedValues()
+		void BuildChangedValues()
 		{
-			if (PositionChanged || RotationChanged) {
+			if (PositionChanged || RotationChanged)
+			{
 				BuildPoints();
 				BuildBounds();
 			}
-			if (PositionChanged || this.HeightPosChanged) {
-				LastPosition = _position;
+
+			if (PositionChanged || this.HeightPosChanged)
+			{
 				PositionChangedBuffer = true;
 				PositionChanged = false;
 				this.SetVisualPosition = true;
 				this.HeightPosChanged = false;
-			} else {
+			}
+			else
+			{
 				PositionChangedBuffer = false;
 				this.SetVisualPosition = false;
 			}
