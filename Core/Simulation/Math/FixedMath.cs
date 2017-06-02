@@ -400,6 +400,18 @@ namespace Lockstep
 
 		public static class Trig
 		{
+			public const long HalfCircle = 180 << SHIFT_AMOUNT;
+
+			public static long Rad2Deg(long rad)
+			{
+				return rad.Mul(HalfCircle.Div(Pi));
+			}
+
+			public static long Deg2Rad(long deg)
+			{
+				return deg.Mul(Pi.Div(HalfCircle));
+			}
+
 			public static long Sin(long theta)
 			{
 				//Taylor series cuz easy
