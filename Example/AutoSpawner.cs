@@ -58,19 +58,16 @@ namespace Lockstep
 				while (AgentController.InstanceManagers.Count <= info.ControllerIndex) {
 
 					AgentController cont = AgentController.Create ();
+					AgentControllerTool.SetFullHostile (cont);
 					PlayerManager.AddController (cont);
-					for (int j = 0; j < AgentController.InstanceManagers.Count; j++) {
-						AgentController ac = AgentController.InstanceManagers [j];
-						if (ac != cont) {
-							cont.SetAllegiance (ac, AllegianceType.Enemy);
-							ac.SetAllegiance (cont, AllegianceType.Enemy);
-						}
-					}
+	
 
 				}
 
 				AgentController controller = AgentController.InstanceManagers [info.ControllerIndex];
-
+				//add default controller if necessary
+				if (info.ControllerIndex == 0)
+					PlayerManager.AddController(controller);
 				for (int j = 0; j < info.Count; j++) {
 					LSAgent agent = controller.CreateAgent (info.AgentCode, info.Position);
 					if (AutoCommand)

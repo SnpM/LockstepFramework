@@ -107,7 +107,7 @@ namespace Lockstep
 				}
 			}
             
-						AgentController.DefaultController = AgentController.Create ();
+			AgentController.DefaultController = AgentController.Create ();
 
 		}
 
@@ -361,6 +361,7 @@ namespace Lockstep
 			InstanceManagers.Add (this);
 			this.SetAllegiance (this, AllegianceType.Friendly);
 		}
+
 
 		public void AddToSelection (LSAgent agent)
 		{
