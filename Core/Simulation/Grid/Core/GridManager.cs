@@ -192,6 +192,13 @@ namespace Lockstep
 			return index >= 0 && index < GridSize;
 		}
 
+        public static Vector2d GetOffsettedPos (Vector2d worldPos)
+        {
+            return new Vector2d(
+                worldPos.x - OffsetX,
+                worldPos.y - OffsetY
+                );
+        }
 		public static void GetCoordinates (long xPos, long yPos, out int xGrid, out int yGrid)
 		{
 			xGrid = (int)((xPos + FixedMath.Half - 1 - OffsetX) >> FixedMath.SHIFT_AMOUNT);
