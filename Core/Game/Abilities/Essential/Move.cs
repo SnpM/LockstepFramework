@@ -460,7 +460,8 @@ namespace Lockstep
 			StoppedTime = 0;
 			Arrived = false;
 
-            viableDestination = Pathfinder.GetPathNode (destination, out destinationNode);// Pathfinder.GetClosestViableNode(Agent.Body.Position, destination, this.GridSize, out destinationNode);
+            //For now, use old next-best-node system when size requires consideration
+            viableDestination = this.GridSize <= 1 ? Pathfinder.GetPathNode (destination, out destinationNode) : Pathfinder.GetClosestViableNode(Agent.Body.Position, destination, this.GridSize, out destinationNode);
             //TODO: If next-best-node, autostop more easily
             //Also implement stopping sooner based on distance
 
