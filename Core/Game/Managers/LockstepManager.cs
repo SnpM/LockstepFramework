@@ -134,7 +134,7 @@ namespace Lockstep
 			}
 		}
 
-		internal static void Initialize (BehaviourHelper[] helpers, NetworkHelper networkHelper)
+		internal static void Initialize (ILockstepEventsHandler[] helpers, NetworkHelper networkHelper)
 		{
 			PlayRate = FixedMath.One;
 			//PauseCount = 0;

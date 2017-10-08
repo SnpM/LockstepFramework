@@ -20,6 +20,7 @@ MonoBehaviour:
   - _name: Attack
   - _name: Move
   - _name: Spawn
+  - _name: Stop
   _projectileData:
   - _name: TestBullet
     _description: 
@@ -46,7 +47,7 @@ MonoBehaviour:
     _icon: {fileID: 0}
     _script:
       _classRef: Lockstep.Stop, Assembly-CSharp
-    _listenInputCode: 
+    _listenInputCode: Stop
     _informationGather: 0
   - _name: DurationAbility
     _description: 

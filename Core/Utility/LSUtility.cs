@@ -14,6 +14,8 @@ namespace Lockstep
 		public static readonly FastList<byte> bufferBytes = new FastList<byte>();
         public static readonly FastList<int> bufferInts = new FastList<int> ();
 
+        public static System.Diagnostics.Stopwatch DebugSW = new System.Diagnostics.Stopwatch();
+
 		const uint Y = 842502087, Z = 3579807591, W = 273326509;
 		public static uint Seed = 1;
 		private static uint y = Y, z = Z, w;

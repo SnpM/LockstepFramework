@@ -1,31 +1,21 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 using Lockstep;
-using System.Collections.Generic;
-using System;
 
 namespace Lockstep
 {
-	public abstract class BehaviourHelper : MonoBehaviour, IBehaviourHelper
+	public abstract class BehaviourHelper : MonoBehaviour, ILockstepEventsHandler
 	{
+		private ushort CachedListenInput;
 
-		public BehaviourHelper()
+		public virtual ushort ListenInput
 		{
-
-		}
-
-		private static FastList<BehaviourHelper> _behaviourHelpers = new FastList<BehaviourHelper>();
-		private static HashSet<Type> _createdTypes = new HashSet<Type>();
-
-		public static FastList<BehaviourHelper> BehaviourHelpers { get { return _behaviourHelpers; } }
-		public static HashSet<Type> CreatedTypes { get { return _createdTypes; } }
-
-		public ushort CachedListenInput { get; private set; }
-
-		public virtual ushort ListenInput {
 			get { return 0; }
 		}
 
+		public ushort GetListenInput()
+		{
+			return CachedListenInput;
+		}
 
 		public void Initialize()
 		{
@@ -38,6 +28,7 @@ namespace Lockstep
 
 			OnEarlyInitialize();
 		}
+
 		protected virtual void OnEarlyInitialize()
 		{
 
@@ -54,7 +45,6 @@ namespace Lockstep
 
 		protected virtual void OnLateInitialize()
 		{
-
 		}
 
 		public void Simulate()
@@ -73,7 +63,6 @@ namespace Lockstep
 
 		protected virtual void OnLateSimulate()
 		{
-
 		}
 
 		public void Visualize()
@@ -84,10 +73,12 @@ namespace Lockstep
 		protected virtual void OnVisualize()
 		{
 		}
+
 		public void LateVisualize()
 		{
 			OnLateVisualize();
 		}
+
 		protected virtual void OnLateVisualize()
 		{
 
@@ -129,7 +120,6 @@ namespace Lockstep
 
 		protected virtual void OnDeactivate()
 		{
-
 		}
 	}
 }

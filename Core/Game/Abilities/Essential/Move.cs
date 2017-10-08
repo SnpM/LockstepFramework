@@ -198,6 +198,16 @@ namespace Lockstep
 
 		bool DoPathfind;
 
+
+        uint GetNodeHash (GridNode node)
+        {
+            //TODO: At the moment, the CombinePathVersion is based on the destination... essentially caching the path to the last destination
+            //Should this be based on commands instead?
+            //Also, a lot of redundancy can be moved into MovementGroupHelper... i.e. getting destination node 
+            uint ret = (uint)(node.gridX * GridManager.Width);
+            ret += (uint) node.gridY;
+            return ret;
+        }
 		protected override void OnSimulate()
 		{
 			if (!CanMove) {
@@ -208,7 +218,7 @@ namespace Lockstep
 					if (DoPathfind) {
 						DoPathfind = false;
 						if (viableDestination) {
-							if (Pathfinder.GetPathNode(cachedBody._position.x, cachedBody._position.y, out currentNode)) {
+							if (Pathfinder.GetPathNode(cachedBody.Position, out currentNode)) {
 								if (currentNode.DoesEqual(this.destinationNode)) {
 									if (this.RepathTries >= 1) {
 										this.Arrive();
@@ -217,7 +227,7 @@ namespace Lockstep
 									if (straightPath) {
 										if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize)) {
 											if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath,
-												GridSize)) {
+												GridSize, GetNodeHash (destinationNode))) {
 												hasPath = true;
 												pathIndex = 0;
 											} else {
@@ -230,9 +240,9 @@ namespace Lockstep
 										} else {
 										}
 									} else {
-										if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize)) {
+                                        if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize)) {
 											if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath,
-												GridSize)) {
+												GridSize, GetNodeHash (destinationNode))) {
 												hasPath = true;
 												pathIndex = 0;
 											} else {
@@ -450,9 +460,11 @@ namespace Lockstep
 			StoppedTime = 0;
 			Arrived = false;
 
-			viableDestination = Pathfinder.GetClosestViableNode(Agent.Body.Position, destination, this.GridSize, out destinationNode);
+            viableDestination = Pathfinder.GetPathNode (destination, out destinationNode);// Pathfinder.GetClosestViableNode(Agent.Body.Position, destination, this.GridSize, out destinationNode);
+            //TODO: If next-best-node, autostop more easily
+            //Also implement stopping sooner based on distance
 
-			StuckTime = 0;
+            StuckTime = 0;
 			RepathTries = 0;
 			IsCasting = true;
 			if (onStartMove != null)

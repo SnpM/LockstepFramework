@@ -40,6 +40,11 @@ namespace Lockstep{
         //Using this for no garbage collection from enumeration
         private FastList<KeyValuePair<byte,FastBucket<LSInfluencer>>> FastIterationBuckets = new FastList<KeyValuePair<byte,FastBucket<LSInfluencer>>>();
 
+		public FastList<KeyValuePair<byte,FastBucket<LSInfluencer>>> GetBuckets()
+		{
+			return FastIterationBuckets;
+		}
+
         public void GetBucketsWithAllegiance (Func<byte,bool> bucketConditional, FastList<FastBucket<LSInfluencer>> output) {
             for (int i = 0; i < FastIterationBuckets.Count; i++) {
                 var pair = FastIterationBuckets[i];

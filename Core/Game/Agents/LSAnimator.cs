@@ -100,7 +100,8 @@ namespace Lockstep
 				AnimationClip clip = GetImpulseClip(impulse);
 				if (clip.IsNotNull())
 				{
-					animator.Blend(clip.name,.8f,fadeLength);
+					//animator.Blend(clip.name,.8f,fadeLength);
+                    animator.Play(clip.name);
 				}
 			}
 		}

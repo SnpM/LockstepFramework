@@ -177,7 +177,12 @@ namespace Lockstep
 			_extraClearanceObsolete = true;
 		}
 
-		static int CachedUnpassableCheckSize;
+        #region CombinePath
+        //This is the system used for groups of pathfinding queries to the same destination
+        //If query 2 finds its way onto a node on the first query, it will use the rest of the first query
+        public uint CombinePathVersion;
+        #endregion
+        static int CachedUnpassableCheckSize;
 
 		internal static void PrepareUnpassableCheck (int size)
 		{
