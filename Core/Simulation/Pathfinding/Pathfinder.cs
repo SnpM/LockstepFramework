@@ -546,10 +546,14 @@ namespace Lockstep.Pathfinding
                 int iterations = 0; // <- this is for debugging
                 for (layer = 1; layer <= this.MaxTestDistance;)
                 {
-                    this.CheckPathNode(GridManager.GetNode(XGrid + dirX, YGrid + dirY));
-                    if (this.castNodeFound)
+                    GridNode checkNode = GridManager.GetNode(XGrid + dirX, YGrid + dirY);
+                    if (checkNode != null)
                     {
-                        return this.closestNode;
+                        this.CheckPathNode(checkNode);
+                        if (this.castNodeFound)
+                        {
+                            return this.closestNode;
+                        }
                     }
                     AdvanceRotation();
                     //If we make a full loop
@@ -639,31 +643,69 @@ namespace Lockstep.Pathfinding
                 }
             }
         }
-		public static bool GetPathNode(Vector2d worldPos, out GridNode returnNode)
+
+        /// <summary>
+        /// Finds closest next-best-node also when destination is off the grid
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="dest"></param>
+        /// <param name="returnNode"></param>
+        /// <returns></returns>
+		public static bool GetPathNode(Vector2d from, Vector2d dest, out GridNode returnNode)
 		{
-			returnNode = GridManager.GetNode(worldPos.x, worldPos.y);
-
-			if (returnNode == null || returnNode.Unwalkable) {
-
-				int xGrid, yGrid;
-				GridManager.GetCoordinates(worldPos.x, worldPos.y, out xGrid, out yGrid);
-				const int maxTestDistance = 3;
-
-                AlternativeNodeFinder.Instance.SetValues(
-                    worldPos,
-                    xGrid, yGrid, maxTestDistance);
-
-
-                GridNode node = AlternativeNodeFinder.Instance.GetNode();
-
-				if (node == null) {
-					return false;
-				}
-				returnNode = node;
-			}
-
+			returnNode = GridManager.GetNode(dest.x, dest.y);
+            if (returnNode == null)
+            {
+                //If null, it is off the grid. Raycast back onto grid for closest viable node to the destination.
+                foreach (var coordinate in PanLineAlgorithm.FractionalLineAlgorithm.Trace(
+                    dest.x.ToDouble(), dest.y.ToDouble(), from.x.ToDouble(), from.y.ToDouble()))
+                {
+                    returnNode = GridManager.GetNode(
+                        FixedMath.Create(coordinate.X), FixedMath.Create(coordinate.Y));
+                    if (returnNode != null)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            else if (returnNode.Unwalkable)
+            {
+                return StarCast(dest, out returnNode);
+            }
 			return true;
 		}
+
+        /// <summary>
+        /// Finds closest next-best-node
+        /// </summary>
+        /// <param name="dest"></param>
+        /// <param name="returnNode"></param>
+        /// <returns></returns>
+        public static bool GetPathNode(Vector2d dest, out GridNode returnNode)
+        {
+            returnNode = GridManager.GetNode(dest.x, dest.y);
+            if (returnNode == null || returnNode.Unwalkable)
+            {
+                return StarCast(dest, out returnNode);
+            }
+            return true;
+        }
+        public static bool StarCast(Vector2d dest, out GridNode returnNode)
+        {
+            int xGrid, yGrid;
+            GridManager.GetCoordinates(dest.x, dest.y, out xGrid, out yGrid);
+            const int maxTestDistance = 3;
+            AlternativeNodeFinder.Instance.SetValues(
+                dest,
+                xGrid, yGrid, maxTestDistance);
+            returnNode = AlternativeNodeFinder.Instance.GetNode();
+            if (returnNode == null)
+            {
+                return false;
+            }
+            return true;
+        }
 
 
         public static bool GetClosestViableNode(Vector2d from, Vector2d dest, int pathingSize, out GridNode returnNode)

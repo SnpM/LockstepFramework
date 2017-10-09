@@ -166,7 +166,7 @@ namespace Lockstep
 
 		public static GridNode GetNode (int xGrid, int yGrid)
 		{
-            if (xGrid < 0 || xGrid >= Grid.Length || yGrid < 0 || yGrid >= Grid.Length) 
+            if (xGrid < 0 || xGrid >= Width || yGrid < 0 || yGrid >= Height) 
 				return null;
 			return Grid [GetGridIndex (xGrid, yGrid)];
 		}
