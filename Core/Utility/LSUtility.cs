@@ -71,7 +71,6 @@ namespace Lockstep
             ulong combined = GetRawRandom();
             combined <<= 32;
             combined |= GetRawRandom();
-            Debug.Log(count);
             return (long)(combined % (ulong)count);
         }
 		public static long GetRandomOne()
