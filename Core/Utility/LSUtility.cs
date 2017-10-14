@@ -56,6 +56,7 @@ namespace Lockstep
 
         public static int GetRandom (int count = int.MaxValue)
         {
+            if (count == 0) return 0;
             //TODO: Improve uniform distribution within count range
             return (int)(GetRawRandom() % count);
         }
@@ -65,10 +66,12 @@ namespace Lockstep
         /// <returns></returns>
         public static long GetRandomLong (long count = long.MaxValue)
         {
+            if (count == 0) return 0;
             //Combines 2 random uints
             ulong combined = GetRawRandom();
             combined <<= 32;
             combined |= GetRawRandom();
+            Debug.Log(count);
             return (long)(combined % (ulong)count);
         }
 		public static long GetRandomOne()
