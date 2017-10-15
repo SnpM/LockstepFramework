@@ -88,7 +88,7 @@ namespace Lockstep
             return heightMap;
         }
         
-        protected override void OnApply()
+        protected override void OnEarlyApply()
         {
             Instance = this;
         }

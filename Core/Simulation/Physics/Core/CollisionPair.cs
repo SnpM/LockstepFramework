@@ -190,6 +190,7 @@ namespace Lockstep
 						if (applyVelocity)
 						{
 							Body2._velocity.x -= DistX;
+                            Body2._velocity.y -= DistY;
 							Body2.VelocityChanged = true;
 						}
 					}

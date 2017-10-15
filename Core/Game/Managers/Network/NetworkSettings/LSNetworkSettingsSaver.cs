@@ -6,7 +6,7 @@ namespace Lockstep
 	public class LSNetworkSettingsSaver : EnvironmentSaver
 	{
 		public LSNetworkSettings SavedSettings = new LSNetworkSettings ();
-		protected override void OnApply ()
+		protected override void OnEarlyApply ()
 		{
 			LSNetworkSettings.Settings = SavedSettings;
 		}
