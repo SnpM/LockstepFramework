@@ -320,18 +320,32 @@ namespace Lockstep
 					}
 
 				}
+                //Temporary improvement to detecting stuck
+                StuckTime++;
+                stuckThreshold = stuckThreshold.Mul(FixedMath.One +
+                    FixedMath.Max(0, FixedMath.Create(StuckTime) / 12)
+                    );
 				if (GetFullCanCollisionStop() && (Agent.Body.Position - this.AveragePosition).FastMagnitude() < (stuckThreshold * stuckThreshold)) {
-					StuckTime += 1;
 
 					if (StuckTime > StuckTimeThreshold) {
-						if (RepathTries < StuckRepathTries) {
-							DoPathfind = true;
-							RepathTries++;
+                        if (movingToWaypoint)
+                        {
+                            this.pathIndex++;
+                        }
+                        else
+                        {
+                            if (RepathTries < StuckRepathTries)
+                            {
+                                DoPathfind = true;
+                                RepathTries++;
 
-						} else {
-							RepathTries = 0;
-							this.Arrive();
-						}
+                            }
+                            else
+                            {
+                                RepathTries = 0;
+                                this.Arrive();
+                            }
+                        }
 						StuckTime = 0;
 
 					}
