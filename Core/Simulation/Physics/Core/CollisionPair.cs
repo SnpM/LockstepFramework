@@ -148,65 +148,103 @@ namespace Lockstep
 
 			if (!DoPhysics)
 				return;
-			
-			switch (LeCollisionType)
-			{
-				case CollisionType.Circle_Circle:
-					DistX = Body1._position.x - Body2._position.x;
-					DistY = Body1._position.y - Body2._position.y;
-					dist = FixedMath.Sqrt((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT);
-                        
-					if (dist == 0)
-					{
-						const int randomMax = (int)((long)int.MaxValue % (FixedMath.One / 64));
-						Body1._position.x += LSUtility.GetRandom(randomMax) - randomMax / 2;
-						Body1._position.y += LSUtility.GetRandom(randomMax) - randomMax / 2;
-						Body1.PositionChanged = true;
-						Body2._position.x += LSUtility.GetRandom(randomMax) - randomMax / 2;
-						Body2._position.y += LSUtility.GetRandom(randomMax) - randomMax / 2;
-						Body2.PositionChanged = true;
-						return;
-					}
+
+            switch (LeCollisionType)
+            {
+                case CollisionType.Circle_Circle:
+                    DistX = Body1._position.x - Body2._position.x;
+                    DistY = Body1._position.y - Body2._position.y;
+                    dist = FixedMath.Sqrt((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT);
+
+                    if (dist == 0)
+                    {
+                        const int randomMax = (int)((long)int.MaxValue % (FixedMath.One / 64));
+                        Body1._position.x += LSUtility.GetRandom(randomMax) - randomMax / 2;
+                        Body1._position.y += LSUtility.GetRandom(randomMax) - randomMax / 2;
+                        Body1.PositionChanged = true;
+                        Body2._position.x += LSUtility.GetRandom(randomMax) - randomMax / 2;
+                        Body2._position.y += LSUtility.GetRandom(randomMax) - randomMax / 2;
+                        Body2.PositionChanged = true;
+                        return;
+                    }
 
 
-					depth = (Body1.Radius + Body2.Radius - dist);
+                    depth = (Body1.Radius + Body2.Radius - dist);
 
-					if (depth <= 0)
-					{
-						return;
-					}
-					DistX = (DistX * depth / dist) / 2L;
-					DistY = (DistY * depth / dist) / 2L;
+                    if (depth <= 0)
+                    {
+                        return;
+                    }
+                    DistX = (DistX * depth / dist) / 2L;
+                    DistY = (DistY * depth / dist) / 2L;
 
                     //Switch, used to be const
-					bool applyVelocity = false;
+                    bool applyVelocity = false;
 
                     //Resolving collision
-					if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority))
-					{
-						Body2._position.x -= DistX;
-						Body2._position.y -= DistY;
-						Body2.PositionChanged = true;
-						if (applyVelocity)
-						{
-							Body2._velocity.x -= DistX;
-                            Body2._velocity.y -= DistY;
-							Body2.VelocityChanged = true;
-						}
-					}
-					else if (Body2.Immovable || Body2.Priority > Body1.Priority)
-					{
+                    //TODO: Less copy-paste code
+                    if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority))
+                    {
+                        DistX *= -1;
+                        DistY *= -1;
 
-						Body1._position.x += DistX;
-						Body1._position.y += DistY;
-						Body1.PositionChanged = true;
-						if (applyVelocity)
-						{
-							Body1._velocity.x += DistX;
-							Body1._velocity.y += DistY;
-							Body1.VelocityChanged = true;
-						}
-					}
+                        if (Body1.Immovable || Body2.ImmovableCollisionDirection.EqualsZero())
+                        {
+                            Body2._position.x += DistX;
+                            Body2._position.y += DistY;
+                            Body2.PositionChanged = true;
+                            Body2.ImmovableCollisionDirection = new Vector2d(DistX, DistY);
+                            if (applyVelocity)
+                            {
+                                Body2._velocity.x += DistX;
+                                Body2._velocity.y += DistY;
+                                Body2.VelocityChanged = true;
+                            }
+                        }
+                        else
+                        {
+                            //Only move if there isn't an immovable object in that direction
+                            if (Body2.ImmovableCollisionDirection.x.Sign() != DistX.Sign())
+                            {
+                                Body1._position.x += DistX;
+                            }
+                            if (Body2.ImmovableCollisionDirection.y.Sign() != DistY.Sign())
+                            {
+                                Body1._position.y += DistY;
+                            }
+                        }
+                    }
+
+                    else if (Body2.Immovable || Body2.Priority > Body1.Priority)
+                    {
+                        if (Body2.Immovable || Body1.ImmovableCollisionDirection.EqualsZero())
+                        {
+                            Body2.ImmovableCollisionDirection = new Vector2d(DistX, DistY);
+
+                            Body1._position.x += DistX;
+                            Body1._position.y += DistY;
+                            Body1.PositionChanged = true;
+                            if (applyVelocity)
+                            {
+                                Body1._velocity.x += DistX;
+                                Body1._velocity.y += DistY;
+                                Body1.VelocityChanged = true;
+                            }
+                        }
+                        else
+                        {
+                            //Only move if there isn't an immovable object in that direction
+                            if (Body1.ImmovableCollisionDirection.x.Sign() != DistX.Sign())
+                            {
+                                Body2._position.x += DistX;
+                            }
+                            if (Body1.ImmovableCollisionDirection.y.Sign() != DistY.Sign())
+                            {
+                                Body2._position.y += DistY;
+                            }
+                        }
+                    }
+            
 					else
 					{
 						DistX /= 2;
