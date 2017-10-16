@@ -39,7 +39,7 @@ namespace Lockstep.Pathfinding
         static GridNode neighbor;
         static int newMovementCostToNeighbor;
         static int i;
-        static int StartNodeIndex;
+        static uint StartNodeIndex;
         static bool FindStraight;
         static bool LastIsObstructed;
         static bool hasInvalidEdge;
@@ -47,7 +47,7 @@ namespace Lockstep.Pathfinding
         #endregion
 
         #region CombinePath Variables
-        static uint combinePathVersion;
+        static ulong combinePathVersion;
         #endregion
         #region Broadphase variables
 
@@ -59,7 +59,7 @@ namespace Lockstep.Pathfinding
         {
             if (!GetPathNodes(Start.x, Start.y, End.x, End.y, out node1, out node2))
                 return false;
-            if (FindRawPath(node1, node2, OutputPath, unitSize, combinePathVersion)) {
+            if (FindRawPath(node1, node2, OutputPath, unitSize)) {
                 SmoothPath(OutputPath, End, outputVectorPath, unitSize);
                 return true;
             }
@@ -124,7 +124,7 @@ namespace Lockstep.Pathfinding
         public static bool FindPath(Vector2d End, GridNode startNode, GridNode endNode, FastList<Vector2d> outputVectorPath, int unitSize = 1, uint combinePathsVersion = 0)
         {
 
-            if (FindRawPath(startNode, endNode, OutputPath, unitSize, combinePathsVersion)) {
+            if (FindRawPath(startNode, endNode, OutputPath, unitSize)) {
                 SmoothPath(OutputPath, End, outputVectorPath, unitSize);
 
                 return true;
@@ -142,6 +142,18 @@ namespace Lockstep.Pathfinding
 
         }
 
+        public static bool IsCombinePath { get; private set; }
+        public static uint CombinePathVersion { get; private set; }
+        static int SearchCount;
+        public static void PrepareCombinePath ()
+        {
+            IsCombinePath = true;
+            CombinePathVersion++;
+        }
+        public static void EndCombinePath ()
+        {
+            IsCombinePath = false;
+        }
         #region method sharing variables
         static GridNode startNode;
         static GridNode endNode;
@@ -157,8 +169,10 @@ namespace Lockstep.Pathfinding
         /// <param name="startNode">Start node.</param>
         /// <param name="endNode">End node.</param>
         /// <param name="outputPath">Return path.</param>
-        public static bool FindRawPath(GridNode _startNode, GridNode _endNode, FastList<GridNode> _outputPath, int _unitSize, uint _combinePathVersion)
+        public static bool FindRawPath(GridNode _startNode, GridNode _endNode, FastList<GridNode> _outputPath, int _unitSize)
         {
+
+            
             //TODO: Not critical but there's a lot of room for better organization
             //i.e. All these static variables and methods goes into individual singleton classes
             startNode = _startNode;
@@ -184,7 +198,8 @@ namespace Lockstep.Pathfinding
 
             GridHeap.FastClear();
             GridClosedSet.FastClear();
-            combinePathVersion = _combinePathVersion;
+            //POSBUG: Hash for end destination and frame count. *Most likely* won't overflow
+            combinePathVersion = (ulong)(endNode.gridIndex) * (ulong)LockstepManager.FrameCount;
             #endregion
 
             #region AStar Algorithm
@@ -199,7 +214,9 @@ namespace Lockstep.Pathfinding
                 return false;
             }
             destinationIsReached = false;
+            SearchCount = 0;
             while (GridHeap.Count > 0) {
+                SearchCount++;
                 currentNode = GridHeap.RemoveFirst();
 #if false
 				Gizmos.DrawCube(currentNode.WorldPos.ToVector3(), Vector3.one);
@@ -295,7 +312,7 @@ namespace Lockstep.Pathfinding
                 }
                 
                 GridClosedSet.Add(currentNode);
-
+                
             }
             #endregion
             return destinationIsReached;
@@ -346,10 +363,15 @@ namespace Lockstep.Pathfinding
             //CombinePaths
             if (combinePathVersion != 0)
             {
-                if (neighbor.CombinePathVersion == combinePathVersion)
+                const int MaxSearchCountForCombine = 16;
+                if (SearchCount < MaxSearchCountForCombine)
                 {
-                    //We found our way onto the previous path!
-                    DestinationReached();
+
+                    if (neighbor.CombinePathVersion == combinePathVersion)
+                    {
+                        //We found our way onto the previous path!
+                        DestinationReached();
+                    }
                 }
             }
         }

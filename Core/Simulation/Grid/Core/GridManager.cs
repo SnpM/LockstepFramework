@@ -233,9 +233,9 @@ namespace Lockstep
 			return ScanGrid [GetScanIndex (xGrid, yGrid)];
 		}
 
-		public static int GetGridIndex (int xGrid, int yGrid)
+		public static uint GetGridIndex (int xGrid, int yGrid)
 		{
-			return xGrid * Height + yGrid;
+            return (uint)(xGrid * Height + yGrid);
 		}
 
 		public static bool ValidateScanCoordinates (int scanX, int scanY)

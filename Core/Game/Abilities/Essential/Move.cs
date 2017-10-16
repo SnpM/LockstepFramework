@@ -322,9 +322,8 @@ namespace Lockstep
 				}
                 //Temporary improvement to detecting stuck
                 StuckTime++;
-                stuckThreshold = stuckThreshold.Mul(FixedMath.One +
-                    FixedMath.Max(0, FixedMath.Create(StuckTime) / 12)
-                    );
+                stuckThreshold = stuckThreshold * 7 / 6;
+                    
 				if (GetFullCanCollisionStop() && (Agent.Body.Position - this.AveragePosition).FastMagnitude() < (stuckThreshold * stuckThreshold)) {
 
 					if (StuckTime > StuckTimeThreshold) {
@@ -464,7 +463,6 @@ namespace Lockstep
 
 		public void StartMove(Vector2d destination)
 		{
-
 			DoPathfind = true;
 			Agent.SetState(AnimState.Moving);
 			hasPath = false;

@@ -35,6 +35,10 @@ namespace Lockstep
 
 		public void Setup (int _x, int _y)
 		{
+            if (_x < 0 || _y < 0)
+            {
+                Debug.LogError("Cannot be negative!");
+            }
 			gridX = _x;
 			gridY = _y;
 			gridIndex = GridManager.GetGridIndex (gridX, gridY);
@@ -82,7 +86,7 @@ namespace Lockstep
 
 		public int gridX;
 		public int gridY;
-		public int gridIndex;
+		public uint gridIndex;
 
 		public int gCost;
 		public int hCost;
@@ -180,7 +184,7 @@ namespace Lockstep
         #region CombinePath
         //This is the system used for groups of pathfinding queries to the same destination
         //If query 2 finds its way onto a node on the first query, it will use the rest of the first query
-        public uint CombinePathVersion;
+        public ulong CombinePathVersion;
         #endregion
         static int CachedUnpassableCheckSize;
 
@@ -348,7 +352,7 @@ namespace Lockstep
 
 		public override int GetHashCode ()
 		{
-			return this.gridIndex;
+			return (int)this.gridIndex;
 		}
 
 		public bool DoesEqual (GridNode obj)
