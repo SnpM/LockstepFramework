@@ -16,6 +16,7 @@ namespace Lockstep
 
         public static int Width {get; private set;}
         public static int Height {get; private set;}
+		public static uint MaxIndex {get; private set;}
         public static int ScanHeight {get; private set;}
         public static int ScanWidth {get; private set;}
         public static int GridSize {get; private set;}
@@ -136,6 +137,7 @@ namespace Lockstep
 
 		public static void Initialize ()
 		{
+			Pathfinding.Pathfinder.Reset ();
 			GridVersion = 1;
 			GridChanged = false;
 			if (!LockstepManager.PoolingEnabled)
@@ -157,6 +159,7 @@ namespace Lockstep
                     Grid[i].FastInitialize();
                 }
             }
+			MaxIndex = GetGridIndex (Width - 1, Height - 1);
 		}
 
 		public static void LateSimulate () {
@@ -191,6 +194,7 @@ namespace Lockstep
 		{
 			return index >= 0 && index < GridSize;
 		}
+
 
         public static Vector2d GetOffsettedPos (Vector2d worldPos)
         {

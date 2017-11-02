@@ -42,6 +42,14 @@ namespace Lockstep
             }
             return false;
         }
+		public bool AdvanceFrames (int amount) {
+			accumulator += amount;
+			if (accumulator >= Interval) {
+				accumulator %= Interval;
+				return true;
+			}
+			return false;
+		}
 
         public void Reset()
         {

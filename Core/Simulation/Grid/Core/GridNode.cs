@@ -57,10 +57,11 @@ namespace Lockstep
 
 		public void FastInitialize ()
 		{
-			this.ClosedSetVersion = 0;
 			this.HeapIndex = 0;
 			this.HeapVersion = 0;
+			this.ClosedHeapVersion = 0;
 			this.GridVersion = 0;
+			this.CombinePathVersion = 0;
 		}
 
 		#endregion
@@ -73,8 +74,8 @@ namespace Lockstep
 
 		#region Collection Helpers
 
-		public uint ClosedSetVersion;
 		public uint HeapVersion;
+		public uint ClosedHeapVersion;
 		public uint HeapIndex;
 
 		public uint GridVersion;
@@ -92,6 +93,7 @@ namespace Lockstep
 		public int hCost;
 		public int fCost;
 		public GridNode parent;
+		public GridNode combineTrailNode;
 		private byte _obstacleCount;
 
 		public byte ObstacleCount {

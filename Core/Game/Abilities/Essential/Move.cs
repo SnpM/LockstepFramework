@@ -532,9 +532,10 @@ namespace Lockstep
 							} else {
 								Arrive ();
 							}
-						} else if (hasPath && otherMover.hasPath //&& otherMover.pathIndex > 0 && otherMover.lastTargetPos.SqrDistance (targetPos.x, targetPos.y) < FixedMath.One
+						} else if (hasPath && otherMover.hasPath && otherMover.pathIndex > 0 && otherMover.lastTargetPos.SqrDistance (targetPos.x, targetPos.y) < FixedMath.One
 						) {
 							if (this.distance < this.closingDistance) {
+								this.pathIndex++;
 							}
 						}
 					} else {

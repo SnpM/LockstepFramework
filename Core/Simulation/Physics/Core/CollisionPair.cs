@@ -158,12 +158,13 @@ namespace Lockstep
 
                     if (dist == 0)
                     {
-                        const int randomMax = (int)((long)int.MaxValue % (FixedMath.One / 64));
-                        Body1._position.x += LSUtility.GetRandom(randomMax) - randomMax / 2;
-                        Body1._position.y += LSUtility.GetRandom(randomMax) - randomMax / 2;
+						//If objects are on the same position, give them push in random direction
+						const long randomMax = FixedMath.One / 32;
+						Body1._position.x += LSUtility.GetRandomLong(randomMax) - randomMax / 2;
+						Body1._position.y += LSUtility.GetRandomLong(randomMax) - randomMax / 2;
                         Body1.PositionChanged = true;
-                        Body2._position.x += LSUtility.GetRandom(randomMax) - randomMax / 2;
-                        Body2._position.y += LSUtility.GetRandom(randomMax) - randomMax / 2;
+						Body2._position.x += LSUtility.GetRandomLong(randomMax) - randomMax / 2;
+						Body2._position.y += LSUtility.GetRandomLong(randomMax) - randomMax / 2;
                         Body2.PositionChanged = true;
                         return;
                     }

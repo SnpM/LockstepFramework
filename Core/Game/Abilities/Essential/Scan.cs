@@ -183,6 +183,12 @@ namespace Lockstep
 			}
 		}
 
+		#region variables for quick fix for repathing to target's new position
+		const long repathDistance = FixedMath.One * 2;
+		FrameTimer repathTimer = new FrameTimer();
+		const int repathInterval = LockstepManager.FrameRate * 2;
+		int repathRandom;
+		#endregion
 		protected override void OnInitialize()
 		{
 			basePriority = Agent.Body.Priority;
@@ -195,6 +201,8 @@ namespace Lockstep
 			isFocused = false;
 			CycleCount = 0;
 			this.Destination = Vector2d.zero;
+			repathTimer.Reset (repathInterval);
+			repathRandom = LSUtility.GetRandom (repathInterval);
 		}
 
 		protected override void OnSimulate()
@@ -319,15 +327,17 @@ namespace Lockstep
 							cachedBody.Priority = basePriority;
 						}
 						else {
-							const long repathDistance = FixedMath.One * 2;
 							if (inRange) {
 								cachedMove.Destination = Target.Body.Position;
-							}
-							else if (Target.Body.PositionChangedBuffer &&
-								Target.Body.Position.FastDistance (cachedMove.Destination.x,cachedMove.Destination.y) >= (repathDistance * repathDistance)
-							)
-							{
-								cachedMove.StartMove (Target.Body._position);
+							} else {
+								if (repathTimer.AdvanceFrame ()) {
+									if (Target.Body.PositionChangedBuffer &&
+									   Target.Body.Position.FastDistance (cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance)) {
+										cachedMove.StartMove (Target.Body._position);
+										//So units don't sync up and path on the same frame
+										repathTimer.AdvanceFrames (repathRandom);
+									}
+								}
 							}
 						}
 					}
