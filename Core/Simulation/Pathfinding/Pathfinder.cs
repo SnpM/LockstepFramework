@@ -197,7 +197,6 @@ namespace Lockstep.Pathfinding
             }
 
             GridHeap.FastClear();
-            GridClosedSet.FastClear();
             //POSBUG: Hash for end destination and frame count. *Most likely* won't overflow
             combinePathVersion = (ulong)(endNode.gridIndex) * (ulong)LockstepManager.FrameCount;
             #endregion
@@ -229,32 +228,28 @@ namespace Lockstep.Pathfinding
                     return true;
                 }
 
+				#if true
 
-                #region idk why this is here. I'll find out and delete later
-                /*
-				for (i = 0; i < 8; i++) {
+                #region Allows diagonal access when edges are blocked
+				for (i = 0; i < 4; i++) {
 					neighbor = currentNode.NeighborNodes [i];
-					if (CheckNeighborInvalid ()) {
-						//continue;
-						//microoptimization... continue is more expensive than letting the loop pass at the end
-					} else {
+					if (CheckNeighborInvalid () == false) {
 						//0-3 = sides, 4-7 = diagonals
-						if (i < 4) {
-							newMovementCostToNeighbor = currentNode.gCost + 100;
-						} else {
-							if (i == 4) {
-								if (!GridManager.UseDiagonalConnections)
-									break;
-							}
-							newMovementCostToNeighbor = currentNode.gCost + 141;
-						}
-
+						newMovementCostToNeighbor = currentNode.gCost + 100;
 						AnalyzeNode();
 					}
 				}
-				*/
-                #endregion
 
+				for (int i = 4; i < 8; i++) {
+					neighbor = currentNode.NeighborNodes [i];
+					if (CheckNeighborInvalid () == false) {
+					newMovementCostToNeighbor = currentNode.gCost + 141;
+					AnalyzeNode();
+
+				}
+				}
+                #endregion
+				#else
                 hasInvalidEdge = false;
                 for (int i = 0; i < 4; i++) {
                     neighbor = currentNode.NeighborNodes[i];
@@ -310,8 +305,7 @@ namespace Lockstep.Pathfinding
                         }
                     }
                 }
-                
-                GridClosedSet.Add(currentNode);
+				#endif
                 
             }
             #endregion
@@ -333,17 +327,17 @@ namespace Lockstep.Pathfinding
 
         static bool CheckInvalid(GridNode gridNode)
         {
-            return gridNode.IsNull() || GridClosedSet.Contains(gridNode) || gridNode.Unpassable();
+			return gridNode.IsNull() || GridHeap.Contained(gridNode) || gridNode.Unpassable();
         }
 
         static bool CheckNeighborInvalid()
         {
-            return neighbor.IsNull() || GridClosedSet.Contains(neighbor) || neighbor.Unpassable();
+			return neighbor.IsNull() || GridHeap.Contained(neighbor) || neighbor.Unpassable();
         }
 
         static void AnalyzeNode()
         {
-            if (!GridHeap.Contains(neighbor)) {
+            if (!GridHeap.Contained(neighbor)) {
                 AddBestNode();
                 GridHeap.Add(neighbor);
             } else if (newMovementCostToNeighbor < neighbor.gCost) {

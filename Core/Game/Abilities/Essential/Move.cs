@@ -32,7 +32,15 @@ namespace Lockstep
 		private bool straightPath;
 		private bool viableDestination;
 		private readonly FastList<Vector2d> myPath = new FastList<Vector2d>();
-		private int pathIndex;
+		private int _pathIndex;
+		private int pathIndex {
+			get { return _pathIndex; }
+			set {
+				if (value != _pathIndex) {
+					_pathIndex = value;
+				}
+			}
+		}
 		private int StoppedTime;
 		private Vector2d targetPos;
 		[HideInInspector]
@@ -93,6 +101,7 @@ namespace Lockstep
 
 		private Vector2d lastTargetPos;
 		private Vector2d targetDirection;
+		private Vector2d waypointDirection {get {return this.targetDirection;}}
 		private GridNode currentNode;
 		private GridNode destinationNode;
 		private Vector2d movementDirection;
@@ -160,7 +169,7 @@ namespace Lockstep
 		protected override void OnInitialize()
 		{
 			myPath.FastClear();
-			pathIndex = 0;
+			_pathIndex = 0;
 			StoppedTime = 0;
 
 			IsFormationMoving = false;
@@ -301,7 +310,6 @@ namespace Lockstep
 					if (CanTurn)
 						CachedTurn.StartTurnDirection(movementDirection);
 
-
 					stuckThreshold = this.timescaledSpeed / 4;
 				} else {
 					if (distance < FixedMath.Mul(closingDistance, StopMultiplier)) {
@@ -356,7 +364,14 @@ namespace Lockstep
 				}
 
 				if (movingToWaypoint) {
-					if (distance < FixedMath.Mul(closingDistance, FixedMath.Half)) {
+
+					if (
+						(
+							this.pathIndex > 0 &&
+							distance < closingDistance &&
+							(movementDirection).Dot (waypointDirection) < 0
+						) ||
+						distance < FixedMath.Mul(closingDistance, FixedMath.Half)) {
 						this.pathIndex++;
 					}
 				}
@@ -510,18 +525,19 @@ namespace Lockstep
 			Move otherMover = tempAgent.GetAbility<Move>();
 			if (ReferenceEquals(otherMover, null) == false) {
 				if (IsMoving && (GetFullCanCollisionStop())) {
-					if (otherMover.MyMovementGroupID == MyMovementGroupID) {
+					if (otherMover.MyMovementGroupID == MyMovementGroupID || otherMover.targetPos == this.targetPos) {
 						if (otherMover.IsMoving == false && otherMover.Arrived && otherMover.StoppedTime > MinimumOtherStopTime) {
 							if (otherMover.CanCollisionStop == false) {
 								TempCanCollisionStop = false;
 							} else {
-								Arrive();
+								Arrive ();
 							}
-						} else if (hasPath && otherMover.hasPath && otherMover.pathIndex > 0 && otherMover.lastTargetPos.SqrDistance(targetPos.x, targetPos.y) < FixedMath.One) {
-							if (movementDirection.Dot(targetDirection.x, targetDirection.y) < 0) {
-								pathIndex++;
+						} else if (hasPath && otherMover.hasPath //&& otherMover.pathIndex > 0 && otherMover.lastTargetPos.SqrDistance (targetPos.x, targetPos.y) < FixedMath.One
+						) {
+							if (this.distance < this.closingDistance) {
 							}
 						}
+					} else {
 					}
 				}
 			}

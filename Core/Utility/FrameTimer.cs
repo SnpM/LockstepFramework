@@ -10,6 +10,10 @@ namespace Lockstep
     public class FrameTimer
     {
         public int Interval { get; private set; }
+        /// <summary>
+        /// Pauses the frame advancement
+        /// </summary>
+        public bool IsPaused { get; set; }
         private int accumulator;
 
         /// <summary>
@@ -19,6 +23,10 @@ namespace Lockstep
         public FrameTimer(int interval)
         {
             Interval = interval;
+        }
+        public FrameTimer ()
+        {
+            Interval = 0;
         }
         /// <summary>
         /// Returns true once every Interval frames
@@ -38,6 +46,15 @@ namespace Lockstep
         public void Reset()
         {
             accumulator = 0;
+        }
+        /// <summary>
+        /// Reset the timer and use a new interval
+        /// </summary>
+        /// <param name="newInterval"></param>
+        public void Reset (int newInterval)
+        {
+            Interval = newInterval;
+            Reset();
         }
     }
 }

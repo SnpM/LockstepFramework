@@ -38,7 +38,6 @@ namespace Lockstep
 			newNode.HeapIndex = 0;
 			SortDown (newNode);
 
-			curNode.HeapVersion--;
 			return curNode;
 		}
 	
@@ -47,7 +46,7 @@ namespace Lockstep
             //SortUp (item);
 		}
 	
-		public static bool Contains (GridNode item)
+		public static bool Contained (GridNode item)
 		{
 			return item.HeapVersion == _Version;
 		}

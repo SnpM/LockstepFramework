@@ -17,7 +17,6 @@ namespace Lockstep
 		public LSAgent Target { get; private set; }
 
 
-
 		public bool HasTarget
 		{
 			get { return _hasTarget; }
@@ -320,9 +319,15 @@ namespace Lockstep
 							cachedBody.Priority = basePriority;
 						}
 						else {
-							if (Target.Body.PositionChangedBuffer || inRange)
+							const long repathDistance = FixedMath.One * 2;
+							if (inRange) {
+								cachedMove.Destination = Target.Body.Position;
+							}
+							else if (Target.Body.PositionChangedBuffer &&
+								Target.Body.Position.FastDistance (cachedMove.Destination.x,cachedMove.Destination.y) >= (repathDistance * repathDistance)
+							)
 							{
-								cachedMove.Destination = Target.Body._position;
+								cachedMove.StartMove (Target.Body._position);
 							}
 						}
 					}
