@@ -37,7 +37,7 @@ namespace Lockstep
             }
         }
 		public static void NotifyGridChanged () {
-
+			Pathfinding.Pathfinder.ChangeCombineIteration ();
 		}
 		public static bool GridChanged {get; private set;}
 		public static uint GridVersion {get; private set;}

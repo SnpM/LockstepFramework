@@ -48,7 +48,7 @@ namespace Lockstep.Pathfinding
 
         #region CombinePath Variables
 		//CombinePath is a system that saves the paths to most recent destination, allowing new path queries to use these paths if they happen to find them
-		public static void ChangeCombine () {
+		public static void ChangeCombineIteration () {
 			lastGridIndex = uint.MaxValue;
 		}
 		public static void Reset () {
@@ -152,16 +152,12 @@ namespace Lockstep.Pathfinding
 
         }
 
-        public static bool IsCombinePath { get; private set; }
 		public static uint CombineVersionCheck { get; private set; }
 		const uint DefaultCombineVersion = uint.MaxValue;
 		public static uint CombineVersionSet { get; private set; }
         static int SearchCount;
 
-        public static void EndCombinePath ()
-        {
-            IsCombinePath = false;
-        }
+
         #region method sharing variables
         static GridNode startNode;
         static GridNode endNode;

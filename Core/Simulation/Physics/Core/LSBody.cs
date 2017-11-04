@@ -272,6 +272,9 @@ namespace Lockstep
 
 		[SerializeField]
 		protected bool _immovable;
+		public bool GetSavedImmovable () {
+			return _immovable;
+		}
 
 		public bool Immovable { get; private set; }
 
