@@ -10,7 +10,7 @@ namespace Lockstep
                 return AbilityDataItem.FindInterfacer(typeof (Scan)).ListenInputID;
 			}
 		}
-
+			
 		protected override void OnExecute (Lockstep.Command com)
 		{
             MovementGroupHelper.StaticExecute (com);

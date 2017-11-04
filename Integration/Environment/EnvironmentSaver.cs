@@ -12,10 +12,18 @@ namespace Lockstep
         protected virtual void OnSave () {
 
         }
-        public void Apply () {
-            OnApply ();
+        public void EarlyApply () {
+            OnEarlyApply ();
         }
-        protected virtual void OnApply () {
+        protected virtual void OnEarlyApply () {
+
+        }
+        public void Apply ()
+        {
+            OnApply();
+        }
+        protected virtual void OnApply ()
+        {
 
         }
         public void LateApply () {

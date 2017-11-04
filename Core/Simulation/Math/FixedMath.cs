@@ -28,7 +28,6 @@ namespace Lockstep
 		public const long MaxFixedNumber = long.MaxValue >> SHIFT_AMOUNT;
 		public const long TenDegrees = FixedMath.One * 1736 / 10000;
 		public const long Epsilon = 1 << (SHIFT_AMOUNT - 10);
-
 		#endregion
 
 		#region Constructors

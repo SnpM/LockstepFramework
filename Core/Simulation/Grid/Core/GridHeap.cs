@@ -19,6 +19,7 @@ namespace Lockstep
 			items [Count++] = item;
 			SortUp (item);
 			item.HeapVersion = _Version;
+
 		}
         static void EnsureCapacity (int min) {
             if (capacity < min) {
@@ -34,28 +35,37 @@ namespace Lockstep
 		{
 			curNode = items [0];
             newNode = items[--Count];
-            items [0] = newNode;;
+            items [0] = newNode;
 			newNode.HeapIndex = 0;
 			SortDown (newNode);
-
 			curNode.HeapVersion--;
 			return curNode;
 		}
 	
 		public static void UpdateItem (GridNode item)
 		{
-            //SortUp (item);
+            SortUp (item);
 		}
 	
 		public static bool Contains (GridNode item)
 		{
 			return item.HeapVersion == _Version;
 		}
+		public static void Close (GridNode item) {
+			item.ClosedHeapVersion = _Version;
+		}
+		public static bool Closed (GridNode item) {
+			return item.ClosedHeapVersion == _Version;
+		}
 
 		static uint i;
 		public static void FastClear ()
 		{
 			_Version++;
+			Count = 0;
+		}
+		public static void Reset () {
+			_Version = 1;
 			Count = 0;
 		}
 	

@@ -34,6 +34,7 @@ public class MovementGroup
         }
         mover.MyMovementGroup = this;
         mover.MyMovementGroupID = indexID;
+
         movers.Add(mover);
         moversCount++;
     }

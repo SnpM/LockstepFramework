@@ -31,7 +31,7 @@ namespace Lockstep
             //this._mapCenter = new Vector2d(transform.position);
         }
 
-        protected override void OnApply()
+        protected override void OnEarlyApply()
         {
             GridManager.Settings = new GridSettings(this.MapWidth,this.MapHeight,this.Offset.x,this.Offset.y, this.UseDiagonalConnetions);
         }

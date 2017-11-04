@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
-
+using UnityEngine.SceneManagement;
 namespace Lockstep.Example
 {
+	
     public class ExampleGameManager : GameManager
     {
         static Replay LastSave = new Replay();
@@ -25,13 +26,13 @@ namespace Lockstep.Example
             if (GUILayout.Button("Restart"))
             {
                 ReplayManager.Stop();
-//                LSUtility.LoadLevel(SceneManager.GetActiveScene().name);
+				SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
             }
 
             if (GUILayout.Button("Playback"))
             {
                 LastSave = ReplayManager.SerializeCurrent();
-//                LSUtility.LoadLevel(SceneManager.GetActiveScene().name);
+				SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
                 ReplayManager.Play(LastSave);
 
             }

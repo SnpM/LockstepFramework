@@ -189,8 +189,14 @@ namespace Lockstep
 
 		private Dictionary<int, CollisionPair> _collisionPairs;
 		private HashSet<int> _collisionPairHolders;
+        public Vector2d ImmovableCollisionDirection;
 
-		internal Dictionary<int, CollisionPair> CollisionPairs {
+
+        /// <summary>
+        /// TODO: Do away with CollisionPairs? Just dynamically collide... much easier and less memory for mobile.
+        /// Potentially faster especially for less physics objects.
+        /// </summary>
+        internal Dictionary<int, CollisionPair> CollisionPairs {
 			get {
 				return _collisionPairs.IsNotNull() ? _collisionPairs : (_collisionPairs = new Dictionary<int, CollisionPair>());
 			}
@@ -266,6 +272,9 @@ namespace Lockstep
 
 		[SerializeField]
 		protected bool _immovable;
+		public bool GetSavedImmovable () {
+			return _immovable;
+		}
 
 		public bool Immovable { get; private set; }
 
@@ -456,6 +465,7 @@ namespace Lockstep
 				CanSetVisualRotation = false;
 			}
 			velocityPosition = Vector3.zero;
+            this.ImmovableCollisionDirection = Vector2d.zero;
 		}
 
 		void CheckVariables()
@@ -566,6 +576,8 @@ namespace Lockstep
 			{
 				BuildPoints();
 				BuildBounds();
+                //Reset this value so we're not permanently considered colliding against wall
+                this.ImmovableCollisionDirection = Vector2d.zero;
 			}
 
 			if (PositionChanged || this.HeightPosChanged)
@@ -694,6 +706,9 @@ namespace Lockstep
 			PhysicsManager.DeactivateCollisionPair(collisionPair);
 		}
 
+		/// <summary>
+		/// Call this to deactivate this body and remove from simulation.
+		/// </summary>
 		public void Deactivate()
 		{
 			Partition.UpdateObject (this, false);

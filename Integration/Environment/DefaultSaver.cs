@@ -29,12 +29,16 @@ namespace Lockstep
 
         }
 
-        protected override void OnApply () {
-            foreach (EnvironmentObject obj in EnvironmentObjects) {
+        protected override void OnEarlyApply () {
+
+        }
+        protected override void OnApply()
+        {
+            foreach (EnvironmentObject obj in EnvironmentObjects)
+            {
                 obj.Initialize();
             }
         }
-
         protected override void OnLateApply()
         {
             foreach (EnvironmentBodyInfo info in EnvironmentBodies) {

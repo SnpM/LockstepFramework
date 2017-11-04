@@ -86,7 +86,7 @@ namespace Lockstep
 				AnimationClip clip = GetStateClip(state);
 				if (clip.IsNotNull())
 				{
-					animator.CrossFade(clip.name, fadeLength);
+					animator.CrossFade(clip.name,fadeLength);
 				}
 			}
 		}

@@ -32,7 +32,15 @@ namespace Lockstep
 		private bool straightPath;
 		private bool viableDestination;
 		private readonly FastList<Vector2d> myPath = new FastList<Vector2d>();
-		private int pathIndex;
+		private int _pathIndex;
+		private int pathIndex {
+			get { return _pathIndex; }
+			set {
+				if (value != _pathIndex) {
+					_pathIndex = value;
+				}
+			}
+		}
 		private int StoppedTime;
 		private Vector2d targetPos;
 		[HideInInspector]
@@ -93,6 +101,7 @@ namespace Lockstep
 
 		private Vector2d lastTargetPos;
 		private Vector2d targetDirection;
+		private Vector2d waypointDirection {get {return this.targetDirection;}}
 		private GridNode currentNode;
 		private GridNode destinationNode;
 		private Vector2d movementDirection;
@@ -160,7 +169,7 @@ namespace Lockstep
 		protected override void OnInitialize()
 		{
 			myPath.FastClear();
-			pathIndex = 0;
+			_pathIndex = 0;
 			StoppedTime = 0;
 
 			IsFormationMoving = false;
@@ -301,7 +310,6 @@ namespace Lockstep
 					if (CanTurn)
 						CachedTurn.StartTurnDirection(movementDirection);
 
-
 					stuckThreshold = this.timescaledSpeed / 4;
 				} else {
 					if (distance < FixedMath.Mul(closingDistance, StopMultiplier)) {
@@ -320,18 +328,31 @@ namespace Lockstep
 					}
 
 				}
+                //Temporary improvement to detecting stuck
+                StuckTime++;
+                stuckThreshold = stuckThreshold * 7 / 6;
+                    
 				if (GetFullCanCollisionStop() && (Agent.Body.Position - this.AveragePosition).FastMagnitude() < (stuckThreshold * stuckThreshold)) {
-					StuckTime += 1;
 
 					if (StuckTime > StuckTimeThreshold) {
-						if (RepathTries < StuckRepathTries) {
-							DoPathfind = true;
-							RepathTries++;
+                        if (movingToWaypoint)
+                        {
+                            this.pathIndex++;
+                        }
+                        else
+                        {
+                            if (RepathTries < StuckRepathTries)
+                            {
+                                DoPathfind = true;
+                                RepathTries++;
 
-						} else {
-							RepathTries = 0;
-							this.Arrive();
-						}
+                            }
+                            else
+                            {
+                                RepathTries = 0;
+                                this.Arrive();
+                            }
+                        }
 						StuckTime = 0;
 
 					}
@@ -343,7 +364,14 @@ namespace Lockstep
 				}
 
 				if (movingToWaypoint) {
-					if (distance < FixedMath.Mul(closingDistance, FixedMath.Half)) {
+
+					if (
+						(
+							this.pathIndex >= 0 &&
+							distance < closingDistance &&
+							(movementDirection).Dot (waypointDirection) < 0
+						) ||
+						distance < FixedMath.Mul(closingDistance, FixedMath.Half)) {
 						this.pathIndex++;
 					}
 				}
@@ -450,7 +478,6 @@ namespace Lockstep
 
 		public void StartMove(Vector2d destination)
 		{
-
 			DoPathfind = true;
 			Agent.SetState(AnimState.Moving);
 			hasPath = false;
@@ -460,7 +487,10 @@ namespace Lockstep
 			StoppedTime = 0;
 			Arrived = false;
 
-            viableDestination = Pathfinder.GetPathNode (destination, out destinationNode);// Pathfinder.GetClosestViableNode(Agent.Body.Position, destination, this.GridSize, out destinationNode);
+            //For now, use old next-best-node system when size requires consideration
+            viableDestination = this.GridSize <= 1 ?
+                Pathfinder.GetPathNode (Agent.Body.Position,destination, out destinationNode) :
+                Pathfinder.GetClosestViableNode(Agent.Body.Position, destination, this.GridSize, out destinationNode);
             //TODO: If next-best-node, autostop more easily
             //Also implement stopping sooner based on distance
 
@@ -495,18 +525,20 @@ namespace Lockstep
 			Move otherMover = tempAgent.GetAbility<Move>();
 			if (ReferenceEquals(otherMover, null) == false) {
 				if (IsMoving && (GetFullCanCollisionStop())) {
-					if (otherMover.MyMovementGroupID == MyMovementGroupID) {
+					if (otherMover.MyMovementGroupID == MyMovementGroupID || otherMover.targetPos == this.targetPos) {
 						if (otherMover.IsMoving == false && otherMover.Arrived && otherMover.StoppedTime > MinimumOtherStopTime) {
 							if (otherMover.CanCollisionStop == false) {
 								TempCanCollisionStop = false;
 							} else {
-								Arrive();
+								Arrive ();
 							}
-						} else if (hasPath && otherMover.hasPath && otherMover.pathIndex > 0 && otherMover.lastTargetPos.SqrDistance(targetPos.x, targetPos.y) < FixedMath.One) {
-							if (movementDirection.Dot(targetDirection.x, targetDirection.y) < 0) {
-								pathIndex++;
+						} else if (hasPath && otherMover.hasPath && otherMover.pathIndex > 0 && otherMover.lastTargetPos.SqrDistance (targetPos.x, targetPos.y) < FixedMath.One
+						) {
+							if (this.distance < this.closingDistance) {
+								this.pathIndex++;
 							}
 						}
+					} else {
 					}
 				}
 			}

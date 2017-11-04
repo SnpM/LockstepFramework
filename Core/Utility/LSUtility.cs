@@ -24,6 +24,7 @@ namespace Lockstep
 
         }
 
+
 		public static void Initialize (uint seed)
 		{
 			Seed = seed;
@@ -42,19 +43,39 @@ namespace Lockstep
 			return ((0xFFFFFFFF & (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)))) % Count);
 		}*/
 
-        public static int GetRandom (int Count = int.MaxValue)
+
+        public static uint GetRawRandom ()
 		{
-            if (Count == 0)
-                return 0;
+
 			uint t = (Seed ^ (Seed << 11));
 			Seed = y;
 			y = z;
 			z = w;
-			return (int)((0x7FFFFFFF & (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)))) % Count);
+			return ((0x7FFFFFFF & (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)))));
 		}
+
+        public static int GetRandom (int count = int.MaxValue)
+        {
+            if (count == 0) return 0;
+            //TODO: Improve uniform distribution within count range
+            return (int)(GetRawRandom() % count);
+        }
+        /// <summary>
+        /// Note: Untested
+        /// </summary>
+        /// <returns></returns>
+        public static long GetRandomLong (long count = long.MaxValue)
+        {
+            if (count == 0) return 0;
+            //Combines 2 random uints
+            ulong combined = GetRawRandom();
+            combined <<= 32;
+            combined |= GetRawRandom();
+            return (long)(combined % (ulong)count);
+        }
 		public static long GetRandomOne()
 		{
-			return FixedMath.Create(GetRandom(), int.MaxValue);
+            return GetRandomLong(FixedMath.One);
 		}
 
 		public static GameObject CreateEmpty()

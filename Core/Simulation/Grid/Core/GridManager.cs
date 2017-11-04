@@ -16,6 +16,7 @@ namespace Lockstep
 
         public static int Width {get; private set;}
         public static int Height {get; private set;}
+		public static uint MaxIndex {get; private set;}
         public static int ScanHeight {get; private set;}
         public static int ScanWidth {get; private set;}
         public static int GridSize {get; private set;}
@@ -36,7 +37,7 @@ namespace Lockstep
             }
         }
 		public static void NotifyGridChanged () {
-
+			Pathfinding.Pathfinder.ChangeCombineIteration ();
 		}
 		public static bool GridChanged {get; private set;}
 		public static uint GridVersion {get; private set;}
@@ -136,6 +137,7 @@ namespace Lockstep
 
 		public static void Initialize ()
 		{
+			Pathfinding.Pathfinder.Reset ();
 			GridVersion = 1;
 			GridChanged = false;
 			if (!LockstepManager.PoolingEnabled)
@@ -157,6 +159,7 @@ namespace Lockstep
                     Grid[i].FastInitialize();
                 }
             }
+			MaxIndex = GetGridIndex (Width - 1, Height - 1);
 		}
 
 		public static void LateSimulate () {
@@ -166,7 +169,7 @@ namespace Lockstep
 
 		public static GridNode GetNode (int xGrid, int yGrid)
 		{
-            if (xGrid < 0 || xGrid >= Grid.Length || yGrid < 0 || yGrid >= Grid.Length) 
+            if (xGrid < 0 || xGrid >= Width || yGrid < 0 || yGrid >= Height) 
 				return null;
 			return Grid [GetGridIndex (xGrid, yGrid)];
 		}
@@ -177,8 +180,10 @@ namespace Lockstep
 		public static GridNode GetNode (long xPos, long yPos)
 		{
 			GetCoordinates (xPos, yPos, out indexX, out indexY);
-			if (!ValidateCoordinates (indexX, indexY))
+			if (!ValidateCoordinates (indexX, indexY)) {
+				Debug.LogError ("No node at position: " + xPos.ToFloat() + ", " + yPos.ToFloat());
 				return null;
+			}
 			return (GetNode (indexX, indexY));
 		}
 
@@ -191,6 +196,7 @@ namespace Lockstep
 		{
 			return index >= 0 && index < GridSize;
 		}
+
 
         public static Vector2d GetOffsettedPos (Vector2d worldPos)
         {
@@ -233,9 +239,9 @@ namespace Lockstep
 			return ScanGrid [GetScanIndex (xGrid, yGrid)];
 		}
 
-		public static int GetGridIndex (int xGrid, int yGrid)
+		public static uint GetGridIndex (int xGrid, int yGrid)
 		{
-			return xGrid * Height + yGrid;
+            return (uint)(xGrid * Height + yGrid);
 		}
 
 		public static bool ValidateScanCoordinates (int scanX, int scanY)
