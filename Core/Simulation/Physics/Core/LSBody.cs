@@ -706,6 +706,9 @@ namespace Lockstep
 			PhysicsManager.DeactivateCollisionPair(collisionPair);
 		}
 
+		/// <summary>
+		/// Call this to deactivate this body and remove from simulation.
+		/// </summary>
 		public void Deactivate()
 		{
 			Partition.UpdateObject (this, false);
