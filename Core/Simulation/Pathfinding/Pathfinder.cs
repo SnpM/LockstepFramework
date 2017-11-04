@@ -40,6 +40,7 @@ namespace Lockstep.Pathfinding
         static int newMovementCostToNeighbor;
         static int i;
         static uint StartNodeIndex;
+		static uint EndNodeIndex;
         static bool FindStraight;
         static bool LastIsObstructed;
         static bool hasInvalidEdge;
@@ -78,7 +79,7 @@ namespace Lockstep.Pathfinding
         public static void SmoothPath(FastList<GridNode> nodePath, Vector2d End, FastList<Vector2d> outputVectorPath, int unitSize)
         {
             outputVectorPath.FastClear();
-            length = nodePath.Count - 1;
+            length = nodePath.Count;
             //culling out unneded nodes
 
 
@@ -89,7 +90,7 @@ namespace Lockstep.Pathfinding
             long oldY = 0;
             long newX = 0;
             long newY = 0;
-            for (i = 1; i < length; i++) {
+			for (i = 1; i < length; i++) {
 
                 GridNode node = nodePath[i];
 
@@ -236,9 +237,8 @@ namespace Lockstep.Pathfinding
 
                 
 				if (rawNode.gridIndex == endNode.gridIndex) {
-                    //Retraces the path then outputs it into outputPath
-                    //Also Simplifies the path
-                    DestinationReached();
+					//We found our way to the end node!
+					DestinationReached();
                     return true;
                 }
 
@@ -257,22 +257,33 @@ namespace Lockstep.Pathfinding
                 #region Allows diagonal access when edges are blocked
 				for (i = 0; i < 4; i++) {
 					neighbor = rawNode.NeighborNodes [i];
-					if (CheckNeighborInvalid () == false) {
-						//0-3 = sides, 4-7 = diagonals
-						newMovementCostToNeighbor = rawNode.gCost + 100;
-						ProcessNode();
-						if (destinationIsReached)
+
+					neighbor = rawNode.NeighborNodes [i];
+					if (CheckNeighborSearchable () == false) {
+						if (neighbor.Unpassable() == false) {
+							newMovementCostToNeighbor = rawNode.gCost + 141;
+							ProcessNode();
+						}
+						else if (neighbor.gridIndex == EndNodeIndex) {
+							AddBestNode();
+							DestinationReached();
 							return true;
+						}
 					}
 				}
 
 				for (int i = 4; i < 8; i++) {
 					neighbor = rawNode.NeighborNodes [i];
-					if (CheckNeighborInvalid () == false) {
-						newMovementCostToNeighbor = rawNode.gCost + 141;
-						ProcessNode();
-						if (destinationIsReached)
+					if (CheckNeighborSearchable () == false) {
+						if (neighbor.Unpassable () == false) {
+							newMovementCostToNeighbor = rawNode.gCost + 141;
+							ProcessNode();
+						}
+						else if (neighbor.gridIndex == EndNodeIndex) {
+							AddBestNode();
+							DestinationReached();
 							return true;
+						}
 					}
 				}
 				GridHeap.Close (rawNode);
@@ -358,9 +369,10 @@ namespace Lockstep.Pathfinding
 			return gridNode.IsNull() || GridHeap.Closed (gridNode) || gridNode.Unpassable();
         }
 
-        static bool CheckNeighborInvalid()
+
+        static bool CheckNeighborSearchable()
         {
-			return neighbor.IsNull() || GridHeap.Closed (neighbor) || neighbor.Unpassable();
+			return neighbor.IsNull () || GridHeap.Closed (neighbor);
         }
         static void ProcessNode()
         {
@@ -395,13 +407,12 @@ namespace Lockstep.Pathfinding
 
 
             StartNodeIndex = startNode.gridIndex;
-			uint endNodeIndex = endNode.gridIndex;
+			EndNodeIndex = endNode.gridIndex;
 			GridNode node;
-			if (isCombine) {
+			if (isCombine)
 				node = rawNode;
-			} else {
+			else
 				node = endNode;
-			}
 			int count = 0;
 			while (node.gridIndex != StartNodeIndex) {
 				//Sets CombinePathVersion while tracing path
@@ -413,11 +424,11 @@ namespace Lockstep.Pathfinding
 				if (count > 1000)
 					throw new System.Exception("path too long");
 			}
+
 			count = 0;
 			//Trace with combineTrail from startNode to endNode
 			node = startNode.combineTrailNode;
-
-			while (node.gridIndex != endNodeIndex) {
+			while (node.gridIndex != EndNodeIndex) {
 				outputPath.Add (node);
 				node = node.combineTrailNode;
 				count++;

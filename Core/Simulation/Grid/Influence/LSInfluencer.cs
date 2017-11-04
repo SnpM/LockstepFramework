@@ -41,6 +41,7 @@ namespace Lockstep
         public void Initialize()
         {
             LocatedNode = GridManager.GetNode(Body._position.x, Body._position.y);
+
             LocatedNode.Add(this);
         }
 

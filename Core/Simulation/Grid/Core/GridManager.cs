@@ -180,8 +180,10 @@ namespace Lockstep
 		public static GridNode GetNode (long xPos, long yPos)
 		{
 			GetCoordinates (xPos, yPos, out indexX, out indexY);
-			if (!ValidateCoordinates (indexX, indexY))
+			if (!ValidateCoordinates (indexX, indexY)) {
+				Debug.LogError ("No node at position: " + xPos.ToFloat() + ", " + yPos.ToFloat());
 				return null;
+			}
 			return (GetNode (indexX, indexY));
 		}
 

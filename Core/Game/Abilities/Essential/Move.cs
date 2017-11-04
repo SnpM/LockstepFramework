@@ -367,7 +367,7 @@ namespace Lockstep
 
 					if (
 						(
-							this.pathIndex > 0 &&
+							this.pathIndex >= 0 &&
 							distance < closingDistance &&
 							(movementDirection).Dot (waypointDirection) < 0
 						) ||
