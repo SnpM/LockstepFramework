@@ -62,6 +62,7 @@ namespace Lockstep
 			this.ClosedHeapVersion = 0;
 			this.GridVersion = 0;
 			this.CombinePathVersion = 0;
+			this._obstacleCount = 0;
 		}
 
 		#endregion
