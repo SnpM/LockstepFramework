@@ -78,8 +78,10 @@ namespace Lockstep.Pathfinding
         }
         public static void SmoothPath(FastList<GridNode> nodePath, Vector2d End, FastList<Vector2d> outputVectorPath, int unitSize)
         {
+			//nodePath should include the start and end nodes
+
             outputVectorPath.FastClear();
-            length = nodePath.Count;
+            length = nodePath.Count - 1;
             //culling out unneded nodes
 
 
@@ -424,6 +426,7 @@ namespace Lockstep.Pathfinding
 
 			count = 0;
 			//Trace with combineTrail from startNode to endNode
+			//output should include start node and end node
 			rawOutputPath.Add(startNode);
 			node = startNode.combineTrailNode;
 			while (node.gridIndex != EndNodeIndex) {
@@ -433,6 +436,8 @@ namespace Lockstep.Pathfinding
 				if (count > 1000)
 					throw new System.Exception("trail too long");
 			}
+			//adds the end node
+			rawOutputPath.Add (node);
 
 
         }
