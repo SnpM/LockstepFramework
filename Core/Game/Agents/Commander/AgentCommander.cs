@@ -13,6 +13,8 @@ namespace Lockstep {
 		protected override void OnInitialize ()
 		{
 		}
-			
+		public T GetAbility<T>() where T: Ability {
+			return Agent.GetAbility<T> ();
+		}
 	}
 }

@@ -373,7 +373,7 @@ namespace Lockstep
 			this.SetAllegiance (this, AllegianceType.Friendly);
 		}
 
-		AgentCommander CreateCommander (string commanderAgentCode) {
+		public AgentCommander CreateCommander (string commanderAgentCode) {
 			if (Commander != null)
 				Debug.LogError("A commander called '" + Commander.Agent.CachedGameObject + "' already exists for '"+  this.ToString() + "'.");
 			LSAgent commanderAgent = CreateAgent (commanderAgentCode, Vector2d.zero);
