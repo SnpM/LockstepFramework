@@ -201,11 +201,7 @@ namespace Lockstep
 		{
 			System.Array.Clear (array, 0, array.Length);
 		}
-		public static void SetActiveIfNot (this GameObject go, bool activeState)
-		{
-			if (go.activeSelf != activeState)
-				go.SetActive (activeState);
-		}
+
 		public static bool RefEquals (this System.Object obj, object other) {
 			return System.Object.ReferenceEquals (obj, other);
 		}

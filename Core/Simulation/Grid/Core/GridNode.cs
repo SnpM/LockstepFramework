@@ -79,6 +79,9 @@ namespace Lockstep
 		public uint ClosedHeapVersion;
 		public uint HeapIndex;
 
+		/// <summary>
+		/// TODO: Maybe it will be more efficient for memory to not cache this?
+		/// </summary>
 		public uint GridVersion;
 
 		#endregion

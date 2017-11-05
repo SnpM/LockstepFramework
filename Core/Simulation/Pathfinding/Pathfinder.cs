@@ -19,8 +19,8 @@ namespace Lockstep.Pathfinding
 {
     public static class Pathfinder
     {
-        public const int SmallSize = 2;
-        public const int MediumSize = 3;
+        public const int SmallSize = 1;
+        public const int MediumSize = 2;
 
         #region Wrapper Variables
 
@@ -28,7 +28,6 @@ namespace Lockstep.Pathfinding
         static GridNode node2;
         static int IndexX, IndexY;
         static FastList<GridNode> TracePath = new FastList<GridNode>();
-        static FastList<GridNode> OutputPath = new FastList<GridNode>();
         static int length;
 
         #endregion
@@ -70,8 +69,9 @@ namespace Lockstep.Pathfinding
         {
             if (!GetPathNodes(Start.x, Start.y, End.x, End.y, out node1, out node2))
                 return false;
-            if (FindRawPath(node1, node2, OutputPath, unitSize)) {
-                SmoothPath(OutputPath, End, outputVectorPath, unitSize);
+			outputPathBuffer.FastClear ();
+			if (FindRawPath(node1, node2, outputPathBuffer, unitSize)) {
+				SmoothPath(outputPathBuffer, End, outputVectorPath, unitSize);
                 return true;
             }
             return false;
@@ -84,7 +84,7 @@ namespace Lockstep.Pathfinding
 
 
             var StartNode = nodePath[0];
-            outputVectorPath.Add(StartNode.WorldPos);
+            //outputVectorPath.Add(StartNode.WorldPos);
             GridNode oldNode = StartNode;
             long oldX = 0;
             long oldY = 0;
@@ -96,11 +96,11 @@ namespace Lockstep.Pathfinding
 
                 bool important = false;
                 if (unitSize <= SmallSize) {
-                    important = !node.Clearance;
+					important = !node.Clearance;
                 } else if (unitSize <= MediumSize) {
-                    important = !node.ExtraClearance;
+					important = !node.ExtraClearance;
                 } else {
-                    important = true;
+					important = true;
                 }
                 //important = true;
                 if (important) {
@@ -134,9 +134,9 @@ namespace Lockstep.Pathfinding
         }
         public static bool FindPath(Vector2d End, GridNode startNode, GridNode endNode, FastList<Vector2d> outputVectorPath, int unitSize = 1, uint combinePathsVersion = 0)
         {
-
-            if (FindRawPath(startNode, endNode, OutputPath, unitSize)) {
-                SmoothPath(OutputPath, End, outputVectorPath, unitSize);
+			outputPathBuffer.FastClear ();
+			if (FindRawPath(startNode, endNode, outputPathBuffer, unitSize)) {
+				SmoothPath(outputPathBuffer, End, outputVectorPath, unitSize);
 
                 return true;
             }
@@ -162,7 +162,10 @@ namespace Lockstep.Pathfinding
         #region method sharing variables
         static GridNode startNode;
         static GridNode endNode;
-        static FastList<GridNode> outputPath;
+		static FastList<GridNode> outputPathBuffer = new FastList<GridNode>();
+		static FastList<GridNode> rawOutputPath;
+
+
         static int unitSize;
 		static GridNode rawNode;
         #endregion
@@ -177,31 +180,30 @@ namespace Lockstep.Pathfinding
         /// <param name="outputPath">Return path.</param>
         public static bool FindRawPath(GridNode _startNode, GridNode _endNode, FastList<GridNode> _outputPath, int _unitSize)
         {
-
             
             //TODO: Not critical but there's a lot of room for better organization
             //i.e. All these static variables and methods goes into individual singleton classes
             startNode = _startNode;
             endNode = _endNode;
-            outputPath = _outputPath;
-            unitSize = _unitSize;
+			rawOutputPath = _outputPath;
+			rawOutputPath.FastClear ();
 
+            unitSize = _unitSize;
+			StartNodeIndex = startNode.gridIndex;
+			EndNodeIndex = endNode.gridIndex;
             #region Broadphase and Preperation
-            if (endNode.Unwalkable) {
+			if (endNode.Unwalkable && !AllowUnwalkableEndNode) {
                 return false;
             }
 
             if (startNode.Unwalkable) {
                 return false;
             }
-
-            outputPath.FastClear();
-
+				
             if (System.Object.ReferenceEquals(startNode, endNode)) {
-                outputPath.Add(endNode);
+				rawOutputPath.Add(endNode);
                 return true;
             }
-
             GridHeap.FastClear();
             //POSBUG: Hash for end destination and frame count. *Most likely* won't overflow
 			//Or no need to factor in frame count
@@ -215,9 +217,7 @@ namespace Lockstep.Pathfinding
 
 
             GridNode.PrepareUnpassableCheck(unitSize); //Prepare Unpassable check optimizations
-            if (_endNode.Unwalkable) {
-                return false;
-            }
+
             destinationIsReached = false;
             SearchCount = 0;
 			CombineVersionSet = CombineIteration * GridManager.MaxIndex + endNode.gridIndex;
@@ -244,7 +244,6 @@ namespace Lockstep.Pathfinding
 
 				if (CombineVersionCheck != DefaultCombineVersion)
 				{
-
 					if (rawNode.CombinePathVersion == CombineVersionCheck)
 					{
 						//We found our way onto an existing path!
@@ -258,12 +257,12 @@ namespace Lockstep.Pathfinding
 				for (i = 0; i < 4; i++) {
 					neighbor = rawNode.NeighborNodes [i];
 
-					neighbor = rawNode.NeighborNodes [i];
-					if (CheckNeighborSearchable () == false) {
-						if (neighbor.Unpassable() == false) {
-							newMovementCostToNeighbor = rawNode.gCost + 141;
+					if (CheckNeighborSearchable ()) {
+						if (neighbor.Unwalkable == false) {
+							newMovementCostToNeighbor = rawNode.gCost + 100;
 							ProcessNode();
 						}
+
 						else if (neighbor.gridIndex == EndNodeIndex) {
 							AddBestNode();
 							DestinationReached();
@@ -274,8 +273,8 @@ namespace Lockstep.Pathfinding
 
 				for (int i = 4; i < 8; i++) {
 					neighbor = rawNode.NeighborNodes [i];
-					if (CheckNeighborSearchable () == false) {
-						if (neighbor.Unpassable () == false) {
+					if (CheckNeighborSearchable ()) {
+						if (neighbor.Unwalkable == false) {
 							newMovementCostToNeighbor = rawNode.gCost + 141;
 							ProcessNode();
 						}
@@ -345,7 +344,6 @@ namespace Lockstep.Pathfinding
                     }
                 }
 				#endif
-                
             }
             #endregion
             return destinationIsReached;
@@ -372,7 +370,7 @@ namespace Lockstep.Pathfinding
 
         static bool CheckNeighborSearchable()
         {
-			return neighbor.IsNull () || GridHeap.Closed (neighbor);
+			return neighbor.IsNotNull () && GridHeap.Closed (neighbor) == false;
         }
         static void ProcessNode()
         {
@@ -402,12 +400,11 @@ namespace Lockstep.Pathfinding
             //Faster to do this to end loop than to check every AnalyzeNode () call
             destinationIsReached = true;
 
-            outputPath.FastClear();
+			rawOutputPath.FastClear();
             TracePath.FastClear();
 
 
-            StartNodeIndex = startNode.gridIndex;
-			EndNodeIndex = endNode.gridIndex;
+
 			GridNode node;
 			if (isCombine)
 				node = rawNode;
@@ -427,9 +424,10 @@ namespace Lockstep.Pathfinding
 
 			count = 0;
 			//Trace with combineTrail from startNode to endNode
+			rawOutputPath.Add(startNode);
 			node = startNode.combineTrailNode;
 			while (node.gridIndex != EndNodeIndex) {
-				outputPath.Add (node);
+				rawOutputPath.Add (node);
 				node = node.combineTrailNode;
 				count++;
 				if (count > 1000)
@@ -507,7 +505,7 @@ namespace Lockstep.Pathfinding
             }
             return true;
         }
-
+		public static bool AllowUnwalkableEndNode { get; set; }
         public static bool GetPathNodes(long StartX, long StartY, long EndX, long EndY, out GridNode startNode, out GridNode endNode)
         {
             startNode = GridManager.GetNode(StartX, StartY);
@@ -525,7 +523,11 @@ namespace Lockstep.Pathfinding
                 }
             }
             endNode = GridManager.GetNode(EndX, EndY);
+
             if (endNode.Unwalkable) {
+				if (AllowUnwalkableEndNode) {
+					return AlternativeNodeFinder.Instance.CheckValidNeighbor (endNode);
+				}
                 for (i = 0; i < 8; i++) {
                     currentNode = endNode.NeighborNodes[i];
                     if (System.Object.ReferenceEquals(currentNode, null) == false && currentNode.Unwalkable == false) {
@@ -533,8 +535,9 @@ namespace Lockstep.Pathfinding
                         break;
                     }
                 }
-                if (endNode.Unwalkable)
-                    return false;
+				if (endNode.Unwalkable) {
+					return false;
+				}
             }
             return true;
         }
@@ -552,6 +555,15 @@ namespace Lockstep.Pathfinding
             bool castNodeFound;
             Vector2d WorldPos;
             Vector2d OffsettedPos;
+			public bool CheckValidNeighbor (GridNode node) {
+				for (int i = 0; i < 8; i++) {
+					var temp = node.NeighborNodes [i];
+					if (temp.IsNotNull () && temp.Unwalkable == false)
+						return true;
+				}
+				return false;
+
+			}
             public void SetValues(Vector2d worldPos, int xGrid, int yGrid, int maxTestDistance)
             {
                 XGrid = xGrid;
@@ -699,36 +711,42 @@ namespace Lockstep.Pathfinding
         }
 
         /// <summary>
-        /// Finds closest next-best-node also when destination is off the grid
+        /// Finds closest next-best-node also when destination is off invalid
         /// </summary>
         /// <param name="from"></param>
         /// <param name="dest"></param>
         /// <param name="returnNode"></param>
         /// <returns></returns>
-		public static bool GetPathNode(Vector2d from, Vector2d dest, out GridNode returnNode)
+		public static bool GetEndNode(Vector2d from, Vector2d dest, out GridNode outputNode)
 		{
-			returnNode = GridManager.GetNode(dest.x, dest.y);
-            if (returnNode == null)
+			outputNode = GridManager.GetNode(dest.x, dest.y);
+            if (outputNode == null)
             {
                 //If null, it is off the grid. Raycast back onto grid for closest viable node to the destination.
                 foreach (var coordinate in PanLineAlgorithm.FractionalLineAlgorithm.Trace(
                     dest.x.ToDouble(), dest.y.ToDouble(), from.x.ToDouble(), from.y.ToDouble()))
                 {
-                    returnNode = GridManager.GetNode(
+                    outputNode = GridManager.GetNode(
                         FixedMath.Create(coordinate.X), FixedMath.Create(coordinate.Y));
-                    if (returnNode != null)
+                    if (outputNode != null)
                     {
                         return true;
                     }
                 }
                 return false;
             }
-            else if (returnNode.Unwalkable)
-            {
-                return StarCast(dest, out returnNode);
+            else if (outputNode.Unwalkable)
+			{
+				if (AllowUnwalkableEndNode && AlternativeNodeFinder.Instance.CheckValidNeighbor (outputNode))
+				{
+					return true;
+				}
+                return StarCast(dest, out outputNode);
             }
 			return true;
 		}
+
+
 
         /// <summary>
         /// Finds closest next-best-node
@@ -736,15 +754,16 @@ namespace Lockstep.Pathfinding
         /// <param name="dest"></param>
         /// <param name="returnNode"></param>
         /// <returns></returns>
-        public static bool GetPathNode(Vector2d dest, out GridNode returnNode)
+        public static bool GetStartNode(Vector2d dest, out GridNode returnNode)
         {
             returnNode = GridManager.GetNode(dest.x, dest.y);
-            if (returnNode == null || returnNode.Unwalkable)
+			if (returnNode == null || (returnNode.Unwalkable))
             {
                 return StarCast(dest, out returnNode);
             }
             return true;
         }
+
         public static bool StarCast(Vector2d dest, out GridNode returnNode)
         {
             int xGrid, yGrid;

@@ -227,7 +227,7 @@ namespace Lockstep
 					if (DoPathfind) {
 						DoPathfind = false;
 						if (viableDestination) {
-							if (Pathfinder.GetPathNode(cachedBody.Position, out currentNode)) {
+							if (Pathfinder.GetStartNode(cachedBody.Position, out currentNode)) {
 								if (currentNode.DoesEqual(this.destinationNode)) {
 									if (this.RepathTries >= 1) {
 										this.Arrive();
@@ -489,7 +489,7 @@ namespace Lockstep
 
             //For now, use old next-best-node system when size requires consideration
             viableDestination = this.GridSize <= 1 ?
-                Pathfinder.GetPathNode (Agent.Body.Position,destination, out destinationNode) :
+				Pathfinder.GetEndNode (Agent.Body.Position,destination, out destinationNode) :
                 Pathfinder.GetClosestViableNode(Agent.Body.Position, destination, this.GridSize, out destinationNode);
             //TODO: If next-best-node, autostop more easily
             //Also implement stopping sooner based on distance

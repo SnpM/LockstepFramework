@@ -339,6 +339,17 @@ namespace Lockstep
 		private readonly FastList<AllegianceType> DiplomacyFlags = new FastList<AllegianceType> ();
 		private readonly FastStack<ushort> OpenLocalIDs = new FastStack<ushort> ();
 
+		private AgentCommander _commander;
+		public AgentCommander Commander { 
+			get {
+				if (_commander.IsNotNull ())
+					return _commander;
+				else {
+					return null;
+				}
+			}
+		}
+
 		public static AgentController Create ()
 		{
 			return new AgentController ();
@@ -362,6 +373,15 @@ namespace Lockstep
 			this.SetAllegiance (this, AllegianceType.Friendly);
 		}
 
+		AgentCommander CreateCommander (string commanderAgentCode) {
+			if (Commander != null)
+				Debug.LogError("A commander called '" + Commander.Agent.CachedGameObject + "' already exists for '"+  this.ToString() + "'.");
+			LSAgent commanderAgent = CreateAgent (commanderAgentCode, Vector2d.zero);
+			_commander = commanderAgent.GetAbility<AgentCommander> ();
+			if (_commander == null)
+				Debug.LogError ("Agent '" + commanderAgentCode + "' does not have AgentCommander component and cannot be a commander.");
+			return Commander;
+		}
 
 		public void AddToSelection (LSAgent agent)
 		{
@@ -398,9 +418,15 @@ namespace Lockstep
 			for (int i = 0; i < selection.selectedAgentLocalIDs.Count; i++) {
 				ushort selectedAgentID = selection.selectedAgentLocalIDs [i];
 				if (LocalAgentActive [selectedAgentID]) {
-					LocalAgents [selectedAgentID].Execute (com);
+					var agent = LocalAgents [selectedAgentID];
+					//Prevent executing twice on commander
+					if (Commander.IsNull() || agent != Commander.Agent) {
+						agent.Execute (com);
+					}
 				}
 			}
+			if (Commander.IsNotNull())
+			Commander.Agent.Execute (com);
 		}
 
 		//Backward compat.
@@ -439,15 +465,14 @@ namespace Lockstep
 			return interfacer.GetAgent ();
 		}
 
-		public LSAgent CreateAgent (
-			string agentCode,
-			Vector2d position,
-			Vector2d rotation
-		)
+		/// <summary>
+		/// Create an uninitialized LSAgent
+		/// </summary>
+		/// <returns>The raw agent.</returns>
+		/// <param name="agentCode">Agent code.</param>
+		/// <param name="isBare">If set to <c>true</c> is bare.</param>
+		public static LSAgent CreateRawAgent (string agentCode)
 		{
-			Vector2d pos = position;
-			Vector2d rot = rotation;
-
 
 			if (!IsValidAgentCode (agentCode)) {
 				throw new System.ArgumentException (string.Format ("Agent code '{0}' not found.", agentCode));
@@ -484,8 +509,18 @@ namespace Lockstep
 				typeAgents.Add (curAgent);
 				typeActive.Add (true);
 			}
-			InitializeAgent (curAgent, pos, rot);
 			return curAgent;
+		}
+		public LSAgent CreateAgent (string agentCode, Vector2d position, Vector2d rotation) {
+			var agent = CreateRawAgent (agentCode);
+			InitializeAgent (agent, position, rotation);
+			return agent;
+		}
+		public LSAgent CreateBareAgent (string agentCode) {
+			var agent = CreateRawAgent (agentCode);
+			AddAgent (agent);
+			agent.InitializeBare ();
+			return agent;
 		}
 
 		private void InitializeAgent (LSAgent agent,
@@ -493,6 +528,7 @@ namespace Lockstep
 		                              Vector2d rotation)
 		{
 			AddAgent (agent);
+
 			agent.Initialize (position, rotation);
 		}
 
