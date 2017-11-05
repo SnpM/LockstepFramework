@@ -96,12 +96,12 @@ namespace Lockstep.UI
 			}
 			if (TrackedAgent.IsVisible == false ||  (amount >= 1f && !GUIManager.ShowHealthWhenFull)) {
 
-				element.gameObject.SetActiveIfNot (false);
+				element.gameObject.SetActive (false);
 				return;
 			}
 			{
 				element.SetFill (amount);
-				element.gameObject.SetActiveIfNot (true);
+				element.gameObject.SetActive (true);
 			}
 		}
 

@@ -711,6 +711,9 @@ namespace Lockstep
 		/// </summary>
 		public void Deactivate()
 		{
+			//Don't double deactivate
+			if (this.Active == false)
+				return;
 			Partition.UpdateObject (this, false);
 
 			foreach (var collisionPair in CollisionPairs.Values) {

@@ -415,7 +415,7 @@ namespace Lockstep
 			this.Deterministic = deterministic;
 
 			this.IsActive = true;
-			this.cachedGameObject.SetActiveIfNot(true);
+			this.cachedGameObject.SetActive(true);
 
 			this.ResetVariables();
 
@@ -774,7 +774,7 @@ namespace Lockstep
 			}
 			else
 			{
-				this.cachedGameObject.SetActiveIfNot(false);
+				this.cachedGameObject.SetActive(false);
 			}
 		}
 

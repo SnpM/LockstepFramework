@@ -342,6 +342,11 @@ namespace Lockstep
 		}
 
 		bool Setuped;
+		//Initialize this agent with basic functions and Ability system
+		public void InitializeBare () {
+			IsActive = true;
+			abilityManager.Initialize ();
+		}
 		public void Initialize(
 			Vector2d position = default(Vector2d),
 			Vector2d rotation = default(Vector2d))
@@ -351,7 +356,7 @@ namespace Lockstep
 			CheckCasting = true;
 
 
-			CachedGameObject.SetActiveIfNot(true);
+			CachedGameObject.SetActive(true);
 			if (Body.IsNotNull())
 			{
 				Body.Initialize(position.ToVector3d(), rotation);
