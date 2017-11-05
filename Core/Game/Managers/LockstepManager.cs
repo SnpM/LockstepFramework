@@ -158,9 +158,10 @@ namespace Lockstep
 			FrameCount = 0;
 			InfluenceFrameCount = 0;
 			MainNetworkHelper = networkHelper;
+			AgentController.Initialize ();
+			ClientManager.Initialize (MainNetworkHelper);
 
 			BehaviourHelperManager.Initialize (helpers);
-			ClientManager.Initialize (MainNetworkHelper);
 
 			GridManager.Initialize ();
 
@@ -170,7 +171,6 @@ namespace Lockstep
 
 			CommandManager.Initialize ();
 
-			AgentController.Initialize ();
 
 			PhysicsManager.Initialize ();
 			PlayerManager.Initialize ();
@@ -198,9 +198,7 @@ namespace Lockstep
 					return;
 				}
 				Stalled = false;
-				if (InfluenceFrameCount == 0) {
-					GameStart ();
-				}
+
 				FrameManager.Simulate ();
 				InfluenceFrameCount++;
 			} else {
@@ -210,7 +208,9 @@ namespace Lockstep
 				return;
 			}
 
-
+			if (FrameCount == 0) {
+				GameStart ();
+			}
 			BehaviourHelperManager.Simulate ();
 			AgentController.Simulate ();
 			PhysicsManager.Simulate ();
@@ -223,6 +223,7 @@ namespace Lockstep
 
 		}
 
+		//Called on the first frame of the game
 		private static void GameStart ()
 		{
 			BehaviourHelperManager.GameStart ();

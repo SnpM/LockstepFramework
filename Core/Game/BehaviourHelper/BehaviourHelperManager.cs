@@ -12,6 +12,7 @@ namespace Lockstep
 			{
 				helper.EarlyInitialize();
 			}
+
 		}
 
 		public static void LateInitialize()

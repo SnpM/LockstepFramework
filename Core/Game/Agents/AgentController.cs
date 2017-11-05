@@ -97,7 +97,7 @@ namespace Lockstep
 
 		public static void Initialize ()
 		{
-			InstanceManagers.FastClear ();
+			InstanceManagers.Clear ();
 			GlobalAgentActive.Clear ();
 			OpenGlobalIDs.FastClear ();
 			PeakGlobalID = 0;
@@ -107,7 +107,6 @@ namespace Lockstep
 				}
 			}
             
-			AgentController.DefaultController = AgentController.Create ();
 
 		}
 
@@ -317,7 +316,9 @@ namespace Lockstep
 			return hash;
 		}
 
-		public static AgentController DefaultController { get; private set;}
+		public static AgentController DefaultController { get { return InstanceManagers[0]; }}
+		//TODO: Hide this list and use methods to access it
+		//Also, move static AC stuff into its own class
 		public static FastList<AgentController> InstanceManagers = new FastList<AgentController> ();
 		public readonly FastBucket<LSAgent> SelectedAgents = new FastBucket<LSAgent> ();
 
@@ -376,10 +377,12 @@ namespace Lockstep
 		public AgentCommander CreateCommander (string commanderAgentCode) {
 			if (Commander != null)
 				Debug.LogError("A commander called '" + Commander.Agent.CachedGameObject + "' already exists for '"+  this.ToString() + "'.");
-			LSAgent commanderAgent = CreateAgent (commanderAgentCode, Vector2d.zero);
+			LSAgent commanderAgent = CreateBareAgent (commanderAgentCode);
+
 			_commander = commanderAgent.GetAbility<AgentCommander> ();
 			if (_commander == null)
 				Debug.LogError ("Agent '" + commanderAgentCode + "' does not have AgentCommander component and cannot be a commander.");
+			
 			return Commander;
 		}
 
