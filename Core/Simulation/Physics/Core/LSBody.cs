@@ -24,6 +24,7 @@ namespace Lockstep
 		internal Vector2d _rotation = Vector2d.up;
 		[SerializeField, FixedNumber]
 		internal long _heightPos;
+
 		[SerializeField]
 		public Vector2d _velocity;
 

@@ -11,6 +11,7 @@ namespace Lockstep.Data
         false,
         Rotorz.ReorderableList.ReorderableListFlagsUtility.DefinedItems,
         true,
+		true,
         typeof(ActiveAbility))]
 #endif
     [Serializable]

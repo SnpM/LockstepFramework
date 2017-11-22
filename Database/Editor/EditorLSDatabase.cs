@@ -177,25 +177,28 @@ namespace Lockstep.Data
             //folding all
             foldAllBufferBuffer = foldAllBuffer;
             foldAllBuffer = false;
-            if (GUILayout.Button("Fold All", GUILayout.MaxWidth(50)))
+            if (GUILayout.Button("Fold All", GUILayout.MaxWidth(80)))
             {
                 FoldAll();        
             }
+
             //Search
-            EditorGUILayout.LabelField("Filter: ", GUILayout.MaxWidth(35));
-            searchString = EditorGUILayout.TextField(searchString, GUILayout.ExpandWidth(true));
-            if (GUILayout.Button("X", GUILayout.MaxWidth(20)))
-            {
-                searchString = "";
-            }
-            if (lastSearchString != searchString)
-            {
-                if (string.IsNullOrEmpty(searchString) == false)
-                {
-                    dataHelper.FilterWithString(searchString);
-                }
-                lastSearchString = searchString;
-            }
+			if (dataHelper.DataAttribute.UseFilter) {
+				EditorGUILayout.LabelField ("Filter: ", GUILayout.MaxWidth (35));
+				searchString = EditorGUILayout.TextField (searchString, GUILayout.ExpandWidth (true));
+				if (GUILayout.Button ("X", GUILayout.MaxWidth (20))) {
+					searchString = "";
+				}
+				if (lastSearchString != searchString) {
+					if (string.IsNullOrEmpty (searchString) == false) {
+						dataHelper.FilterWithString (searchString);
+					}
+					lastSearchString = searchString;
+				}
+			} else {
+				EditorGUILayout.LabelField ("Filter Disabled", GUILayout.MaxWidth (150));
+
+			}
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();

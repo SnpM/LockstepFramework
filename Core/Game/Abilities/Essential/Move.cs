@@ -121,7 +121,8 @@ namespace Lockstep
 		private bool _canMove = true;
 
 		public bool CanMove {
-			get { return _canMove; }
+			get;
+			set;
 		}
 
 		[SerializeField]
@@ -168,10 +169,12 @@ namespace Lockstep
 
 		protected override void OnInitialize()
 		{
+			
 			myPath.FastClear();
 			_pathIndex = 0;
 			StoppedTime = 0;
 
+			CanMove = _canMove;
 			IsFormationMoving = false;
 			MyMovementGroupID = -1;
 			CanCollisionStop = true;
@@ -222,7 +225,10 @@ namespace Lockstep
 			if (!CanMove) {
 				return;
 			}
+
 			if (IsMoving) {
+				Agent.SetState(AnimState.Moving);
+
 				if (CanPathfind) {
 					if (DoPathfind) {
 						DoPathfind = false;
@@ -479,7 +485,6 @@ namespace Lockstep
 		public void StartMove(Vector2d destination)
 		{
 			DoPathfind = true;
-			Agent.SetState(AnimState.Moving);
 			hasPath = false;
 			straightPath = false;
 			this.Destination = destination;
