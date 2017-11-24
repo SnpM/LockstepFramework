@@ -714,6 +714,7 @@ namespace Lockstep
 		{
 
 			Func<LSAgent, bool> agentConditional = AgentConditional;
+
 			LSAgent agent = InfluenceManager.Scan(
 										 this.cachedBody.Position,
 										 this.Sight,
@@ -721,7 +722,6 @@ namespace Lockstep
 										 (bite) =>
 										 {
 											 return ((this.Agent.Controller.GetAllegiance(bite) & this.TargetAllegiance) != 0);
-
 										 }
 									 );
 

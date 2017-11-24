@@ -27,7 +27,7 @@ namespace Lockstep {
 			for (int i = gridXMin; i <= gridXMax; i++) {
 				for (int j = gridYMin; j <= gridYMax; j++) {
 					PartitionNode node = Partition.GetNode (i, j);
-					for (int k = 0; k < node.ContainedDynamicObjects; k++) {
+					for (int k = 0; k < node.ContainedDynamicObjects.Count; k++) {
 						var body = PhysicsManager.SimObjects [node.ContainedDynamicObjects [k]];
 						long minFastDist = body.Radius + radius;
 						//unnormalized distance value for comparison

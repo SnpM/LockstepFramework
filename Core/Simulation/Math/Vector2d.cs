@@ -91,6 +91,10 @@ namespace Lockstep
             return FixedMath.Sqrt(temp1);
         }
 
+		/// <summary>
+		/// Unnormalized square magnitude used for comparisons.
+		/// </summary>
+		/// <returns>The magnitude.</returns>
         public long FastMagnitude()
         {
             return this.x * this.x + this.y * this.y;

@@ -248,13 +248,20 @@ namespace Lockstep
 			}
 			return s;
 		}
-        public static string PrintAll (this IEnumerable collection) {
+		public static string PrintAll (this IEnumerable collection) {
             string s = "";
             foreach (object obj in collection) {
                 s += obj.ToString ()+ ", ";
             }
             return s;
         }
+		public static string PrintAll (this IEnumerable collection, Func<object,string> operation) {
+			string s = "";
+			foreach (object obj in collection) {
+				s += operation (obj)+ ", ";
+			}
+			return s;
+		}
         public static bool InsensitiveContains (this string source, string other) {
             return source.IndexOf(other, StringComparison.OrdinalIgnoreCase) >= 0;
         }
