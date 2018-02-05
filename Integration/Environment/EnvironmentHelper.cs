@@ -61,6 +61,9 @@ namespace Lockstep
         protected override void OnEarlyInitialize()
         {
             foreach (EnvironmentSaver saver in Savers) {
+				if (saver == null) {
+					Debug.LogError ("One of the EnvironmentSavers does not exist. Re-scan with the EnvironmentHelper component.");
+				}
                 saver.EarlyApply ();
             }
         }

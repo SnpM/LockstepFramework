@@ -166,10 +166,10 @@ namespace Lockstep.Data {
         }
         
         bool CreateDatabase (string absolutePath) {
+
             LSDatabase database = (LSDatabase)ScriptableObject.CreateInstance (DatabaseType);
             if (database == null) return false;
 
-            LoadDatabase (database);
             
             string relativePath = absolutePath.GetRelativeUnityAssetPath ();
 
@@ -177,7 +177,8 @@ namespace Lockstep.Data {
             
             AssetDatabase.SaveAssets ();
             AssetDatabase.Refresh ();
-            
+			LoadDatabase (database);
+
             return true;
         }
         
