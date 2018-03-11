@@ -105,6 +105,10 @@ namespace Lockstep
 		[Lockstep]
 		public bool VelocityChanged { get; set; }
 
+		/// <summary>
+		/// Units per second the unit is moving.
+		/// </summary>
+		/// <value>The velocity.</value>
 		[Lockstep]
 		public Vector2d Velocity {
 			get { return _velocity; }
@@ -557,8 +561,8 @@ namespace Lockstep
 
 			if (VelocityFastMagnitude != 0)
 			{
-				_position.x += _velocity.x;
-				_position.y += _velocity.y;
+				_position.x += _velocity.x / LockstepManager.FrameRate;
+				_position.y += _velocity.y / LockstepManager.FrameRate;
 				PositionChanged = true;
 			}
 

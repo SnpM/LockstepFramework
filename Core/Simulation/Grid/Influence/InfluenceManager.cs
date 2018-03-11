@@ -74,7 +74,7 @@ namespace Lockstep
 		public static void ScanAll(Vector2d position, long radius, Func<LSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, FastList<LSAgent> output)
 		{
 			//If radius is too big and we scan too many tiles, performance will be bad
-			const long circleCastRadius = FixedMath.One * 8;
+			const long circleCastRadius = FixedMath.One * 16;
 			output.FastClear();
 
 			if (radius >= circleCastRadius) {
