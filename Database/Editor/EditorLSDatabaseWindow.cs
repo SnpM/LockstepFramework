@@ -17,8 +17,12 @@ namespace Lockstep.Data {
         
         public EditorLSDatabase DatabaseEditor {
             get {
-                return _databaseEditor;
+				return _databaseEditor;
             }
+			set {
+				_databaseEditor = value;
+				Debug.Log (value);
+			}
         }
         
         private LSDatabase _database;
@@ -36,19 +40,29 @@ namespace Lockstep.Data {
             window.Show ();
         }
          
-        void Awake () {
+        void LoadInit () {
 			Window = this;
             this.LoadDatabase(LSFSettingsManager.GetSettings().Database);
             if (this.Database != null) {
                 _databaseType = LSFSettingsManager.GetSettings().Database.GetType();
                 if (_databaseType.Type == null) _databaseType = typeof (DefaultLSDatabase);
             }
+			loadInited = true;
         }
+
+		void OnEnable () {
+
+			LoadInit ();
+		}
         
         Vector2 scrollPos;
         //Rect windowRect = new Rect (0, 0, 500, 500);
-        
+		bool loadInited = false;
         void OnGUI () {
+
+			if (!loadInited) {
+				LoadInit ();
+			}
             if (Application.isPlaying) {
                 EditorGUILayout.LabelField ("Do not modify database during runtime", EditorStyles.boldLabel);
                 //return;
@@ -145,17 +159,18 @@ namespace Lockstep.Data {
                 LoadDatabase (database);
                 return true;
             }
-            _databaseEditor = null;
+            DatabaseEditor = null;
             return false;
         }
         
         void LoadDatabase (LSDatabase database) {
             _database = database;
-            _databaseEditor = new EditorLSDatabase();
+            DatabaseEditor = new EditorLSDatabase();
             bool isValid;
-            _databaseEditor.Initialize (this,Database, out isValid);
+            DatabaseEditor.Initialize (this,Database, out isValid);
             if (!isValid) {
-                this._databaseEditor = null;
+				Debug.Log ("Load unsuccesful");
+                this.DatabaseEditor = null;
                 this._database = null;
                 IsLoaded = false;
                 return;

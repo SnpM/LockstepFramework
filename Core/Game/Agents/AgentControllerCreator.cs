@@ -31,6 +31,7 @@ namespace Lockstep {
 				if (!string.IsNullOrEmpty (settings.CommanderCode)) {
 					controller.CreateCommander (settings.CommanderCode);
 				}
+				AgentControllerTool.SetFullHostile (controller);
 			}
 		}
 			

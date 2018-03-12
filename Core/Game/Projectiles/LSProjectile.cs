@@ -521,7 +521,7 @@ namespace Lockstep
 					Forward = TargetPosition - this.Position.ToVector2d();
 					Forward.Normalize();
 					break;
-				case TargetingType.Free:
+				case TargetingType.Directional:
 
 					Vector3d vel = this.Direction;
 					vel.Mul(speedPerFrame);
@@ -556,7 +556,7 @@ namespace Lockstep
 
 		private void OnHit()
 		{
-			if (this.TargetingBehavior == TargetingType.Free)
+			if (this.TargetingBehavior == TargetingType.Directional)
 			{
 				switch (this.HitBehavior)
 				{
@@ -693,7 +693,7 @@ namespace Lockstep
 						MoveToTargetPosition();
 					}
 					break;
-				case TargetingType.Free:
+				case TargetingType.Directional:
 					RaycastMove(this.Velocity);
 					break;
 				case TargetingType.Positional:

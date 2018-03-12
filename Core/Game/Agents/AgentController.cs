@@ -468,6 +468,25 @@ namespace Lockstep
 			return interfacer.GetAgent ();
 		}
 
+
+		public static void RegisterRawAgent (LSAgent agent) {
+			var agentCodeID = AgentController.GetAgentCodeIndex (agent.MyAgentCode);
+			FastList<bool> typeActive;
+			if (!AgentController.TypeAgentsActive.TryGetValue (agentCodeID, out typeActive)) {
+				typeActive = new FastList<bool> ();
+				TypeAgentsActive.Add (agentCodeID, typeActive);
+			}
+			FastList<LSAgent> typeAgents;
+			if (!TypeAgents.TryGetValue (agentCodeID, out typeAgents)) {
+				typeAgents = new FastList<LSAgent> ();
+				TypeAgents.Add (agentCodeID, typeAgents);
+			}
+
+			agent.TypeIndex = (ushort)typeAgents.Count;
+			typeAgents.Add (agent);
+			typeActive.Add (true);
+		}
+
 		/// <summary>
 		/// Create an uninitialized LSAgent
 		/// </summary>
@@ -476,19 +495,15 @@ namespace Lockstep
 		/// <param name="isBare">If set to <c>true</c> is bare.</param>
 		public static LSAgent CreateRawAgent (string agentCode)
 		{
-
 			if (!IsValidAgentCode (agentCode)) {
 				throw new System.ArgumentException (string.Format ("Agent code '{0}' not found.", agentCode));
 			}
-
-           
 			FastStack<LSAgent> cache = CachedAgents [agentCode];
 			LSAgent curAgent = null;
-			ushort agentCodeID = AgentController.GetAgentCodeIndex (agentCode);
 
 			if (cache.IsNotNull () && cache.Count > 0) {
 				curAgent = cache.Pop ();
-
+				ushort agentCodeID = AgentController.GetAgentCodeIndex (agentCode);
 				TypeAgentsActive [agentCodeID] [curAgent.TypeIndex] = true;
 			} else {
 				IAgentData interfacer = AgentController.CodeInterfacerMap [agentCode];
@@ -496,21 +511,8 @@ namespace Lockstep
 				curAgent = GameObject.Instantiate (AgentController.GetAgentTemplate (agentCode).gameObject).GetComponent<LSAgent> ();
 				curAgent.Setup (interfacer);
 
+				RegisterRawAgent (curAgent);
 
-				FastList<bool> typeActive;
-				if (!AgentController.TypeAgentsActive.TryGetValue (agentCodeID, out typeActive)) {
-					typeActive = new FastList<bool> ();
-					TypeAgentsActive.Add (agentCodeID, typeActive);
-				}
-				FastList<LSAgent> typeAgents;
-				if (!TypeAgents.TryGetValue (agentCodeID, out typeAgents)) {
-					typeAgents = new FastList<LSAgent> ();
-					TypeAgents.Add (agentCodeID, typeAgents);
-				}
-
-				curAgent.TypeIndex = (ushort)typeAgents.Count;
-				typeAgents.Add (curAgent);
-				typeActive.Add (true);
 			}
 			return curAgent;
 		}

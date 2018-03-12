@@ -83,7 +83,7 @@ namespace Lockstep
 
 
 		[SerializeField]
-		private int _selectionPriority;
+		private int _selectionPriority = 0;
 		public int SelectionPriority { get { return _selectionPriority; } }
 
 		[SerializeField]
@@ -91,6 +91,10 @@ namespace Lockstep
 		public bool Selectable { get { return _selectable; } }
 		public bool CanSelect { get { return Selectable && IsVisible; } }
 
+		/// <summary>
+		/// The index of this agent in the pool.
+		/// </summary>
+		/// <value>The index of the type.</value>
 		public ushort TypeIndex { get; set;}
 
 		public int ReferenceIndex { get; set;}

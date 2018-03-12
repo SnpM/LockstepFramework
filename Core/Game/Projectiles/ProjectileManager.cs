@@ -93,7 +93,7 @@ namespace Lockstep {
 		{
             IProjectileData projData = CodeDataMap[projCode];
 			if (projData.GetProjectile().gameObject != null) {
-				curProj = ((GameObject)GameObject.Instantiate<GameObject>(projData.GetProjectile().gameObject)).GetComponent<LSProjectile>();
+				var curProj = ((GameObject)GameObject.Instantiate<GameObject>(projData.GetProjectile().gameObject)).GetComponent<LSProjectile>();
 				if (curProj != null) {
 					curProj.Setup(projData);
 					return curProj;
@@ -120,25 +120,27 @@ namespace Lockstep {
         }
         public static LSProjectile Create (string projCode, Vector3d position, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional, Action<LSAgent> hitEffect)
 		{
-            curProj = RawCreate (projCode);
+            var curProj = RawCreate (projCode);
 
             int id = ProjectileBucket.Add(curProj);
 			curProj.Prepare (id, position,agentConditional,bucketConditional, hitEffect, true);
 			return curProj;
 		}
         private static LSProjectile RawCreate (string projCode) {
+			Debug.Log (projCode);
             if (ProjectilePool.ContainsKey (projCode) == false) {
                 Debug.Log(projCode + " Caused boom");
                 return null;
             }
             FastStack<LSProjectile> pool = ProjectilePool[projCode];
+			LSProjectile curProj = null;
             if (pool.Count > 0)
             {
                 curProj = pool.Pop ();
             }
             else {
                 curProj = NewProjectile (projCode);
-            } 
+            }
             return curProj;
         }
 		public static void Fire (LSProjectile projectile)
@@ -149,16 +151,23 @@ namespace Lockstep {
 		}
 
         private static FastBucket<LSProjectile> NDProjectileBucket = new FastBucket<LSProjectile>();
+		/// <summary>
+		/// Non-deterministic
+		/// </summary>
+		/// <returns>The create and fire.</returns>
+		/// <param name="curProj">Current proj.</param>
+		/// <param name="projCode">Proj code.</param>
+		/// <param name="position">Position.</param>
+		/// <param name="direction">Direction.</param>
+		/// <param name="gravity">If set to <c>true</c> gravity.</param>
         public static LSProjectile NDCreateAndFire (string projCode, Vector3d position, Vector3d direction, bool gravity = false) {
-			if (curProj != null) {
-				curProj = RawCreate(projCode);
-				int id = NDProjectileBucket.Add(curProj);
-				curProj.Prepare(id, position, (a) => false, (a) => false, (a) => { }, false);
-				curProj.InitializeFree(direction, (a) => false, gravity);
-				ProjectileManager.Fire(curProj);
-				return curProj;
-			}
-			else return null;
+			
+			var curProj = RawCreate(projCode);
+			int id = NDProjectileBucket.Add(curProj);
+			curProj.Prepare(id, position, (a) => false, (a) => false, (a) => { }, false);
+			curProj.InitializeFree(direction, (a) => false, gravity);
+			ProjectileManager.Fire(curProj);
+			return curProj;
         }
 
 		public static void EndProjectile (LSProjectile projectile)
@@ -202,10 +211,6 @@ namespace Lockstep {
 		}
 		#endregion
 
-		#region Helpers
-		static LSAgent curAgent;
-		static LSProjectile curProj;
-		#endregion
     }
 
 }
