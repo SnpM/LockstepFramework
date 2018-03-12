@@ -82,7 +82,6 @@ namespace Lockstep
 		public static ushort GetAgentCodeIndex (string agentCode)
 		{
 			return CodeIndexMap [agentCode];
-            
 		}
 
 		public static string GetAgentCode (ushort id)
@@ -125,7 +124,7 @@ namespace Lockstep
 			for (int i = 0; i < DeathingAgents.PeakCount; i++) {
 				if (DeathingAgents.arrayAllocation [i]) {
 					LSAgent agent = DeathingAgents [i];
-					agent.Pool ();
+					AgentController.CompleteLife (agent);
 				}
 			}
 			DeathingAgents.FastClear ();
@@ -251,7 +250,7 @@ namespace Lockstep
 			DeactivationBuffer.Add (new DeactivationData (agent, immediate));
 
 		}
-
+		public const ushort UNREGISTERED_TYPE_INDEX = ushort.MaxValue;
 		private static void DestroyAgentBuffer (DeactivationData data)
 		{
 			
@@ -261,13 +260,33 @@ namespace Lockstep
 			bool immediate = data.Immediate;
 
 			agent.Deactivate (immediate);
-
-			ushort agentCodeID = AgentController.GetAgentCodeIndex (agent.MyAgentCode);
-
-			TypeAgentsActive [agentCodeID] [agent.TypeIndex] = false;
-
 			ChangeController (agent, null);
 
+			//Pool if the agent is registered
+			ushort agentCodeID;
+			if (agent.TypeIndex != UNREGISTERED_TYPE_INDEX) {
+				if (CodeIndexMap.TryGetValue (agent.MyAgentCode, out agentCodeID)) {
+					TypeAgentsActive [agentCodeID] [agent.TypeIndex] = false;
+				}
+			}
+
+
+		}
+		/// <summary>
+		/// Completes the life of the agent and pools or destroys it.
+		/// </summary>
+		/// <param name="agent">Agent.</param>
+		public static void CompleteLife (LSAgent agent)
+		{
+			if (agent.CachedGameObject != null)
+				agent.CachedGameObject.SetActive (false);
+			if (agent.TypeIndex != UNREGISTERED_TYPE_INDEX) {
+				AgentController.CacheAgent (agent);
+
+			} else {
+				//This agent was not registered for pooling. Let's destroy it
+				GameObject.Destroy (agent);	
+			}
 		}
 
 		public static void CacheAgent (LSAgent agent)
@@ -482,7 +501,8 @@ namespace Lockstep
 				TypeAgents.Add (agentCodeID, typeAgents);
 			}
 
-			agent.TypeIndex = (ushort)typeAgents.Count;
+			//TypeIndex of ushort.MaxValue means that this agent isn't registered for the pool
+			agent.TypeIndex = (ushort)(typeAgents.Count);
 			typeAgents.Add (agent);
 			typeActive.Add (true);
 		}
@@ -504,6 +524,7 @@ namespace Lockstep
 			if (cache.IsNotNull () && cache.Count > 0) {
 				curAgent = cache.Pop ();
 				ushort agentCodeID = AgentController.GetAgentCodeIndex (agentCode);
+				Debug.Log (curAgent.TypeIndex);
 				TypeAgentsActive [agentCodeID] [curAgent.TypeIndex] = true;
 			} else {
 				IAgentData interfacer = AgentController.CodeInterfacerMap [agentCode];

@@ -91,11 +91,21 @@ namespace Lockstep
 		public bool Selectable { get { return _selectable; } }
 		public bool CanSelect { get { return Selectable && IsVisible; } }
 
+
+		ushort _typeIndex;
 		/// <summary>
 		/// The index of this agent in the pool.
 		/// </summary>
 		/// <value>The index of the type.</value>
-		public ushort TypeIndex { get; set;}
+		public ushort TypeIndex {
+			get {
+				return _typeIndex;
+			}
+			set {
+				_typeIndex = value;
+				_typeIndex = AgentController.UNREGISTERED_TYPE_INDEX;
+			}
+		}
 
 		public int ReferenceIndex { get; set;}
 
@@ -470,7 +480,7 @@ namespace Lockstep
 				poolCoroutine = CoroutineManager.StartCoroutine(PoolDelayer());
 			}
 			else {
-				Pool();
+				AgentController.CompleteLife (this);
 			}
 		}
 		private void _Deactivate()
@@ -502,15 +512,9 @@ namespace Lockstep
 			yield return _deathTime;
 			AgentController.DeathingAgents.RemoveAt(deathingIndex);
 
-			Pool();
+			AgentController.CompleteLife (this);
 		}
 
-		public void Pool()
-		{
-			AgentController.CacheAgent(this);
-			if (CachedGameObject != null)
-				CachedGameObject.SetActive(false);
-		}
 
 		public void SetState(AnimState animState)
 		{
