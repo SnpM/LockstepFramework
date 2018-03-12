@@ -463,12 +463,12 @@ namespace Lockstep
 				CanSetVisualRotation = true;
 				//                visualRot = Quaternion.LookRotation(Forward.ToVector3(0f) + _rotationOffset);
 				//				_rotationOffset = transform.GetComponent<InvasionDay.GeoHandler>()._eulerOffset;
-				visualRot = Quaternion.Euler(Quaternion.LookRotation(Forward.ToVector3(0f)).eulerAngles + _rotationOffset);
+				visualRot = Forward.ToVector3();
 				lastVisualRot = visualRot;
-				RotationalTransform.rotation = visualRot;
 			} else {
 				CanSetVisualRotation = false;
 			}
+			SetVisuals ();
 			velocityPosition = Vector3.zero;
             this.ImmovableCollisionDirection = Vector2d.zero;
 		}
@@ -624,7 +624,11 @@ namespace Lockstep
 
 			if (this.SetVisualRotation) {
 				this.DoSetVisualRotation(_rotation);
-				RotationalTransform.rotation = Quaternion.Slerp(lastVisualRot, visualRot, 1f/Time.fixedDeltaTime);
+
+				RotationalTransform.rotation = Quaternion.LookRotation (
+					Vector3.Slerp (lastVisualRot, visualRot, PhysicsManager.LerpTime),
+					Vector3.up);
+					// Quaternion.Slerp(lastVisualRot, visualRot, PhysicsManager.LerpTime);
 			}
 
 		}
@@ -643,15 +647,18 @@ namespace Lockstep
 		private void DoSetVisualRotation(Vector2d rot)
 		{
 			if (this.CanSetVisualRotation) {
-				lastVisualRot = RotationalTransform.rotation;
-				visualRot = Quaternion.Euler(Quaternion.LookRotation(Forward.ToVector3(0f)).eulerAngles + _rotationOffset);
+				lastVisualRot = visualRot;
+				visualRot = Forward.ToVector3 ();
+					// Quaternion.Euler(Quaternion.LookRotation(Forward.ToVector3(0f)).eulerAngles + _rotationOffset);
 				SetRotationBuffer = true;
 			}
 		}
 
 		Vector3 lastVisualPos;
-		Quaternion lastVisualRot;
-		Quaternion visualRot = Quaternion.identity;
+
+		//Testing out vectors instead of quaternions for interpolation
+		Vector3 lastVisualRot;
+		Vector3 visualRot = Vector3.forward;
 
 //		public void Visualize()
 //		{
@@ -679,7 +686,7 @@ namespace Lockstep
 
 			if (CanSetVisualRotation) {
 				if (SetRotationBuffer) {
-					RotationalTransform.rotation = visualRot;
+					RotationalTransform.rotation = Quaternion.LookRotation (visualRot);
 					SetRotationBuffer = false;
 				}
 			}

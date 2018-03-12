@@ -35,9 +35,9 @@ namespace Lockstep.Data {
             window.minSize = new Vector2 (400, 100);
             window.Show ();
         }
-        
-        void OnEnable () {
-            Window = this;
+         
+        void Awake () {
+			Window = this;
             this.LoadDatabase(LSFSettingsManager.GetSettings().Database);
             if (this.Database != null) {
                 _databaseType = LSFSettingsManager.GetSettings().Database.GetType();
