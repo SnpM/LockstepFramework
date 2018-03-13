@@ -37,7 +37,9 @@ namespace Lockstep{
 			var bucket = LocatedAgents [influencer.Agent.Controller.ControllerID];
 			bucket.RemoveAt(influencer.NodeTicket);
 			//Important! This ensure sync for the next game session.
-			bucket.SoftClear();
+			if (bucket.Count == 0) {
+				bucket.SoftClear ();
+			}
 			AgentCount--;
         }
 

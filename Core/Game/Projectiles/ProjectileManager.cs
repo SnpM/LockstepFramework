@@ -127,7 +127,6 @@ namespace Lockstep {
 			return curProj;
 		}
         private static LSProjectile RawCreate (string projCode) {
-			Debug.Log (projCode);
             if (ProjectilePool.ContainsKey (projCode) == false) {
                 Debug.Log(projCode + " Caused boom");
                 return null;

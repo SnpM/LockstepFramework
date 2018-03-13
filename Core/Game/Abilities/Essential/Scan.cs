@@ -712,7 +712,6 @@ namespace Lockstep
 
 		protected virtual LSAgent DoScan()
 		{
-
 			Func<LSAgent, bool> agentConditional = AgentConditional;
 
 			LSAgent agent = InfluenceManager.Scan(
