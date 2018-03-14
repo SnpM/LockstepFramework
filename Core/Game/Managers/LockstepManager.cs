@@ -43,6 +43,10 @@ namespace Lockstep
 
 		public static int InfluenceFrameCount { get; private set; }
 
+		/// <summary>
+		/// Number of frames that have passed. FrameCount/FrameRate = duration of game session in seconds.
+		/// </summary>
+		/// <value>The frame count.</value>
 		public static int FrameCount { get; private set; }
 
 		public static bool GameStarted { get; private set; }
