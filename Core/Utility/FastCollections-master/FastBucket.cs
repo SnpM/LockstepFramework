@@ -5,6 +5,11 @@ using System.Collections.Generic;
 
 namespace FastCollections
 {
+
+	/// <summary>
+	/// Bucket for O(1) removal of items.
+	/// Note: Iterating through is not the same unless the bucket is reset!
+	/// </summary>
 	public class FastBucket<T> : FastEnumerable<T>
 	{
 		public T[] innerArray;
@@ -156,7 +161,14 @@ namespace FastCollections
 			}
 			FastClear();
 		}
-
+		/// <summary>
+		/// When there are no items, this resets the bucket to be allocated the same way as when it was created.
+		/// </summary>
+		public void SoftClear () {
+			OpenSlots.FastClear();
+			PeakCount = 0;
+			Count = 0;
+		}
 		public void FastClear()
 		{
 			arrayAllocation.SetAll(false);

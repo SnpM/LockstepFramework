@@ -91,6 +91,10 @@ namespace Lockstep
             return FixedMath.Sqrt(temp1);
         }
 
+		/// <summary>
+		/// Unnormalized square magnitude used for comparisons.
+		/// </summary>
+		/// <returns>The magnitude.</returns>
         public long FastMagnitude()
         {
             return this.x * this.x + this.y * this.y;
@@ -300,7 +304,7 @@ namespace Lockstep
         }
 
         /// <summary>
-        /// Returns a value that is greater if the distance is greater.
+        /// Does not normalize the calculations to fixed-point numbers. Can be used for distance comparisons but scales quadratically.
         /// </summary>
         /// <returns>The FastDistance.</returns>
         public long FastDistance(long otherX, long otherY)

@@ -82,7 +82,6 @@ namespace Lockstep
 		public static ushort GetAgentCodeIndex (string agentCode)
 		{
 			return CodeIndexMap [agentCode];
-            
 		}
 
 		public static string GetAgentCode (ushort id)
@@ -97,7 +96,7 @@ namespace Lockstep
 
 		public static void Initialize ()
 		{
-			InstanceManagers.FastClear ();
+			InstanceManagers.Clear ();
 			GlobalAgentActive.Clear ();
 			OpenGlobalIDs.FastClear ();
 			PeakGlobalID = 0;
@@ -107,7 +106,6 @@ namespace Lockstep
 				}
 			}
             
-			AgentController.DefaultController = AgentController.Create ();
 
 		}
 
@@ -126,7 +124,7 @@ namespace Lockstep
 			for (int i = 0; i < DeathingAgents.PeakCount; i++) {
 				if (DeathingAgents.arrayAllocation [i]) {
 					LSAgent agent = DeathingAgents [i];
-					agent.Pool ();
+					AgentController.CompleteLife (agent);
 				}
 			}
 			DeathingAgents.FastClear ();
@@ -252,7 +250,7 @@ namespace Lockstep
 			DeactivationBuffer.Add (new DeactivationData (agent, immediate));
 
 		}
-
+		public const ushort UNREGISTERED_TYPE_INDEX = ushort.MaxValue;
 		private static void DestroyAgentBuffer (DeactivationData data)
 		{
 			
@@ -262,13 +260,33 @@ namespace Lockstep
 			bool immediate = data.Immediate;
 
 			agent.Deactivate (immediate);
-
-			ushort agentCodeID = AgentController.GetAgentCodeIndex (agent.MyAgentCode);
-
-			TypeAgentsActive [agentCodeID] [agent.TypeIndex] = false;
-
 			ChangeController (agent, null);
 
+			//Pool if the agent is registered
+			ushort agentCodeID;
+			if (agent.TypeIndex != UNREGISTERED_TYPE_INDEX) {
+				if (CodeIndexMap.TryGetValue (agent.MyAgentCode, out agentCodeID)) {
+					TypeAgentsActive [agentCodeID] [agent.TypeIndex] = false;
+				}
+			}
+
+
+		}
+		/// <summary>
+		/// Completes the life of the agent and pools or destroys it.
+		/// </summary>
+		/// <param name="agent">Agent.</param>
+		public static void CompleteLife (LSAgent agent)
+		{
+			if (agent.CachedGameObject != null)
+				agent.CachedGameObject.SetActive (false);
+			if (agent.TypeIndex != UNREGISTERED_TYPE_INDEX) {
+				AgentController.CacheAgent (agent);
+
+			} else {
+				//This agent was not registered for pooling. Let's destroy it
+				GameObject.Destroy (agent);	
+			}
 		}
 
 		public static void CacheAgent (LSAgent agent)
@@ -317,7 +335,9 @@ namespace Lockstep
 			return hash;
 		}
 
-		public static AgentController DefaultController { get; private set;}
+		public static AgentController DefaultController { get { return InstanceManagers[0]; }}
+		//TODO: Hide this list and use methods to access it
+		//Also, move static AC stuff into its own class
 		public static FastList<AgentController> InstanceManagers = new FastList<AgentController> ();
 		public readonly FastBucket<LSAgent> SelectedAgents = new FastBucket<LSAgent> ();
 
@@ -338,6 +358,17 @@ namespace Lockstep
 
 		private readonly FastList<AllegianceType> DiplomacyFlags = new FastList<AllegianceType> ();
 		private readonly FastStack<ushort> OpenLocalIDs = new FastStack<ushort> ();
+
+		private AgentCommander _commander;
+		public AgentCommander Commander { 
+			get {
+				if (_commander.IsNotNull ())
+					return _commander;
+				else {
+					return null;
+				}
+			}
+		}
 
 		public static AgentController Create ()
 		{
@@ -362,6 +393,17 @@ namespace Lockstep
 			this.SetAllegiance (this, AllegianceType.Friendly);
 		}
 
+		public AgentCommander CreateCommander (string commanderAgentCode) {
+			if (Commander != null)
+				Debug.LogError("A commander called '" + Commander.Agent.CachedGameObject + "' already exists for '"+  this.ToString() + "'.");
+			LSAgent commanderAgent = CreateBareAgent (commanderAgentCode);
+
+			_commander = commanderAgent.GetAbility<AgentCommander> ();
+			if (_commander == null)
+				Debug.LogError ("Agent '" + commanderAgentCode + "' does not have AgentCommander component and cannot be a commander.");
+			
+			return Commander;
+		}
 
 		public void AddToSelection (LSAgent agent)
 		{
@@ -398,9 +440,15 @@ namespace Lockstep
 			for (int i = 0; i < selection.selectedAgentLocalIDs.Count; i++) {
 				ushort selectedAgentID = selection.selectedAgentLocalIDs [i];
 				if (LocalAgentActive [selectedAgentID]) {
-					LocalAgents [selectedAgentID].Execute (com);
+					var agent = LocalAgents [selectedAgentID];
+					//Prevent executing twice on commander
+					if (Commander.IsNull() || agent != Commander.Agent) {
+						agent.Execute (com);
+					}
 				}
 			}
+			if (Commander.IsNotNull())
+			Commander.Agent.Execute (com);
 		}
 
 		//Backward compat.
@@ -439,28 +487,44 @@ namespace Lockstep
 			return interfacer.GetAgent ();
 		}
 
-		public LSAgent CreateAgent (
-			string agentCode,
-			Vector2d position,
-			Vector2d rotation
-		)
+
+		public static void RegisterRawAgent (LSAgent agent) {
+			var agentCodeID = AgentController.GetAgentCodeIndex (agent.MyAgentCode);
+			FastList<bool> typeActive;
+			if (!AgentController.TypeAgentsActive.TryGetValue (agentCodeID, out typeActive)) {
+				typeActive = new FastList<bool> ();
+				TypeAgentsActive.Add (agentCodeID, typeActive);
+			}
+			FastList<LSAgent> typeAgents;
+			if (!TypeAgents.TryGetValue (agentCodeID, out typeAgents)) {
+				typeAgents = new FastList<LSAgent> ();
+				TypeAgents.Add (agentCodeID, typeAgents);
+			}
+
+			//TypeIndex of ushort.MaxValue means that this agent isn't registered for the pool
+			agent.TypeIndex = (ushort)(typeAgents.Count);
+			typeAgents.Add (agent);
+			typeActive.Add (true);
+		}
+
+		/// <summary>
+		/// Create an uninitialized LSAgent
+		/// </summary>
+		/// <returns>The raw agent.</returns>
+		/// <param name="agentCode">Agent code.</param>
+		/// <param name="isBare">If set to <c>true</c> is bare.</param>
+		public static LSAgent CreateRawAgent (string agentCode)
 		{
-			Vector2d pos = position;
-			Vector2d rot = rotation;
-
-
 			if (!IsValidAgentCode (agentCode)) {
 				throw new System.ArgumentException (string.Format ("Agent code '{0}' not found.", agentCode));
 			}
-
-           
 			FastStack<LSAgent> cache = CachedAgents [agentCode];
 			LSAgent curAgent = null;
-			ushort agentCodeID = AgentController.GetAgentCodeIndex (agentCode);
 
 			if (cache.IsNotNull () && cache.Count > 0) {
 				curAgent = cache.Pop ();
-
+				ushort agentCodeID = AgentController.GetAgentCodeIndex (agentCode);
+				Debug.Log (curAgent.TypeIndex);
 				TypeAgentsActive [agentCodeID] [curAgent.TypeIndex] = true;
 			} else {
 				IAgentData interfacer = AgentController.CodeInterfacerMap [agentCode];
@@ -468,24 +532,21 @@ namespace Lockstep
 				curAgent = GameObject.Instantiate (AgentController.GetAgentTemplate (agentCode).gameObject).GetComponent<LSAgent> ();
 				curAgent.Setup (interfacer);
 
+				RegisterRawAgent (curAgent);
 
-				FastList<bool> typeActive;
-				if (!AgentController.TypeAgentsActive.TryGetValue (agentCodeID, out typeActive)) {
-					typeActive = new FastList<bool> ();
-					TypeAgentsActive.Add (agentCodeID, typeActive);
-				}
-				FastList<LSAgent> typeAgents;
-				if (!TypeAgents.TryGetValue (agentCodeID, out typeAgents)) {
-					typeAgents = new FastList<LSAgent> ();
-					TypeAgents.Add (agentCodeID, typeAgents);
-				}
-
-				curAgent.TypeIndex = (ushort)typeAgents.Count;
-				typeAgents.Add (curAgent);
-				typeActive.Add (true);
 			}
-			InitializeAgent (curAgent, pos, rot);
 			return curAgent;
+		}
+		public LSAgent CreateAgent (string agentCode, Vector2d position, Vector2d rotation) {
+			var agent = CreateRawAgent (agentCode);
+			InitializeAgent (agent, position, rotation);
+			return agent;
+		}
+		public LSAgent CreateBareAgent (string agentCode) {
+			var agent = CreateRawAgent (agentCode);
+			AddAgent (agent);
+			agent.InitializeBare ();
+			return agent;
 		}
 
 		private void InitializeAgent (LSAgent agent,
@@ -493,6 +554,7 @@ namespace Lockstep
 		                              Vector2d rotation)
 		{
 			AddAgent (agent);
+
 			agent.Initialize (position, rotation);
 		}
 

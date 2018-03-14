@@ -201,11 +201,7 @@ namespace Lockstep
 		{
 			System.Array.Clear (array, 0, array.Length);
 		}
-		public static void SetActiveIfNot (this GameObject go, bool activeState)
-		{
-			if (go.activeSelf != activeState)
-				go.SetActive (activeState);
-		}
+
 		public static bool RefEquals (this System.Object obj, object other) {
 			return System.Object.ReferenceEquals (obj, other);
 		}
@@ -252,13 +248,20 @@ namespace Lockstep
 			}
 			return s;
 		}
-        public static string PrintAll (this IEnumerable collection) {
+		public static string PrintAll (this IEnumerable collection) {
             string s = "";
             foreach (object obj in collection) {
                 s += obj.ToString ()+ ", ";
             }
             return s;
         }
+		public static string PrintAll (this IEnumerable collection, Func<object,string> operation) {
+			string s = "";
+			foreach (object obj in collection) {
+				s += operation (obj)+ ", ";
+			}
+			return s;
+		}
         public static bool InsensitiveContains (this string source, string other) {
             return source.IndexOf(other, StringComparison.OrdinalIgnoreCase) >= 0;
         }

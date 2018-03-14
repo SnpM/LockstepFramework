@@ -70,9 +70,29 @@ namespace Lockstep
 
         static FastList<FastBucket<LSInfluencer>> bufferBuckets = new FastList<FastBucket<LSInfluencer>>();
 		public static FastList<LSAgent> bufferAgents = new FastList<LSAgent>();
+		private static FastList<LSBody> bufferBodies = new FastList<LSBody> ();
 		public static void ScanAll(Vector2d position, long radius, Func<LSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, FastList<LSAgent> output)
 		{
+			//If radius is too big and we scan too many tiles, performance will be bad
+			const long circleCastRadius = FixedMath.One * 16;
 			output.FastClear();
+
+			if (radius >= circleCastRadius) {
+				bufferBodies.FastClear ();
+				PhysicsTool.CircleCast (position, radius, bufferBodies);
+				for (int i = 0; i < bufferBodies.Count; i++) {
+					var body = bufferBodies [i];
+					var agent = body.Agent;
+					//we have to check agent's controller since we did not filter it through buckets
+					if (bucketConditional (agent.Controller.ControllerID)) {
+						if (agentConditional (agent)) {
+							output.Add (agent);
+						}
+					}
+				}
+				return;
+			}
+
 			int xMin = ((position.x - radius - GridManager.OffsetX) / (long)GridManager.ScanResolution).ToInt();
 			int xMax = ((position.x + radius - GridManager.OffsetX) / (long)GridManager.ScanResolution).CeilToInt();
 			int yMin = ((position.y - radius - GridManager.OffsetY) / (long)GridManager.ScanResolution).ToInt();

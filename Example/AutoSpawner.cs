@@ -21,9 +21,10 @@ namespace Lockstep
                 for (int i = 0; i < Spawns.Length; i++)
                 {
                     SpawnInfo info = Spawns[i];
-                    while (AgentController.InstanceManagers.Count <= info.ControllerIndex)
+                    
+					/*while (AgentController.InstanceManagers.Count <= info.ControllerIndex)
                     {
-
+						
                         AgentController cont = AgentController.Create();
                         PlayerManager.AddController(cont);
                         for (int j = 0; j < AgentController.InstanceManagers.Count; j++)
@@ -36,7 +37,9 @@ namespace Lockstep
                             }
                         }
 
-                    }
+                    }*/
+					if (info.ControllerIndex >= AgentController.InstanceManagers.Count)
+						Debug.LogError ("Controller with index " + info.ControllerIndex + " not created. You can automatically create controllers by configuring AgentControllerCreator.");
 
                     AgentController controller = AgentController.InstanceManagers[info.ControllerIndex];
 
@@ -55,7 +58,7 @@ namespace Lockstep
 
 			for (int i = 0; i < Spawns.Length; i++) {
 				SpawnInfo info = Spawns [i];
-				while (AgentController.InstanceManagers.Count <= info.ControllerIndex) {
+				/*while (AgentController.InstanceManagers.Count <= info.ControllerIndex) {
 
 					AgentController cont = AgentController.Create ();
 					AgentControllerTool.SetFullHostile (cont);
@@ -63,8 +66,13 @@ namespace Lockstep
 	
 
 				}
+				*/
+				if (info.ControllerIndex >= AgentController.InstanceManagers.Count)
+					Debug.LogError ("Controller with index " + info.ControllerIndex + " not created. You can automatically create controllers by configuring AgentControllerCreator.");
+
 
 				AgentController controller = AgentController.InstanceManagers [info.ControllerIndex];
+
 				//add default controller if necessary
 				if (info.ControllerIndex == 0)
 					PlayerManager.AddController(controller);

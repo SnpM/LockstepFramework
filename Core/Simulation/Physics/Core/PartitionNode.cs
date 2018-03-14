@@ -7,6 +7,9 @@ namespace Lockstep
 	public class PartitionNode
 	{
 
+		/// <summary>
+		/// Stores dynamic bodies' PhysicsManager IDs.
+		/// </summary>
 		public readonly FastList<int> ContainedDynamicObjects = new FastList<int> ();
 		public readonly FastList<int> ContainedImmovableObjects = new FastList<int> ();
 

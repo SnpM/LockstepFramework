@@ -17,7 +17,7 @@ namespace Lockstep.Integration
             so.PropertyField("_targetingBehavior");
             TargetingType targetingBehavior = (TargetingType) so.FindProperty("_targetingBehavior").enumValueIndex;
             switch (targetingBehavior) {
-                case TargetingType.Free:
+                case TargetingType.Directional:
 					so.PropertyField("_speed");
 					break;
                 case TargetingType.Positional:

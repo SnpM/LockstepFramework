@@ -324,11 +324,11 @@ namespace Lockstep
             original = newArray;
         }
 
-        public const ReorderableListFlags DisableReordering = ReorderableListFlags.DisableReordering;
+		public const ReorderableListFlags DisableReordering = ReorderableListFlags.DisableReordering;
         public const ReorderableListFlags DisableAddRemove = ReorderableListFlags.HideAddButton | ReorderableListFlags.HideRemoveButtons;
-        public const ReorderableListFlags DefaultListFlags = DisableReordering;
+		public const ReorderableListFlags DefaultListFlags = ReorderableListFlags.ShowIndices;
 
-        public static void ListField(SerializedProperty property, ReorderableListFlags flags = DisableReordering)
+		public static void ListField(SerializedProperty property, ReorderableListFlags flags = DefaultListFlags)
         {
             Rotorz.ReorderableList.ReorderableListGUI.ListField(
                 property

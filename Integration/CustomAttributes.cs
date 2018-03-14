@@ -80,7 +80,6 @@ namespace Lockstep
         }
 
     }
-
     public class EnumMaskAttribute : PropertyAttribute
     {
     

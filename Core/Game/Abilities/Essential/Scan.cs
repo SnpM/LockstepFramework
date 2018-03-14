@@ -477,7 +477,7 @@ namespace Lockstep
 				case TargetingType.Positional:
 					currentProjectile.InitializePositional(target.Body.Position.ToVector3d(target.Body.HeightPos));
 					break;
-				case TargetingType.Free:
+				case TargetingType.Directional:
 					//TODO
 					throw new System.Exception("Not implemented yet.");
 					//break;
@@ -508,7 +508,7 @@ namespace Lockstep
 				case TargetingType.Positional:
 					currentProjectile.InitializePositional(targetPos);
 					break;
-				case TargetingType.Free:
+				case TargetingType.Directional:
 					//TODO
 					throw new System.Exception("Not implemented yet.");
 					//break;
@@ -712,8 +712,8 @@ namespace Lockstep
 
 		protected virtual LSAgent DoScan()
 		{
-
 			Func<LSAgent, bool> agentConditional = AgentConditional;
+
 			LSAgent agent = InfluenceManager.Scan(
 										 this.cachedBody.Position,
 										 this.Sight,
@@ -721,7 +721,6 @@ namespace Lockstep
 										 (bite) =>
 										 {
 											 return ((this.Agent.Controller.GetAllegiance(bite) & this.TargetAllegiance) != 0);
-
 										 }
 									 );
 

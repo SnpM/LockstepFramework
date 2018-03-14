@@ -102,6 +102,39 @@ namespace Lockstep
 				GridYMax = GetGridY (Body.YMax);
 			}
 		}
+		/// <summary>
+		/// Gets the grid bounds from world bounds.
+		/// </summary>
+		/// <param name="xMin">X minimum.</param>
+		/// <param name="xMax">X max.</param>
+		/// <param name="yMin">Y minimum.</param>
+		/// <param name="yMax">Y max.</param>
+		public static void GetGridBounds (long xMin, long xMax, long yMin, long yMax,
+			out int gridXMin, out int gridXMax, out int gridYMin, out int gridYMax) {
+			gridXMin = GetGridX (xMin);
+			gridXMax = GetGridX (xMax);
+			gridYMin = GetGridY (yMin);
+			gridYMax = GetGridY (yMax);
+
+			gridXMin = ClampX (gridXMin);
+			gridXMax = ClampX (gridXMax);
+			gridYMin = ClampY (gridYMin);
+			gridYMax = ClampY (gridYMax);
+		}
+		static int ClampX (int gridX) {
+			if (gridX < 0)
+				return 0;
+			if (gridX >= Nodes.Width)
+				return Nodes.Width - 1;
+			return gridX;
+		}
+		static int ClampY (int gridY) {
+			if (GridXMax < 0)
+				return 0;
+			if (gridY >= Nodes.Height)
+				return Nodes.Height - 1;
+			return gridY;
+		}
 
 		public static void PartitionObject (LSBody Body, bool gridBoundsCalculated = false)
 		{
@@ -166,7 +199,7 @@ namespace Lockstep
 			}
 			return false;
 		}
-
+					
 		static int id1, id2;
 		static CollisionPair pair;
 

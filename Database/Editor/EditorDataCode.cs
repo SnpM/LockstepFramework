@@ -34,54 +34,50 @@ namespace Lockstep.Data {
                 }
                 else {
                     DataItem[] data = helper.Data;
-                    GUIContent[] dataContents = new GUIContent[data.Length];
+                    GUIContent[] dataContents = new GUIContent[data.Length + 1];
+
                     if (property.isArray && property.type != "string") {
                         int arraySize = property.arraySize;
                         arraySize = EditorGUI.IntField (drawPos, "Size", arraySize);
                         property.arraySize = arraySize;
                         for (int n = 0; n < arraySize; n++) {
                             SerializedProperty element = property.GetArrayElementAtIndex (n);
-                    
-                            string curName = element.stringValue;
-                            int index = -1;
-                            for (int i = 0; i < data.Length; i++) {
-                                string name = data [i].Name;
-                                if (curName.Equals (name)) {
-                                    index = i;
-                                }
-                        
-                                GUIContent content = new GUIContent (name);
-                                dataContents [i] = content;
-                            }
-                            //label.tooltip += dca.TargetDataName;
-                            int newIndex = EditorGUI.Popup (drawPos, label, index, dataContents);
-                            if (newIndex >= 0 && newIndex < dataContents.Length) {
-                                element.stringValue = dataContents [newIndex].text;
-                            }
+							DrawElement (element, dataContents, data, drawPos, label);
                         }
                     
                     } else {
                 
-                        string curName = property.stringValue;
-                        int index = -1;
-                        for (int i = 0; i < data.Length; i++) {
-                            string name = data [i].Name;
-                            if (curName.Equals (name)) {
-                                index = i;
-                            }
-                    
-                            GUIContent content = new GUIContent (name);
-                            dataContents [i] = content;
-                        }
-                        //label.tooltip += dca.TargetDataName;
-                        int newIndex = EditorGUI.Popup (drawPos, label, index, dataContents);
-                        if (newIndex >= 0 && newIndex < dataContents.Length) {
-                            property.stringValue = dataContents [newIndex].text;
-                        }
+						DrawElement (property, dataContents, data, drawPos, label);
                     }
                 }
             }
             accumulatedHeight = drawPos.yMax - position.yMin;
         }
+
+		void DrawElement (SerializedProperty element, GUIContent[] dataContents, DataItem[] data, Rect drawPos, GUIContent label) {
+			string curName = element.stringValue;
+			int index = -1;
+			GUIContent noneContent = new GUIContent ("[None]");
+			dataContents [0] = noneContent;
+			if (string.IsNullOrEmpty (curName))
+				index = 0;
+			for (int i = 0; i < data.Length; i++) {
+				string name = data [i].Name;
+				if (curName.Equals (name)) {
+					index = i+1;
+				}
+
+				GUIContent content = new GUIContent (name);
+				dataContents [i+1] = content;
+			}
+			//label.tooltip += dca.TargetDataName;
+			int newIndex = EditorGUI.Popup (drawPos, label, index, dataContents);
+
+			if (newIndex >= 1 && newIndex < dataContents.Length) {
+				element.stringValue = dataContents [newIndex].text;
+			} else if (newIndex == 0) {
+				element.stringValue = null;
+			}
+		}
     }
 }

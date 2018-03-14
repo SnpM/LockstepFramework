@@ -53,6 +53,7 @@ namespace Lockstep
 				agentInfo.Agent.Setup (AgentController.GetAgentInterfacer (agentInfo.AgentCode));
 				agentInfo.Agent.Initialize (agentInfo.Position.ToVector2d(), agentInfo.Rotation);
 				agentInfo.Agent.Body.HeightPos = agentInfo.Position.z;
+				agentInfo.Agent.TypeIndex = AgentController.UNREGISTERED_TYPE_INDEX;
 			}
         }
 

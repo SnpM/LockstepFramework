@@ -13,6 +13,7 @@ namespace Lockstep{
             this.X = x;
             this.Y = y;
         }
+		//TODO: THIS DICTIONARY IS NOT DETERMINISTIC WHEN ITERATING!
         //One bucket for each AC of units that lands on this ScanNode
         private Dictionary<byte,FastBucket<LSInfluencer>> LocatedAgents = new Dictionary<byte,FastBucket<LSInfluencer>> ();
 
@@ -33,7 +34,12 @@ namespace Lockstep{
         }
 
         public void Remove (LSInfluencer influencer) {
-            LocatedAgents[influencer.Agent.Controller.ControllerID].RemoveAt(influencer.NodeTicket);
+			var bucket = LocatedAgents [influencer.Agent.Controller.ControllerID];
+			bucket.RemoveAt(influencer.NodeTicket);
+			//Important! This ensure sync for the next game session.
+			if (bucket.Count == 0) {
+				bucket.SoftClear ();
+			}
 			AgentCount--;
         }
 
@@ -52,14 +58,5 @@ namespace Lockstep{
                     output.Add(pair.Value);
             }
         }
-        /*
-        public IEnumerable<FastBucket<LSInfluencer>> BucketsWithAllegiance (Func<byte,bool> bucketConditional) {
-            foreach (KeyValuePair<byte,FastBucket<LSInfluencer>> pair in LocatedAgents) {
-                if (bucketConditional (pair.Key))
-                {
-                    yield return pair.Value;
-                }
-            }
-        }*/
 	}
 }

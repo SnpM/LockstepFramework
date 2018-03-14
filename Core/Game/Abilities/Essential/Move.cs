@@ -82,22 +82,7 @@ namespace Lockstep
 
 		public Vector2d AveragePosition { get; set; }
 
-		public long timescaledSpeed {
-			get {
-				long ret = ((this.Speed + this.AdditiveSpeedModifier) / LockstepManager.FrameRate).Mul(FixedMath.One + this.MultiplicativeSpeedModifier);
-				if (ret < 0)
-					ret = 0;
-				return ret;
-			}
-		}
-
 		private long timescaledAcceleration;
-
-		[Lockstep(true)]
-		public long AdditiveSpeedModifier { get; set; }
-
-		[Lockstep(true)]
-		public long MultiplicativeSpeedModifier { get; set; }
 
 		private Vector2d lastTargetPos;
 		private Vector2d targetDirection;
@@ -121,7 +106,8 @@ namespace Lockstep
 		private bool _canMove = true;
 
 		public bool CanMove {
-			get { return _canMove; }
+			get;
+			set;
 		}
 
 		[SerializeField]
@@ -156,9 +142,8 @@ namespace Lockstep
 			CachedTurn = Agent.GetAbility<Turn>();
 			CanTurn = _canTurn && CachedTurn != null;
 
-			timescaledAcceleration = Acceleration * 32 / LockstepManager.FrameRate;
-			if (timescaledAcceleration > FixedMath.One)
-				timescaledAcceleration = FixedMath.One;
+			timescaledAcceleration = Acceleration / LockstepManager.FrameRate;
+
 			closingDistance = cachedBody.Radius;
 			stuckTolerance = ((Agent.Body.Radius * Speed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
 			stuckTolerance *= stuckTolerance;
@@ -168,10 +153,12 @@ namespace Lockstep
 
 		protected override void OnInitialize()
 		{
+			
 			myPath.FastClear();
 			_pathIndex = 0;
 			StoppedTime = 0;
 
+			CanMove = _canMove;
 			IsFormationMoving = false;
 			MyMovementGroupID = -1;
 			CanCollisionStop = true;
@@ -222,12 +209,15 @@ namespace Lockstep
 			if (!CanMove) {
 				return;
 			}
+
 			if (IsMoving) {
+				Agent.SetState(AnimState.Moving);
+
 				if (CanPathfind) {
 					if (DoPathfind) {
 						DoPathfind = false;
 						if (viableDestination) {
-							if (Pathfinder.GetPathNode(cachedBody.Position, out currentNode)) {
+							if (Pathfinder.GetStartNode(cachedBody.Position, out currentNode)) {
 								if (currentNode.DoesEqual(this.destinationNode)) {
 									if (this.RepathTries >= 1) {
 										this.Arrive();
@@ -310,7 +300,7 @@ namespace Lockstep
 					if (CanTurn)
 						CachedTurn.StartTurnDirection(movementDirection);
 
-					stuckThreshold = this.timescaledSpeed / 4;
+					stuckThreshold = this.timescaledAcceleration / 4;
 				} else {
 					if (distance < FixedMath.Mul(closingDistance, StopMultiplier)) {
 						Arrive();
@@ -323,7 +313,7 @@ namespace Lockstep
 
 					} else {
 						desiredVelocity = (movementDirection);
-						stuckThreshold = this.timescaledSpeed / 2;
+						stuckThreshold = this.timescaledAcceleration / 2;
 
 					}
 
@@ -375,22 +365,31 @@ namespace Lockstep
 						this.pathIndex++;
 					}
 				}
-				desiredVelocity *= timescaledSpeed;
 
-				cachedBody._velocity += (desiredVelocity - cachedBody._velocity) * timescaledAcceleration;
+				desiredVelocity *= Speed;
+				cachedBody._velocity += GetAdjustVector(desiredVelocity);
 
 				cachedBody.VelocityChanged = true;
 
 				TempCanCollisionStop = true;
 			} else {
 				if (cachedBody.VelocityFastMagnitude > 0) {
-					cachedBody._velocity -= cachedBody._velocity * timescaledAcceleration;
-					cachedBody.VelocityChanged = true;
+					cachedBody.Velocity += GetAdjustVector (Vector2d.zero);
 				}
 				StoppedTime++;
 			}
 			AveragePosition = AveragePosition.Lerped(Agent.Body.Position, FixedMath.One / 4);
+		}
 
+		Vector2d GetAdjustVector (Vector2d desiredVel) {
+			var adjust = desiredVel - cachedBody._velocity;
+			var adjustFastMag = adjust.FastMagnitude ();           
+			//Cap acceleration vector magnitude
+			if (adjustFastMag > timescaledAcceleration * (timescaledAcceleration)) {
+				var mag = FixedMath.Sqrt (adjustFastMag >> FixedMath.SHIFT_AMOUNT);
+				adjust *= timescaledAcceleration.Div (mag);
+			}
+			return adjust;
 		}
 
 		public Command LastCommand;
@@ -479,7 +478,6 @@ namespace Lockstep
 		public void StartMove(Vector2d destination)
 		{
 			DoPathfind = true;
-			Agent.SetState(AnimState.Moving);
 			hasPath = false;
 			straightPath = false;
 			this.Destination = destination;
@@ -489,7 +487,7 @@ namespace Lockstep
 
             //For now, use old next-best-node system when size requires consideration
             viableDestination = this.GridSize <= 1 ?
-                Pathfinder.GetPathNode (Agent.Body.Position,destination, out destinationNode) :
+				Pathfinder.GetEndNode (Agent.Body.Position,destination, out destinationNode) :
                 Pathfinder.GetClosestViableNode(Agent.Body.Position, destination, this.GridSize, out destinationNode);
             //TODO: If next-best-node, autostop more easily
             //Also implement stopping sooner based on distance

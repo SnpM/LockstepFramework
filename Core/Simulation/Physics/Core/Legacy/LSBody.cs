@@ -13,8 +13,10 @@ using FastCollections;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+
 namespace Lockstep.Legacy
 {
+	[System.Obsolete ("This class is only used for automatically swapping legacy LSBodies.")]
 	public partial class LSBody : MonoBehaviour
 	{
 

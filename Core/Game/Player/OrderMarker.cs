@@ -21,7 +21,7 @@ public class OrderMarker : MonoBehaviour {
 		if (markerType == MarkerType.None) return;
         
         var renderer = GetComponent<Renderer>();
-        renderer.gameObject.SetActiveIfNot (true);
+        renderer.gameObject.SetActive (true);
 
 		transform.position = pos;
             if (!hasRenderer) return;

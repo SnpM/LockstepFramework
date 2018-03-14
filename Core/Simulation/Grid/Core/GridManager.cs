@@ -37,9 +37,9 @@ namespace Lockstep
             }
         }
 		public static void NotifyGridChanged () {
+			GridVersion++;
 			Pathfinding.Pathfinder.ChangeCombineIteration ();
 		}
-		public static bool GridChanged {get; private set;}
 		public static uint GridVersion {get; private set;}
 
         private static bool _settingsChanged = true;
@@ -139,7 +139,6 @@ namespace Lockstep
 		{
 			Pathfinding.Pathfinder.Reset ();
 			GridVersion = 1;
-			GridChanged = false;
 			if (!LockstepManager.PoolingEnabled)
 				_settingsChanged = true;
             if (_settingsChanged) {
@@ -163,8 +162,7 @@ namespace Lockstep
 		}
 
 		public static void LateSimulate () {
-			if (GridChanged)
-				GridVersion++;
+
 		}
 
 		public static GridNode GetNode (int xGrid, int yGrid)

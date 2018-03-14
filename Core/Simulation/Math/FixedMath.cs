@@ -11,6 +11,7 @@ using UnityEngine;
 using System.Collections; using FastCollections;
 using System;
 
+
 namespace Lockstep
 {
 	public static class FixedMath
@@ -300,7 +301,7 @@ namespace Lockstep
 
 		public static bool MoreThanEpsilon(this long f1)
 		{
-			return f1 > Epsilon || f1 < Epsilon;
+			return f1 > Epsilon || f1 < -Epsilon;
 		}
 
 		public static long MoveTowards(long from, long to, long maxAmount)

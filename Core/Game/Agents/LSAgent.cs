@@ -83,7 +83,7 @@ namespace Lockstep
 
 
 		[SerializeField]
-		private int _selectionPriority;
+		private int _selectionPriority = 0;
 		public int SelectionPriority { get { return _selectionPriority; } }
 
 		[SerializeField]
@@ -91,7 +91,21 @@ namespace Lockstep
 		public bool Selectable { get { return _selectable; } }
 		public bool CanSelect { get { return Selectable && IsVisible; } }
 
-		public ushort TypeIndex { get; set;}
+
+		ushort _typeIndex;
+		/// <summary>
+		/// The index of this agent in the pool.
+		/// </summary>
+		/// <value>The index of the type.</value>
+		public ushort TypeIndex {
+			get {
+				return _typeIndex;
+			}
+			set {
+				_typeIndex = value;
+				_typeIndex = AgentController.UNREGISTERED_TYPE_INDEX;
+			}
+		}
 
 		public int ReferenceIndex { get; set;}
 
@@ -342,6 +356,11 @@ namespace Lockstep
 		}
 
 		bool Setuped;
+		//Initialize this agent with basic functions and Ability system
+		public void InitializeBare () {
+			IsActive = true;
+			abilityManager.Initialize ();
+		}
 		public void Initialize(
 			Vector2d position = default(Vector2d),
 			Vector2d rotation = default(Vector2d))
@@ -351,7 +370,7 @@ namespace Lockstep
 			CheckCasting = true;
 
 
-			CachedGameObject.SetActiveIfNot(true);
+			CachedGameObject.SetActive(true);
 			if (Body.IsNotNull())
 			{
 				Body.Initialize(position.ToVector3d(), rotation);
@@ -461,7 +480,7 @@ namespace Lockstep
 				poolCoroutine = CoroutineManager.StartCoroutine(PoolDelayer());
 			}
 			else {
-				Pool();
+				AgentController.CompleteLife (this);
 			}
 		}
 		private void _Deactivate()
@@ -493,15 +512,9 @@ namespace Lockstep
 			yield return _deathTime;
 			AgentController.DeathingAgents.RemoveAt(deathingIndex);
 
-			Pool();
+			AgentController.CompleteLife (this);
 		}
 
-		public void Pool()
-		{
-			AgentController.CacheAgent(this);
-			if (CachedGameObject != null)
-				CachedGameObject.SetActive(false);
-		}
 
 		public void SetState(AnimState animState)
 		{
