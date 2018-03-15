@@ -5,6 +5,8 @@ using Lockstep.Data;
 using System.Collections.Generic;
 using FastCollections;
 
+//TODO: Simulate checks to see if target exists
+
 #if UNITY_EDITOR
 using UnityEditor;
 using Lockstep.Integration;
