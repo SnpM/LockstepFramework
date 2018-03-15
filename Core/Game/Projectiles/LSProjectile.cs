@@ -395,9 +395,12 @@ namespace Lockstep
 				}
 				else
 				{
+					//Certain targeting types collide with a target
+					if (this.TargetingBehavior == TargetingType.Homing) {
+						EffectManager.CreateCollisionEffect (this.HitFX, this, Target.Body);
+					} else {
+						EffectManager.CreateEffect (this.HitFX, this.cachedTransform.position, this.cachedTransform.rotation);
 
-					{
-						EffectManager.LazyCreateEffect(this.HitFX, this.cachedTransform.position, this.cachedTransform.rotation);
 					}
 				}
 			}
@@ -545,7 +548,7 @@ namespace Lockstep
 
 			if (UseEffects)
 			{
-				LSEffect effect = EffectManager.LazyCreateEffect(this.StartFX, this.Position.ToVector3(), this.cachedTransform.rotation);
+				LSEffect effect = EffectManager.CreateEffect(this.StartFX, this.Position.ToVector3(), this.cachedTransform.rotation);
 				if (effect != null)
 				{
 					effect.StartPos = this.Position.ToVector3();

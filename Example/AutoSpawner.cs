@@ -74,7 +74,7 @@ namespace Lockstep
 				AgentController controller = AgentController.InstanceManagers [info.ControllerIndex];
 
 				//add default controller if necessary
-				if (info.ControllerIndex == 0)
+				if (info.ControllerIndex == 0 && PlayerManager.AgentControllers.Count == 0)
 					PlayerManager.AddController(controller);
 				for (int j = 0; j < info.Count; j++) {
 					LSAgent agent = controller.CreateAgent (info.AgentCode, info.Position);

@@ -432,6 +432,7 @@ namespace Lockstep
 			_heightPos = StartPosition.z;
 			_rotation = StartRotation;
 			ForwardNeedsSet = true;
+			FastRadius = this.Radius * this.Radius;
 
 			XMin = 0;
 			XMax = 0;
