@@ -369,7 +369,15 @@ namespace Lockstep
 				}
 			}
 		}
-
+		public static AgentController GetInstanceManager (int index) {
+			if (index >= AgentController.InstanceManagers.Count) {
+				Debug.LogError ("Controller with index " + index + " not created. You can automatically create controllers by configuring AgentControllerCreator.");
+				return null;
+			} else if (index < 0) {
+				Debug.LogError ("Controller cannot have negative index.");
+			}
+			return AgentController.InstanceManagers [index];
+		}
 		public static AgentController Create ()
 		{
 			return new AgentController ();
@@ -542,6 +550,12 @@ namespace Lockstep
 			InitializeAgent (agent, position, rotation);
 			return agent;
 		}
+
+		/// <summary>
+		/// Creates and initializes an agent without activating LSBody, LSInfluencer, etc..
+		/// </summary>
+		/// <returns>The bare agent.</returns>
+		/// <param name="agentCode">Agent code.</param>
 		public LSAgent CreateBareAgent (string agentCode) {
 			var agent = CreateRawAgent (agentCode);
 			AddAgent (agent);

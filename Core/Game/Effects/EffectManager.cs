@@ -58,8 +58,12 @@ namespace Lockstep
         {
 			return !string.IsNullOrEmpty (effectCode) && effectCode != "None" && CodeDataMap.ContainsKey (effectCode);
         }
-
-        public static LSEffect LazyCreateEffect(string effectCode, Vector3 position)
+		public static LSEffect CreateCollisionEffect (string effectCode, LSProjectile projectile, LSBody hitBody) {
+			Vector3 collisionDirection = -(projectile.Forward.ToVector3());
+			Vector3 collisionPosition = collisionDirection * hitBody.Radius.ToFloat () + hitBody.PositionalTransform.position;
+			return CreateEffect (effectCode, collisionPosition, projectile.transform.rotation);
+		}
+        public static LSEffect CreateEffect(string effectCode, Vector3 position)
         {
             if (!IsValid(effectCode))
                 return null;
@@ -69,7 +73,7 @@ namespace Lockstep
             return effect;
         }
 
-        public static LSEffect LazyCreateEffect(string effectCode, Vector3 position, Quaternion rotation)
+        public static LSEffect CreateEffect(string effectCode, Vector3 position, Quaternion rotation)
         {
             if (!IsValid(effectCode))
                 return null;
@@ -81,7 +85,7 @@ namespace Lockstep
 
         }
 
-        public static LSEffect LazyCreateEffect(string effectCode, Transform spawnParent)
+        public static LSEffect CreateEffect(string effectCode, Transform spawnParent)
         {
             if (!IsValid(effectCode))
                 return null;

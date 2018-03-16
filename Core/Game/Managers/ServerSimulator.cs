@@ -61,7 +61,7 @@ namespace Lockstep
 					receivedBytes.FastClear ();
 					Send (bufferBytes.ToArray ());
 				}
-				yield return LSUtility.WaitRealTime (LockstepManager.BaseDeltaTime * LockstepManager.InfluenceResolution);
+				yield return LSUtility.WaitRealTime (LockstepManager.DeltaTimeF * LockstepManager.InfluenceResolution);
 			}
 		}
 	}

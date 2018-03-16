@@ -21,7 +21,6 @@ namespace Lockstep.Data {
             }
 			set {
 				_databaseEditor = value;
-				Debug.Log (value);
 			}
         }
         

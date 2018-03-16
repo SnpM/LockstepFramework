@@ -37,12 +37,17 @@ namespace Lockstep
 	{
 		public const int FrameRate = 32;
 		public const int InfluenceResolution = 2;
-		public const float BaseDeltaTime = (float)(1d / FrameRate);
+		public const long DeltaTime = FixedMath.One / FrameRate;
+		public const float DeltaTimeF = DeltaTime / FixedMath.OneF;
 
 		private static int InfluenceCount;
 
 		public static int InfluenceFrameCount { get; private set; }
 
+		/// <summary>
+		/// Number of frames that have passed. FrameCount/FrameRate = duration of game session in seconds.
+		/// </summary>
+		/// <value>The frame count.</value>
 		public static int FrameCount { get; private set; }
 
 		public static bool GameStarted { get; private set; }
@@ -95,7 +100,7 @@ namespace Lockstep
 			PhysicsManager.Setup ();
 			ClientManager.Setup ();
 
-			Time.fixedDeltaTime = BaseDeltaTime;
+			Time.fixedDeltaTime = DeltaTimeF;
 			Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
 			InputCodeManager.Setup ();
 

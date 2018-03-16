@@ -132,7 +132,7 @@ namespace Lockstep
 		{
 			Partition.CheckAndDistributeCollisions();
 			Simulated = true;
-
+			AccumulatedTime = 0f;
 		}
 
 		internal static FastBucket<InstanceCollisionPair> RanCollisionPairs = new FastBucket<InstanceCollisionPair>();
@@ -221,6 +221,7 @@ namespace Lockstep
 
 		public static bool Simulated { get; private set; }
 		public static double AccumulatedTime { get; private set; }
+		public static double ExpectedAccumulation { get; private set; }
 		public static float LerpTime { get; private set; }
 		public static void LateVisualize()
 		{
@@ -246,6 +247,8 @@ namespace Lockstep
 			//			}
 
 			LerpTime = (float)PhysicsManager.FixedDeltaTime / (float)Time.timeScale;
+			AccumulatedTime += Time.deltaTime;
+			ExpectedAccumulation = AccumulatedTime / LerpTime;
 			for (int i = 0; i < DynamicSimObjects.PeakCount; i++) {
 				LSBody b1 = DynamicSimObjects.innerArray[i];
 				if (b1.IsNotNull()) {

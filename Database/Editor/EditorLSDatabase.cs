@@ -92,7 +92,6 @@ namespace Lockstep.Data
         {
             this.MainWindow = window;
             Database = database;
-			Debug.Log (Database);
             InitializeData();
 			bool isValid = true;
             for (int i = 0; i < DataItemInfos.Count; i++)

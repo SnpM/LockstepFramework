@@ -207,8 +207,9 @@ namespace Lockstep
 
 		protected override void OnSimulate()
 		{
-
-			attackCount -= FixedMath.One / LockstepManager.FrameRate;
+			if (attackCount > 0) {
+				attackCount -= LockstepManager.DeltaTime;
+			}
 			if (HasTarget)
 			{
 				BehaveWithTarget();
@@ -251,88 +252,58 @@ namespace Lockstep
 			if (Target.IsActive == false || Target.SpawnVersion != targetVersion ||
 				(this.TargetAllegiance & Agent.GetAllegiance(Target)) == 0)
 			{
+				//Target no longer exists
 				StopEngage();
 				BehaveWithNoTarget();
 				return;
 			}
-			if (IsWindingUp)
-			{
-                windupCount -= FixedMath.One / LockstepManager.FrameRate;
-				if (windupCount < 0)
-				{
-					if (this.AgentConditional(Target))
-					{
-						Fire();
-						while (this.attackCount < 0)
-							this.attackCount += (this.AttackInterval);
-						this.attackCount -= Windup;
-					}
-					else {
-						StopEngage();
-						this.ScanAndEngage();
-					}
-                    IsWindingUp = false;
 
-                }
-            }
-			else {
+			if (!IsWindingUp) {
 				Vector2d targetDirection = Target.Body._position - cachedBody._position;
-				long fastMag = targetDirection.FastMagnitude();
+				long fastMag = targetDirection.FastMagnitude ();
 
-				if (fastMag <= fastRangeToTarget)
-				{
-					if (!inRange)
-					{
+				if (fastMag <= fastRangeToTarget) {
+					if (!inRange) {
 						if (CanMove)
-							cachedMove.StopMove();
+							cachedMove.StopMove ();
 
 					}
-					Agent.SetState(EngagingAnimState);
+					Agent.SetState (EngagingAnimState);
 
 					long mag;
-					targetDirection.Normalize(out mag);
+					targetDirection.Normalize (out mag);
 					bool withinTurn = TrackAttackAngle == false ||
-													 (fastMag != 0 &&
-													 cachedBody.Forward.Dot(targetDirection.x, targetDirection.y) > 0
-													 && cachedBody.Forward.Cross(targetDirection.x, targetDirection.y).Abs() <= AttackAngle);
+					                  (fastMag != 0 &&
+					                  cachedBody.Forward.Dot (targetDirection.x, targetDirection.y) > 0
+					                  && cachedBody.Forward.Cross (targetDirection.x, targetDirection.y).Abs () <= AttackAngle);
 					bool needTurn = mag != 0 && !withinTurn;
-					if (needTurn)
-					{
-						if (CanTurn)
-						{
-							cachedTurn.StartTurnDirection(targetDirection);
-						}
-						else {
+					if (needTurn) {
+						if (CanTurn) {
+							cachedTurn.StartTurnDirection (targetDirection);
+						} else {
 
 						}
-					}
-					else {
-						if (attackCount <= 0)
-						{
-							StartWindup();
+					} else {
+						if (attackCount <= 0) {
+							StartWindup ();
 						}
 					}
 
-					if (inRange == false)
-					{
+					if (inRange == false) {
 						inRange = true;
 					}
-				}
-				else {
-					if (CanMove)
-					{
-						if (cachedMove.IsMoving == false)
-						{
-							cachedMove.StartMove(Target.Body._position);
+				} else {
+					if (CanMove) {
+						if (cachedMove.IsMoving == false) {
+							cachedMove.StartMove (Target.Body._position);
 							cachedBody.Priority = basePriority;
-						}
-						else {
+						} else {
 							if (inRange) {
 								cachedMove.Destination = Target.Body.Position;
 							} else {
 								if (repathTimer.AdvanceFrame ()) {
 									if (Target.Body.PositionChangedBuffer &&
-									   Target.Body.Position.FastDistance (cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance)) {
+									    Target.Body.Position.FastDistance (cachedMove.Destination.x, cachedMove.Destination.y) >= (repathDistance * repathDistance)) {
 										cachedMove.StartMove (Target.Body._position);
 										//So units don't sync up and path on the same frame
 										repathTimer.AdvanceFrames (repathRandom);
@@ -342,23 +313,44 @@ namespace Lockstep
 						}
 					}
 
-					if (isAttackMoving || isFocused == false)
-					{
+					if (isAttackMoving || isFocused == false) {
 						searchCount -= 1;
-						if (searchCount <= 0)
-						{
+						if (searchCount <= 0) {
 							searchCount = SearchRate;
-							if (ScanAndEngage())
-							{
-							}
-							else {
+							if (ScanAndEngage ()) {
+							} else {
 							}
 						}
 					}
-					if (inRange == true)
-					{
+					if (inRange == true) {
 						inRange = false;
 					}
+
+				}
+			}
+
+			if (IsWindingUp)
+			{
+				windupCount -= LockstepManager.DeltaTime;
+				if (windupCount < 0)
+				{
+					if (this.AgentConditional(Target))
+					{
+						Fire();
+						int counter = 0;
+						while (this.attackCount <= 0) {
+							this.attackCount += (this.AttackInterval);
+							counter++;
+							if (counter > 1)
+								Debug.Log ("asdf" + this.attackCount.ToDouble());
+						}
+						this.attackCount -= Windup;
+					}
+					else {
+						StopEngage();
+						this.ScanAndEngage();
+					}
+					IsWindingUp = false;
 
 				}
 			}
@@ -743,7 +735,7 @@ namespace Lockstep
 #if UNITY_EDITOR
 		void OnDrawGizmos()
 		{
-			if (Agent.IsActive == false) return;
+			if (Agent == null || Agent.IsActive == false) return;
 			if (Agent.Body == null)
 				Debug.Log (Agent.gameObject);
 			Gizmos.DrawWireSphere(Application.isPlaying ? Agent.Body._visualPosition : this.transform.position, this.Range.ToFloat());
