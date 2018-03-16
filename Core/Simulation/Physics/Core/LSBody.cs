@@ -134,19 +134,13 @@ namespace Lockstep
 
 		public bool PositionChangedBuffer { get; private set; }
 		//D
-		public bool SetPositionBuffer { get; private set; }
-		//ND
-
 
 		public bool RotationChangedBuffer { get; private set; }
 		//D
-		private bool SetRotationBuffer { get; set; }
-		//ND
 
-		bool SetVisualPosition { get; set; }
-
-		bool SetVisualRotation { get; set; }
-
+		private int _settingVisualsCounter;
+		bool SettingVisuals { get { return _settingVisualsCounter > 0; } }
+		const int SETTING_VISUALS_COUNT = LockstepManager.FrameRate;
 		private bool Setted { get; set; }
 
 
@@ -308,8 +302,6 @@ namespace Lockstep
 		[SerializeField]
 		private Transform _rotationalTransform;
 
-		public Vector3 _rotationOffset;
-
 		public Transform RotationalTransform { get; set; }
 
 
@@ -462,9 +454,8 @@ namespace Lockstep
 			}
 			if (RotationalTransform != null) {
 				CanSetVisualRotation = true;
-				//                visualRot = Quaternion.LookRotation(Forward.ToVector3(0f) + _rotationOffset);
+				visualRot = GetVisualRot ();
 				//				_rotationOffset = transform.GetComponent<InvasionDay.GeoHandler>()._eulerOffset;
-				visualRot = Forward.ToVector3();
 				lastVisualRot = visualRot;
 			} else {
 				CanSetVisualRotation = false;
@@ -573,8 +564,19 @@ namespace Lockstep
 			{
 				Partition.UpdateObject(this);
 			}
+
+			if (SettingVisuals) {
+				this.DoSetVisualRotation (_rotation);
+				DoSetVisualPosition (
+					_position.ToVector3 (HeightPos.ToFloat ())
+				);
+				_settingVisualsCounter--;
+			}
 		}
 
+		Quaternion GetVisualRot () {
+			return Quaternion.LookRotation (Forward.ToVector3 (0));
+		}
 
 		void BuildChangedValues()
 		{
@@ -590,46 +592,32 @@ namespace Lockstep
 			{
 				PositionChangedBuffer = true;
 				PositionChanged = false;
-				this.SetVisualPosition = true;
+				this._settingVisualsCounter = SETTING_VISUALS_COUNT;
 				this.HeightPosChanged = false;
 			}
 			else
 			{
 				PositionChangedBuffer = false;
-				this.SetVisualPosition = false;
 			}
 
 			if (RotationChanged) {
 				_rotation.Normalize();
 				RotationChangedBuffer = true;
 				RotationChanged = false;
-				this.SetVisualRotation = true;
+				this._settingVisualsCounter = SETTING_VISUALS_COUNT;
 			} else {
 				RotationChangedBuffer = false;
-				this.SetVisualRotation = false;
-
 			}
 		}
 
 		public void SetVisuals()
 		{
 
+			if (this.SettingVisuals) {
 
-
-			if (this.SetVisualPosition) {
-				DoSetVisualPosition(
-					_position.ToVector3(HeightPos.ToFloat())
-				);
-				PositionalTransform.position = Vector3.SmoothDamp (lastVisualPos, _visualPosition, ref velocityPosition, PhysicsManager.LerpTime);
-			}
-
-			if (this.SetVisualRotation) {
-				this.DoSetVisualRotation(_rotation);
-
-				RotationalTransform.rotation = Quaternion.LookRotation (
-					Vector3.Slerp (lastVisualRot, visualRot, PhysicsManager.LerpTime),
-					Vector3.up);
-					// Quaternion.Slerp(lastVisualRot, visualRot, PhysicsManager.LerpTime);
+				//PositionalTransform.position = Vector3.SmoothDamp (lastVisualPos, _visualPosition, ref velocityPosition, PhysicsManager.LerpTime);
+				PositionalTransform.position = Vector3.LerpUnclamped (lastVisualPos,VisualPosition, (float)PhysicsManager.ExpectedAccumulation);
+				RotationalTransform.rotation = Quaternion.SlerpUnclamped (lastVisualRot, visualRot, (float)PhysicsManager.ExpectedAccumulation);
 			}
 
 		}
@@ -640,7 +628,6 @@ namespace Lockstep
 
 				lastVisualPos = PositionalTransform.position;
 				_visualPosition = pos;
-				SetPositionBuffer = true;
 
 			}
 		}
@@ -648,56 +635,16 @@ namespace Lockstep
 		private void DoSetVisualRotation(Vector2d rot)
 		{
 			if (this.CanSetVisualRotation) {
-				lastVisualRot = visualRot;
-				visualRot = Forward.ToVector3 ();
-					// Quaternion.Euler(Quaternion.LookRotation(Forward.ToVector3(0f)).eulerAngles + _rotationOffset);
-				SetRotationBuffer = true;
+				lastVisualRot = RotationalTransform.rotation;
+				visualRot = GetVisualRot ();
 			}
 		}
 
 		Vector3 lastVisualPos;
 
 		//Testing out vectors instead of quaternions for interpolation
-		Vector3 lastVisualRot;
-		Vector3 visualRot = Vector3.forward;
-
-//		public void Visualize()
-//		{
-//			float lerpTime = PhysicsManager.LerpTime;
-//			if (CanSetVisualPosition) {
-//				if (SetPositionBuffer) {
-//
-//					PositionalTransform.position = Vector3.Lerp(lastVisualPos, _visualPosition, lerpTime);
-//					SetPositionBuffer = lerpTime < 1f;
-//				}
-//			}
-//			//const float rotationLerpDamping = 1f;
-//			if (CanSetVisualRotation && RotationalTransform != null) {
-//				if (SetRotationBuffer) {
-//					RotationalTransform.rotation =
-//										   Quaternion.Lerp(lastVisualRot, visualRot, lerpTime);
-//					SetRotationBuffer = lerpTime < 1f;
-//
-//				}
-//			}
-//		}
-
-		public void LerpOverReset()
-		{
-
-			if (CanSetVisualRotation) {
-				if (SetRotationBuffer) {
-					RotationalTransform.rotation = Quaternion.LookRotation (visualRot);
-					SetRotationBuffer = false;
-				}
-			}
-			if (this.CanSetVisualPosition) {
-				if (this.SetPositionBuffer) {
-					PositionalTransform.position = this._visualPosition;
-					SetPositionBuffer = false;
-				}
-			}
-		}
+		Quaternion lastVisualRot;
+		Quaternion visualRot;
 
 
 
