@@ -166,6 +166,8 @@ namespace Lockstep.Data {
         void LoadDatabase (LSDatabase database) {
             _database = database;
 			if (database.GetType () != DatabaseType) {
+				//Note: A hacky fix for changing the type of a previously saved database is to turn on Debug mode
+				//and change the script type of the database asset in the inspector. Back it up before attempting!
 				Debug.Log ("Loaded database type does not match DatabaseType.");
 			}
             DatabaseEditor = new EditorLSDatabase();
