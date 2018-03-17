@@ -63,7 +63,7 @@ namespace Lockstep.Data {
 				LoadInit ();
 			}
             if (Application.isPlaying) {
-                EditorGUILayout.LabelField ("Do not modify database during runtime", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField ("Values modified may not be pulled by previously existing units.", EditorStyles.boldLabel);
                 //return;
             }
             DrawSettings ();
@@ -153,17 +153,21 @@ namespace Lockstep.Data {
         
         bool LoadDatabaseFromPath (string absolutePath) {
             string relativePath = absolutePath.GetRelativeUnityAssetPath ();
-            LSDatabase database = AssetDatabase.LoadAssetAtPath<LSDatabase> (relativePath);
+			LSDatabase database = AssetDatabase.LoadAssetAtPath (relativePath, DatabaseType) as LSDatabase;
             if (database != null) {
                 LoadDatabase (database);
                 return true;
             }
             DatabaseEditor = null;
+
             return false;
         }
         
         void LoadDatabase (LSDatabase database) {
             _database = database;
+			if (database.GetType () != DatabaseType) {
+				Debug.Log ("Loaded database type does not match DatabaseType.");
+			}
             DatabaseEditor = new EditorLSDatabase();
             bool isValid;
             DatabaseEditor.Initialize (this,Database, out isValid);
@@ -178,7 +182,6 @@ namespace Lockstep.Data {
             LSFSettingsModifier.Save ();
             IsLoaded = true;
         }
-        
         bool CreateDatabase (string absolutePath) {
 
             LSDatabase database = (LSDatabase)ScriptableObject.CreateInstance (DatabaseType);

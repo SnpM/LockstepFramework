@@ -146,6 +146,7 @@ namespace Lockstep.Data
             EditorGUILayout.BeginHorizontal();
             if (DataHelpers.Count == 0)
             {
+				EditorGUILayout.LabelField ("Nothin' here to see");
                 return;
             }
             for (int i = 0; i < DataHelpers.Count; i++)
@@ -181,6 +182,7 @@ namespace Lockstep.Data
                 FoldAll();        
             }
 
+			//TODO: Prevent search from modifying data... only modifying display of data
             //Search
 			if (dataHelper.DataAttribute.UseFilter) {
 				EditorGUILayout.LabelField ("Filter: ", GUILayout.MaxWidth (35));
