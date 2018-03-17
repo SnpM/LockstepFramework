@@ -202,6 +202,8 @@ namespace Lockstep.Data {
         }
         
         void Save () {
+			if (Application.isPlaying)
+				return;
             DatabaseEditor.Save ();
             EditorUtility.SetDirty (DatabaseEditor.Database);
             AssetDatabase.SaveAssets ();
