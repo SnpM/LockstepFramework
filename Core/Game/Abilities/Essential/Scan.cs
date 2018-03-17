@@ -25,16 +25,6 @@ namespace Lockstep
 				if (_hasTarget != value)
 				{
 					_hasTarget = value;
-					if (CanMove)
-					{
-						if (_hasTarget)
-						{
-							cachedMove.CanCollisionStop = false;
-						}
-						else {
-							cachedMove.CanCollisionStop = true;
-						}
-					}
 				}
 			}
 		}
@@ -220,6 +210,10 @@ namespace Lockstep
 			}
 			else {
 				BehaveWithNoTarget();
+			}
+
+			if (CanMove) {
+				cachedMove.CanCollisionStop = !(HasTarget || isAttackMoving);
 			}
 		}
 
