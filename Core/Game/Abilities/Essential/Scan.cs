@@ -213,7 +213,9 @@ namespace Lockstep
 			}
 
 			if (CanMove) {
-				cachedMove.CanCollisionStop = !(HasTarget || isAttackMoving);
+				if (HasTarget || isAttackMoving) {
+					cachedMove.PauseAutoStop ();
+				}
 			}
 		}
 
