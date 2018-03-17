@@ -345,7 +345,7 @@ namespace Lockstep
 		public void SessionReset()
 		{
 			this.BoxVersion = 0;
-			this.SpawnVersion = 0;
+			this.SpawnVersion = 1;
 		}
 
 		internal void InitializeController(AgentController controller, ushort localID, ushort globalID)

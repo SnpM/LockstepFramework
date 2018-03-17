@@ -73,5 +73,8 @@ namespace Lockstep
             MessageManager.Instance.Invoke <Command> (com, "Execute");
         }
 
+		public static void Reset () {
+			MessageManager.Instance.Reset ();
+		}
     }
 }

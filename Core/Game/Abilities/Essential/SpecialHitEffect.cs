@@ -20,11 +20,11 @@ namespace Lockstep
 		{
 			cachedScan.ExtraOnHit += ApplyEffect;
 		}
-		protected virtual void ApplyEffect(LSAgent agent)
+		protected virtual void ApplyEffect(LSAgent agent, bool isCurrent)
 		{
-			OnApplyEffect(agent);
+			OnApplyEffect(agent, isCurrent);
 		}
-		protected virtual void OnApplyEffect (LSAgent agent)
+		protected virtual void OnApplyEffect (LSAgent agent, bool isCurrent)
 		{
 		}
 

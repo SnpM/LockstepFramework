@@ -11,17 +11,21 @@ namespace Lockstep
         private static bool Setted {get; set;}
         public static void Setup () {
             IInputDataProvider provider;
-            if (LSDatabaseManager.TryGetDatabase<IInputDataProvider> (out provider)) {
-                InputDataItem[] inputData = provider.InputData;
-                for (int i = inputData.Length - 1; i >= 0; i--) {
-                    InputDataItem item = inputData[i];
-                    ushort id = (ushort)(i + 1);
-                    string code = inputData[i].Name;
-                    InputMap.Add(code,id);
-                    InputDataMap.Add (code,item);
-                }
-                Setted = true;
+			//TODO: Implement this pattern for all database retrieval
+			if (!LSDatabaseManager.TryGetDatabase<IInputDataProvider> (out provider)) {
+				Debug.LogError ("IInputDataProvider unavailable.");
+			}
+
+            InputDataItem[] inputData = provider.InputData;
+            for (int i = inputData.Length - 1; i >= 0; i--) {
+                InputDataItem item = inputData[i];
+                ushort id = (ushort)(i + 1);
+                string code = inputData[i].Name;
+                InputMap.Add(code,id);
+                InputDataMap.Add (code,item);
             }
+            Setted = true;
+            
         }
         public static InputDataItem GetInputData (string code) {
             InputDataItem item;
