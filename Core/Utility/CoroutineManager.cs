@@ -33,6 +33,11 @@ namespace Lockstep
 			}
 		}
 
+		/// <summary>
+		/// Starts coroutine that returns number of frames to wait.
+		/// </summary>
+		/// <returns>The coroutine.</returns>
+		/// <param name="enumerator">Enumerator.</param>
 		public static Coroutine StartCoroutine(IEnumerator<int> enumerator)
 		{
 			Coroutine coroutine = new Coroutine();
