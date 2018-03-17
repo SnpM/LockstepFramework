@@ -145,13 +145,11 @@ namespace Lockstep
 				if (depth <= 0) {
 					return;
 				}
-				DistX = (DistX * depth / dist) / 2L;
-				DistY = (DistY * depth / dist) / 2L;
+				DistX = (DistX * depth / dist);
+				DistY = (DistY * depth / dist);
 
 				//Resolving collision
 
-				DistX /= 2;
-				DistY /= 2;
 
 				if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority)) {
 					DistX *= -1;
@@ -160,7 +158,8 @@ namespace Lockstep
 				} else if (Body2.Immovable || Body2.Priority > Body1.Priority) {
 					DistributeCircle_CirclePriority (Body2, Body1);
 				} else {
-
+					DistX /= 2;
+					DistY /= 2;
 					DistributeCircle (Body1);
 					DistX *= -1;
 					DistY *= -1;
@@ -189,11 +188,12 @@ namespace Lockstep
 		{
 
 
-			if (higherPriority.Immovable || lowerPriority.ImmovableCollisionDirection.EqualsZero ()) {
+			if (true || higherPriority.Immovable || lowerPriority.ImmovableCollisionDirection.EqualsZero ()) {
 				DistributeCircle (lowerPriority);
 				lowerPriority.ImmovableCollisionDirection = new Vector2d (DistX, DistY);
 
 			} else {
+				//TODO: Fix this behavior. It's supposed to prevent pass-through between i.e. buildings.
 				//Only move if there isn't an immovable object in that direction
 				if (lowerPriority.ImmovableCollisionDirection.x.Sign () != DistX.Sign ()) {
 					lowerPriority._position.x += DistX;
@@ -210,7 +210,7 @@ namespace Lockstep
 			body._position.y += DistY;
 			body.PositionChanged = true;
 
-			if (false) {
+			if (true) {
 				body._velocity.x += DistX / 8;
 				body._velocity.y += DistY / 8;
 				body.VelocityChanged = true;
