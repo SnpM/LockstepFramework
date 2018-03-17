@@ -41,6 +41,10 @@ namespace Lockstep {
 		}
 			
 		public AgentController GetInstanceManager (string controllerCode) {
+			if (string.IsNullOrEmpty (controllerCode)) {
+				Debug.Log ("controllerCode is null or empty.");
+				return null;
+			}
 			byte id;
 			if (!CodeIDMap.TryGetValue (controllerCode, out id)) {
 				Debug.Log ("Controller name " + controllerCode + " is not valid.");
