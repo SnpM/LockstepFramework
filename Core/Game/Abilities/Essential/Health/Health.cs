@@ -33,10 +33,6 @@ namespace Lockstep
 			}
 		}
 
-		public long DamageMultiplier {
-			get;
-			set;
-		}
 
 		public event Action onHealthChange;
 		public event Action<long> onHealthDelta;
@@ -98,7 +94,6 @@ namespace Lockstep
 		public void TakeDamage (long damage, AttackerInfo attackerInfo = null)
 		{
 			if (damage >= 0) {
-				damage.Mul (DamageMultiplier);
 				HealthAmount -= damage;
 				if (attackerInfo != null) {
 					LastAttacker = attackerInfo;

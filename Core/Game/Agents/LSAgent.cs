@@ -270,7 +270,8 @@ namespace Lockstep
 		private readonly FastList<int> TrackedLockstepTickets = new FastList<int>();
 		void Awake()
 		{
-			//gameObject.SetActive(false);
+
+			gameObject.SetActive(false);
 
 		}
 		public void Setup(IAgentData interfacer)
@@ -345,7 +346,7 @@ namespace Lockstep
 		public void SessionReset()
 		{
 			this.BoxVersion = 0;
-			this.SpawnVersion = 0;
+			this.SpawnVersion = 1;
 		}
 
 		internal void InitializeController(AgentController controller, ushort localID, ushort globalID)

@@ -5,7 +5,8 @@
 // http://opensource.org/licenses/MIT)
 //=======================================================================
 using UnityEngine;
-using System.Collections; using FastCollections;
+using System.Collections;
+ using FastCollections;
 
 namespace Lockstep
 {
@@ -23,7 +24,7 @@ namespace Lockstep
 		public bool _isColliding;
 
 		public bool IsColliding {
-			get {return _isColliding;}
+			get { return _isColliding; }
 			set {
 				_isColliding = value;
 			}
@@ -41,19 +42,16 @@ namespace Lockstep
 
 		bool IsValid { get; set; }
 
-		public void Initialize(LSBody b1, LSBody b2)
+		public void Initialize (LSBody b1, LSBody b2)
 		{
 			IsValid = true;
 			if (!IsValid)
 				return;
 
-			if (b1.ID < b2.ID)
-			{
+			if (b1.ID < b2.ID) {
 				Body1 = b1;
 				Body2 = b2;
-			}
-			else
-			{
+			} else {
 				Body1 = b2;
 				Body2 = b1;
 			}
@@ -71,238 +69,158 @@ namespace Lockstep
 			CacheSqrDistance *= CacheSqrDistance;
 
 			LeCollisionType = CollisionType.None;
-			if (Body1.Shape == ColliderType.None || Body2.Shape == ColliderType.None)
-			{
-			}
-			else if (Body1.Shape == ColliderType.Circle)
-			{
-				if (Body2.Shape == ColliderType.Circle)
-				{
+			if (Body1.Shape == ColliderType.None || Body2.Shape == ColliderType.None) {
+			} else if (Body1.Shape == ColliderType.Circle) {
+				if (Body2.Shape == ColliderType.Circle) {
 					LeCollisionType = CollisionType.Circle_Circle;
-				}
-				else if (Body2.Shape == ColliderType.AABox)
-				{
+				} else if (Body2.Shape == ColliderType.AABox) {
 					LeCollisionType = CollisionType.Circle_AABox;
 
-				}
-				else if (Body2.Shape == ColliderType.Polygon)
-				{
+				} else if (Body2.Shape == ColliderType.Polygon) {
 					LeCollisionType = CollisionType.Circle_Polygon;
 				}
-			}
-			else if (Body1.Shape == ColliderType.AABox)
-			{
-				if (Body2.Shape == ColliderType.Circle)
-				{
+			} else if (Body1.Shape == ColliderType.AABox) {
+				if (Body2.Shape == ColliderType.Circle) {
 					LeCollisionType = CollisionType.Circle_AABox;
-				}
-				else if (Body2.Shape == ColliderType.AABox)
-				{
+				} else if (Body2.Shape == ColliderType.AABox) {
 					LeCollisionType = CollisionType.AABox_AABox;
-				}
-				else if (Body2.Shape == ColliderType.Polygon)
-				{
+				} else if (Body2.Shape == ColliderType.Polygon) {
 					LeCollisionType = CollisionType.AABox_Polygon;
 				}
-			}
-			else if (Body1.Shape == ColliderType.Polygon)
-			{
-				if (Body2.Shape == ColliderType.Circle)
-				{
+			} else if (Body1.Shape == ColliderType.Polygon) {
+				if (Body2.Shape == ColliderType.Circle) {
 					LeCollisionType = CollisionType.Circle_Polygon;
-				}
-				else if (Body2.Shape == ColliderType.AABox)
-				{
+				} else if (Body2.Shape == ColliderType.AABox) {
 					LeCollisionType = CollisionType.AABox_Polygon;
-				}
-				else if (Body2.Shape == ColliderType.Polygon)
-				{
+				} else if (Body2.Shape == ColliderType.Polygon) {
 					LeCollisionType = CollisionType.Polygon_Polygon;
 				}
 			}
 
 			DoPhysics = ((Body1.IsTrigger || Body2.IsTrigger) == false);
-			if (DoPhysics)
-			{
+			if (DoPhysics) {
 
 			}
 			Active = true;
 			_Version++;
 		}
 
-		public void Deactivate()
+		public void Deactivate ()
 		{
 			if (IsColliding) {
-				Body1.NotifyContact(Body2, false, IsColliding);
-				Body2.NotifyContact(Body1, false, IsColliding);
+				Body1.NotifyContact (Body2, false, IsColliding);
+				Body2.NotifyContact (Body1, false, IsColliding);
 			}
 			Active = false;
 		}
 
 		static long dist, depth;
 
-		private void DistributeCollision()
+		private void DistributeCollision ()
 		{
-
-
-
 			if (!DoPhysics)
 				return;
 
-            switch (LeCollisionType)
-            {
-                case CollisionType.Circle_Circle:
-                    DistX = Body1._position.x - Body2._position.x;
-                    DistY = Body1._position.y - Body2._position.y;
-                    dist = FixedMath.Sqrt((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT);
+			switch (LeCollisionType) {
+			case CollisionType.Circle_Circle:
+				DistX = Body1._position.x - Body2._position.x;
+				DistY = Body1._position.y - Body2._position.y;
+				dist = FixedMath.Sqrt ((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT);
 
-                    if (dist == 0)
-                    {
-						//If objects are on the same position, give them push in random direction
-						const long randomMax = FixedMath.One / 32;
-						Body1._position.x += LSUtility.GetRandomLong(randomMax) - randomMax / 2;
-						Body1._position.y += LSUtility.GetRandomLong(randomMax) - randomMax / 2;
-                        Body1.PositionChanged = true;
-						Body2._position.x += LSUtility.GetRandomLong(randomMax) - randomMax / 2;
-						Body2._position.y += LSUtility.GetRandomLong(randomMax) - randomMax / 2;
-                        Body2.PositionChanged = true;
-                        return;
-                    }
+				if (dist == 0) {
+					//If objects are on the same position, give them push in random direction
+					const long randomMax = FixedMath.One / 32;
+					Body1._position.x += LSUtility.GetRandomLong (randomMax) - randomMax / 2;
+					Body1._position.y += LSUtility.GetRandomLong (randomMax) - randomMax / 2;
+					Body1.PositionChanged = true;
+					Body2._position.x += LSUtility.GetRandomLong (randomMax) - randomMax / 2;
+					Body2._position.y += LSUtility.GetRandomLong (randomMax) - randomMax / 2;
+					Body2.PositionChanged = true;
+					return;
+				}
 
 
-                    depth = (Body1.Radius + Body2.Radius - dist);
+				depth = (Body1.Radius + Body2.Radius - dist);
 
-                    if (depth <= 0)
-                    {
-                        return;
-                    }
-                    DistX = (DistX * depth / dist) / 2L;
-                    DistY = (DistY * depth / dist) / 2L;
+				if (depth <= 0) {
+					return;
+				}
+				DistX = (DistX * depth / dist);
+				DistY = (DistY * depth / dist);
 
-                    //Switch, used to be const
-                    bool applyVelocity = false;
+				//Resolving collision
 
-                    //Resolving collision
-                    //TODO: Less copy-paste code
-                    if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority))
-                    {
-                        DistX *= -1;
-                        DistY *= -1;
 
-                        if (Body1.Immovable || Body2.ImmovableCollisionDirection.EqualsZero())
-                        {
-                            Body2._position.x += DistX;
-                            Body2._position.y += DistY;
-                            Body2.PositionChanged = true;
-                            Body2.ImmovableCollisionDirection = new Vector2d(DistX, DistY);
-                            if (applyVelocity)
-                            {
-                                Body2._velocity.x += DistX;
-                                Body2._velocity.y += DistY;
-                                Body2.VelocityChanged = true;
-                            }
-                        }
-                        else
-                        {
-                            //Only move if there isn't an immovable object in that direction
-                            if (Body2.ImmovableCollisionDirection.x.Sign() != DistX.Sign())
-                            {
-                                Body1._position.x += DistX;
-                            }
-                            if (Body2.ImmovableCollisionDirection.y.Sign() != DistY.Sign())
-                            {
-                                Body1._position.y += DistY;
-                            }
-                        }
-                    }
-
-                    else if (Body2.Immovable || Body2.Priority > Body1.Priority)
-                    {
-                        if (Body2.Immovable || Body1.ImmovableCollisionDirection.EqualsZero())
-                        {
-                            Body2.ImmovableCollisionDirection = new Vector2d(DistX, DistY);
-
-                            Body1._position.x += DistX;
-                            Body1._position.y += DistY;
-                            Body1.PositionChanged = true;
-                            if (applyVelocity)
-                            {
-                                Body1._velocity.x += DistX;
-                                Body1._velocity.y += DistY;
-                                Body1.VelocityChanged = true;
-                            }
-                        }
-                        else
-                        {
-                            //Only move if there isn't an immovable object in that direction
-                            if (Body1.ImmovableCollisionDirection.x.Sign() != DistX.Sign())
-                            {
-                                Body2._position.x += DistX;
-                            }
-                            if (Body1.ImmovableCollisionDirection.y.Sign() != DistY.Sign())
-                            {
-                                Body2._position.y += DistY;
-                            }
-                        }
-                    }
-            
-					else
-					{
-						DistX /= 2;
-						DistY /= 2;
-
-						Body1._position.x += DistX;
-						Body1._position.y += DistY;
-						Body2._position.x -= DistX;
-						Body2._position.y -= DistY;
-                        
-						Body1.PositionChanged = true;
-						Body2.PositionChanged = true;
-						if (applyVelocity)
-						{
-
-							DistX /= 8;
-							DistY /= 8;
-							Body1._velocity.x += DistX;
-							Body1._velocity.y += DistY;
-							Body1.VelocityChanged = true;
+				if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority)) {
+					DistX *= -1;
+					DistY *= -1;
+					DistributeCircle_CirclePriority (Body1, Body2);
+				} else if (Body2.Immovable || Body2.Priority > Body1.Priority) {
+					DistributeCircle_CirclePriority (Body2, Body1);
+				} else {
+					DistX /= 2;
+					DistY /= 2;
+					DistributeCircle (Body1);
+					DistX *= -1;
+					DistY *= -1;
+					DistributeCircle (Body2);
+				}
+				break;
+			case CollisionType.Circle_AABox:
+				if (Body1.Shape == ColliderType.AABox) {
+					DistributeCircle_Box (Body1, Body2);
+				} else {
+					DistributeCircle_Box (Body2, Body1);
+				}
+				break;
                             
-							Body2._velocity.x -= DistX;
-							Body2._velocity.y -= DistY;
-							Body2.VelocityChanged = true;
-						}
-					}
-					break;
-				case CollisionType.Circle_AABox:
-					if (Body1.Shape == ColliderType.AABox)
-					{
-						DistributeCircle_Box(Body1, Body2);
-					}
-					else
-					{
-						DistributeCircle_Box(Body2, Body1);
-					}
-					break;
-                            
-				case CollisionType.Circle_Polygon:
-					if (Body1.Shape == ColliderType.Circle)
-					{
-						this.DistributeCircle_Poly(Body1, Body2);
-					}
-					else
-					{
-						this.DistributeCircle_Poly(Body2, Body1);
-					}
-					break;
+			case CollisionType.Circle_Polygon:
+				if (Body1.Shape == ColliderType.Circle) {
+					this.DistributeCircle_Poly (Body1, Body2);
+				} else {
+					this.DistributeCircle_Poly (Body2, Body1);
+				}
+				break;
 			}
-
-
 		}
 
-		void DistributeCircle_Poly(LSBody circle, LSBody poly)
+		void DistributeCircle_CirclePriority (LSBody higherPriority, LSBody lowerPriority)
+		{
+
+
+			if (true || higherPriority.Immovable || lowerPriority.ImmovableCollisionDirection.EqualsZero ()) {
+				DistributeCircle (lowerPriority);
+				lowerPriority.ImmovableCollisionDirection = new Vector2d (DistX, DistY);
+
+			} else {
+				//TODO: Fix this behavior. It's supposed to prevent pass-through between i.e. buildings.
+				//Only move if there isn't an immovable object in that direction
+				if (lowerPriority.ImmovableCollisionDirection.x.Sign () != DistX.Sign ()) {
+					lowerPriority._position.x += DistX;
+				}
+				if (lowerPriority.ImmovableCollisionDirection.y.Sign () != DistY.Sign ()) {
+					lowerPriority._position.y += DistY;
+				}
+			}
+		}
+
+		void DistributeCircle (LSBody body)
+		{
+			body._position.x += DistX + PhysicsManager.PositionCycler;
+			body._position.y += DistY;
+			body.PositionChanged = true;
+
+			if (true) {
+				body._velocity.x += DistX / 8;
+				body._velocity.y += DistY / 8;
+				body.VelocityChanged = true;
+			}
+		}
+
+		void DistributeCircle_Poly (LSBody circle, LSBody poly)
 		{
 			Vector2d edgeAxis = ClosestAxis.rotatedRight;
-			long horProjection = circle._position.Dot(edgeAxis.x, edgeAxis.y);
+			long horProjection = circle._position.Dot (edgeAxis.x, edgeAxis.y);
 			long verProjection = ClosestAxisProjection + ClosestDist;
 			Vector2d newPos = ClosestAxis * verProjection + edgeAxis * horProjection;
 			circle._position = newPos; 
@@ -310,109 +228,91 @@ namespace Lockstep
 		}
 
 		public int _ranIndex;
-		public void CheckAndDistributeCollision()
+
+		public void CheckAndDistributeCollision ()
 		{
 
-			if (!Active)
-			{
+			if (!Active) {
 				return;
 			}
-			if (_ranIndex < 0)
-			{ 
-				_ranIndex = PhysicsManager.RanCollisionPairs.Add(new PhysicsManager.InstanceCollisionPair(_Version,this));
+			if (_ranIndex < 0) { 
+				_ranIndex = PhysicsManager.RanCollisionPairs.Add (new PhysicsManager.InstanceCollisionPair (_Version, this));
 			}
 			LastFrame = LockstepManager.FrameCount;
 			CurrentCollisionPair = this;
     
 			IsCollidingChanged = false;
-			if (CheckHeight())
-			{
-				bool result = CheckCollision();
-				if (result != IsColliding)
-				{
+			if (CheckHeight ()) {
+				bool result = CheckCollision ();
+				if (result != IsColliding) {
 					IsColliding = result;
 					IsCollidingChanged = true;
 				}
-				if (CheckCollision())
-				{
-					DistributeCollision();
+				if (CheckCollision ()) {
+					DistributeCollision ();
 				} 
 			}
-			Body1.NotifyContact(Body2, IsColliding, IsCollidingChanged);
+			Body1.NotifyContact (Body2, IsColliding, IsCollidingChanged);
 
-			Body2.NotifyContact(Body1, IsColliding, IsCollidingChanged);
+			Body2.NotifyContact (Body1, IsColliding, IsCollidingChanged);
 		}
 
-		public bool CheckHeight()
+		public bool CheckHeight ()
 		{
 			return Body1.HeightMax >= Body2.HeightMin && Body1.HeightMin <= Body2.HeightMax;
 		}
 
-		public bool CheckCollision()
+		public bool CheckCollision ()
 		{
-			if (!Body1.PositionChangedBuffer && !Body2.PositionChangedBuffer && !Body1.RotationChangedBuffer && !Body2.RotationChangedBuffer)
-			{
+			if (!Body1.PositionChangedBuffer && !Body2.PositionChangedBuffer && !Body1.RotationChangedBuffer && !Body2.RotationChangedBuffer) {
 				return IsColliding;
 			}
-			switch (LeCollisionType)
-			{
-				case CollisionType.None:
-					break;
+			switch (LeCollisionType) {
+			case CollisionType.None:
+				break;
 
 			//Check
-				case CollisionType.Circle_Circle:
-					return CheckCircle();
+			case CollisionType.Circle_Circle:
+				return CheckCircle ();
 			//break;
             
 			//Check
-				case CollisionType.Circle_AABox:
-					if (CheckBox())
-					{
+			case CollisionType.Circle_AABox:
+				if (CheckBox ()) {
 
-						if (Body1.Shape == ColliderType.AABox)
-						{
-							if (CheckCircle_Box(Body1, Body2))
-							{
-								return true;
-							}
+					if (Body1.Shape == ColliderType.AABox) {
+						if (CheckCircle_Box (Body1, Body2)) {
+							return true;
+						}
 
+					} else {
+						if (CheckCircle_Box (Body2, Body1)) {
+							return true;
 						}
-						else
-						{
-							if (CheckCircle_Box(Body2, Body1))
-							{
-								return true;
-							}
-						}
+					}
  
-					}
+				}
 
-					break;
+				break;
             
-				case CollisionType.Circle_Polygon:
-					if (CheckCircle())
-					{
-						if (Body1.Shape == ColliderType.Circle)
-						{
-							if (CheckCircle_Poly(Body1, Body2))
-							{
-								return true;
-							}
+			case CollisionType.Circle_Polygon:
+				if (CheckCircle ()) {
+					if (Body1.Shape == ColliderType.Circle) {
+						if (CheckCircle_Poly (Body1, Body2)) {
+							return true;
 						}
-						else
-						{
-							if (CheckCircle_Poly(Body2, Body1))
-							{
-								return true;
-							}
+					} else {
+						if (CheckCircle_Poly (Body2, Body1)) {
+							return true;
 						}
 					}
-					break;
+				}
+				break;
 
 			//Check
-				case CollisionType.AABox_AABox:
+			case CollisionType.AABox_AABox:
                 //Not supported
-					return false;
+				return false;
 			/*
                     if (DoPhysics)
                     {
@@ -433,9 +333,9 @@ namespace Lockstep
                     break;
                     */
 
-				case CollisionType.AABox_Polygon:
+			case CollisionType.AABox_Polygon:
                 //Not supported
-					return false;
+				return false;
 			/*
                     if (CheckCircle())
                     {
@@ -457,9 +357,9 @@ namespace Lockstep
                     break;
                     */
 
-				case CollisionType.Polygon_Polygon:
+			case CollisionType.Polygon_Polygon:
                 //Not supported
-					return false;
+				return false;
 			/*
                     if (CheckCircle())
                     {
@@ -475,13 +375,12 @@ namespace Lockstep
 			return false;
 		}
 
-		public bool CheckCircle()
+		public bool CheckCircle ()
 		{
 
 			DistX = Body1._position.x - Body2._position.x;
 			DistY = Body1._position.y - Body2._position.y;
-			if ((DistX * DistX + DistY * DistY) <= CacheSqrDistance)
-			{
+			if ((DistX * DistX + DistY * DistY) <= CacheSqrDistance) {
 				return true;
 			}
 
@@ -490,16 +389,12 @@ namespace Lockstep
 			return false;
 		}
 
-		public bool CheckBox()
+		public bool CheckBox ()
 		{
-			if (Body1.XMin <= Body2.XMax)
-			{
-				if (Body1.XMax >= Body2.XMin)
-				{
-					if (Body1.YMin <= Body2.YMax)
-					{
-						if (Body1.YMax >= Body2.YMin)
-						{
+			if (Body1.XMin <= Body2.XMax) {
+				if (Body1.XMax >= Body2.XMin) {
+					if (Body1.YMin <= Body2.YMax) {
+						if (Body1.YMax >= Body2.YMin) {
 							return true;
 						}
 					}
@@ -509,51 +404,37 @@ namespace Lockstep
 			return false;
 		}
 
-		public static bool CheckBox_Poly(LSBody box, LSBody poly)
+		public static bool CheckBox_Poly (LSBody box, LSBody poly)
 		{
 			bool Right = poly._position.x > box._position.x;
 			bool Top = poly._position.y > box._position.y;
 			bool xPassed = false;
 			bool yPassed = false;
 			int vertCount = poly.RealPoints.Length;
-			for (int i = 0; i < vertCount; i++)
-			{
-				if (!xPassed)
-				{
-					if (Right)
-					{
-						if (poly.RealPoints[i].x <= box.XMax)
-						{
+			for (int i = 0; i < vertCount; i++) {
+				if (!xPassed) {
+					if (Right) {
+						if (poly.RealPoints [i].x <= box.XMax) {
 							xPassed = true;
 						}
-					}
-					else
-					{
-						if (poly.RealPoints[i].x >= box.XMin)
-						{
+					} else {
+						if (poly.RealPoints [i].x >= box.XMin) {
 							xPassed = true;
 						}
 					}
 				}
-				if (!yPassed)
-				{
-					if (Top)
-					{
-						if (poly.RealPoints[i].y <= box.YMax)
-						{
+				if (!yPassed) {
+					if (Top) {
+						if (poly.RealPoints [i].y <= box.YMax) {
 							yPassed = true;
 						}
-					}
-					else
-					{
-						if (poly.RealPoints[i].y >= box.YMin)
-						{
+					} else {
+						if (poly.RealPoints [i].y >= box.YMin) {
 							yPassed = true;
 						}
 					}
 				}
-				if (xPassed && yPassed)
-				{
+				if (xPassed && yPassed) {
 					return true;
 				}
 			}
@@ -565,43 +446,35 @@ namespace Lockstep
 		private static long ClosestAxisProjection;
 
 
-		public static bool CheckCircle_Poly(LSBody circle, LSBody poly)
+		public static bool CheckCircle_Poly (LSBody circle, LSBody poly)
 		{
 			int EdgeCount = poly.EdgeNorms.Length;
 			ClosestDist = long.MaxValue;
-			for (int i = 0; i < EdgeCount; i++)
-			{
-				Vector2d axis = poly.EdgeNorms[i];
-				long CircleProjection = circle._position.Dot(axis.x, axis.y);
+			for (int i = 0; i < EdgeCount; i++) {
+				Vector2d axis = poly.EdgeNorms [i];
+				long CircleProjection = circle._position.Dot (axis.x, axis.y);
 				long CircleMin = CircleProjection - circle.Radius;
 				long CircleMax = CircleProjection + circle.Radius;
 
 				long PolyMin;
 				long PolyMax;
-				ProjectPolygon(axis.x, axis.y, poly, out PolyMin, out PolyMax);
+				ProjectPolygon (axis.x, axis.y, poly, out PolyMin, out PolyMax);
 				//TODO: Cache PolyMin and PolyMax?
-				if (CheckOverlap(CircleMin, CircleMax, PolyMin, PolyMax))
-				{
+				if (CheckOverlap (CircleMin, CircleMax, PolyMin, PolyMax)) {
 					long dist1 = PolyMax - CircleMin;
 					long dist2 = CircleMax - PolyMin;
 					long localCloseDist = 0;
-					if (dist1 <= dist2)
-					{
+					if (dist1 <= dist2) {
 						localCloseDist = dist1;
-					}
-					else
-					{
+					} else {
 						localCloseDist = -dist2;
 					}
-					if (localCloseDist.Abs() < ClosestDist.Abs())
-					{
+					if (localCloseDist.Abs () < ClosestDist.Abs ()) {
 						ClosestDist = localCloseDist;
 						ClosestAxis = axis;
 						ClosestAxisProjection = CircleProjection;
 					}
-				}
-				else
-				{
+				} else {
 					return false;
 				}
 			}
@@ -617,25 +490,19 @@ namespace Lockstep
 		static bool Collided;
 		static long xAbs, yAbs;
 
-		public void DistributeCircle_Box(LSBody box, LSBody circle)
+		public void DistributeCircle_Box (LSBody box, LSBody circle)
 		{
 			xMore = circle._position.x > box._position.x;
 			yMore = circle._position.y > box._position.y;
 
-			if (xMore)
-			{
+			if (xMore) {
 				PenetrationX = (circle.XMin - box.XMax);
-			}
-			else
-			{
+			} else {
 				PenetrationX = (circle.XMax - box.XMin);
 			}
-			if (yMore)
-			{
+			if (yMore) {
 				PenetrationY = (circle.YMin - box.YMax);
-			}
-			else
-			{
+			} else {
 				PenetrationY = (circle.YMax - box.YMin);
 			}
 
@@ -644,28 +511,22 @@ namespace Lockstep
 			xAbs = PenetrationX < 0 ? -PenetrationX : PenetrationX;
 			yAbs = PenetrationY < 0 ? -PenetrationY : PenetrationY;
 
-			if ((xAbs <= circle.Radius && yAbs <= circle.Radius))
-			{
+			if ((xAbs <= circle.Radius && yAbs <= circle.Radius)) {
 				Vector2d corner;
 				corner.x = xMore ? box.Position.x + box.HalfWidth : box.Position.x - box.HalfWidth;
 				corner.y = yMore ? box.Position.y + box.HalfHeight : box.Position.y - box.HalfHeight;
 				Vector2d dir = circle.Position - corner;
-				dir.Normalize();
+				dir.Normalize ();
 
 				circle.Position = corner + dir * circle.Radius;
-			}
-			else
-			{
-				if (xAbs > yAbs)
-				{
+			} else {
+				if (xAbs > yAbs) {
 					PenetrationX = 0;
 					//if (yAbs < circle.Radius) PenetrationY = PenetrationY * yAbs / circle.Radius;
 					if (PenetrationY > 0 == yMore)
 						PenetrationY = -PenetrationY;
 
-				}
-				else
-				{
+				} else {
 					PenetrationY = 0;
 					//if (xAbs < circle.Radius) PenetrationX = PenetrationX * xAbs / circle.Radius;
 					if (PenetrationX > 0 == xMore)
@@ -683,69 +544,50 @@ namespace Lockstep
 
 
 			circle.PositionChanged = true;
-			circle.BuildBounds();
+			circle.BuildBounds ();
 		}
 
-		public static bool CheckCircle_Box(LSBody box, LSBody circle)
+		public static bool CheckCircle_Box (LSBody box, LSBody circle)
 		{
 			Collided = false;
 
 			xMore = circle._position.x > box._position.x;
 			yMore = circle._position.y > box._position.y;
-			if (!Collided)
-			{
+			if (!Collided) {
 				Collided = false;
-				if (xMore)
-				{
-					if (circle._position.x <= box.XMax)
-					{
+				if (xMore) {
+					if (circle._position.x <= box.XMax) {
 						Collided = true;
 					}
-				}
-				else
-				{
-					if (circle._position.x >= box.XMin)
-					{
+				} else {
+					if (circle._position.x >= box.XMin) {
 						Collided = true;
 					}
 				}
 
-				if (yMore)
-				{
-					if (circle._position.y <= box.YMax)
-					{
+				if (yMore) {
+					if (circle._position.y <= box.YMax) {
 						Collided = true;
 					}
-				}
-				else
-				{
-					if (circle._position.y >= box.YMin)
-					{
+				} else {
+					if (circle._position.y >= box.YMin) {
 						Collided = true;
 					}
 				}
 
-				if (!Collided)
-				{
-					if (xMore)
-					{
+				if (!Collided) {
+					if (xMore) {
 						xDist = (circle._position.x) - (box.XMax);
-					}
-					else
-					{
+					} else {
 						xDist = (circle._position.x) - (box.XMin);
 					}
-					if (yMore)
-					{
+					if (yMore) {
 						yDist = (circle._position.y) - (box.YMax);
-					}
-					else
-					{
+					} else {
 						yDist = (circle._position.y) - (box.YMin);
 					}
 
-					if ((xDist * xDist + yDist * yDist) <= circle.Radius * circle.Radius)
-					{
+					if ((xDist * xDist + yDist * yDist) <= circle.Radius * circle.Radius) {
 						Collided = true;
 					}
 				}   
@@ -754,74 +596,60 @@ namespace Lockstep
 			return Collided;
 		}
 
-		public static bool CheckPoly_Poly(LSBody poly1, LSBody poly2)
+		public static bool CheckPoly_Poly (LSBody poly1, LSBody poly2)
 		{
 			int Poly1EdgeCount = poly1.EdgeNorms.Length;
 			int EdgeCount = Poly1EdgeCount + poly2.EdgeNorms.Length;
-			for (int i = 0; i < EdgeCount; i++)
-			{
+			for (int i = 0; i < EdgeCount; i++) {
 				Vector2d edge;
-				if (i < Poly1EdgeCount)
-				{
-					edge = poly1.EdgeNorms[i];
-				}
-				else
-				{
-					edge = poly1.EdgeNorms[i - Poly1EdgeCount];
+				if (i < Poly1EdgeCount) {
+					edge = poly1.EdgeNorms [i];
+				} else {
+					edge = poly1.EdgeNorms [i - Poly1EdgeCount];
 				}
 				long Poly1Min;
 				long Poly1Max;
-				ProjectPolygon(edge.x, edge.y, poly1, out Poly1Min, out Poly1Max);
+				ProjectPolygon (edge.x, edge.y, poly1, out Poly1Min, out Poly1Max);
 				long Poly2Min;
 				long Poly2Max;
-				ProjectPolygon(edge.x, edge.y, poly2, out Poly2Min, out Poly2Max);
-				if (!CheckOverlap(Poly1Min, Poly1Max, Poly2Min, Poly2Max))
-				{
+				ProjectPolygon (edge.x, edge.y, poly2, out Poly2Min, out Poly2Max);
+				if (!CheckOverlap (Poly1Min, Poly1Max, Poly2Min, Poly2Max)) {
 					return false;
 				}
 			}
 			return true;
 		}
 
-		public static void ProjectPolygon(long AxisX, long AxisY, LSBody Poly, out long Min, out long Max)
+		public static void ProjectPolygon (long AxisX, long AxisY, LSBody Poly, out long Min, out long Max)
 		{
-			Min = Poly.RealPoints[0].Dot(AxisX, AxisY);
+			Min = Poly.RealPoints [0].Dot (AxisX, AxisY);
 			Max = Min;
 
 			int PointCount = Poly.RealPoints.Length;
 			long Projection;
-			for (int i = 1; i < PointCount; i++)
-			{
-				Projection = Poly.RealPoints[i].Dot(AxisX, AxisY);
-				if (Projection < Min)
-				{
+			for (int i = 1; i < PointCount; i++) {
+				Projection = Poly.RealPoints [i].Dot (AxisX, AxisY);
+				if (Projection < Min) {
 					Min = Projection;
-				}
-				else if (Projection > Max)
-				{
+				} else if (Projection > Max) {
 					Max = Projection;
 				}
 			}
 		}
 
-		public static long IntervalDistance(long Min1, long Max1, long Min2, long Max2)
+		public static long IntervalDistance (long Min1, long Max1, long Min2, long Max2)
 		{
-			if (Min1 < Min2)
-			{
+			if (Min1 < Min2) {
 				return Min2 - Max1;
-			}
-			else
-			{
+			} else {
 				return Min1 - Max2;
 			}
 		}
 
-		public static bool CheckOverlap(long Min1, long Max1, long Min2, long Max2)
+		public static bool CheckOverlap (long Min1, long Max1, long Min2, long Max2)
 		{
-			if (Max1 >= Min2)
-			{
-				if (Min1 <= Max2)
-				{
+			if (Max1 >= Min2) {
+				if (Min1 <= Max2) {
 					return true;
 				}
 			}

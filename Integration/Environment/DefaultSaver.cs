@@ -48,12 +48,15 @@ namespace Lockstep
             foreach (EnvironmentObject obj in EnvironmentObjects) {
                 obj.LateInitialize();
             }
+			var environmentController = AgentControllerHelper.Instance.GetInstanceManager (AgentControllerHelper.Instance.EnvironmentController);
+
 			foreach (var agentInfo in EnvironmentAgents) {
-				AgentController.DefaultController.AddAgent (agentInfo.Agent);
+				var agent = agentInfo.Agent;
 				agentInfo.Agent.Setup (AgentController.GetAgentInterfacer (agentInfo.AgentCode));
-				agentInfo.Agent.Initialize (agentInfo.Position.ToVector2d(), agentInfo.Rotation);
+				environmentController.InitializeAgent (agent,agentInfo.Position.ToVector2d(), agentInfo.Rotation);
 				agentInfo.Agent.Body.HeightPos = agentInfo.Position.z;
 				agentInfo.Agent.TypeIndex = AgentController.UNREGISTERED_TYPE_INDEX;
+
 			}
         }
 

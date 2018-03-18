@@ -308,6 +308,8 @@ namespace Lockstep
 			LSServer.Deactivate ();
 			DefaultMessageRaiser.LateDeactivate ();
 			CoroutineManager.Deactivate();
+
+			DefaultMessageRaiser.Reset ();
 		}
 
 		public static void Quit ()

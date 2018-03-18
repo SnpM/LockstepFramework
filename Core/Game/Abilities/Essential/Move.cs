@@ -46,15 +46,19 @@ namespace Lockstep
 		[HideInInspector]
 		public Vector2d Destination;
 
-		public bool GetFullCanCollisionStop()
+		public bool GetFullCanAutoStop()
 		{
 
-			return CanCollisionStop && TempCanCollisionStop;
+			return CanCollisionStop && AutoStopPauser <= 0;
 		}
 
 		public bool CanCollisionStop { get; set; }
 
-		public bool TempCanCollisionStop { get; set; }
+		const int AUTO_STOP_PAUSE_TIME = LockstepManager.FrameRate / 8;
+		private int AutoStopPauser;
+		public void PauseAutoStop () {
+			AutoStopPauser = AUTO_STOP_PAUSE_TIME;
+		}
 
 		public long StopMultiplier { get; set; }
 
@@ -162,7 +166,7 @@ namespace Lockstep
 			IsFormationMoving = false;
 			MyMovementGroupID = -1;
 			CanCollisionStop = true;
-			TempCanCollisionStop = true;
+			AutoStopPauser = 0;
 			StopMultiplier = DirectStop;
 
 			viableDestination = false;
@@ -322,7 +326,7 @@ namespace Lockstep
                 StuckTime++;
                 stuckThreshold = stuckThreshold * 7 / 6;
                     
-				if (GetFullCanCollisionStop() && (Agent.Body.Position - this.AveragePosition).FastMagnitude() < (stuckThreshold * stuckThreshold)) {
+				if (GetFullCanAutoStop() && (Agent.Body.Position - this.AveragePosition).FastMagnitude() < (stuckThreshold * stuckThreshold)) {
 
 					if (StuckTime > StuckTimeThreshold) {
                         if (movingToWaypoint)
@@ -371,7 +375,7 @@ namespace Lockstep
 
 				cachedBody.VelocityChanged = true;
 
-				TempCanCollisionStop = true;
+				AutoStopPauser--;
 			} else {
 				if (cachedBody.VelocityFastMagnitude > 0) {
 					cachedBody.Velocity += GetAdjustVector (Vector2d.zero);
@@ -522,11 +526,11 @@ namespace Lockstep
 
 			Move otherMover = tempAgent.GetAbility<Move>();
 			if (ReferenceEquals(otherMover, null) == false) {
-				if (IsMoving && (GetFullCanCollisionStop())) {
+				if (IsMoving && (GetFullCanAutoStop())) {
 					if (otherMover.MyMovementGroupID == MyMovementGroupID || otherMover.targetPos == this.targetPos) {
 						if (otherMover.IsMoving == false && otherMover.Arrived && otherMover.StoppedTime > MinimumOtherStopTime) {
 							if (otherMover.CanCollisionStop == false) {
-								TempCanCollisionStop = false;
+								PauseAutoStop ();
 							} else {
 								Arrive ();
 							}

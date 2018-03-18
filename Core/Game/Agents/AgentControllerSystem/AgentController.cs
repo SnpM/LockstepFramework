@@ -300,7 +300,9 @@ namespace Lockstep
 		private static void UpdateDiplomacy (AgentController newCont)
 		{
 			for (int i = 0; i < InstanceManagers.Count; i++) {
-				InstanceManagers [i].SetAllegiance (newCont, AllegianceType.Neutral);
+				var other = InstanceManagers [i];
+				other.SetAllegiance (newCont, other.DefaultAllegiance);
+				newCont.SetAllegiance (other, newCont.DefaultAllegiance);
 			}
 		}
 
@@ -356,6 +358,8 @@ namespace Lockstep
 
 		public Team MyTeam { get; private set; }
 
+		public AllegianceType DefaultAllegiance { get; private set;}
+
 		private readonly FastList<AllegianceType> DiplomacyFlags = new FastList<AllegianceType> ();
 		private readonly FastStack<ushort> OpenLocalIDs = new FastStack<ushort> ();
 
@@ -378,12 +382,12 @@ namespace Lockstep
 			}
 			return AgentController.InstanceManagers [index];
 		}
-		public static AgentController Create ()
+		public static AgentController Create (AllegianceType defaultAllegiance = AllegianceType.Neutral)
 		{
-			return new AgentController ();
+			return new AgentController (defaultAllegiance);
 		}
 
-		private AgentController ()
+		private AgentController (AllegianceType defaultAllegiance)
 		{
 			if (InstanceManagers.Count > byte.MaxValue) {
 				throw new System.Exception ("Cannot have more than 256 AgentControllers");
@@ -391,13 +395,14 @@ namespace Lockstep
 			OpenLocalIDs.FastClear ();
 			PeakLocalID = 0;
 			ControllerID = (byte)InstanceManagers.Count;
+			DefaultAllegiance = defaultAllegiance;
 
 			for (int i = 0; i < InstanceManagers.Count; i++) {
 				this.SetAllegiance (InstanceManagers [i], AllegianceType.Neutral);
 			}
-			UpdateDiplomacy (this);
 
 			InstanceManagers.Add (this);
+			UpdateDiplomacy (this);
 			this.SetAllegiance (this, AllegianceType.Friendly);
 		}
 
@@ -548,6 +553,7 @@ namespace Lockstep
 		public LSAgent CreateAgent (string agentCode, Vector2d position, Vector2d rotation) {
 			var agent = CreateRawAgent (agentCode);
 			InitializeAgent (agent, position, rotation);
+
 			return agent;
 		}
 
@@ -563,12 +569,11 @@ namespace Lockstep
 			return agent;
 		}
 
-		private void InitializeAgent (LSAgent agent,
+		public void InitializeAgent (LSAgent agent,
 		                              Vector2d position,
 		                              Vector2d rotation)
 		{
 			AddAgent (agent);
-
 			agent.Initialize (position, rotation);
 		}
 
@@ -615,13 +620,14 @@ namespace Lockstep
 		}
 	}
 
+	//Implemented as flags for selecting multiple types.
 	[System.Flags]
-	public enum AllegianceType : int
+	public enum AllegianceType : byte
 	{
 		Neutral = 1 << 0,
 		Friendly = 1 << 1,
 		Enemy = 1 << 2,
-		All = ~0
+		All = 0xff
 	}
   
 }

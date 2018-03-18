@@ -5,6 +5,8 @@ namespace Lockstep.Data {
     public static class LSFSettingsModifier {
 
         internal static void Save () {
+			if (Application.isPlaying)
+				return;
 			if (EditorLSDatabaseWindow.CanSave) {
 				EditorUtility.SetDirty (LSFSettingsManager.GetSettings ());
 

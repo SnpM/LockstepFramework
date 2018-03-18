@@ -118,17 +118,17 @@ namespace Lockstep {
                 hitEffect);
             return proj;
         }
-        public static LSProjectile Create (string projCode, Vector3d position, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional, Action<LSAgent> hitEffect)
+        public static LSProjectile Create (string projCode, Vector3d position, Func<LSAgent,bool> agentConditional, Func<byte,bool> bucketConditional, Action<LSAgent> onHit)
 		{
             var curProj = RawCreate (projCode);
 
             int id = ProjectileBucket.Add(curProj);
-			curProj.Prepare (id, position,agentConditional,bucketConditional, hitEffect, true);
+			curProj.Prepare (id, position,agentConditional,bucketConditional, onHit, true);
 			return curProj;
 		}
         private static LSProjectile RawCreate (string projCode) {
             if (ProjectilePool.ContainsKey (projCode) == false) {
-                Debug.Log(projCode + " Caused boom");
+				Debug.Log(projCode + " fired by " + Scan.LastFire + " Caused boom");
                 return null;
             }
             FastStack<LSProjectile> pool = ProjectilePool[projCode];

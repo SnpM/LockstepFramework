@@ -25,16 +25,6 @@ namespace Lockstep
 				if (_hasTarget != value)
 				{
 					_hasTarget = value;
-					if (CanMove)
-					{
-						if (_hasTarget)
-						{
-							cachedMove.CanCollisionStop = false;
-						}
-						else {
-							cachedMove.CanCollisionStop = true;
-						}
-					}
 				}
 			}
 		}
@@ -170,7 +160,6 @@ namespace Lockstep
 			}
 
 			CanTurn = cachedTurn.IsNotNull();
-			CachedOnHit = OnHit;
 			CachedAgentValid = this.AgentValid;
 		}
 
@@ -203,6 +192,11 @@ namespace Lockstep
 			this.Destination = Vector2d.zero;
 			repathTimer.Reset (repathInterval);
 			repathRandom = LSUtility.GetRandom (repathInterval);
+
+			//caching parameters
+			var spawnVersion = Agent.SpawnVersion;
+			var controller = Agent.Controller;
+			CachedOnHit = (target) => OnHit (target, spawnVersion,controller);
 		}
 
 		protected override void OnSimulate()
@@ -216,6 +210,12 @@ namespace Lockstep
 			}
 			else {
 				BehaveWithNoTarget();
+			}
+
+			if (CanMove) {
+				if (HasTarget || isAttackMoving) {
+					cachedMove.PauseAutoStop ();
+				}
 			}
 		}
 
@@ -379,18 +379,21 @@ namespace Lockstep
 			}
 		}
 
-		public event Action<LSAgent> ExtraOnHit;
-		protected void CallExtraOnHit(LSAgent agent)
+		public event Action<LSAgent,bool> ExtraOnHit;
+		protected void CallExtraOnHit(LSAgent agent, bool isCurrent)
 		{
 			if (ExtraOnHit != null)
-				ExtraOnHit(agent);
+				ExtraOnHit(agent, isCurrent);
 		}
-		protected virtual void OnHit(LSAgent agent)
+
+		protected virtual void OnHit(LSAgent target, uint agentVersion, AgentController controller)
 		{
-			Health healther = agent.GetAbility<Health>();
-			AttackerInfo info = new AttackerInfo(Agent, this.Agent.Controller);
+			//If the shooter died, certain effects or records can't be completed
+			bool isCurrent = Agent != null && agentVersion == Agent.SpawnVersion;
+			Health healther = target.GetAbility<Health>();
+			AttackerInfo info = new AttackerInfo (isCurrent ? Agent : null, controller);
 			healther.TakeDamage(Damage, info);
-			CallExtraOnHit(agent);
+			CallExtraOnHit(target,isCurrent);
 		}
 
 		private Action<LSAgent> CachedOnHit;
@@ -443,8 +446,11 @@ namespace Lockstep
 			FireProjectile(proj);
 			return proj;
 		}
+
+		public static Scan LastFire;
 		public LSProjectile PrepareProjectile(string projectileCode, Vector3d projOffset, LSAgent target)
 		{
+			LastFire = this;
 			LSProjectile currentProjectile = ProjectileManager.Create(
 				projectileCode,
 				this.Agent,

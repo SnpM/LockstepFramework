@@ -14,72 +14,17 @@ namespace Lockstep
 		{
 		}
 
-        protected override void OnVisualize()
-        {
-            if (Input.GetKeyDown (KeyCode.M))
-            {
-                for (int i = 0; i < Spawns.Length; i++)
-                {
-                    SpawnInfo info = Spawns[i];
-                    
-					/*while (AgentController.InstanceManagers.Count <= info.ControllerIndex)
-                    {
-						
-                        AgentController cont = AgentController.Create();
-                        PlayerManager.AddController(cont);
-                        for (int j = 0; j < AgentController.InstanceManagers.Count; j++)
-                        {
-                            AgentController ac = AgentController.InstanceManagers[j];
-                            if (ac != cont)
-                            {
-                                cont.SetAllegiance(ac, AllegianceType.Enemy);
-                                ac.SetAllegiance(cont, AllegianceType.Enemy);
-                            }
-                        }
-
-                    }*/
-					if (info.ControllerIndex >= AgentController.InstanceManagers.Count)
-						Debug.LogError ("Controller with index " + info.ControllerIndex + " not created. You can automatically create controllers by configuring AgentControllerCreator.");
-
-                    AgentController controller = AgentController.InstanceManagers[info.ControllerIndex];
-
-                    for (int j = 0; j < info.Count; j++)
-                    {
-                        LSAgent agent = controller.CreateAgent(info.AgentCode, info.Position);
-                        if (AutoCommand)
-                            Selector.Add(agent);
-                    }
-                }
-            }
-        }
-        protected override void OnGameStart ()
-		{
-
+		public void LaunchSpawns () {
 
 			for (int i = 0; i < Spawns.Length; i++) {
 				SpawnInfo info = Spawns [i];
-				/*while (AgentController.InstanceManagers.Count <= info.ControllerIndex) {
 
-					AgentController cont = AgentController.Create ();
-					AgentControllerTool.SetFullHostile (cont);
-					PlayerManager.AddController (cont);
-	
-
-				}
-				*/
-				if (info.ControllerIndex >= AgentController.InstanceManagers.Count)
-					Debug.LogError ("Controller with index " + info.ControllerIndex + " not created. You can automatically create controllers by configuring AgentControllerCreator.");
-
-
-				AgentController controller = AgentController.InstanceManagers [info.ControllerIndex];
-
-				//add default controller if necessary
-				if (info.ControllerIndex == 0 && PlayerManager.AgentControllers.Count == 0)
-					PlayerManager.AddController(controller);
+				var controller = AgentControllerHelper.Instance.GetInstanceManager (info.ControllerCode);
+				
 				for (int j = 0; j < info.Count; j++) {
 					LSAgent agent = controller.CreateAgent (info.AgentCode, info.Position);
 					if (AutoCommand)
-					Selector.Add (agent);
+						Selector.Add (agent);
 				}
 			}
 
@@ -99,6 +44,17 @@ namespace Lockstep
 
 			}
 		}
+        protected override void OnVisualize()
+        {
+			if (Input.GetKeyDown (KeyCode.M)) {
+				LaunchSpawns ();
+			}
+        }
+        protected override void OnGameStart ()
+		{
+			LaunchSpawns ();
+
+		}
 	}
 
 	[System.Serializable]
@@ -108,7 +64,8 @@ namespace Lockstep
 		[DataCode ("Agents")]
 		public string AgentCode;
 		public int Count;
-		public int ControllerIndex;
+		[DataCode ("AgentControllers")]
+		public string ControllerCode;
 		public Vector2d Position;
 	}
 }

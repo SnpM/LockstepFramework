@@ -70,6 +70,21 @@ namespace Lockstep
 		public static LSBody[] SimObjects = new LSBody[MaxSimObjects];
 		public static FastBucket<LSBody> DynamicSimObjects = new FastBucket<LSBody>(MaxSimObjects / 4);
 
+		private static long _positionCycler;
+		/// <summary>
+		/// Prevents units from getting stuck in perfect collisions.
+		/// </summary>
+		/// <value>The position cycler.</value>
+		public static long PositionCycler {
+			get {
+				_positionCycler += 13;
+				const long maxPositionCycler = FixedMath.One / 256;
+				if (_positionCycler > maxPositionCycler)
+					_positionCycler -= maxPositionCycler * 2;
+				return _positionCycler;
+				
+			}
+		}
 		#endregion
 
 		#region Assignment Variables
@@ -93,10 +108,6 @@ namespace Lockstep
 
 		public static void Initialize()
 		{
-
-
-
-
 
 			if (SettingsChanged) {
 				SettingsChanged = false;
@@ -125,6 +136,7 @@ namespace Lockstep
 			RanCollisionPairs.FastClear();
 			InactiveCollisionPairs.FastClear();
 
+			_positionCycler = 0;
 		}
 
 

@@ -74,8 +74,6 @@ namespace Lockstep
             }
         }
 
-
-        const AllegianceType AllAllegiance = (AllegianceType)~0;
     }
 
 

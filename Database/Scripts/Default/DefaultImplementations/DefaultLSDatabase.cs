@@ -7,7 +7,7 @@ namespace Lockstep.Data
     [System.Serializable]
 
     public class DefaultLSDatabase : LSDatabase, IEssentialDataProvider, IUnitConfigDataProvider
-    ,IAgentDataProvider
+    ,IAgentDataProvider, IAgentControllerDataProvider
     {
         #region Agents
 
@@ -38,19 +38,9 @@ namespace Lockstep.Data
         [SerializeField]
         [RegisterData ("Input")]
 		protected InputDataItem[] _inputData = new InputDataItem[] {
-            new InputDataItem("Special1", KeyCode.Q),
-            new InputDataItem("Special2", KeyCode.W),
-            new InputDataItem("Special3", KeyCode.E),
-            new InputDataItem("Special4", KeyCode.R),
-            new InputDataItem("Core1", KeyCode.A),
-            new InputDataItem("Core2", KeyCode.S),
-            new InputDataItem("Core3", KeyCode.D),
-            new InputDataItem("Core4",KeyCode.F),
-            new InputDataItem("Item1", KeyCode.Z),
-            new InputDataItem("Item2",KeyCode.X),
-            new InputDataItem("Item3",KeyCode.C),
-            new InputDataItem("Item4",KeyCode.V),
-			new InputDataItem("Spawn",KeyCode.None)
+			new InputDataItem("Move",KeyCode.M),
+			new InputDataItem("Attack",KeyCode.A),
+			new InputDataItem("Stop",KeyCode.S)
         };
         public InputDataItem[] InputData {get {return _inputData;}}
         #endregion
@@ -83,7 +73,6 @@ namespace Lockstep.Data
         public AbilityDataItem[] AbilityData { get { return _abilityData; } }
 
 		#endregion
-
 		
 		#region Unit Configs
 		[SerializeField, RegisterData ("UnitConfigElements")]
@@ -98,6 +87,9 @@ namespace Lockstep.Data
 		protected UnitConfigDataItem [] _unitConfigData;
 		public IUnitConfigDataItem [] UnitConfigData { get { return _unitConfigData; } }
 		#endregion
-		
+
+		[SerializeField,RegisterDataAttribute("AgentControllers")]
+		protected AgentControllerDataItem[] _agentControllerData;
+		public AgentControllerDataItem[] AgentControllerData {get {return _agentControllerData;}}
     }
 }
