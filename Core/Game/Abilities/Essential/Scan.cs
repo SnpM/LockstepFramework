@@ -253,7 +253,7 @@ namespace Lockstep
 				Vector2d targetDirection = Target.Body._position - cachedBody._position;
 				long fastMag = targetDirection.FastMagnitude ();
 
-				if (CheckRange) {
+				if (CheckRange()) {
 					if (!inRange) {
 						if (CanMove)
 							cachedMove.StopMove ();
