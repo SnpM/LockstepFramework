@@ -58,3 +58,16 @@ MonoBehaviour:
     _informationGather: 0
   _unitConfigElementData: []
   _unitConfigData: []
+  _agentControllerData:
+  - _name: Neutral
+    _defaultAllegiance: 1
+    _playerManaged: 0
+  - _name: Hostile
+    _defaultAllegiance: 1
+    _playerManaged: 0
+  - _name: Player 1
+    _defaultAllegiance: 4
+    _playerManaged: 1
+  - _name: Player 2
+    _defaultAllegiance: 4
+    _playerManaged: 1
