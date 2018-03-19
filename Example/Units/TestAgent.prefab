@@ -111,7 +111,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 303604a1e18fd47bcb08544b311cfd4b, type: 2}
+  - {fileID: 2100000, guid: 9c40c643a46213a43ae19d71488df0bf, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -128,6 +128,7 @@ MeshRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
 --- !u!23 &2347950
 MeshRenderer:
@@ -142,7 +143,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 303604a1e18fd47bcb08544b311cfd4b, type: 2}
+  - {fileID: 2100000, guid: 9c40c643a46213a43ae19d71488df0bf, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -159,6 +160,7 @@ MeshRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
 --- !u!33 &3360344
 MeshFilter:
@@ -217,7 +219,7 @@ MonoBehaviour:
   _canMove: 1
   _canTurn: 1
   _speed: 131072
-  _acceleration: 65536
+  _acceleration: 524288
   _canPathfind: 0
   DrawPath: 1
 --- !u!114 &11439568
@@ -472,6 +474,9 @@ MonoBehaviour:
     RealPoints: []
     Edges: []
     EdgeNorms: []
+    ImmovableCollisionDirection:
+      x: 0
+      y: 0
     _shape: 1
     _isTrigger: 0
     _layer: 0
@@ -484,4 +489,3 @@ MonoBehaviour:
     _height: 65536
     _positionalTransform: {fileID: 465378}
     _rotationalTransform: {fileID: 465378}
-    _rotationOffset: {x: 0, y: 0, z: 0}

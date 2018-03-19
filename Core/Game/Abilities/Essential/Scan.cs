@@ -16,19 +16,6 @@ namespace Lockstep
 
 		public LSAgent Target { get; private set; }
 
-
-		public bool HasTarget
-		{
-			get { return _hasTarget; }
-			set
-			{
-				if (_hasTarget != value)
-				{
-					_hasTarget = value;
-				}
-			}
-		}
-
 		public virtual string ProjCode { get { return _projectileCode; } }
 
 		public virtual long Range { get { return _range + RangeModifier; } }
@@ -139,7 +126,6 @@ namespace Lockstep
 		private uint targetVersion;
 		private int searchCount;
 		private long attackCount;
-		private bool _hasTarget;
 		private bool isAttackMoving;
 		private bool isFocused;
 
@@ -167,7 +153,7 @@ namespace Lockstep
 		{
 			if (this.isAttackMoving)
 			{
-				if (this.HasTarget == false)
+				if (Target == null)
 					isAttackMoving = false;
 			}
 		}
@@ -183,7 +169,6 @@ namespace Lockstep
 			basePriority = Agent.Body.Priority;
 			searchCount = LSUtility.GetRandom(SearchRate) + 1;
 			attackCount = 0;
-			HasTarget = false;
 			Target = null;
 			isAttackMoving = false;
 			inRange = false;
@@ -204,7 +189,7 @@ namespace Lockstep
 			if (attackCount > 0) {
 				attackCount -= LockstepManager.DeltaTime;
 			}
-			if (HasTarget)
+			if (Target != null)
 			{
 				BehaveWithTarget();
 			}
@@ -213,7 +198,7 @@ namespace Lockstep
 			}
 
 			if (CanMove) {
-				if (HasTarget || isAttackMoving) {
+				if (Target != null || isAttackMoving) {
 					cachedMove.PauseAutoStop ();
 				}
 			}
@@ -247,6 +232,12 @@ namespace Lockstep
 			get { return AnimImpulse.Fire; }
 		}
 
+		bool CheckRange () {
+			Vector2d targetDirection = Target.Body._position - cachedBody._position;
+			long fastMag = targetDirection.FastMagnitude ();
+
+			return fastMag <= fastRangeToTarget;
+		}
 		void BehaveWithTarget()
 		{
 			if (Target.IsActive == false || Target.SpawnVersion != targetVersion ||
@@ -262,11 +253,11 @@ namespace Lockstep
 				Vector2d targetDirection = Target.Body._position - cachedBody._position;
 				long fastMag = targetDirection.FastMagnitude ();
 
-				if (fastMag <= fastRangeToTarget) {
+				if (CheckRange()) {
 					if (!inRange) {
 						if (CanMove)
 							cachedMove.StopMove ();
-
+						inRange = true;
 					}
 					Agent.SetState (EngagingAnimState);
 
@@ -289,9 +280,6 @@ namespace Lockstep
 						}
 					}
 
-					if (inRange == false) {
-						inRange = true;
-					}
 				} else {
 					if (CanMove) {
 						if (cachedMove.IsMoving == false) {
@@ -531,14 +519,15 @@ namespace Lockstep
 				if (cachedTargetHealth.IsNotNull())
 				{
 					OnEngage(other);
-
 					Target = other;
-
-					HasTarget = true;
 					targetVersion = Target.SpawnVersion;
 					IsCasting = true;
 					fastRangeToTarget = Range + (Target.Body.IsNotNull() ? Target.Body.Radius : 0) + Agent.Body.Radius;
 					fastRangeToTarget *= fastRangeToTarget;
+
+					if (!CheckRange ()) {
+						cachedMove.StartMove (Target.Body.Position);
+					}
 				}
 			}
 		}
@@ -567,7 +556,7 @@ namespace Lockstep
 				else {
 					if (CanMove)
 					{
-						if (HasTarget && inRange == false)
+						if (Target != null && inRange == false)
 						{
 							cachedMove.StopMove();
 						}
@@ -575,7 +564,6 @@ namespace Lockstep
 				}
 			}
 
-			HasTarget = false;
 			Target = null;
 			cachedBody.Priority = basePriority;
 
@@ -594,7 +582,7 @@ namespace Lockstep
 			//if formal (going through normal Execute routes), do the group stuff
 			if (isFormal)
 			{
-				if (HasTarget)
+				if (Target != null)
 				{
 					cachedMove.RegisterGroup(false);
 				}
@@ -603,7 +591,8 @@ namespace Lockstep
 				}
 			}
 			else {
-				cachedMove.StartMove(position);
+				if (Target == null)
+					cachedMove.StartMove(position);
 			}
 			isAttackMoving = true;
 			isFocused = false;
@@ -614,9 +603,7 @@ namespace Lockstep
 			DefaultData target;
 			if (com.TryGetData<Vector2d>(out pos) && CanMove)
 			{
-
 				StartAttackMove(pos);
-
 			}
 			else if (com.TryGetData<DefaultData>(out target) && target.Is(DataType.UShort))
 			{
@@ -650,7 +637,7 @@ namespace Lockstep
 		private bool ScanAndEngage()
 		{
 			LSAgent agent = DoScan();
-			if (agent == null || HasTarget && agent == Target)
+			if (agent == null || agent == Target)
 			{
 				return false;
 			}
