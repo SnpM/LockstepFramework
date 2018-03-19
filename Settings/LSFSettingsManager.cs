@@ -12,7 +12,10 @@ namespace Lockstep
         public const string SETTINGS_NAME = "LockstepFrameworkSettings";
         static LSFSettings MainSettings;
 
-        static LSFSettingsManager()
+		static LSFSettingsManager () {
+			Initialize ();
+		}
+		static void Initialize()
         {
             LSFSettings settings = Resources.Load<LSFSettings>(SETTINGS_NAME);
 
@@ -28,7 +31,7 @@ namespace Lockstep
                     AssetDatabase.CreateAsset(settings, "Assets/Resources/" + SETTINGS_NAME + ".asset");
                     AssetDatabase.SaveAssets();
                     AssetDatabase.Refresh();
-                
+					Debug.Log("Successfuly created new settings file.");
                 } else
                 {
                 }
@@ -46,6 +49,9 @@ namespace Lockstep
 
         public static LSFSettings GetSettings()
         {
+
+			if (MainSettings == null)
+				Initialize ();
             return MainSettings;
         }
 
