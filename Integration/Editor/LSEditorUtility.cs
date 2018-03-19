@@ -675,7 +675,7 @@ namespace Lockstep
             {
                 relativePath = absolutePath;
             }
-
+			Path.GetFileNameWithoutExtension (relativePath);
             return relativePath;
         }
 

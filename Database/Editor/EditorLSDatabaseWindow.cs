@@ -153,7 +153,7 @@ namespace Lockstep.Data {
         
         bool LoadDatabaseFromPath (string absolutePath) {
             string relativePath = absolutePath.GetRelativeUnityAssetPath ();
-			LSDatabase database = AssetDatabase.LoadAssetAtPath (relativePath, DatabaseType) as LSDatabase;
+			LSDatabase database = AssetDatabase.LoadAssetAtPath<LSDatabase>(relativePath);
             if (database != null) {
                 LoadDatabase (database);
                 return true;
