@@ -566,10 +566,6 @@ namespace Lockstep
 			}
 
 			if (SettingVisuals) {
-				this.DoSetVisualRotation (_rotation);
-				DoSetVisualPosition (
-					_position.ToVector3 (HeightPos.ToFloat ())
-				);
 				_settingVisualsCounter--;
 			}
 		}
@@ -614,10 +610,14 @@ namespace Lockstep
 		{
 
 			if (this.SettingVisuals) {
-
+				if (PhysicsManager.ResetAccumulation) {
+					DoSetVisualPosition (Position.ToVector3(HeightPos.ToFloat()));
+					DoSetVisualRotation (Rotation);
+				}
 				//PositionalTransform.position = Vector3.SmoothDamp (lastVisualPos, _visualPosition, ref velocityPosition, PhysicsManager.LerpTime);
-				PositionalTransform.position = Vector3.LerpUnclamped (lastVisualPos,VisualPosition, (float)PhysicsManager.ExpectedAccumulation);
-				RotationalTransform.rotation = Quaternion.SlerpUnclamped (lastVisualRot, visualRot, (float)PhysicsManager.ExpectedAccumulation);
+				PositionalTransform.position = Vector3.Lerp (lastVisualPos,VisualPosition, (float)PhysicsManager.ExpectedAccumulation);
+				RotationalTransform.rotation = Quaternion.Slerp (lastVisualRot, visualRot, (float)PhysicsManager.ExpectedAccumulation);
+
 			}
 
 		}

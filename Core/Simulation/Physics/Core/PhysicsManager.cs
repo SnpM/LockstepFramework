@@ -144,7 +144,6 @@ namespace Lockstep
 		{
 			Partition.CheckAndDistributeCollisions();
 			Simulated = true;
-			AccumulatedTime = 0f;
 		}
 
 		internal static FastBucket<InstanceCollisionPair> RanCollisionPairs = new FastBucket<InstanceCollisionPair>();
@@ -161,6 +160,7 @@ namespace Lockstep
 			public CollisionPair Pair;
 		}
 
+		public static bool ResetAccumulation {get; private set;}
 		public static void LateSimulate()
 		{
 			//2 seconds before turning off
@@ -221,6 +221,7 @@ namespace Lockstep
 					b1.Simulate();
 				}
 			}
+			ResetAccumulation = true;
 
 		}
 
@@ -237,28 +238,13 @@ namespace Lockstep
 		public static float LerpTime { get; private set; }
 		public static void LateVisualize()
 		{
-			//			bool doSetVisuals = false;
-			//			if (AccumulatedTime >= PhysicsManager.FixedDeltaTime && Simulated) {
-			//				AccumulatedTime = Time.deltaTime + (LerpTime % PhysicsManager.FixedDeltaTime);
-			//				doSetVisuals = true;
-			//				Simulated = false;
-			//			} else {
-			//				AccumulatedTime += Time.deltaTime;
-			//			}
-			//			LerpTime = (float)(AccumulatedTime / PhysicsManager.FixedDeltaTime);
-			//			if (LerpTime > 1f) LerpTime = 1f;
-			//			for (int i = 0; i < DynamicSimObjects.PeakCount; i++) {
-			//				LSBody b1 = DynamicSimObjects.innerArray[i];
-			//
-			//				if (b1.IsNotNull()) {
-			//					if (doSetVisuals) {
-			//						b1.SetVisuals();
-			//					}
-			//					b1.Visualize();
-			//				}
-			//			}
 
-			LerpTime = (float)PhysicsManager.FixedDeltaTime / (float)Time.timeScale;
+		}
+		public static void Visualize () {
+			LerpTime = Time.fixedDeltaTime;
+			if (ResetAccumulation) {
+				AccumulatedTime = 0;
+			}
 			AccumulatedTime += Time.deltaTime;
 			ExpectedAccumulation = AccumulatedTime / LerpTime;
 			for (int i = 0; i < DynamicSimObjects.PeakCount; i++) {
@@ -267,8 +253,10 @@ namespace Lockstep
 					b1.SetVisuals();
 				}
 			}
-		}
 
+			ResetAccumulation = false;
+
+		}
 		public static float ElapsedTime;
 
 

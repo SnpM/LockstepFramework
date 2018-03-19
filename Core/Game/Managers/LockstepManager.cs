@@ -278,7 +278,7 @@ namespace Lockstep
 			ProjectileManager.Visualize ();
 			EffectManager.Visualize ();
 			CommandManager.Visualize();
-
+			PhysicsManager.Visualize ();
 		}
 
 		internal static void LateVisualize ()

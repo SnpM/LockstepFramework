@@ -153,7 +153,7 @@ namespace Lockstep.Data {
         
         bool LoadDatabaseFromPath (string absolutePath) {
             string relativePath = absolutePath.GetRelativeUnityAssetPath ();
-			LSDatabase database = AssetDatabase.LoadAssetAtPath (relativePath, DatabaseType) as LSDatabase;
+			LSDatabase database = AssetDatabase.LoadAssetAtPath<LSDatabase>(relativePath);
             if (database != null) {
                 LoadDatabase (database);
                 return true;
@@ -165,14 +165,16 @@ namespace Lockstep.Data {
         
         void LoadDatabase (LSDatabase database) {
             _database = database;
-			if (database.GetType () != DatabaseType) {
-				//Note: A hacky fix for changing the type of a previously saved database is to turn on Debug mode
-				//and change the script type of the database asset in the inspector. Back it up before attempting!
-				Debug.Log ("Loaded database type does not match DatabaseType.");
+			bool isValid = false;
+			if (_database != null) {
+				if (database.GetType () != DatabaseType) {
+					//Note: A hacky fix for changing the type of a previously saved database is to turn on Debug mode
+					//and change the script type of the database asset in the inspector. Back it up before attempting!
+					Debug.Log ("Loaded database type does not match DatabaseType.");
+				}
+				DatabaseEditor = new EditorLSDatabase ();
+				DatabaseEditor.Initialize (this, Database, out isValid);
 			}
-            DatabaseEditor = new EditorLSDatabase();
-            bool isValid;
-            DatabaseEditor.Initialize (this,Database, out isValid);
             if (!isValid) {
 				Debug.Log ("Load unsuccesful");
                 this.DatabaseEditor = null;

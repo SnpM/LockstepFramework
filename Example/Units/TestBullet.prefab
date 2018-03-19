@@ -65,7 +65,7 @@ MonoBehaviour:
   _canVisualize: 1
   _exclusiveTargetType: 0
   _targetingBehavior: 1
-  _hitBehavior: 0
+  _hitBehavior: 1
   _angle: 32768
   _radius: 131072
   _lastingDuration: 0
