@@ -2,6 +2,7 @@
 using UnityEngine;
 using Lockstep.Pathfinding;
 using FastCollections;
+
 namespace Lockstep
 {
 	public class Move : ActiveAbility
@@ -13,7 +14,7 @@ namespace Lockstep
 		private const int StuckTimeThreshold = LockstepManager.FrameRate / 4;
 		private const int StuckRepathTries = 4;
 
-		public int GridSize { get { return (cachedBody.Radius * 2).ToInt(); } }
+		public int GridSize { get { return (cachedBody.Radius * 2).ToInt (); } }
 
 
 		public Vector2d Position { get { return cachedBody._position; } }
@@ -31,8 +32,9 @@ namespace Lockstep
 		private bool hasPath;
 		private bool straightPath;
 		private bool viableDestination;
-		private readonly FastList<Vector2d> myPath = new FastList<Vector2d>();
+		private readonly FastList<Vector2d> myPath = new FastList<Vector2d> ();
 		private int _pathIndex;
+
 		private int pathIndex {
 			get { return _pathIndex; }
 			set {
@@ -41,25 +43,34 @@ namespace Lockstep
 				}
 			}
 		}
+
 		private int StoppedTime;
 		private Vector2d targetPos;
 		[HideInInspector]
 		public Vector2d Destination;
 
-		public bool GetCanAutoStop()
+		public bool GetCanAutoStop ()
 		{
 			return AutoStopPauser <= 0;
 		}
-		public bool GetCanCollisionStop () {
+
+		public bool GetCanCollisionStop ()
+		{
 			return CollisionStopPauser <= 0;
 		}
-		const int AUTO_STOP_PAUSE_TIME = LockstepManager.FrameRate / 8;
+
+		const int AUTO_STOP_PAUSE_TIME = LockstepManager.FrameRate;
 		private int AutoStopPauser;
-		public void PauseAutoStop () {
+
+		public void PauseAutoStop ()
+		{
 			AutoStopPauser = AUTO_STOP_PAUSE_TIME;
 		}
+
 		private int CollisionStopPauser;
-		public void PauseCollisionStop () {
+
+		public void PauseCollisionStop ()
+		{
 			CollisionStopPauser = AUTO_STOP_PAUSE_TIME;
 		}
 
@@ -87,7 +98,9 @@ namespace Lockstep
 
 		private Vector2d lastTargetPos;
 		private Vector2d targetDirection;
-		private Vector2d waypointDirection {get {return this.targetDirection;}}
+
+		private Vector2d waypointDirection { get { return this.targetDirection; } }
+
 		private GridNode currentNode;
 		private GridNode destinationNode;
 		private Vector2d movementDirection;
@@ -95,7 +108,7 @@ namespace Lockstep
 		private long closingDistance;
 		private long stuckTolerance;
 
-		[Lockstep(true)]
+		[Lockstep (true)]
 		public bool SlowArrival {
 			get;
 			set;
@@ -129,18 +142,18 @@ namespace Lockstep
 
 		public long Acceleration { get { return _acceleration; } }
 
-		[SerializeField, UnityEngine.Serialization.FormerlySerializedAs("Flying")]
+		[SerializeField, UnityEngine.Serialization.FormerlySerializedAs ("Flying")]
 		private bool _canPathfind = true;
 
 		public bool CanPathfind { get; private set; }
 
 		#endregion
 
-		protected override void OnSetup()
+		protected override void OnSetup ()
 		{
 			cachedBody = Agent.Body;
 			cachedBody.onContact += HandleCollision;
-			CachedTurn = Agent.GetAbility<Turn>();
+			CachedTurn = Agent.GetAbility<Turn> ();
 			CanTurn = _canTurn && CachedTurn != null;
 
 			timescaledAcceleration = Acceleration / LockstepManager.FrameRate;
@@ -152,10 +165,10 @@ namespace Lockstep
 			this.SlowArrival = true;
 		}
 
-		protected override void OnInitialize()
+		protected override void OnInitialize ()
 		{
 			
-			myPath.FastClear();
+			myPath.FastClear ();
 			_pathIndex = 0;
 			StoppedTime = 0;
 
@@ -181,12 +194,13 @@ namespace Lockstep
 
 		private int StuckTime {
 			get { return _stuckTime; }
-				set {
+			set {
 				_stuckTime = value;
 				if (_stuckTime == 0) {
 				}
-				}
+			}
 		}
+
 		private int _stuckTime;
 
 		private int RepathTries;
@@ -194,43 +208,44 @@ namespace Lockstep
 		bool DoPathfind;
 
 
-        uint GetNodeHash (GridNode node)
-        {
-            //TODO: At the moment, the CombinePathVersion is based on the destination... essentially caching the path to the last destination
-            //Should this be based on commands instead?
-            //Also, a lot of redundancy can be moved into MovementGroupHelper... i.e. getting destination node 
-            uint ret = (uint)(node.gridX * GridManager.Width);
-            ret += (uint) node.gridY;
-            return ret;
-        }
-		protected override void OnSimulate()
+		uint GetNodeHash (GridNode node)
+		{
+			//TODO: At the moment, the CombinePathVersion is based on the destination... essentially caching the path to the last destination
+			//Should this be based on commands instead?
+			//Also, a lot of redundancy can be moved into MovementGroupHelper... i.e. getting destination node 
+			uint ret = (uint)(node.gridX * GridManager.Width);
+			ret += (uint)node.gridY;
+			return ret;
+		}
+
+		protected override void OnSimulate ()
 		{
 			if (!CanMove) {
 				return;
 			}
 
 			if (IsMoving) {
-				Agent.SetState(AnimState.Moving);
+				Agent.SetState (AnimState.Moving);
 
 				if (CanPathfind) {
 					if (DoPathfind) {
 						DoPathfind = false;
 						if (viableDestination) {
-							if (Pathfinder.GetStartNode(cachedBody.Position, out currentNode)) {
-								if (currentNode.DoesEqual(this.destinationNode)) {
+							if (Pathfinder.GetStartNode (cachedBody.Position, out currentNode)) {
+								if (currentNode.DoesEqual (this.destinationNode)) {
 									if (this.RepathTries >= 1) {
-										this.Arrive();
+										this.Arrive ();
 									}
 								} else {
 									if (straightPath) {
-										if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize)) {
-											if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath,
-												GridSize, GetNodeHash (destinationNode))) {
+										if (Pathfinder.NeedsPath (currentNode, destinationNode, this.GridSize)) {
+											if (Pathfinder.FindPath (Destination, currentNode, destinationNode, myPath,
+												    GridSize, GetNodeHash (destinationNode))) {
 												hasPath = true;
 												pathIndex = 0;
 											} else {
 												if (IsFormationMoving) {
-													StartMove(MyMovementGroup.Destination);
+													StartMove (MyMovementGroup.Destination);
 													IsFormationMoving = false;
 												}
 											}
@@ -238,14 +253,14 @@ namespace Lockstep
 										} else {
 										}
 									} else {
-                                        if (Pathfinder.NeedsPath(currentNode, destinationNode, this.GridSize)) {
-											if (Pathfinder.FindPath(Destination, currentNode, destinationNode, myPath,
-												GridSize, GetNodeHash (destinationNode))) {
+										if (Pathfinder.NeedsPath (currentNode, destinationNode, this.GridSize)) {
+											if (Pathfinder.FindPath (Destination, currentNode, destinationNode, myPath,
+												    GridSize, GetNodeHash (destinationNode))) {
 												hasPath = true;
 												pathIndex = 0;
 											} else {
 												if (IsFormationMoving) {
-													StartMove(MyMovementGroup.Destination);
+													StartMove (MyMovementGroup.Destination);
 													IsFormationMoving = false;
 												}
 											}
@@ -260,7 +275,7 @@ namespace Lockstep
 						} else {
 							hasPath = false;
 							if (IsFormationMoving) {
-								StartMove(MyMovementGroup.Destination);
+								StartMove (MyMovementGroup.Destination);
 								IsFormationMoving = false;
 							}
 						}
@@ -274,7 +289,7 @@ namespace Lockstep
 						if (pathIndex >= myPath.Count) {
 							targetPos = this.Destination;
 						} else {
-							targetPos = myPath[pathIndex];
+							targetPos = myPath [pathIndex];
 						}
 					} else {
 						targetPos = Destination;
@@ -285,7 +300,7 @@ namespace Lockstep
 
 				movementDirection = targetPos - cachedBody._position;
 
-				movementDirection.Normalize(out distance);
+				movementDirection.Normalize (out distance);
 				if (targetPos.x != lastTargetPos.x || targetPos.y != lastTargetPos.y) {
 					lastTargetPos = targetPos;
 					targetDirection = movementDirection;
@@ -297,16 +312,16 @@ namespace Lockstep
 					desiredVelocity = (movementDirection);
 
 					if (CanTurn)
-						CachedTurn.StartTurnDirection(movementDirection);
+						CachedTurn.StartTurnDirection (movementDirection);
 
-					stuckThreshold = this.timescaledAcceleration / 2;
+					stuckThreshold = this.timescaledAcceleration / 4;
 				} else {
-					if (distance < FixedMath.Mul(closingDistance, StopMultiplier)) {
-						Arrive();
+					if (distance < FixedMath.Mul (closingDistance, StopMultiplier)) {
+						Arrive ();
 						return;
 					}
 					if (this.SlowArrival) {
-						long closingSpeed = distance.Div(closingDistance);
+						long closingSpeed = distance.Div (closingDistance);
 						desiredVelocity = movementDirection * (closingSpeed);
 						stuckThreshold = closingSpeed / LockstepManager.FrameRate;
 
@@ -317,57 +332,51 @@ namespace Lockstep
 					}
 
 				}
-                //If unit has not moved stuckThreshold in a frame, it's stuck
-                StuckTime++;
-				if ((Agent.Body.Position - this.AveragePosition).FastMagnitude() <= (stuckThreshold * stuckThreshold)) {
+				//If unit has not moved stuckThreshold in a frame, it's stuck
+				StuckTime++;
+				if (GetCanAutoStop ()) {
+						if (Agent.Body.Position.FastDistance(AveragePosition) <= (stuckThreshold * stuckThreshold)) {
 
-					if (StuckTime > StuckTimeThreshold) {
-                        if (movingToWaypoint)
-                        {
-                            this.pathIndex++;
-                        }
-                        else
-                        {
-                            if (RepathTries < StuckRepathTries)
-                            {
-                                DoPathfind = true;
-                                RepathTries++;
-                            }
-							else
-                            {
-                                RepathTries = 0;
-                                this.Arrive();
-                            }
-                        }
-						StuckTime = 0;
+						if (StuckTime > StuckTimeThreshold) {
+							if (movingToWaypoint) {
+								this.pathIndex++;
+							} else {
+								if (RepathTries < StuckRepathTries) {
+									DoPathfind = true;
+									RepathTries++;
+								} else {
+									RepathTries = 0;
+									this.Arrive ();
+								}
+							}
+							StuckTime = 0;
+						}
+					} else {
+						if (StuckTime > 0)
+							StuckTime -= 1;
+
+						RepathTries = 0;
 					}
-				} else {
-					if (StuckTime > 0)
-					StuckTime -= 1;
-
-					RepathTries = 0;
 				}
-
 				if (movingToWaypoint) {
 
 					if (
 						(
-							this.pathIndex >= 0 &&
-							distance < closingDistance &&
-							(movementDirection).Dot (waypointDirection) < 0
+						    this.pathIndex >= 0 &&
+						    distance < closingDistance &&
+						    (movementDirection).Dot (waypointDirection) < 0
 						) ||
-						distance < FixedMath.Mul(closingDistance, FixedMath.Half)) {
+						distance < FixedMath.Mul (closingDistance, FixedMath.Half)) {
 						this.pathIndex++;
 					}
 				}
 
 				desiredVelocity *= Speed;
-				cachedBody._velocity += GetAdjustVector(desiredVelocity);
+				cachedBody._velocity += GetAdjustVector (desiredVelocity);
 
 				cachedBody.VelocityChanged = true;
 
-				AutoStopPauser--;
-				CollisionStopPauser--;
+
 			} else {
 				//Slowin' down
 				if (cachedBody.VelocityFastMagnitude > 0) {
@@ -375,10 +384,14 @@ namespace Lockstep
 				}
 				StoppedTime++;
 			}
-			AveragePosition = AveragePosition.Lerped(Agent.Body.Position, FixedMath.One / 4);
+			AutoStopPauser--;
+			CollisionStopPauser--;
+			AveragePosition = AveragePosition.Lerped (Agent.Body.Position, FixedMath.One / 2);
+			
 		}
 
-		Vector2d GetAdjustVector (Vector2d desiredVel) {
+		Vector2d GetAdjustVector (Vector2d desiredVel)
+		{
 			var adjust = desiredVel - cachedBody._velocity;
 			var adjustFastMag = adjust.FastMagnitude ();           
 			//Cap acceleration vector magnitude
@@ -391,81 +404,80 @@ namespace Lockstep
 
 		public Command LastCommand;
 
-		protected override void OnExecute(Command com)
+		protected override void OnExecute (Command com)
 		{
 			LastCommand = com;
-			if (com.ContainsData<Vector2d>()) {
-				StartFormalMove(com.GetData<Vector2d>());
+			if (com.ContainsData<Vector2d> ()) {
+				StartFormalMove (com.GetData<Vector2d> ());
 			}
 		}
 
-		public void StartFormalMove(Vector2d position)
+		public void StartFormalMove (Vector2d position)
 		{
-			Agent.StopCast(ID);
+			Agent.StopCast (ID);
 			IsCasting = true;
-			RegisterGroup();
+			RegisterGroup ();
 
 		}
 
-		public void RegisterGroup(bool moveOnProcessed = true)
+		public void RegisterGroup (bool moveOnProcessed = true)
 		{
 			MoveOnGroupProcessed = moveOnProcessed;
-			if (MovementGroupHelper.CheckValidAndAlert())
-				MovementGroupHelper.LastCreatedGroup.Add(this);
+			if (MovementGroupHelper.CheckValidAndAlert ())
+				MovementGroupHelper.LastCreatedGroup.Add (this);
 
 
 		}
 
-		public void Arrive()
+		public void Arrive ()
 		{
+			StopMove ();
 
-			StopMove();
-
-			if (onArrive.IsNotNull()) {
-				onArrive();
+			if (onArrive.IsNotNull ()) {
+				onArrive ();
 			}
-			this.OnArrive();
+			this.OnArrive ();
 
 			this.AutoStopPauser = 0;
 			this.CollisionStopPauser = 0;
 			Arrived = true;
 		}
 
-		protected virtual void OnArrive()
+		protected virtual void OnArrive ()
 		{
 
 		}
 
 
-		public void StopMove()
+		public void StopMove ()
 		{
 			if (IsMoving) {
 
-				if (MyMovementGroup.IsNotNull()) {
-					MyMovementGroup.Remove(this);
+				if (MyMovementGroup.IsNotNull ()) {
+					MyMovementGroup.Remove (this);
 				}
 
 				IsMoving = false;
 				StoppedTime = 0;
 
 				IsCasting = false;
-				if (OnStopMove.IsNotNull()) {
-					OnStopMove();
+				if (OnStopMove.IsNotNull ()) {
+					OnStopMove ();
 				}
 			}
 		}
 
-		public void OnGroupProcessed(Vector2d destination)
+		public void OnGroupProcessed (Vector2d destination)
 		{
 			Destination = destination;
 			if (MoveOnGroupProcessed) {
-				StartMove(destination);
+				StartMove (destination);
 				MoveOnGroupProcessed = false;
 			} else {
 				this.Destination = destination;
 			}
 			if (this.onGroupProcessed != null)
-				this.onGroupProcessed();
+				this.onGroupProcessed ();
 		}
 
 		public event Action onGroupProcessed;
@@ -475,7 +487,7 @@ namespace Lockstep
 
 
 
-		public void StartMove(Vector2d destination)
+		public void StartMove (Vector2d destination)
 		{
 			DoPathfind = true;
 			hasPath = false;
@@ -485,23 +497,23 @@ namespace Lockstep
 			StoppedTime = 0;
 			Arrived = false;
 
-            //For now, use old next-best-node system when size requires consideration
-            viableDestination = this.GridSize <= 1 ?
-				Pathfinder.GetEndNode (Agent.Body.Position,destination, out destinationNode) :
-                Pathfinder.GetClosestViableNode(Agent.Body.Position, destination, this.GridSize, out destinationNode);
-            //TODO: If next-best-node, autostop more easily
-            //Also implement stopping sooner based on distance
+			//For now, use old next-best-node system when size requires consideration
+			viableDestination = this.GridSize <= 1 ?
+				Pathfinder.GetEndNode (Agent.Body.Position, destination, out destinationNode) :
+                Pathfinder.GetClosestViableNode (Agent.Body.Position, destination, this.GridSize, out destinationNode);
+			//TODO: If next-best-node, autostop more easily
+			//Also implement stopping sooner based on distance
 
-            StuckTime = 0;
+			StuckTime = 0;
 			RepathTries = 0;
 			IsCasting = true;
 			if (onStartMove != null)
-				onStartMove();
+				onStartMove ();
 		}
 
-		protected override void OnStopCast()
+		protected override void OnStopCast ()
 		{
-			StopMove();
+			StopMove ();
 		}
 
 
@@ -510,7 +522,8 @@ namespace Lockstep
 
 		static LSAgent tempAgent;
 
-		private void HandleCollision(LSBody other)
+		bool paused;
+		private void HandleCollision (LSBody other)
 		{
 			if (!CanMove) {
 				return;
@@ -518,24 +531,25 @@ namespace Lockstep
 			if ((tempAgent = other.Agent) == null) {
 				return;
 			}
-			Move otherMover = tempAgent.GetAbility<Move>();
-			if (ReferenceEquals(otherMover, null) == false) {
+			Move otherMover = tempAgent.GetAbility<Move> ();
+			if (ReferenceEquals (otherMover, null) == false) {
 				if (IsMoving) {
-					if (otherMover.MyMovementGroupID == MyMovementGroupID || otherMover.targetPos == this.targetPos) {
-						if (otherMover.IsMoving == false && otherMover.Arrived && otherMover.StoppedTime > MinimumOtherStopTime) {
-							if (otherMover.GetCanCollisionStop () == false) {
-								//Prevent units who are stopped for attacking from stopping/repathing other units
-								PauseAutoStop ();
-							} else {
+					//If the other mover is moving to a similar point
+					if (otherMover.MyMovementGroupID == MyMovementGroupID || otherMover.targetPos.FastDistance (this.targetPos) <= (closingDistance * closingDistance)) {
+						if (otherMover.IsMoving == false) {
+							if (otherMover.Arrived && otherMover.StoppedTime > MinimumOtherStopTime) {
 								Arrive ();
-							}
-						} else if (hasPath && otherMover.hasPath && otherMover.pathIndex > 0 && otherMover.lastTargetPos.SqrDistance (targetPos.x, targetPos.y) < FixedMath.One
-						) {
-							if (this.distance < this.closingDistance) {
-								this.pathIndex++;
+							} 
+						} else {
+							if (hasPath && otherMover.hasPath && otherMover.pathIndex > 0 && otherMover.lastTargetPos.SqrDistance (targetPos.x, targetPos.y) < closingDistance.Mul(closingDistance)) {
+								if (this.distance < this.closingDistance) {
+									this.pathIndex++;
+								}
 							}
 						}
-					} else {
+					}
+					if (otherMover.GetCanCollisionStop () == false || otherMover.GetCanAutoStop() == false) {
+						PauseAutoStop ();
 					}
 				}
 			}
@@ -543,19 +557,19 @@ namespace Lockstep
 
 		static Vector2d desiredVelocity;
 
-#if UNITY_EDITOR
+		#if UNITY_EDITOR
 		public bool DrawPath = true;
 
-		void OnDrawGizmos()
+		void OnDrawGizmos ()
 		{
 			if (DrawPath) {
 				const float height = 0f;
 				for (int i = 1; i < myPath.Count; i++) {
-					UnityEditor.Handles.Label(myPath[i - 1].ToVector3(height), i.ToString());
-					Gizmos.DrawLine(myPath[i - 1].ToVector3(height), myPath[i].ToVector3(height));
+					UnityEditor.Handles.Label (myPath [i - 1].ToVector3 (height), i.ToString ());
+					Gizmos.DrawLine (myPath [i - 1].ToVector3 (height), myPath [i].ToVector3 (height));
 				}
 			}
 		}
-#endif
+		#endif
 	}
 }
