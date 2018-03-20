@@ -48,7 +48,6 @@ namespace Lockstep
 
 		public bool GetFullCanAutoStop()
 		{
-
 			return CanCollisionStop && AutoStopPauser <= 0;
 		}
 
@@ -61,12 +60,6 @@ namespace Lockstep
 		}
 
 		public long StopMultiplier { get; set; }
-
-
-		private bool collisionTicked;
-
-		public bool CollisionTicked { get { return collisionTicked; } }
-
 
 		//Has this unit arrived at destination? Default set to false.
 		public bool Arrived { get; private set; }
@@ -174,10 +167,8 @@ namespace Lockstep
 			Destination = Vector2d.zero;
 			hasPath = false;
 			IsMoving = false;
-			collisionTicked = false;
 			StuckTime = 0;
 			RepathTries = 0;
-
 
 			Arrived = true;
 			AveragePosition = Agent.Body.Position;
@@ -326,7 +317,7 @@ namespace Lockstep
                 StuckTime++;
                 stuckThreshold = stuckThreshold * 7 / 6;
                     
-				if (GetFullCanAutoStop() && (Agent.Body.Position - this.AveragePosition).FastMagnitude() < (stuckThreshold * stuckThreshold)) {
+				if ((Agent.Body.Position - this.AveragePosition).FastMagnitude() < (stuckThreshold * stuckThreshold)) {
 
 					if (StuckTime > StuckTimeThreshold) {
                         if (movingToWaypoint)
@@ -341,14 +332,13 @@ namespace Lockstep
                                 RepathTries++;
 
                             }
-                            else
+							else if (GetFullCanAutoStop())
                             {
                                 RepathTries = 0;
                                 this.Arrive();
                             }
                         }
 						StuckTime = 0;
-
 					}
 				} else {
 					if (StuckTime > 0)

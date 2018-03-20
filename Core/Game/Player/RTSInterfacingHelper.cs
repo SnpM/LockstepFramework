@@ -35,7 +35,6 @@ namespace Lockstep
         public static AbilityDataItem QuickPos;
         public static AbilityDataItem QuickTarget;
 
-
         private static bool _isGathering;
         public static bool IsGathering {
             get {return _isGathering;}
