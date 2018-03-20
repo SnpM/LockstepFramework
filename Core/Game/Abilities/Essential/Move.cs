@@ -49,6 +49,8 @@ namespace Lockstep
 		[HideInInspector]
 		public Vector2d Destination;
 
+
+		#region Auto stopping
 		public bool GetCanAutoStop ()
 		{
 			return AutoStopPauser <= 0;
@@ -59,13 +61,15 @@ namespace Lockstep
 			return CollisionStopPauser <= 0;
 		}
 
-		const int AUTO_STOP_PAUSE_TIME = LockstepManager.FrameRate;
+		const int AUTO_STOP_PAUSE_TIME = LockstepManager.FrameRate / 8;
 		private int AutoStopPauser;
 
 		public void PauseAutoStop ()
 		{
 			AutoStopPauser = AUTO_STOP_PAUSE_TIME;
 		}
+
+		private int StopPauseLayer;
 
 		private int CollisionStopPauser;
 
@@ -74,6 +78,19 @@ namespace Lockstep
 			CollisionStopPauser = AUTO_STOP_PAUSE_TIME;
 		}
 
+		//TODO: Improve the naming
+		bool GetLookingForStopPause () {
+			return StopPauseLooker >= 0;
+		}
+
+		private int StopPauseLooker;
+		/// <summary>
+		/// Start the search process for collisions/obstructions that are in the same attack group.
+		/// </summary>
+		public void StartLookingForStopPause () {
+			StopPauseLooker = AUTO_STOP_PAUSE_TIME;
+		}
+		#endregion
 		public long StopMultiplier { get; set; }
 
 		//Has this unit arrived at destination? Default set to false.
@@ -175,8 +192,12 @@ namespace Lockstep
 			CanMove = _canMove;
 			IsFormationMoving = false;
 			MyMovementGroupID = -1;
+
 			AutoStopPauser = 0;
 			CollisionStopPauser = 0;
+			StopPauseLooker = 0;
+			StopPauseLayer = 0;
+
 			StopMultiplier = DirectStop;
 
 			viableDestination = false;
@@ -386,6 +407,7 @@ namespace Lockstep
 			}
 			AutoStopPauser--;
 			CollisionStopPauser--;
+			StopPauseLooker--;
 			AveragePosition = AveragePosition.Lerped (Agent.Body.Position, FixedMath.One / 2);
 			
 		}
@@ -438,8 +460,12 @@ namespace Lockstep
 			}
 			this.OnArrive ();
 
-			this.AutoStopPauser = 0;
-			this.CollisionStopPauser = 0;
+			//TODO: Reset this variables when changing destination/command
+			AutoStopPauser = 0;
+			CollisionStopPauser = 0;
+			StopPauseLooker = 0;
+			StopPauseLayer = 0;
+
 			Arrived = true;
 		}
 
@@ -531,6 +557,7 @@ namespace Lockstep
 			if ((tempAgent = other.Agent) == null) {
 				return;
 			}
+
 			Move otherMover = tempAgent.GetAbility<Move> ();
 			if (ReferenceEquals (otherMover, null) == false) {
 				if (IsMoving) {
@@ -548,13 +575,24 @@ namespace Lockstep
 							}
 						}
 					}
-					if (otherMover.GetCanCollisionStop () == false || otherMover.GetCanAutoStop() == false) {
-						PauseAutoStop ();
+
+					if (GetLookingForStopPause ()) {
+						//As soon as the original collision stop unit is released, units will start breaking out of pauses
+						if (otherMover.GetCanCollisionStop () == false) {
+							StopPauseLayer = -1;
+							PauseAutoStop ();
+						} else if (otherMover.GetCanAutoStop () == false) {
+							if (otherMover.StopPauseLayer < StopPauseLayer) {
+								StopPauseLayer = otherMover.StopPauseLayer + 1;
+								PauseAutoStop ();
+							}
+						}
+					} else {
+						
 					}
 				}
 			}
 		}
-
 		static Vector2d desiredVelocity;
 
 		#if UNITY_EDITOR

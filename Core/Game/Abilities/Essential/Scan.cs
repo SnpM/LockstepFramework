@@ -197,8 +197,8 @@ namespace Lockstep
 			}
 
 			if (CanMove) {
-				if (Target != null) {
-
+				if (IsAttackMoving) {
+					cachedMove.StartLookingForStopPause ();
 				}
 			}
 		}

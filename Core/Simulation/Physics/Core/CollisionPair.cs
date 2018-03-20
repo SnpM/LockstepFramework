@@ -253,7 +253,6 @@ namespace Lockstep
 				} 
 			}
 			Body1.NotifyContact (Body2, IsColliding, IsCollidingChanged);
-
 			Body2.NotifyContact (Body1, IsColliding, IsCollidingChanged);
 		}
 
