@@ -35,7 +35,6 @@ namespace Lockstep
         public static AbilityDataItem QuickPos;
         public static AbilityDataItem QuickTarget;
 
-
         private static bool _isGathering;
         public static bool IsGathering {
             get {return _isGathering;}
@@ -151,7 +150,7 @@ namespace Lockstep
                         curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
                     }
                     break;
-                case InformationGatherType.None:
+			case InformationGatherType.None:
                     curCom = new Command(facer.ListenInputID);
                     break;
             }

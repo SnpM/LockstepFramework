@@ -126,7 +126,7 @@ namespace Lockstep
 		private uint targetVersion;
 		private int searchCount;
 		private long attackCount;
-		private bool isAttackMoving;
+		public bool IsAttackMoving {get; private set;}
 		private bool isFocused;
 
 		protected override void OnSetup()
@@ -151,10 +151,9 @@ namespace Lockstep
 
 		private void HandleOnArrive()
 		{
-			if (this.isAttackMoving)
+			if (this.IsAttackMoving)
 			{
-				if (Target == null)
-					isAttackMoving = false;
+				IsAttackMoving = false;
 			}
 		}
 
@@ -170,7 +169,7 @@ namespace Lockstep
 			searchCount = LSUtility.GetRandom(SearchRate) + 1;
 			attackCount = 0;
 			Target = null;
-			isAttackMoving = false;
+			IsAttackMoving = false;
 			inRange = false;
 			isFocused = false;
 			CycleCount = 0;
@@ -198,8 +197,8 @@ namespace Lockstep
 			}
 
 			if (CanMove) {
-				if (Target != null || isAttackMoving) {
-					cachedMove.PauseAutoStop ();
+				if (IsAttackMoving) {
+					cachedMove.StartLookingForStopPause ();
 				}
 			}
 		}
@@ -282,6 +281,8 @@ namespace Lockstep
 
 				} else {
 					if (CanMove) {
+						cachedMove.PauseAutoStop ();
+						cachedMove.PauseCollisionStop ();
 						if (cachedMove.IsMoving == false) {
 							cachedMove.StartMove (Target.Body._position);
 							cachedBody.Priority = basePriority;
@@ -301,7 +302,7 @@ namespace Lockstep
 						}
 					}
 
-					if (isAttackMoving || isFocused == false) {
+					if (IsAttackMoving || isFocused == false) {
 						searchCount -= 1;
 						if (searchCount <= 0) {
 							searchCount = SearchRate;
@@ -342,13 +343,18 @@ namespace Lockstep
 
 				}
 			}
+		
+			if (inRange) {
+				cachedMove.PauseAutoStop ();
+				cachedMove.PauseCollisionStop ();
+			}
 		}
 
 		void BehaveWithNoTarget()
 		{
-			if (isAttackMoving || Agent.IsCasting == false)
+			if (IsAttackMoving || Agent.IsCasting == false)
 			{
-				if (isAttackMoving)
+				if (IsAttackMoving)
 				{
 					{
 						searchCount -= 8;
@@ -541,10 +547,10 @@ namespace Lockstep
 			isFocused = false;
 			if (complete)
 			{
-				isAttackMoving = false;
+				IsAttackMoving = false;
 			}
 			else {
-				if (isAttackMoving)
+				if (IsAttackMoving)
 				{
 					if (ScanAndEngage() == false)
 					{
@@ -594,7 +600,7 @@ namespace Lockstep
 				if (Target == null)
 					cachedMove.StartMove(position);
 			}
-			isAttackMoving = true;
+			IsAttackMoving = true;
 			isFocused = false;
 		}
 		protected override void OnExecute(Command com)
@@ -608,7 +614,7 @@ namespace Lockstep
 			else if (com.TryGetData<DefaultData>(out target) && target.Is(DataType.UShort))
 			{
 				isFocused = true;
-				isAttackMoving = false;
+				IsAttackMoving = false;
 				LSAgent tempTarget;
 				ushort targetValue = (ushort)target.Value;
 				if (AgentController.TryGetAgentInstance(targetValue, out tempTarget))

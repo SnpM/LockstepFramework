@@ -90,6 +90,7 @@ namespace Lockstep
 			Command.Setup ();
 
 			GridManager.Setup ();
+			InputCodeManager.Setup ();
 			AbilityDataItem.Setup ();
          
 			AgentController.Setup ();
@@ -102,7 +103,6 @@ namespace Lockstep
 
 			Time.fixedDeltaTime = DeltaTimeF;
 			Time.maximumDeltaTime = Time.fixedDeltaTime * 2;
-			InputCodeManager.Setup ();
 
 
 			DefaultMessageRaiser.LateSetup ();
