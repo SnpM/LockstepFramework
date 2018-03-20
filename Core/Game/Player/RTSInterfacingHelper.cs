@@ -150,7 +150,7 @@ namespace Lockstep
                         curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
                     }
                     break;
-                case InformationGatherType.None:
+			case InformationGatherType.None:
                     curCom = new Command(facer.ListenInputID);
                     break;
             }

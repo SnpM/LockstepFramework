@@ -37,8 +37,12 @@ namespace Lockstep.Data
                         //exception or ignore?
                         continue;
                     }
+					interfacer.LocalInitialize ();
                     CodeInterfacerMap.Add(interfacer.Name, interfacer);
                     TypeInterfacerMap.Add(interfacer.Script.Type, interfacer);
+
+					//Debug.Log (interfacer.ListenInputCode + ", " + InputCodeManager.GetCodeID (interfacer.ListenInputCode) + ", " + InputCodeManager.GetCodeID ("Stop"));
+					//Debug.Log (interfacer.Name + ", " + interfacer.ListenInputCode + ", " + interfacer.ListenInputID);
                 }
             }
         }
@@ -66,6 +70,11 @@ namespace Lockstep.Data
             return FindInterfacer(typeof(TAbility));
         }
 
+		private void LocalInitialize () {
+			ListenInputInitialized = true;
+			_listenInputID = InputCodeManager.GetCodeID(_listenInputCode);
+		}
+
         public string GetAbilityCode()
         {
             return this.Name;
@@ -90,8 +99,7 @@ namespace Lockstep.Data
                     return _listenInputID;
                 } else
                 {
-                    ListenInputInitialized = true;
-                    return _listenInputID = InputCodeManager.GetCodeID(_listenInputCode);
+					throw new System.Exception ("This is a bug");
                 }
             }
         }

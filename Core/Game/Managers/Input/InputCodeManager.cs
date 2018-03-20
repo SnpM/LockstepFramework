@@ -25,7 +25,7 @@ namespace Lockstep
                 InputDataMap.Add (code,item);
             }
             Setted = true;
-            
+
         }
         public static InputDataItem GetInputData (string code) {
             InputDataItem item;

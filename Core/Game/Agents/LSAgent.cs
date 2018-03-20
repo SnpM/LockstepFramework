@@ -91,7 +91,6 @@ namespace Lockstep
 		public bool Selectable { get { return _selectable; } }
 		public bool CanSelect { get { return Selectable && IsVisible; } }
 
-
 		ushort _typeIndex;
 		/// <summary>
 		/// The index of this agent in the pool.

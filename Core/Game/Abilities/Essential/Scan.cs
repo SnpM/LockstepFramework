@@ -198,7 +198,7 @@ namespace Lockstep
 
 			if (CanMove) {
 				if (Target != null || isAttackMoving) {
-					cachedMove.PauseAutoStop ();
+					cachedMove.PauseCollisionStop ();
 				} else {
 
 				}
@@ -283,6 +283,8 @@ namespace Lockstep
 
 				} else {
 					if (CanMove) {
+						cachedMove.PauseAutoStop ();
+						cachedMove.PauseCollisionStop ();
 						if (cachedMove.IsMoving == false) {
 							cachedMove.StartMove (Target.Body._position);
 							cachedBody.Priority = basePriority;

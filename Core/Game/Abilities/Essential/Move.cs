@@ -46,17 +46,21 @@ namespace Lockstep
 		[HideInInspector]
 		public Vector2d Destination;
 
-		public bool GetFullCanAutoStop()
+		public bool GetCanAutoStop()
 		{
-			return CanAutoStop && AutoStopPauser <= 0;
+			return AutoStopPauser <= 0;
 		}
-
-		public bool CanAutoStop { get; set; }
-
+		public bool GetCanCollisionStop () {
+			return CollisionStopPauser <= 0;
+		}
 		const int AUTO_STOP_PAUSE_TIME = LockstepManager.FrameRate / 8;
 		private int AutoStopPauser;
 		public void PauseAutoStop () {
 			AutoStopPauser = AUTO_STOP_PAUSE_TIME;
+		}
+		private int CollisionStopPauser;
+		public void PauseCollisionStop () {
+			CollisionStopPauser = AUTO_STOP_PAUSE_TIME;
 		}
 
 		public long StopMultiplier { get; set; }
@@ -158,8 +162,8 @@ namespace Lockstep
 			CanMove = _canMove;
 			IsFormationMoving = false;
 			MyMovementGroupID = -1;
-			CanAutoStop = true;
 			AutoStopPauser = 0;
+			CollisionStopPauser = 0;
 			StopMultiplier = DirectStop;
 
 			viableDestination = false;
@@ -363,6 +367,7 @@ namespace Lockstep
 				cachedBody.VelocityChanged = true;
 
 				AutoStopPauser--;
+				CollisionStopPauser--;
 			} else {
 				//Slowin' down
 				if (cachedBody.VelocityFastMagnitude > 0) {
@@ -422,6 +427,7 @@ namespace Lockstep
 			this.OnArrive();
 
 			this.AutoStopPauser = 0;
+			this.CollisionStopPauser = 0;
 			Arrived = true;
 		}
 
@@ -506,20 +512,19 @@ namespace Lockstep
 
 		private void HandleCollision(LSBody other)
 		{
-
 			if (!CanMove) {
 				return;
 			}
 			if ((tempAgent = other.Agent) == null) {
 				return;
 			}
-
 			Move otherMover = tempAgent.GetAbility<Move>();
 			if (ReferenceEquals(otherMover, null) == false) {
 				if (IsMoving) {
 					if (otherMover.MyMovementGroupID == MyMovementGroupID || otherMover.targetPos == this.targetPos) {
 						if (otherMover.IsMoving == false && otherMover.Arrived && otherMover.StoppedTime > MinimumOtherStopTime) {
-							if (otherMover.GetFullCanAutoStop () == false) {
+							if (otherMover.GetCanCollisionStop () == false) {
+								//Prevent units who are stopped for attacking from stopping/repathing other units
 								PauseAutoStop ();
 							} else {
 								Arrive ();
