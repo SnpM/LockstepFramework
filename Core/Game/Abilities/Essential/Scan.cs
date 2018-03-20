@@ -153,8 +153,7 @@ namespace Lockstep
 		{
 			if (this.isAttackMoving)
 			{
-				if (Target == null)
-					isAttackMoving = false;
+				isAttackMoving = false;
 			}
 		}
 
@@ -200,6 +199,8 @@ namespace Lockstep
 			if (CanMove) {
 				if (Target != null || isAttackMoving) {
 					cachedMove.PauseAutoStop ();
+				} else {
+
 				}
 			}
 		}

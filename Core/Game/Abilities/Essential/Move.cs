@@ -48,10 +48,10 @@ namespace Lockstep
 
 		public bool GetFullCanAutoStop()
 		{
-			return CanCollisionStop && AutoStopPauser <= 0;
+			return CanAutoStop && AutoStopPauser <= 0;
 		}
 
-		public bool CanCollisionStop { get; set; }
+		public bool CanAutoStop { get; set; }
 
 		const int AUTO_STOP_PAUSE_TIME = LockstepManager.FrameRate / 8;
 		private int AutoStopPauser;
@@ -158,7 +158,7 @@ namespace Lockstep
 			CanMove = _canMove;
 			IsFormationMoving = false;
 			MyMovementGroupID = -1;
-			CanCollisionStop = true;
+			CanAutoStop = true;
 			AutoStopPauser = 0;
 			StopMultiplier = DirectStop;
 
@@ -287,7 +287,7 @@ namespace Lockstep
 					targetDirection = movementDirection;
 				}
 				bool movingToWaypoint = (this.hasPath && this.pathIndex < myPath.Count - 1);
-				long stuckThreshold = 0;
+				long stuckThreshold = 1;
 
 				if (distance > closingDistance || movingToWaypoint) {
 					desiredVelocity = (movementDirection);
@@ -295,7 +295,7 @@ namespace Lockstep
 					if (CanTurn)
 						CachedTurn.StartTurnDirection(movementDirection);
 
-					stuckThreshold = this.timescaledAcceleration / 4;
+					stuckThreshold = this.timescaledAcceleration / 2;
 				} else {
 					if (distance < FixedMath.Mul(closingDistance, StopMultiplier)) {
 						Arrive();
@@ -304,20 +304,18 @@ namespace Lockstep
 					if (this.SlowArrival) {
 						long closingSpeed = distance.Div(closingDistance);
 						desiredVelocity = movementDirection * (closingSpeed);
-						stuckThreshold = closingSpeed / 2;
+						stuckThreshold = closingSpeed / LockstepManager.FrameRate;
 
 					} else {
 						desiredVelocity = (movementDirection);
-						stuckThreshold = this.timescaledAcceleration / 2;
+						stuckThreshold = this.timescaledAcceleration;
 
 					}
 
 				}
-                //Temporary improvement to detecting stuck
+                //If unit has not moved stuckThreshold in a frame, it's stuck
                 StuckTime++;
-                stuckThreshold = stuckThreshold * 7 / 6;
-                    
-				if ((Agent.Body.Position - this.AveragePosition).FastMagnitude() < (stuckThreshold * stuckThreshold)) {
+				if ((Agent.Body.Position - this.AveragePosition).FastMagnitude() <= (stuckThreshold * stuckThreshold)) {
 
 					if (StuckTime > StuckTimeThreshold) {
                         if (movingToWaypoint)
@@ -330,9 +328,8 @@ namespace Lockstep
                             {
                                 DoPathfind = true;
                                 RepathTries++;
-
                             }
-							else if (GetFullCanAutoStop())
+							else
                             {
                                 RepathTries = 0;
                                 this.Arrive();
@@ -367,6 +364,7 @@ namespace Lockstep
 
 				AutoStopPauser--;
 			} else {
+				//Slowin' down
 				if (cachedBody.VelocityFastMagnitude > 0) {
 					cachedBody.Velocity += GetAdjustVector (Vector2d.zero);
 				}
@@ -422,6 +420,8 @@ namespace Lockstep
 				onArrive();
 			}
 			this.OnArrive();
+
+			this.AutoStopPauser = 0;
 			Arrived = true;
 		}
 
@@ -516,10 +516,10 @@ namespace Lockstep
 
 			Move otherMover = tempAgent.GetAbility<Move>();
 			if (ReferenceEquals(otherMover, null) == false) {
-				if (IsMoving && (GetFullCanAutoStop())) {
+				if (IsMoving) {
 					if (otherMover.MyMovementGroupID == MyMovementGroupID || otherMover.targetPos == this.targetPos) {
 						if (otherMover.IsMoving == false && otherMover.Arrived && otherMover.StoppedTime > MinimumOtherStopTime) {
-							if (otherMover.CanCollisionStop == false) {
+							if (otherMover.GetFullCanAutoStop () == false) {
 								PauseAutoStop ();
 							} else {
 								Arrive ();
