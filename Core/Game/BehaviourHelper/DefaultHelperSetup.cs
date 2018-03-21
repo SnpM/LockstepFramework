@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+using Lockstep.EssentialAbilities;
 namespace Lockstep
 {
 	[ExecuteInEditMode]

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections; using FastCollections;
 using Lockstep.Data;
+using Lockstep.EssentialAbilities;
 namespace Lockstep
 {
 	public class ScanGroupHelper : BehaviourHelper

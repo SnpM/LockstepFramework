@@ -2,7 +2,7 @@
 using UnityEngine;
 using Lockstep.Data;
 using FastCollections;
-namespace Lockstep
+namespace Lockstep.EssentialAbilities
 {
     public class MovementGroupHelper : BehaviourHelper
     {

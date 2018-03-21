@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using Lockstep.Data;
-
+using Lockstep.EssentialAbilities;
 namespace Lockstep
 {
 	[UnityEngine.DisallowMultipleComponent]
@@ -306,6 +306,7 @@ namespace Lockstep
 						searchCount -= 1;
 						if (searchCount <= 0) {
 							searchCount = SearchRate;
+							//TODO: This might be bugged. A unit randomly found a target out of range.
 							if (ScanAndEngage ()) {
 							} else {
 							}

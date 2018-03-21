@@ -3,7 +3,7 @@ using UnityEngine;
 using Lockstep.Pathfinding;
 using FastCollections;
 
-namespace Lockstep
+namespace Lockstep.EssentialAbilities
 {
 	public class Move : ActiveAbility
 	{
@@ -141,6 +141,8 @@ namespace Lockstep
 			set;
 		}
 
+
+
 		[SerializeField]
 		private bool _canTurn = true;
 
@@ -155,7 +157,7 @@ namespace Lockstep
 
 
 		[SerializeField, FixedNumber]
-		private long _acceleration = FixedMath.One;
+		private long _acceleration = FixedMath.One * 8;
 
 		public long Acceleration { get { return _acceleration; } }
 

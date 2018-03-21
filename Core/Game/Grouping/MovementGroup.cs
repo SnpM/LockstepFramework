@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using FastCollections;
-namespace Lockstep {
+namespace Lockstep.EssentialAbilities {
 public class MovementGroup
 {       
     const int MinGroupSize = 2;
