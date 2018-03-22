@@ -598,7 +598,7 @@ namespace Lockstep
 				}
 			}
 			else {
-				if (Target == null)
+				if (Target == null && CanMove)
 					cachedMove.StartMove(position);
 			}
 			IsAttackMoving = true;

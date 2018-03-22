@@ -6,11 +6,13 @@ namespace Lockstep.EssentialAbilities
 {
     public class MovementGroupHelper : BehaviourHelper
     {
+		private ushort _listenInput;
         public override ushort ListenInput
         {
             get
             {
-                return AbilityDataItem.FindInterfacer(typeof (Move)).ListenInputID;
+				
+				return _listenInput;
             }
         }
 
@@ -38,6 +40,7 @@ namespace Lockstep.EssentialAbilities
         {
             Instance = this;
             activeGroups.FastClear();
+			_listenInput = AbilityDataItem.FindInterfacer (typeof(Move)).ListenInputID;
         }
         
         protected override void OnSimulate()
