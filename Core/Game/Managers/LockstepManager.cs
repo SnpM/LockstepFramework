@@ -149,8 +149,6 @@ namespace Lockstep
 				Loaded = true;
 			}
 
-
-
 			DefaultMessageRaiser.EarlyInitialize ();
 
 			LSDatabaseManager.Initialize ();
@@ -256,11 +254,12 @@ namespace Lockstep
 				Debug.LogError ("BOOM");
 				return;
 			}
+			BehaviourHelperManager.Execute (com);
+
 			if (com.ControllerID != byte.MaxValue) {
 				AgentController cont = AgentController.InstanceManagers [com.ControllerID];
 				cont.Execute (com);
 			} else {
-				BehaviourHelperManager.Execute (com);
 			}
 
 			DefaultMessageRaiser.Execute (com);

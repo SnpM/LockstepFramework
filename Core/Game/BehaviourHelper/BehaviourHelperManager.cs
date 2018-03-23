@@ -55,7 +55,7 @@ namespace Lockstep
 		{
 			foreach (ILockstepEventsHandler helper in Helpers)
 			{
-				if (helper.GetListenInput() == com.InputCode)
+				if (helper.ListenInput == com.InputCode)
 				{
 					helper.GlobalExecute(com);
 				}

@@ -1,7 +1,6 @@
 using UnityEngine;
 using System;
 
-using Lockstep.EssentialAbilities;
 namespace Lockstep {
     public class Stats : Ability {
 

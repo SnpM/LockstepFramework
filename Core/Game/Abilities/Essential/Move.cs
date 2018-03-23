@@ -3,7 +3,7 @@ using UnityEngine;
 using Lockstep.Pathfinding;
 using FastCollections;
 
-namespace Lockstep.EssentialAbilities
+namespace Lockstep
 {
 	public class Move : ActiveAbility
 	{

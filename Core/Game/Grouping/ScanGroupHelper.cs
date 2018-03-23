@@ -1,15 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections; using FastCollections;
 using Lockstep.Data;
-using Lockstep.EssentialAbilities;
 namespace Lockstep
 {
 	public class ScanGroupHelper : BehaviourHelper
 	{
-		public override ushort ListenInput {
-			get {
-                return AbilityDataItem.FindInterfacer(typeof (Scan)).ListenInputID;
-			}
+		public override ushort GetListenInput () {
+            return AbilityDataItem.FindInterfacer(typeof (Scan)).ListenInputID;
 		}
 			
 		protected override void OnExecute (Lockstep.Command com)

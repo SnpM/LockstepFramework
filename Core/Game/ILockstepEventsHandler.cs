@@ -3,7 +3,7 @@ namespace Lockstep
 {
 	public interface ILockstepEventsHandler
 	{
-		ushort GetListenInput();
+		ushort ListenInput { get;}
 		void Initialize();
 		void EarlyInitialize();
 		void LateInitialize();

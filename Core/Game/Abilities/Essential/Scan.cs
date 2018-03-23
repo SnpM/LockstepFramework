@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using Lockstep.Data;
-using Lockstep.EssentialAbilities;
 namespace Lockstep
 {
 	[UnityEngine.DisallowMultipleComponent]

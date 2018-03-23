@@ -2,18 +2,13 @@
 using UnityEngine;
 using Lockstep.Data;
 using FastCollections;
-namespace Lockstep.EssentialAbilities
+namespace Lockstep
 {
     public class MovementGroupHelper : BehaviourHelper
     {
-		private ushort _listenInput;
-        public override ushort ListenInput
+        public override ushort GetListenInput ()
         {
-            get
-            {
-				
-				return _listenInput;
-            }
+			return AbilityDataItem.FindInterfacer (typeof(Move)).ListenInputID;
         }
 
 
@@ -40,7 +35,6 @@ namespace Lockstep.EssentialAbilities
         {
             Instance = this;
             activeGroups.FastClear();
-			_listenInput = AbilityDataItem.FindInterfacer (typeof(Move)).ListenInputID;
         }
         
         protected override void OnSimulate()
