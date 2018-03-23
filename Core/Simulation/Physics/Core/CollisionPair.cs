@@ -210,7 +210,7 @@ namespace Lockstep
 			body._position.y += DistY;
 			body.PositionChanged = true;
 
-			if (true) {
+			if (false) {
 				body._velocity.x += DistX / 8;
 				body._velocity.y += DistY / 8;
 				body.VelocityChanged = true;
