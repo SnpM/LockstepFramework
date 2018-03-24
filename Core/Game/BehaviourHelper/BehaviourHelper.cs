@@ -24,21 +24,32 @@ namespace Lockstep
 			get { return CachedListenInput; }
 		}
 
-		public void Initialize()
+
+		public void FirstInitialize()
 		{
-			OnInitialize();
+			CachedListenInput = GetListenInput ();
+			OnFirstInitialize();
+		}
+		/// <summary>
+		/// Initialize independent helpers here.
+		/// </summary>
+		protected virtual void OnFirstInitialize()
+		{
+
 		}
 
 		public void EarlyInitialize()
 		{
-			CachedListenInput = GetListenInput ();
-
 			OnEarlyInitialize();
 		}
 
 		protected virtual void OnEarlyInitialize()
 		{
 
+		}
+		public void Initialize()
+		{
+			OnInitialize();
 		}
 
 		protected virtual void OnInitialize()

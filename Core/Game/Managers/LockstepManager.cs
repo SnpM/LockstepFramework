@@ -148,10 +148,11 @@ namespace Lockstep
 				Setup ();
 				Loaded = true;
 			}
+			//TODO: Fix this sphagetti. Call order and singleton dependency management.
+			LSDatabaseManager.Initialize ();
 
 			DefaultMessageRaiser.EarlyInitialize ();
 
-			LSDatabaseManager.Initialize ();
 			LSUtility.Initialize (1);
 			InfluenceCount = 0;
 			Time.timeScale = 1f;

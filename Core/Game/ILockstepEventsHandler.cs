@@ -4,6 +4,7 @@ namespace Lockstep
 	public interface ILockstepEventsHandler
 	{
 		ushort ListenInput { get;}
+		void FirstInitialize();
 		void Initialize();
 		void EarlyInitialize();
 		void LateInitialize();

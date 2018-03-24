@@ -11,8 +11,13 @@ namespace Lockstep.Data
 
 		[SerializeField]
 		protected bool _playerManaged;
-
 		public bool PlayerManaged { get { return _playerManaged; } }
+
+		[SerializeField,DataCodeAttribute ("Agents")]
+		private string _commanderCode;
+
+		public string CommanderCode { get { return _commanderCode; } }
+
 
 		public AgentControllerDataItem (string name) {
 			_name = name;
