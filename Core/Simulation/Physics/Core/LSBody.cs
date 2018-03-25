@@ -615,7 +615,9 @@ namespace Lockstep
 					DoSetVisualRotation (Rotation);
 				}
 				//PositionalTransform.position = Vector3.SmoothDamp (lastVisualPos, _visualPosition, ref velocityPosition, PhysicsManager.LerpTime);
+				if (CanSetVisualPosition)
 				PositionalTransform.position = Vector3.Lerp (lastVisualPos,VisualPosition, (float)PhysicsManager.ExpectedAccumulation);
+				if (CanSetVisualRotation)
 				RotationalTransform.rotation = Quaternion.Slerp (lastVisualRot, visualRot, (float)PhysicsManager.ExpectedAccumulation);
 
 			}
