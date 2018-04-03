@@ -26,6 +26,12 @@ Quick Setup
 
 Note: The example only shows the basic functionality of the framework. Comprehensive examples will be added close to the end of core development.
 
+**Tutorials and more**
+---------
+To find out more about Lockstep Framework, please explore the wiki (https://github.com/SnpM/LockstepFramework/wiki) and feel free to ask us questions.
+
+Check out tutorial series here: https://github.com/SnpM/LockstepFramework/wiki/Tutorial-Series
+
 Road Map
 ---------
 - DOCUMENTATION - Tutorials for the major features of LS and descriptions of important methods and variables
@@ -54,20 +60,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-//Ability info will go in docs later
-/*
-Ability Pattern
-----------------
-Abilities are moddable behaviors that can be easily attached, detached, and moddified on prefab game objects. They follow the following pattern:
-- The overridable Initialize() method is called when the agent the ability belongs to is created and initialized. It provides an argument that is the agent the ability belongs to. Because LSF uses object pooling, the Ability must also be reset in Initialize(). Note: Lockstep varaibles are implemented but not tested. These will make resetting in Initialize obsolete.
-- Simulate() is called every single simulation frame (FixedUpdate frames).
-- Visualize is called every render frame (Update frames).
-- Deactivate() is called when the ability's agent is deactivated (i.e. killed). Note that Simulate() will not be called until after Initialize() is called again.
-
-ActiveAbility Pattern
-_____________________________
-ActiveAbility inherits from Ability and includes all the patterns described above. In addition ActiveAbilitys can be interacted with by players through Commands.
-- Execute () is called when a Command is received and activates the ability. This method provides an argument that is the Command responsible for the ability's activation.
- */
-
