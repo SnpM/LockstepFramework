@@ -5,6 +5,7 @@ namespace Lockstep.Example
 	
     public class ExampleGameManager : GameManager
     {
+		public bool ShowGUI = true;
         static Replay LastSave = new Replay();
 
 		//        public static void LoadLevel (string levelName) {
@@ -19,6 +20,8 @@ namespace Lockstep.Example
 
         void OnGUI()
         {
+			if (ShowGUI == false)
+				return;
             GUI.matrix = Matrix4x4.TRS(new Vector3(0, 0, 0), Quaternion.identity, new Vector3(2.5f, 2.5f, 1)); 
 
 
