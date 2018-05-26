@@ -31,16 +31,18 @@ namespace Lockstep.Extra
             HeightBounds.Draw();
             
             Interval.Draw();
-            
+
             so.FindProperty ("_bonusHeight").Draw ();
+			so.ApplyModifiedProperties();
+
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Maps",EditorStyles.boldLabel);
             SerializedProperty Maps = so.FindProperty("_maps");
             
             int size = EditorGUILayout.IntField ("Map Count", Maps.arraySize);
-            if (size != Maps.arraySize)
-            Maps.arraySize = size;
-            
+			if (size != Maps.arraySize) {
+				Maps.arraySize = size;
+			}
             so.ApplyModifiedProperties();
             
             for (int i = 0; i < hh.Maps.Length; i++) {
@@ -62,6 +64,7 @@ namespace Lockstep.Extra
             so.ApplyModifiedProperties();
             
             EditorUtility.SetDirty(hh);
+
         }
     }
 }

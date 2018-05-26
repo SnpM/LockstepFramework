@@ -107,9 +107,9 @@ namespace Lockstep
 					property.Next (true);
 					Y = property.Copy ();
 
-					cache = true;
+					cache = false;
 				}
-
+				bool changed = false;
 				Rect contentPosition = EditorGUI.PrefixLabel (position, new GUIContent (name));
 
 				//Check if there is enough space to put the name on the same line (to save space)
@@ -134,8 +134,10 @@ namespace Lockstep
 				{
 					EditorGUI.BeginChangeCheck ();
 					var newVal = FixedNumberField (contentPosition, new GUIContent ("X"), X.longValue);
-					if (EditorGUI.EndChangeCheck ())
+					if (EditorGUI.EndChangeCheck ()) {
 						X.longValue = newVal;
+						changed = true;
+					}
 				}
 				EditorGUI.EndProperty ();
 
@@ -145,10 +147,13 @@ namespace Lockstep
 				{
 					EditorGUI.BeginChangeCheck ();
 					var newVal = FixedNumberField (contentPosition, new GUIContent ("Y"), Y.longValue);
-					if (EditorGUI.EndChangeCheck ())
+					if (EditorGUI.EndChangeCheck ()) {
 						Y.longValue = newVal;
+						changed = true;
+					}
 				}
 				EditorGUI.EndProperty ();
+
 			}
 
 			long FixedNumberField (Rect position, GUIContent label, long value)
