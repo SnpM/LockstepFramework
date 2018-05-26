@@ -153,7 +153,7 @@ namespace Lockstep
 
 			long FixedNumberField (Rect position, GUIContent label, long value)
 			{
-				return FixedMath.Create (EditorGUI.DoubleField (position, new GUIContent ("X"), value.ToDouble ()));
+				return FixedMath.Create (EditorGUI.DoubleField (position, label, value.ToDouble ()));
 			}
 		}
 
