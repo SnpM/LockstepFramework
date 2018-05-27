@@ -119,46 +119,9 @@ namespace Lockstep
             }
         }
 
-        public static Command GetProcessInterfacer(AbilityDataItem facer)
-        {
-
-            if (facer == null)
-            {
-                Debug.LogError("Interfacer does not exist. Can't generate command.");
-                return null;
-            }
-            switch (facer.InformationGather)
-            {
-                case InformationGatherType.Position:
-                    curCom = new Command(facer.ListenInputID);
-					curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
-                    break;
-                case InformationGatherType.Target:
-                    curCom = new Command(facer.ListenInputID);
-                    if (RTSInterfacing.MousedAgent.IsNotNull())
-                    {
-                        curCom.SetData<DefaultData>(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.LocalID));
-                    }
-                    break;
-                case InformationGatherType.PositionOrTarget:
-                    curCom = new Command(facer.ListenInputID);
-                    if (RTSInterfacing.MousedAgent.IsNotNull())
-                    {
-                        curCom.Add<DefaultData>(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.GlobalID));
-                    } else
-                    {
-                        curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
-                    }
-                    break;
-			case InformationGatherType.None:
-                    curCom = new Command(facer.ListenInputID);
-                    break;
-            }
-
-            return curCom;
-        }
+       
         public static void ProcessInterfacer (AbilityDataItem facer) {
-            Command com = GetProcessInterfacer (facer);
+            Command com = RTSInterfacing.GetProcessInterfacer (facer);
             Send(com);
         }
 

@@ -2,6 +2,7 @@
 using System.Collections; using FastCollections;
 using System;
 using UnityEngine.EventSystems;
+using Lockstep.Data;
 namespace Lockstep
 {
 	public static class RTSInterfacing
@@ -17,6 +18,46 @@ namespace Lockstep
 		static float heightDif;
 		static float closestDistance;
 		static LSAgent closestAgent;
+
+		public static Command GetProcessInterfacer(AbilityDataItem facer)
+		{
+
+			if (facer == null)
+			{
+				Debug.LogError("Interfacer does not exist. Can't generate command.");
+				return null;
+			}
+			Command curCom = null;
+			switch (facer.InformationGather)
+			{
+			case InformationGatherType.Position:
+				curCom = new Command(facer.ListenInputID);
+				curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
+				break;
+			case InformationGatherType.Target:
+				curCom = new Command(facer.ListenInputID);
+				if (RTSInterfacing.MousedAgent.IsNotNull())
+				{
+					curCom.SetData<DefaultData>(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.LocalID));
+				}
+				break;
+			case InformationGatherType.PositionOrTarget:
+				curCom = new Command(facer.ListenInputID);
+				if (RTSInterfacing.MousedAgent.IsNotNull())
+				{
+					curCom.Add<DefaultData>(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.GlobalID));
+				} else
+				{
+					curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
+				}
+				break;
+			case InformationGatherType.None:
+				curCom = new Command(facer.ListenInputID);
+				break;
+			}
+
+			return curCom;
+		}
 
 		public static LSAgent GetScreenAgent (Vector2 screenPos, Func<LSAgent, bool> conditional = null)
 		{
