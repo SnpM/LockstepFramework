@@ -23,7 +23,7 @@ namespace Lockstep
         public static int ScanGridSize {get; private set;}
 		public static GridNode[] Grid;
 		private static ScanNode[] ScanGrid;
-		public const int ScanResolution = 4;
+		public const int ScanResolution = 8;
 		public const int SqrScanResolution = ScanResolution * ScanResolution;
         public static long OffsetX {get; private set;}
         public static long OffsetY {get; private set;}
@@ -79,8 +79,6 @@ namespace Lockstep
 		private static void Generate ()
 		{
 
-
-
         #region Pooling; no need to create all those nodes again
 
             if (Grid != null) {
@@ -103,7 +101,7 @@ namespace Lockstep
             }
         #endregion
 
-
+			long startMem = System.GC.GetTotalMemory (true);
 			ScanGrid = new ScanNode[ScanGridSize];
             for (int i = ScanWidth - 1; i >= 0; i--) {
                 for (int j = ScanHeight - 1; j >= 0; j--) {
@@ -120,6 +118,8 @@ namespace Lockstep
                     Grid [GetGridIndex (i,j)] = node;
 				}
 			}
+			long usedMem = System.GC.GetTotalMemory (true) - startMem;
+			Debug.Log ("Grid generated using " + usedMem + " Bytes!");
 		}
 		
 
@@ -146,6 +146,7 @@ namespace Lockstep
                     _settings = DefaultSettings;
                 ApplySettings ();
 
+				//TODO: This might cause desyncs... will test further
                 Generate ();
 
                 for (int i = GridSize - 1; i >= 0; i--) {
