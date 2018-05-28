@@ -726,6 +726,36 @@ namespace Lockstep
 			return (f / snap) * snap;
 		}
 
+		public void GetCoveredNodePositions (long resolution, FastList<Vector2d> output) {
+			long xmin = GetFlooredSnap(this.XMin - FixedMath.Half, FixedMath.One);
+			long ymin = GetFlooredSnap(this.YMin - FixedMath.Half, FixedMath.One);
+
+			long xmax = GetCeiledSnap(this.XMax + FixedMath.Half - xmin, FixedMath.One) + xmin;
+			long ymax = GetCeiledSnap(this.YMax + FixedMath.Half - ymin, FixedMath.One) + ymin;
+
+			long xAcc = 0;
+			long yAcc = 0;
+			for (long x = xmin; x < xmax;) {
+				for (long y = ymin; y < ymax;) {
+					Vector2d checkPos = new Vector2d(x + xAcc, y + xAcc);
+					if (IsPositionCovered(checkPos)) {
+						output.Add(checkPos);
+					}
+					yAcc += resolution;
+					if (yAcc >= FixedMath.One) {
+						//Move on to next node position
+						yAcc -= FixedMath.One;
+						y += FixedMath.One;
+					}
+				}
+				xAcc += resolution;
+				if (xAcc >= FixedMath.One) {
+					xAcc -= FixedMath.One;
+					x += FixedMath.One;
+				}
+			}
+		}
+
 		public void GetCoveredSnappedPositions(long snapSpacing, FastList<Vector2d> output)
 		{
 			//long referenceX = 0,
@@ -735,6 +765,7 @@ namespace Lockstep
 
 			long xmax = GetCeiledSnap(this.XMax + FixedMath.Half - xmin, snapSpacing) + xmin;
 			long ymax = GetCeiledSnap(this.YMax + FixedMath.Half - ymin, snapSpacing) + ymin;
+
 			//Used for getting snapped positions this body covered
 			for (long x = xmin; x < xmax; x += snapSpacing) {
 				for (long y = ymin; y < ymax; y += snapSpacing) {

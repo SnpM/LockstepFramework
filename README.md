@@ -1,6 +1,6 @@
 Lockstep Framework
 ------------------------
-The Lockstep Framework (LSF) is a framework designed for games that especially need lockstep simulations. It includes a deterministic 2D physics engine, pathfinding, behavior system, and more. LSF is integrated with Unity.
+The Lockstep Framework (LSF) is a framework designed for games that need lockstep simulations. It includes a deterministic 2D physics engine, pathfinding, behavior system, and more. LSF is integrated with Unity.
 
 Special thanks to Liv Games (http://www.livgames.com), 360 Studio (http://www.360studio.me), and Thoopid (http://www.thoopid.com/) for supporting the development of Lockstep Framework. Also, thank you GladFox (https://github.com/GladFox) and the community for helping with development.
 
@@ -9,13 +9,12 @@ Created by John Pan (https://github.com/SnpM).
 Features
 __________
 - Deterministic math library and simulation
-- Custom 2D physics engine on the X-Z plane.
+- Custom 2D physics engine on the X-Z plane
 - Behaviour system for both individual agents and globally
 - Lockstep variables - know when and where desyncs happen
-- Size-based pathfinding (big units won't get stuck in those narrow gaps)
+- Size-based pathfinding (big units won't get stuck in narrow gaps)
 - Customizable database system
-- Support for DakrRift and Photon Networking (Forge Networking support deprecated but let me know if you need it)
-- 3D Raycasting
+- Support for DarkRift and Photon Networking (Forge Networking support deprecated but let me know if you need it)
 
 Quick Setup
 -----------
@@ -35,7 +34,6 @@ Check out tutorial series here: https://github.com/SnpM/LockstepFramework/wiki/T
 Road Map
 ---------
 - DOCUMENTATION - Tutorials for the major features of LS and descriptions of important methods and variables
-- Deterministic fog of war
 
 License
 --------

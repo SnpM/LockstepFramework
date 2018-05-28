@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections; using FastCollections;
 using Lockstep;
+using System.Collections.Generic;
 
 //Blocker for static environment pieces in a scene.
 [RequireComponent (typeof (Lockstep.UnityLSBody))]
@@ -22,9 +23,11 @@ public class Blocker : EnvironmentObject
 		CachedBody = this.GetComponent<UnityLSBody> ().InternalBody;
 
         if (this.BlockPathfinding) {
-            const long gridSpacing = FixedMath.One;
+			const long gridSpacing = FixedMath.One;
             bufferCoordinates.FastClear();
-            CachedBody.GetCoveredSnappedPositions (gridSpacing, bufferCoordinates);
+			CachedBody.GetCoveredNodePositions (FixedMath.One / 8, bufferCoordinates);
+
+
             foreach (Vector2d vec in bufferCoordinates) {
     			GridNode node = GridManager.GetNode(vec.x,vec.y);
                 int gridX, gridY;
