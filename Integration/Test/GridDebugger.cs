@@ -65,13 +65,19 @@ namespace Lockstep
                     Gizmos.color = Color.green; //I'm part colorblind... grey doesn't work very well with red
                 Gizmos.DrawCube(node.WorldPos.ToVector3(LeHeight), nodeScale);
 
+				if (node.ClearanceSource != GridNode.DEFAULT_SOURCE) {
+					#if UNITY_EDITOR
+					UnityEditor.Handles.color = Color.red;
+					UnityEditor.Handles.Label (node.WorldPos.ToVector3 (LeHeight), "d" + node.ClearanceDegree.ToString ());
+					#endif
+				}
             }
         }
 
         public enum GridType
         {
             Pathfinding,
-            Building
+            Building,
         }
     }
 }

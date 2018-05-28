@@ -52,6 +52,8 @@ namespace Lockstep
 
 			GenerateNeighbors ();
 			LinkedScanNode = GridManager.GetScanNode (gridX / GridManager.ScanResolution, gridY / GridManager.ScanResolution);
+			_clearanceDegree = DEFAULT_DEGREE;
+			_clearanceSource = DEFAULT_SOURCE;
 			this.FastInitialize ();
 		}
 
@@ -114,26 +116,19 @@ namespace Lockstep
 			}
 		}
 
-		private bool _clearance;
 
-		public bool Clearance {
-			get {
-				CheckUpdateValues ();
-				return _clearance;
-			}
-		}
+		private byte _clearanceSource;
+		internal byte ClearanceSource { get { return _clearanceSource; } }
+		private byte _clearanceDegree;
+		/// <summary>
+		/// How many connections until the closest unwalkable node.
+		/// If a big unit stands directly on this node, it won't be able to fit if the degree is too low.
+		/// </summary>
 
-		bool _extraClearanceObsolete;
-		private bool _extraClearnace;
-
-		public bool ExtraClearance {
-			get {
-				CheckUpdateValues();
-				if (_extraClearanceObsolete) {
-					UpdateExtraClearance ();
-				}
-				return _extraClearnace;
-			}
+		public byte ClearanceDegree{ get {return _clearanceDegree;}}
+		public byte GetClearanceDegree (){
+			CheckUpdateValues ();
+			return _clearanceDegree;
 		}
 
 		void CheckUpdateValues ()
@@ -142,36 +137,43 @@ namespace Lockstep
 				UpdateValues ();
 			}
 		}
-
-		void UpdateExtraClearance ()
-		{
-			_extraClearanceObsolete = false;
-
-			if (Unwalkable) {
-				_extraClearnace = false;
-			} else {
-				_extraClearnace = true;
-				for (int i = 7; i >= 0; i--) {
-					var neighbor = NeighborNodes [i];
-					if (neighbor.IsNull () || !neighbor.Clearance) {
-						_extraClearnace = false;
-					}
-				}
-			}
-		}
-
+		public const byte DEFAULT_DEGREE = byte.MaxValue;
+		public const byte DEFAULT_SOURCE = byte.MaxValue;
 		void UpdateClearance ()
 		{
 			if (Unwalkable) {
-				_clearance = false;
+				_clearanceDegree = 0;
+				_clearanceSource = DEFAULT_SOURCE;
 			} else {
-				_clearance = true;
-				//backward looping is faster
+				if (_clearanceSource <= 7) {
 
+					//refresh source in case the map changed
+					var source = NeighborNodes[_clearanceSource];
+					var prevSourceClearance = source.ClearanceDegree;
+					if (source.ClearanceDegree < _clearanceDegree) {
+						source.UpdateValues ();
+						//It can no longer be trusted!
+						if (source.ClearanceDegree != prevSourceClearance) {
+							_clearanceDegree = DEFAULT_DEGREE;
+							_clearanceSource = DEFAULT_SOURCE;
+						}
+					} else {
+						_clearanceDegree = (byte)(source.ClearanceDegree + 1);
+					}
+				}
+
+				//This method isn't always 100% accurate but after several updates, it will have a better picture of the map
+				//TODO: Test this thoroughly and visualize
 				for (int i = 7; i >= 0; i--) {
 					var neighbor = NeighborNodes [i];
 					if (neighbor.IsNull () || neighbor.Unwalkable) {
-						_clearance = false;
+						_clearanceDegree = 1;
+						_clearanceSource = (byte)i;
+						break;
+					}
+					if (neighbor._clearanceDegree < ClearanceDegree) {
+						_clearanceDegree = (byte)(neighbor._clearanceDegree + 1);
+						_clearanceSource = (byte)i;
 					}
 				}
 			}
@@ -184,7 +186,6 @@ namespace Lockstep
 			//fast enough to just do it
 			UpdateClearance();
 
-			_extraClearanceObsolete = true;
 		}
 
         #region CombinePath
@@ -199,13 +200,14 @@ namespace Lockstep
 			CachedUnpassableCheckSize = size;
 		}
 
+		/// <summary>
+		/// If this unit is too fat to fit.
+		/// </summary>
 		internal bool Unpassable ()
 		{
-			if (CachedUnpassableCheckSize > Pathfinder.SmallSize) {
-				if (CachedUnpassableCheckSize > Pathfinder.MediumSize) {
-					return !ExtraClearance;
-				}
-				return !Clearance;
+			if (true){//CachedUnpassableCheckSize) {
+				//If there's an unwalkable within the size's number of connections, the unit cannot pass
+				return GetClearanceDegree () < CachedUnpassableCheckSize;
 			}
 			return Unwalkable;
 
