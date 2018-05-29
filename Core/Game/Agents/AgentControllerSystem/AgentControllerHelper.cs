@@ -36,6 +36,9 @@ namespace Lockstep {
 				if (item.PlayerManaged) {
 					PlayerManager.AddController (controller);
 				}
+				if (string.IsNullOrEmpty (item.CommanderCode) == false) {
+					controller.CreateCommander (item.CommanderCode);
+				}
 				CodeIDMap.Add (item.Name, controller.ControllerID);
 			}
 		}

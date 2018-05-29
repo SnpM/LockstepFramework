@@ -119,7 +119,7 @@ namespace Lockstep
 				}
 			}
 			long usedMem = System.GC.GetTotalMemory (true) - startMem;
-			Debug.Log ("Grid generated using " + usedMem + " Bytes!");
+			//Debug.Log ("Grid generated using " + usedMem + " Bytes!");
 		}
 		
 
