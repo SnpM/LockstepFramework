@@ -102,6 +102,26 @@ namespace Lockstep {
                 Abilitys[k].Deactivate();
             }
         }
+
+		public Ability GetAbilityWithInput (string inputCode) {
+			//Linear search for first ability with inputCode
+			for (int i = 0; i < ActiveAbilitys.Length; i++) {
+				var abil = ActiveAbilitys [i];
+				if (abil.Data.ListenInputCode == inputCode)
+					return abil;
+			}
+			return null;
+		}
+		public Ability GetAbilityWithInput (int inputID) {
+			//Linear search for first ability with inputID
+			for (int i = 0; i < ActiveAbilitys.Length; i++) {
+				var abil = ActiveAbilitys [i];
+				if (abil.Data.ListenInputID == inputID)
+					return abil;
+			}
+			return null;
+		}
+
 		public Ability GetAbilityAny (Type type)
 		{
 			for (var k = 0; k < Abilitys.Length; k++) {
