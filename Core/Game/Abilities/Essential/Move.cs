@@ -7,9 +7,10 @@ namespace Lockstep
 {
 	public class Move : ActiveAbility
 	{
+		//Stop multipliers determine accuracy required for stopping on the destination
 		public const long FormationStop = FixedMath.One / 4;
 		public const long GroupDirectStop = FixedMath.One;
-		public const long DirectStop = FixedMath.One / 8;
+		public const long DirectStop = FixedMath.One / 4;
 		private const int MinimumOtherStopTime = (int)(LockstepManager.FrameRate / 4);
 		private const int StuckTimeThreshold = LockstepManager.FrameRate / 4;
 		private const int StuckRepathTries = 4;
@@ -112,6 +113,8 @@ namespace Lockstep
 		public Vector2d AveragePosition { get; set; }
 
 		private long timescaledAcceleration;
+		public long timescaledDecceleration;
+		bool decellerating;
 
 		private Vector2d lastTargetPos;
 		private Vector2d targetDirection;
@@ -173,8 +176,10 @@ namespace Lockstep
 			CachedTurn = Agent.GetAbility<Turn> ();
 			CanTurn = _canTurn && CachedTurn != null;
 
-			timescaledAcceleration = Acceleration / LockstepManager.FrameRate;
-
+			timescaledAcceleration = Acceleration.Mul (Speed) / LockstepManager.FrameRate;
+			//Cleaner stops with more decelleration
+			timescaledDecceleration = timescaledAcceleration * 3;
+			//Fatter objects can afford to land imprecisely
 			closingDistance = cachedBody.Radius;
 			stuckTolerance = ((Agent.Body.Radius * Speed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
 			stuckTolerance *= stuckTolerance;
@@ -244,7 +249,7 @@ namespace Lockstep
 			if (!CanMove) {
 				return;
 			}
-
+			//TODO: Organize/split this function
 			if (IsMoving) {
 				Agent.SetState (AnimState.Moving);
 
@@ -329,28 +334,36 @@ namespace Lockstep
 				bool movingToWaypoint = (this.hasPath && this.pathIndex < myPath.Count - 1);
 				long stuckThreshold = 1;
 
-				if (distance > closingDistance || movingToWaypoint) {
-					desiredVelocity = (movementDirection);
+				long slowDistance = cachedBody.VelocityMagnitude.Div (timescaledDecceleration);
 
+
+				if (distance > slowDistance || movingToWaypoint) {
+					desiredVelocity = (movementDirection);
 					if (CanTurn)
 						CachedTurn.StartTurnDirection (movementDirection);
+					stuckThreshold = timescaledAcceleration / 4;
 
-					stuckThreshold = this.timescaledAcceleration / 4;
-				} else {
+				}
+				else {
+
 					if (distance < FixedMath.Mul (closingDistance, StopMultiplier)) {
 						Arrive ();
+						//TODO: Don't skip this frame of slowing down
 						return;
 					}
-					if (this.SlowArrival) {
-						long closingSpeed = distance.Div (closingDistance);
-						desiredVelocity = movementDirection * (closingSpeed);
-						stuckThreshold = closingSpeed / LockstepManager.FrameRate;
-
-					} else {
-						desiredVelocity = (movementDirection);
-						stuckThreshold = this.timescaledAcceleration;
-
+					if (distance > closingDistance) {
+						if (CanTurn)
+							CachedTurn.StartTurnDirection (movementDirection);
 					}
+					if (distance <= slowDistance) {
+						long closingSpeed = distance.Div (slowDistance);
+						if (CanTurn)
+							CachedTurn.StartTurnDirection (movementDirection);
+						desiredVelocity = movementDirection * closingSpeed;
+						stuckThreshold = closingSpeed / LockstepManager.FrameRate;
+						decellerating = true;
+					}
+
 
 				}
 				//If unit has not moved stuckThreshold in a frame, it's stuck
@@ -400,11 +413,13 @@ namespace Lockstep
 
 			} else {
 				//Slowin' down
-				if (cachedBody.VelocityFastMagnitude > 0) {
+				if (cachedBody.VelocityMagnitude > 0) {
 					cachedBody.Velocity += GetAdjustVector (Vector2d.zero);
 				}
 				StoppedTime++;
 			}
+			decellerating = false;
+
 			AutoStopPauser--;
 			CollisionStopPauser--;
 			StopPauseLooker--;
@@ -417,6 +432,10 @@ namespace Lockstep
 			var adjust = desiredVel - cachedBody._velocity;
 			var adjustFastMag = adjust.FastMagnitude ();           
 			//Cap acceleration vector magnitude
+			float accel = timescaledAcceleration;
+			if (decellerating) {
+				accel = timescaledDecceleration;
+			}
 			if (adjustFastMag > timescaledAcceleration * (timescaledAcceleration)) {
 				var mag = FixedMath.Sqrt (adjustFastMag >> FixedMath.SHIFT_AMOUNT);
 				adjust *= timescaledAcceleration.Div (mag);

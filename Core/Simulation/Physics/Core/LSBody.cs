@@ -144,7 +144,7 @@ namespace Lockstep
 		private bool Setted { get; set; }
 
 
-		public long VelocityFastMagnitude { get; private set; }
+		public long VelocityMagnitude { get; private set; }
 
 
 		public bool Active { get; private set; }
@@ -419,7 +419,7 @@ namespace Lockstep
 
 			Priority = BasePriority;
 			Velocity = Vector2d.zero;
-			VelocityFastMagnitude = 0;
+			VelocityMagnitude = 0;
 			LastPosition = _position = StartPosition.ToVector2d();
 			_heightPos = StartPosition.z;
 			_rotation = StartRotation;
@@ -545,13 +545,13 @@ namespace Lockstep
 
 			if (VelocityChanged)
 			{
-				VelocityFastMagnitude = _velocity.FastMagnitude();
+				VelocityMagnitude = _velocity.Magnitude();
 				VelocityChanged = false;
 			}
 
 			LastPosition = _position;
 
-			if (VelocityFastMagnitude != 0)
+			if (VelocityMagnitude != 0)
 			{
 				_position.x += _velocity.x / LockstepManager.FrameRate;
 				_position.y += _velocity.y / LockstepManager.FrameRate;
