@@ -253,6 +253,7 @@ namespace Lockstep
 				Vector2d targetDirection = Target.Body._position - cachedBody._position;
 				long fastMag = targetDirection.FastMagnitude ();
 
+				//TODO: Optimize this instead of recalculating magnitude multiple times
 				if (CheckRange ()) {
 					if (!inRange) {
 						if (CanMove)
@@ -271,8 +272,6 @@ namespace Lockstep
 					if (needTurn) {
 						if (CanTurn) {
 							cachedTurn.StartTurnDirection (targetDirection);
-						} else {
-
 						}
 					} else {
 						if (attackCount >= AttackInterval) {
@@ -321,18 +320,21 @@ namespace Lockstep
 			if (IsWindingUp) {
 				//TODO: Do we need AgentConditional checks here?
 				windupCount += LockstepManager.DeltaTime;
+				if (CanTurn) {
+					Vector2d targetVector = Target.Body._position - cachedBody._position;
+					cachedTurn.StartTurnVector (targetVector);
+				}
 				if (windupCount >= Windup) {
 					windupCount = 0;
 					Fire ();
-					int counter = 0;
-					while (this.attackCount >= attackCount) {
+					while (this.attackCount >= AttackInterval) {
 						//resetting back down after attack is fired
 						this.attackCount -= (this.AttackInterval);
 					}
 					this.attackCount += Windup;
+					IsWindingUp = false;
 				} 
 
-				IsWindingUp = false;
 			} else {
 				windupCount = 0;
 			}
@@ -527,6 +529,7 @@ namespace Lockstep
 
 		public void StopEngage (bool complete = false)
 		{
+			inRange = false;
 			IsWindingUp = false;
 			isFocused = false;
 			if (complete) {

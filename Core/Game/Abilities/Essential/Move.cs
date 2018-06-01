@@ -178,7 +178,7 @@ namespace Lockstep
 
 			timescaledAcceleration = Acceleration.Mul (Speed) / LockstepManager.FrameRate;
 			//Cleaner stops with more decelleration
-			timescaledDecceleration = timescaledAcceleration * 3;
+			timescaledDecceleration = timescaledAcceleration * 4;
 			//Fatter objects can afford to land imprecisely
 			closingDistance = cachedBody.Radius;
 			stuckTolerance = ((Agent.Body.Radius * Speed) >> FixedMath.SHIFT_AMOUNT) / LockstepManager.FrameRate;
@@ -411,6 +411,8 @@ namespace Lockstep
 
 
 			} else {
+				decellerating = true;
+
 				//Slowin' down
 				if (cachedBody.VelocityMagnitude > 0) {
 					cachedBody.Velocity += GetAdjustVector (Vector2d.zero);

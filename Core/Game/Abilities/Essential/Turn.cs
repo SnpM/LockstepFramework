@@ -96,6 +96,10 @@ namespace Lockstep
 			bufferStartTurn = true;
 			bufferTargetRot = targetDirection.ToRotation ();
 		}
+		//TODO: Implement this!
+		public void SetDefaultTurn (Vector2d targetDirection) {
+
+		}
 
 		private void _StartTurn (Vector2d targetRot)
 		{
