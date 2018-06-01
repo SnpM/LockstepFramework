@@ -91,6 +91,8 @@ namespace TypeReferences {
 		}
 
 		public static implicit operator Type(ClassTypeReference typeReference) {
+			if (typeReference == null)
+				return null;
 			return typeReference.Type;
 		}
 
