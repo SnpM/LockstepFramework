@@ -33,6 +33,9 @@ namespace Lockstep {
 			for (int i = 0; i < controllerItems.Length; i++) {
 				var item = controllerItems [i];
 				var controller = AgentController.Create (item.DefaultAllegiance);
+				if (!string.IsNullOrEmpty (item.CommanderCode)) {
+					controller.CreateCommander (item.CommanderCode);
+				}
 				if (item.PlayerManaged) {
 					PlayerManager.AddController (controller);
 				}
@@ -42,15 +45,15 @@ namespace Lockstep {
 				CodeIDMap.Add (item.Name, controller.ControllerID);
 			}
 		}
-			
+
 		public AgentController GetInstanceManager (string controllerCode) {
 			if (string.IsNullOrEmpty (controllerCode)) {
-				Debug.Log ("controllerCode is null or empty.");
+				Debug.Log ("Controller '"+ controllerCode + "' is not set up.");
 				return null;
 			}
 			byte id;
 			if (!CodeIDMap.TryGetValue (controllerCode, out id)) {
-				Debug.Log ("Controller name " + controllerCode + " is not valid.");
+				Debug.Log ("Controller '" + controllerCode + "' is not set up.");
 			}
 
 			return AgentController.GetInstanceManager (id);

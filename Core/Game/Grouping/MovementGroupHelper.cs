@@ -6,12 +6,9 @@ namespace Lockstep
 {
     public class MovementGroupHelper : BehaviourHelper
     {
-        public override ushort ListenInput
+        public override ushort GetListenInput ()
         {
-            get
-            {
-                return AbilityDataItem.FindInterfacer(typeof (Move)).ListenInputID;
-            }
+			return AbilityDataItem.FindInterfacer (typeof(Move)).ListenInputID;
         }
 
 

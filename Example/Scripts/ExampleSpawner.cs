@@ -5,10 +5,8 @@ namespace Lockstep.Example
 {
 	public class ExampleSpawner : BehaviourHelper
 	{
-		public override ushort ListenInput {
-			get {
-				return InputCodeManager.GetCodeID("Spawn");
-			}
+		public override ushort GetListenInput () {
+			return InputCodeManager.GetCodeID("Spawn");
 		}
 
 
