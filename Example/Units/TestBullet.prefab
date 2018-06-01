@@ -54,12 +54,12 @@ MonoBehaviour:
     y: 0
     z: 0
   _speed: 1048576
-  _visualArc: 1
+  _visualArc: 0
   _delay: 0
   _attachEndEffectToTarget: 0
   _hitFX: 
   CanRotate: 1
-  _startFX: Muzzle Ball
+  _startFX: 
   IsActive: 0
   UseEffects: 1
   _canVisualize: 1

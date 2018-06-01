@@ -92,7 +92,7 @@ Transform:
   m_GameObject: {fileID: 100310}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children:
   - {fileID: 450234}
   m_Father: {fileID: 0}
@@ -216,6 +216,7 @@ MonoBehaviour:
   Destination:
     x: 0
     y: 0
+  timescaledDecceleration: 0
   _canMove: 1
   _canTurn: 1
   _speed: 131072
@@ -262,9 +263,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cooldown: 0
   _projectileCode: TestBullet
-  _range: 786432
-  _sight: 983040
-  _damage: 655360
+  _range: 655360
+  _sight: 1966080
+  _damage: 1310720
   _attackInterval: 65536
   _targetAllegiance: 4
   _trackAttackAngle: 1
@@ -295,7 +296,7 @@ MonoBehaviour:
   _selectionPriority: 0
   _selectable: 1
   Tag: 0
-  _selectionRadius: 1
+  _selectionRadius: -1
   _visualCenter: {fileID: 465378}
   VisualPositionChanged: 0
 --- !u!1001 &100100000
@@ -482,7 +483,7 @@ MonoBehaviour:
     _layer: 0
     _halfWidth: 32768
     _halfHeight: 32768
-    _radius: 32768
+    _radius: 65536
     _immovable: 0
     _basePriority: 0
     _vertices: []
