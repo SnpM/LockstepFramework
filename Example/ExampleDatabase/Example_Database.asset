@@ -20,6 +20,10 @@ MonoBehaviour:
     _description: 
     _icon: {fileID: 0}
     _prefab: {fileID: 1473157134852708, guid: 7c0bc57c089f7ee42a2b8219ada3d840, type: 2}
+  - _name: Headquarters
+    _description: 
+    _icon: {fileID: 0}
+    _prefab: {fileID: 1987992853921454, guid: f55ea7fa196d4be419f4e3b58f804404, type: 2}
   _inputData:
   - _name: Attack
   - _name: Move
