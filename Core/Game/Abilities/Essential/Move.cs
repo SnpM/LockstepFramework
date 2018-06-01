@@ -158,7 +158,7 @@ namespace Lockstep
 
 
 		[SerializeField, FixedNumber]
-		private long _acceleration = FixedMath.One;
+		private long _acceleration = FixedMath.One * 4;
 
 		public long Acceleration { get { return _acceleration; } }
 
@@ -332,7 +332,7 @@ namespace Lockstep
 					targetDirection = movementDirection;
 				}
 				bool movingToWaypoint = (this.hasPath && this.pathIndex < myPath.Count - 1);
-				long stuckThreshold = 1;
+				long stuckThreshold = timescaledAcceleration / LockstepManager.FrameRate;
 
 				long slowDistance = cachedBody.VelocityMagnitude.Div (timescaledDecceleration);
 
@@ -341,8 +341,6 @@ namespace Lockstep
 					desiredVelocity = (movementDirection);
 					if (CanTurn)
 						CachedTurn.StartTurnDirection (movementDirection);
-					stuckThreshold = timescaledAcceleration / 4;
-
 				}
 				else {
 
@@ -360,8 +358,9 @@ namespace Lockstep
 						if (CanTurn)
 							CachedTurn.StartTurnDirection (movementDirection);
 						desiredVelocity = movementDirection * closingSpeed;
-						stuckThreshold = closingSpeed / LockstepManager.FrameRate;
 						decellerating = true;
+						//Reduce occurence of units preventing other units from reaching destination
+						stuckThreshold *= 4;
 					}
 
 
