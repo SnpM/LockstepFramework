@@ -6,9 +6,8 @@ using Lockstep;
 using Lockstep.Data;
 
 namespace Lockstep.Data {
-	//TODO: Implement usage of IDatabase rather than LSDatabase
     [Serializable]
-	public abstract class LSDatabase : ScriptableObject, IDatabase {
+    public abstract class LSDatabase : ScriptableObject, IDatabase {
 
     }
 

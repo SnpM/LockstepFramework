@@ -175,35 +175,7 @@ namespace Lockstep
             vec.Lerp(target.x, target.y, amount);
             return vec;
         }
-		public void ClampMagnitude (long min, long max) {
-			long fastMin = min * min;
-			long fastMax = max * max;
-			long mag = this.FastMagnitude ();
-			mag *= mag;
 
-			long normal;
-			//Check if normalization is needed and if so, set scale to normalize to
-			if (mag < fastMin) {
-				normal = fastMin;
-			} else if (mag > mag) {
-				normal = fastMax;
-			} else {
-				return;
-			}
-				
-			//convert from fast multiplied value
-			normal = FixedMath.Sqrt(normal >> FixedMath.SHIFT_AMOUNT);
-
-			mag = FixedMath.Sqrt (mag >> FixedMath.SHIFT_AMOUNT);
-			if (mag.MoreThanEpsilon ()) {
-				//Shift unneeded as fixed fraction canceled through mul then div
-				x = x * normal / mag;
-				y = y * normal / mag;
-			} else {
-				x = 0;
-				y = 0;
-			}
-		}
         public void Rotate(long cos, long sin)
         {
             temp1 = (this.x * cos + this.y * sin) >> FixedMath.SHIFT_AMOUNT;

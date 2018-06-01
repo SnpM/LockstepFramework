@@ -35,8 +35,6 @@ namespace Lockstep.Data {
             //You can also set this manually by dragging the desired database onto the saved LSFSettings in...
             //'Assets/Resources/LockstepFrameworkSettings'
             LSDatabase database = LSFSettingsManager.GetSettings ().Database;
-			if (database == null)
-				Debug.LogError ("No database loaded.");
             _currentDatabase = database;
         }
 

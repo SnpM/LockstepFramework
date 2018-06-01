@@ -10,46 +10,31 @@ namespace Lockstep
 	{
 		private ushort CachedListenInput;
 
-		/// <summary>
-		/// Called once and cached.
-		/// </summary>
-		/// <returns>The listen input.</returns>
-		public virtual ushort GetListenInput ()
+		public virtual ushort ListenInput
 		{
-			return 0;
+			get { return 0; }
 		}
 
-		public ushort ListenInput
+		public ushort GetListenInput()
 		{
-			get { return CachedListenInput; }
+			return CachedListenInput;
 		}
 
-
-		public void FirstInitialize()
+		public void Initialize()
 		{
-			CachedListenInput = GetListenInput ();
-			OnFirstInitialize();
-		}
-		/// <summary>
-		/// Initialize independent helpers here.
-		/// </summary>
-		protected virtual void OnFirstInitialize()
-		{
-
+			OnInitialize();
 		}
 
 		public void EarlyInitialize()
 		{
+			CachedListenInput = ListenInput;
+
 			OnEarlyInitialize();
 		}
 
 		protected virtual void OnEarlyInitialize()
 		{
 
-		}
-		public void Initialize()
-		{
-			OnInitialize();
 		}
 
 		protected virtual void OnInitialize()

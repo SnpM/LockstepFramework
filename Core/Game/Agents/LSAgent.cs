@@ -559,7 +559,6 @@ namespace Lockstep
 			_cachedGameObject = base.gameObject;
 			_unityBody = GetComponent<UnityLSBody>();
 			_animator = GetComponent<LSAnimatorBase>();
-			//TODO: Guarantee determinism
 			_attachedAbilities = GetComponents<Ability>();
 		}
 #if UNITY_EDITOR

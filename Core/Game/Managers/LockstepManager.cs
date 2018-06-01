@@ -148,11 +148,12 @@ namespace Lockstep
 				Setup ();
 				Loaded = true;
 			}
-			//TODO: Fix this sphagetti. Call order and singleton dependency management.
-			LSDatabaseManager.Initialize ();
+
+
 
 			DefaultMessageRaiser.EarlyInitialize ();
 
+			LSDatabaseManager.Initialize ();
 			LSUtility.Initialize (1);
 			InfluenceCount = 0;
 			Time.timeScale = 1f;
@@ -255,12 +256,11 @@ namespace Lockstep
 				Debug.LogError ("BOOM");
 				return;
 			}
-			BehaviourHelperManager.Execute (com);
-
 			if (com.ControllerID != byte.MaxValue) {
 				AgentController cont = AgentController.InstanceManagers [com.ControllerID];
 				cont.Execute (com);
 			} else {
+				BehaviourHelperManager.Execute (com);
 			}
 
 			DefaultMessageRaiser.Execute (com);

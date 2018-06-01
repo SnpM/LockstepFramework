@@ -93,7 +93,6 @@ namespace Lockstep
 				return;
 			}
 
-			//todo: Implement cacher inner-to-outer tile scans to scan less tiles and return the first agent found
 			int xMin = ((position.x - radius - GridManager.OffsetX) / (long)GridManager.ScanResolution).ToInt();
 			int xMax = ((position.x + radius - GridManager.OffsetX) / (long)GridManager.ScanResolution).CeilToInt();
 			int yMin = ((position.y - radius - GridManager.OffsetY) / (long)GridManager.ScanResolution).ToInt();

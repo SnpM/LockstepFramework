@@ -14,7 +14,6 @@ namespace Lockstep
 
 			//Currently deterministic but not guaranteed by Unity
 			// may be add as serialized Array as property?  [SerializeField] private BehaviourHelper[] helpers; ?
-			//TODO: Implement as serialized array and automatically update (maybe before hitting play scene)
 			BehaviourHelper[] helpers = this.gameObject.GetComponentsInChildren<BehaviourHelper>();
 			LockstepManager.Initialize(helpers, networkHelper);
 		}

@@ -20,6 +20,7 @@ namespace Lockstep
 				SpawnInfo info = Spawns [i];
 
 				var controller = AgentControllerHelper.Instance.GetInstanceManager (info.ControllerCode);
+				
 				for (int j = 0; j < info.Count; j++) {
 					LSAgent agent = controller.CreateAgent (info.AgentCode, info.Position);
 					if (AutoCommand)
