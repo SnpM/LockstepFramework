@@ -107,6 +107,10 @@ namespace Lockstep
 			}
 
 
+			//TODO: The time between collision checks might cause goofy behavior
+			//Maybe use a distance or velocity heuristic for culling instead of time since last collision
+			//It wouldn't be able to replace partitions because of raycasts and fast-moving objects
+			//Let's see if this works well or if something better is needed. 
 			if (Body1.PreventCulling || Body2.PreventCulling)
 				CullCounter = -1;
 			else
