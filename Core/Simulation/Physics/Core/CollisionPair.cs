@@ -21,6 +21,9 @@ namespace Lockstep
 		public uint PartitionVersion;
 
 		public ushort _Version = 1;
+		internal ushort TimeSinceLastCollision;
+		internal short CullCounter;
+
 		public bool _isColliding;
 
 		public bool IsColliding {
@@ -44,6 +47,7 @@ namespace Lockstep
 
 		public void Initialize (LSBody b1, LSBody b2)
 		{
+
 			IsValid = true;
 			if (!IsValid)
 				return;
@@ -101,6 +105,16 @@ namespace Lockstep
 			if (DoPhysics) {
 
 			}
+
+
+			if (Body1.PreventCulling || Body2.PreventCulling)
+				CullCounter = -1;
+			else
+				//Immediately check collision
+				CullCounter = 0;
+			//But don't have many checks until the bodies collide
+			TimeSinceLastCollision = PhysicsManager.CullingTimeSinceLastCollisionDefault;
+
 			Active = true;
 			_Version++;
 		}
@@ -231,29 +245,58 @@ namespace Lockstep
 
 		public void CheckAndDistributeCollision ()
 		{
+			if (CullCounter <= 0) {
+				IsCollidingChanged = false;
 
-			if (!Active) {
-				return;
-			}
-			if (_ranIndex < 0) { 
-				_ranIndex = PhysicsManager.RanCollisionPairs.Add (new PhysicsManager.InstanceCollisionPair (_Version, this));
-			}
-			LastFrame = LockstepManager.FrameCount;
-			CurrentCollisionPair = this;
-    
-			IsCollidingChanged = false;
-			if (CheckHeight ()) {
-				bool result = CheckCollision ();
-				if (result != IsColliding) {
-					IsColliding = result;
-					IsCollidingChanged = true;
+				if (!Active) {
+					return;
 				}
-				if (CheckCollision ()) {
-					DistributeCollision ();
-				} 
+				if (_ranIndex < 0) {
+					_ranIndex = PhysicsManager.RanCollisionPairs.Add (new PhysicsManager.InstanceCollisionPair (_Version, this));
+				}
+				LastFrame = LockstepManager.FrameCount;
+				CurrentCollisionPair = this;
+    
+				IsCollidingChanged = false;
+
+				if (CheckHeight ()) {
+					bool result = CheckCollision ();
+
+					if (result != IsColliding) {
+						IsColliding = result;
+						IsCollidingChanged = true;
+					}
+					if (CheckCollision ()) {
+						DistributeCollision ();
+					} 
+				}
+				Body1.NotifyContact (Body2, IsColliding, IsCollidingChanged);
+				Body2.NotifyContact (Body1, IsColliding, IsCollidingChanged);
+				if (IsColliding == false) {
+					//A negative cull counter means a Body is preventing culling
+					if (CullCounter >= 0) {
+						//Set number of frames until next collision check
+						CullCounter = (short)(TimeSinceLastCollision / PhysicsManager.CullingFrequencyStep);
+						if (CullCounter > PhysicsManager.CullingFrequencyMax)
+							CullCounter = PhysicsManager.CullingFrequencyMax;
+					}
+				}
+			} else {
+				//Culled and counter 1 step closer until checking again
+				CullCounter--;
+				if (Body1.Agent == null) {
+					if (Body2.Agent.Data.Name == "TestHero")
+						Debug.Log (CullCounter);
+				}
+
 			}
-			Body1.NotifyContact (Body2, IsColliding, IsCollidingChanged);
-			Body2.NotifyContact (Body1, IsColliding, IsCollidingChanged);
+
+			//For further culling of collisions
+			if (IsColliding) {
+				TimeSinceLastCollision = 0;
+			} else {
+				TimeSinceLastCollision++;
+			}
 		}
 
 		public bool CheckHeight ()

@@ -20,6 +20,13 @@ namespace Lockstep
 
 		public const bool SimulatePhysics = true;
 
+		//After a certain amount of frames have passed without collision, culling frequency will increase
+		internal const int CullingFrequencyStep = LockstepManager.FrameRate;
+		//Maximum amount of frames to wait between checks
+		internal const int CullingFrequencyMax = LockstepManager.FrameRate / 4;
+		//Optimally the rate to increase culling requency is higher when the CollisionPair is first created
+		//but this is much cheaper and effective optimization
+		internal const int CullingTimeSinceLastCollisionDefault = LockstepManager.FrameRate * CullingFrequencyMax / 4;
 
 		static double FixedDeltaTime {
 			get {

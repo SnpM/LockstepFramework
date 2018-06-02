@@ -28,6 +28,8 @@ namespace Lockstep
 		[SerializeField]
 		public Vector2d _velocity;
 
+		[SerializeField, Tooltip ("Useful for fast-moving objects that might pass through if not checked for a frame.")]
+		private bool _preventCulling = false;
 		#endregion
 
 		#region Lockstep variables
@@ -121,6 +123,8 @@ namespace Lockstep
 		public Vector2d LastPosition { get; private set; }
 
 		internal uint RaycastVersion { get; set; }
+
+		internal bool PreventCulling { get { return _preventCulling; } }
 
 		#endregion
 
