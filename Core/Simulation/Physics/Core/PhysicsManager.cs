@@ -30,7 +30,7 @@ namespace Lockstep
 		internal const int CullDistanceMax = LockstepManager.FrameRate / 2;
 		internal const long CullFastDistanceMax = (FixedMath.One * 4) * (FixedMath.One * 4);
 
-		internal const int CullTimeStep = LockstepManager.FrameRate / 8;
+		internal const int CullTimeStep = LockstepManager.FrameRate * 8;
 		internal const int CullTimeMax = LockstepManager.FrameRate / 8;
 		#endregion
 

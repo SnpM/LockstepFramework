@@ -292,22 +292,20 @@ namespace Lockstep
 						if (PreventDistanceCull) {
 							CullCounter = (short)(
 								(LockstepManager.FrameCount - LastCollidedFrame) / PhysicsManager.CullTimeStep);
+							if (CullCounter > PhysicsManager.CullTimeMax)
+								CullCounter = PhysicsManager.CullTimeMax;
 						} else {
 							//Set number of frames until next collision check based on distance
-							var distanceCull = (
+							CullCounter = (short)(
 							                      ((FastDistance - FastCollideDistance) >> FixedMath.SHIFT_AMOUNT)
 							                      / PhysicsManager.CullDistanceStep + PhysicsManager.CullDistributor
 							                  );
-							if (distanceCull > PhysicsManager.CullDistanceMax)
-								distanceCull = PhysicsManager.CullDistanceMax;
-							if (distanceCull < 0)
-								distanceCull = 0;
-						
-							var timeCull = (LockstepManager.FrameCount - LastCollidedFrame) / PhysicsManager.CullTimeStep;
-							if (timeCull > PhysicsManager.CullTimeMax)
-								timeCull = PhysicsManager.CullTimeMax;
+							if (CullCounter > PhysicsManager.CullDistanceMax)
+								CullCounter = PhysicsManager.CullDistanceMax;
+							if (CullCounter < 0)
+								CullCounter = 0;
 
-							CullCounter = (short)(distanceCull + timeCull);
+
 						}
 
 
