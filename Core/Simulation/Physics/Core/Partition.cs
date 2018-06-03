@@ -14,8 +14,8 @@ namespace Lockstep
 	public static class Partition
 	{
 		#region Settings
-		public const int DefaultCount = 512;
-		public const int AdditionalShiftSize = 4;
+		public const int DefaultCount = 256;
+		public const int AdditionalShiftSize = 3;
 		public const int ShiftSize = FixedMath.SHIFT_AMOUNT + AdditionalShiftSize;
 		public const long BlockSize = 1L << ShiftSize;
 		public static int BoundX { get; private set; } //Lower bound X
