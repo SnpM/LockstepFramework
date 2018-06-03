@@ -21,13 +21,18 @@ namespace Lockstep
 		public const bool SimulatePhysics = true;
 
 		//After a certain amount of frames have passed without collision, culling frequency will increase
-		internal const int CullingFrequencyStep = LockstepManager.FrameRate;
+		internal const long CullFrequencyStep = FixedMath.One * 2;
 		//Maximum amount of frames to wait between checks
-		internal const int CullingFrequencyMax = LockstepManager.FrameRate / 4;
-		//Optimally the rate to increase culling requency is higher when the CollisionPair is first created
-		//but this is much cheaper and effective optimization
-		internal const int CullingTimeSinceLastCollisionDefault = LockstepManager.FrameRate * CullingFrequencyMax / 4;
+		internal const int CullFrequencyMax = LockstepManager.FrameRate / 2;
 
+		static int _cullDistributor;
+		internal static int CullDistributor {
+			get {
+				if (_cullDistributor > 1)
+					_cullDistributor = -1;
+				return _cullDistributor++;
+			}
+		}
 		static double FixedDeltaTime {
 			get {
 				return 1d / LockstepManager.FrameRate;
@@ -170,8 +175,10 @@ namespace Lockstep
 		public static bool ResetAccumulation {get; private set;}
 		public static void LateSimulate()
 		{
-			//2 seconds before turning off
-			int inactiveFrameThreshold = 0;
+			//TODO: Look into this
+			//8 seconds before turning off
+			int inactiveFrameThreshold = LockstepManager.FrameRate * 8;
+
 
 			for (int i = 0; i < RanCollisionPairs.PeakCount; i++) {
 				if (RanCollisionPairs.arrayAllocation[i]) {
@@ -222,6 +229,7 @@ namespace Lockstep
 					}
 				}
 			}
+
 			for (int i = 0; i < DynamicSimObjects.PeakCount; i++) {
 				LSBody b1 = DynamicSimObjects.innerArray[i];
 				if (b1.IsNotNull()) {
@@ -356,8 +364,31 @@ namespace Lockstep
 				body.DynamicID = -1;
 			}
 		}
+		/// <summary>
+		/// Takes away some safety checks
+		/// </summary>
 
+		internal static CollisionPair GetCollisionPairRaw (int ID1, int ID2) {
+			LSBody body1;
+			LSBody body2;
+			if ((body1 = SimObjects[ID1]).IsNotNull() && (body2 = SimObjects[ID2]).IsNotNull()) {
+				if (body1.ID < body2.ID) {
+				} else {
+					var temp = body1;
+					body1 = body2;
+					body2 = temp;
+				}
 
+				CollisionPair pair;
+				if (!body1.CollisionPairs.TryGetValue(body2.ID, out pair)) {
+					pair = CreatePair(body1, body2);
+					body1.CollisionPairs.Add(body2.ID, pair);
+					body2.CollisionPairHolders.Add(body1.ID);
+				}
+				return pair;
+			}
+			return null;
+		}
 		public static CollisionPair GetCollisionPair(int ID1, int ID2)
 		{
 			LSBody body1;

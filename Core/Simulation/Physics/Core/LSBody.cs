@@ -170,6 +170,10 @@ namespace Lockstep
 		public Vector2d[] Edges;
 		public Vector2d[] EdgeNorms;
 
+		/// <summary>
+		/// Used for preventing culling for the first frame this object is added to a new partition node.
+		/// </summary>
+		internal bool PartitionChanged {get; set;}
 
 		public long XMin { get; private set; }
 
@@ -467,6 +471,7 @@ namespace Lockstep
 			SetVisuals ();
 			velocityPosition = Vector3.zero;
             this.ImmovableCollisionDirection = Vector2d.zero;
+			PartitionChanged = true;
 		}
 
 		void CheckVariables()
@@ -564,6 +569,7 @@ namespace Lockstep
 
 			BuildChangedValues();
 
+			PartitionChanged = false;
 			if (PositionChanged || this.PositionChangedBuffer)
 			{
 				Partition.UpdateObject(this);

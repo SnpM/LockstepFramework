@@ -15,8 +15,9 @@ namespace Lockstep
 	{
 		#region Settings
 		public const int DefaultCount = 512;
-		public const int AdditionalShiftSize = 2;
+		public const int AdditionalShiftSize = 4;
 		public const int ShiftSize = FixedMath.SHIFT_AMOUNT + AdditionalShiftSize;
+		public const long BlockSize = 1L << ShiftSize;
 		public static int BoundX { get; private set; } //Lower bound X
 		public static int BoundY { get; private set; } //Lower bound Y
 													   //Offset due to partition nodes being centered on grid positions
@@ -67,6 +68,7 @@ namespace Lockstep
 				Body.PastGridYMin != GridYMin ||
 			     Body.PastGridYMax != GridYMax)) {
 
+				//Remove from all partitions no longer located on
 				for (int o = Body.PastGridXMin; o <= Body.PastGridXMax; o++) {
 					for (int p = Body.PastGridYMin; p <= Body.PastGridYMax; p++) {
 						PartitionNode node = GetNode (o, p);
@@ -149,6 +151,7 @@ namespace Lockstep
 			for (int i = GridXMin; i <= GridXMax; i++) {
 				for (int j = GridYMin; j <= GridYMax; j++) {
 					PartitionNode node = GetNode (i, j);
+					Body.PartitionChanged = true;
 					if (Body.Immovable)
                     {
                         node.AddImmovable (Body.ID);
