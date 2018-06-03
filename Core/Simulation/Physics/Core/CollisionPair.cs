@@ -129,6 +129,10 @@ namespace Lockstep
 				Body2.NotifyContact (Body1, false, IsColliding);
 			}
 			Active = false;
+			if (_ranIndex >= 0) {
+				PhysicsManager.RanCollisionPairs.RemoveAt (_ranIndex);
+				_ranIndex = -1;
+			}
 		}
 
 		static long dist, depth;
@@ -259,9 +263,7 @@ namespace Lockstep
 			IsCollidingChanged = false;
 			LastFrame = LockstepManager.FrameCount;
 			CurrentCollisionPair = this;
-
 			if (CullCounter <= 0) {
-    
 				GenerateCircleValues ();
 				if (CheckHeight ()) {
 					bool result = CheckCollision ();
@@ -281,7 +283,6 @@ namespace Lockstep
 					if (CullCounter >= 0) {
 						//Set number of frames until next collision check
 						CullCounter = (short)((FastDistance >> FixedMath.SHIFT_AMOUNT) / PhysicsManager.CullFrequencyStep + PhysicsManager.CullDistributor);
-						Debug.Log (CullCounter);
 						if (CullCounter > PhysicsManager.CullFrequencyMax)
 							CullCounter = PhysicsManager.CullFrequencyMax;
 						else if (CullCounter < 0)
