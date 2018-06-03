@@ -20,10 +20,19 @@ namespace Lockstep
 
 		public const bool SimulatePhysics = true;
 
+		#region Culling
 		//After a certain amount of frames have passed without collision, culling frequency will increase
-		internal const long CullFrequencyStep = FixedMath.One * 2;
+		//Currently scales to have BlockSize result in CulFrequencyMax
+		internal const long CullDistanceStep =
+			(((Partition.BlockSize + FixedMath.One) * (Partition.BlockSize + FixedMath.One)) >> FixedMath.SHIFT_AMOUNT) 
+			/ CullDistanceMax;
 		//Maximum amount of frames to wait between checks
-		internal const int CullFrequencyMax = LockstepManager.FrameRate / 2;
+		internal const int CullDistanceMax = LockstepManager.FrameRate / 2;
+		internal const long CullFastDistanceMax = (FixedMath.One * 4) * (FixedMath.One * 4);
+
+		internal const int CullTimeStep = LockstepManager.FrameRate / 8;
+		internal const int CullTimeMax = LockstepManager.FrameRate / 8;
+		#endregion
 
 		static int _cullDistributor;
 		internal static int CullDistributor {
@@ -176,7 +185,6 @@ namespace Lockstep
 		public static void LateSimulate()
 		{
 			//TODO: Look into this
-			//8 seconds before turning off
 			int inactiveFrameThreshold = LockstepManager.FrameRate * 8;
 
 
@@ -186,47 +194,33 @@ namespace Lockstep
 					var pair = RanCollisionPairs[i].Pair;
 
 					if (instancePair.Version != instancePair.Pair._Version) {
-						RanCollisionPairs.RemoveAt(i);
-						pair._ranIndex = -1;
-
+						//pair is removed at Deactivate so no longer possible
 					} else {
-						if (pair.LastFrame == LockstepManager.FrameCount) {
-
-						} else if (pair._ranIndex >= 0) {
-#if false
-							if (!RanCollisionPairs.SafeRemoveAt(pair._ranIndex, instancePair))
-						{
-							Debug.Log("Removal Failed");
-						}
-#else
+						if (pair._ranIndex >= 0) {
 							RanCollisionPairs.RemoveAt(pair._ranIndex);
-#endif
-
 							pair._ranIndex = -1;
-
 							InactiveCollisionPairs.Add(instancePair);
 						}
 					}
 				}
 			}
 
+			//Clear the buffer of collision pairs to turn off and pool
 			while (InactiveCollisionPairs.Count > 0) {
 				var instancePair = InactiveCollisionPairs.Peek();
 				var pair = instancePair.Pair;
-				if (instancePair.Version != pair._Version) {
+
+				if (pair.Active) {
+					//It's active again! Get it out of inactives and move on to the next guy.
 					InactiveCollisionPairs.Remove();
+				}
+
+				var passedFrames = LockstepManager.FrameCount - pair.LastFrame;
+				if (passedFrames >= inactiveFrameThreshold) {
+					InactiveCollisionPairs.Remove ();
+					FullDeactivateCollisionPair (pair);
 				} else {
-					int dif = LockstepManager.FrameCount - pair.LastFrame;
-					if (dif == 0) {
-						InactiveCollisionPairs.Remove();
-					} else {
-						if (dif >= inactiveFrameThreshold) {
-							FullDeactivateCollisionPair(pair);
-							InactiveCollisionPairs.Remove();
-						} else {
-							break;
-						}
-					}
+					break;
 				}
 			}
 

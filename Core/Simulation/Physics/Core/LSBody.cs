@@ -28,6 +28,10 @@ namespace Lockstep
 		[SerializeField]
 		public Vector2d _velocity;
 
+		//TODO: Account for teleports when culling.
+		/// <summary>
+		/// Used to prevent distance culling for very large objects.
+		/// </summary>
 		[SerializeField, Tooltip ("Useful for fast-moving objects that might pass through if not checked for a frame.")]
 		private bool _preventCulling = false;
 		#endregion
@@ -275,6 +279,10 @@ namespace Lockstep
 		[SerializeField, FixedNumber]
 		protected long _radius = FixedMath.Half;
 
+		/// <summary>
+		/// Gets the bounding circle radius.
+		/// </summary>
+		/// <value>The radius.</value>
 		public long Radius { get { return _radius; } }
 
 		[SerializeField]
@@ -386,12 +394,7 @@ namespace Lockstep
 			if (Shape == ColliderType.Circle) {
 				_radius = Radius;
 			} else if (Shape == ColliderType.AABox) {
-				if (HalfHeight == HalfWidth) {
-					_radius = FixedMath.Sqrt((HalfHeight * HalfHeight * 2) >> FixedMath.SHIFT_AMOUNT);
-				} else {
-					_radius = FixedMath.Sqrt((HalfHeight * HalfHeight + HalfWidth * HalfWidth) >> FixedMath.SHIFT_AMOUNT);
-				}
-
+				_radius = FixedMath.Sqrt((HalfHeight * HalfHeight + HalfWidth * HalfWidth) >> FixedMath.SHIFT_AMOUNT);
 			} else if (Shape == ColliderType.Polygon) {
 				long BiggestSqrRadius = Vertices[0].SqrMagnitude();
 				for (int i = 1; i < Vertices.Length; i++) {
@@ -472,6 +475,8 @@ namespace Lockstep
 			velocityPosition = Vector3.zero;
             this.ImmovableCollisionDirection = Vector2d.zero;
 			PartitionChanged = true;
+
+
 		}
 
 		void CheckVariables()

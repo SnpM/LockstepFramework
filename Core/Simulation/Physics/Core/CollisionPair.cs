@@ -22,7 +22,10 @@ namespace Lockstep
 		public uint PartitionVersion;
 
 		public ushort _Version = 1;
+		//If negative, prevent culling altogether
 		internal short CullCounter;
+		internal bool PreventDistanceCull;
+		internal int LastCollidedFrame;
 
 		public bool _isColliding;
 
@@ -112,12 +115,16 @@ namespace Lockstep
 			//Maybe use a distance or velocity heuristic for culling instead of time since last collision
 			//It wouldn't be able to replace partitions because of raycasts and fast-moving objects
 			//Let's see if this works well or if something better is needed. 
-			if (Body1.PreventCulling || Body2.PreventCulling)
+			if (Body1.PreventCulling || Body2.PreventCulling) {
+				//Never cull
 				CullCounter = -1;
-			else
+			}
+			else {
 				//Immediately check collision
 				CullCounter = 0;
-
+				//If collision distance is too large, don't cull based on distance
+				PreventDistanceCull = FastCollideDistance > PhysicsManager.CullFastDistanceMax;
+			}
 			Active = true;
 			_Version++;
 		}
@@ -281,13 +288,32 @@ namespace Lockstep
 				if (IsColliding == false) {
 					//A negative cull counter means a Body is preventing culling
 					if (CullCounter >= 0) {
-						//Set number of frames until next collision check
-						CullCounter = (short)((FastDistance >> FixedMath.SHIFT_AMOUNT) / PhysicsManager.CullFrequencyStep + PhysicsManager.CullDistributor);
-						if (CullCounter > PhysicsManager.CullFrequencyMax)
-							CullCounter = PhysicsManager.CullFrequencyMax;
-						else if (CullCounter < 0)
-							CullCounter = 0;
+
+						if (PreventDistanceCull) {
+							CullCounter = (short)(
+								(LockstepManager.FrameCount - LastCollidedFrame) / PhysicsManager.CullTimeStep);
+						} else {
+							//Set number of frames until next collision check based on distance
+							var distanceCull = (
+							                      ((FastDistance - FastCollideDistance) >> FixedMath.SHIFT_AMOUNT)
+							                      / PhysicsManager.CullDistanceStep + PhysicsManager.CullDistributor
+							                  );
+							if (distanceCull > PhysicsManager.CullDistanceMax)
+								distanceCull = PhysicsManager.CullDistanceMax;
+							if (distanceCull < 0)
+								distanceCull = 0;
+						
+							var timeCull = (LockstepManager.FrameCount - LastCollidedFrame) / PhysicsManager.CullTimeStep;
+							if (timeCull > PhysicsManager.CullTimeMax)
+								timeCull = PhysicsManager.CullTimeMax;
+
+							CullCounter = (short)(distanceCull + timeCull);
+						}
+
+
 					}
+				} else {
+					LastCollidedFrame = LockstepManager.FrameCount;
 				}
 			} else {
 				if (Body1.PartitionChanged || Body2.PartitionChanged) {
