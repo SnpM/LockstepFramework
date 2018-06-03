@@ -26,6 +26,7 @@ namespace Lockstep
 		internal short CullCounter;
 		internal bool PreventDistanceCull;
 		internal int LastCollidedFrame;
+		private long FastDistanceOffset;
 
 		public bool _isColliding;
 
@@ -124,6 +125,9 @@ namespace Lockstep
 				CullCounter = 0;
 				//If collision distance is too large, don't cull based on distance
 				PreventDistanceCull = FastCollideDistance > PhysicsManager.CullFastDistanceMax;
+				LastCollidedFrame = LockstepManager.FrameCount;
+				FastDistanceOffset = FixedMath.Sqrt (FastCollideDistance >> FixedMath.SHIFT_AMOUNT) + FixedMath.One * 2;
+				FastDistanceOffset *= FastDistanceOffset;
 			}
 			Active = true;
 			_Version++;
@@ -259,11 +263,10 @@ namespace Lockstep
 
 		public void CheckAndDistributeCollision ()
 		{
+			
 			if (!Active) {
 				return;
 			}
-
-
 			if (_ranIndex < 0) {
 				_ranIndex = PhysicsManager.RanCollisionPairs.Add (new PhysicsManager.InstanceCollisionPair (_Version, this));
 			}
@@ -296,18 +299,21 @@ namespace Lockstep
 								CullCounter = PhysicsManager.CullTimeMax;
 						} else {
 							//Set number of frames until next collision check based on distance
-							CullCounter = (short)(
-							                      ((FastDistance - FastCollideDistance) >> FixedMath.SHIFT_AMOUNT)
+							var distCull = (
+										((FastDistance - FastDistanceOffset) >> FixedMath.SHIFT_AMOUNT)
 							                      / PhysicsManager.CullDistanceStep + PhysicsManager.CullDistributor
 							                  );
-							if (CullCounter > PhysicsManager.CullDistanceMax)
-								CullCounter = PhysicsManager.CullDistanceMax;
-							if (CullCounter < 0)
-								CullCounter = 0;
+							if (distCull > PhysicsManager.CullDistanceMax)
+								distCull = PhysicsManager.CullDistanceMax;
+							if (distCull < 0)
+								distCull = 0;
 
+							var timeCull = (LockstepManager.FrameCount - LastCollidedFrame) / PhysicsManager.CullTimeStep;
+							if (timeCull > PhysicsManager.CullTimeMax)
+								timeCull = PhysicsManager.CullTimeMax;
 
+							CullCounter = (short)(timeCull + distCull);
 						}
-
 
 					}
 				} else {

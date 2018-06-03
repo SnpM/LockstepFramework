@@ -556,7 +556,6 @@ namespace Lockstep
 
 		public void Simulate()
 		{
-
 			if (VelocityChanged)
 			{
 				VelocityMagnitude = _velocity.Magnitude();

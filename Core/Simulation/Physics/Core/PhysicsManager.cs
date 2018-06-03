@@ -24,14 +24,14 @@ namespace Lockstep
 		//After a certain amount of frames have passed without collision, culling frequency will increase
 		//Currently scales to have BlockSize result in CulFrequencyMax
 		internal const long CullDistanceStep =
-			(((Partition.BlockSize + FixedMath.One) * (Partition.BlockSize + FixedMath.One)) >> FixedMath.SHIFT_AMOUNT) 
+			(((Partition.BlockSize + FixedMath.One * 2) * (Partition.BlockSize + FixedMath.One * 2)) >> FixedMath.SHIFT_AMOUNT)
 			/ CullDistanceMax;
 		//Maximum amount of frames to wait between checks
-		internal const int CullDistanceMax = LockstepManager.FrameRate / 2;
+		internal const int CullDistanceMax = LockstepManager.FrameRate / 3;
 		internal const long CullFastDistanceMax = (FixedMath.One * 4) * (FixedMath.One * 4);
 
-		internal const int CullTimeStep = LockstepManager.FrameRate * 8;
-		internal const int CullTimeMax = LockstepManager.FrameRate / 8;
+		internal const int CullTimeStep = LockstepManager.FrameRate * 3;
+		internal const int CullTimeMax = LockstepManager.FrameRate / 5;
 		#endregion
 
 		static int _cullDistributor;
