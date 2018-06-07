@@ -516,6 +516,7 @@ namespace Lockstep
 					fastRangeToTarget *= fastRangeToTarget;
 
 					if (!CheckRange ()) {
+						if (CanMove)
 						cachedMove.StartMove (Target.Body.Position);
 					}
 				}
