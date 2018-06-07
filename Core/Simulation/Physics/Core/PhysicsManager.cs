@@ -184,9 +184,8 @@ namespace Lockstep
 		public static bool ResetAccumulation {get; private set;}
 		public static void LateSimulate()
 		{
-			//TODO: Look into this
-			int inactiveFrameThreshold = LockstepManager.FrameRate * 8;
-
+			
+			int inactiveFrameThreshold = LockstepManager.FrameRate * 1;
 
 			for (int i = 0; i < RanCollisionPairs.PeakCount; i++) {
 				if (RanCollisionPairs.arrayAllocation[i]) {
@@ -294,13 +293,13 @@ namespace Lockstep
 			return id;
 		}
 
-		private static FastStack<CollisionPair> CachedCollisionPairs = new FastStack<CollisionPair>();
+		private static FastStack<CollisionPair> PooledCollisionPairs = new FastStack<CollisionPair>();
 
 		private static CollisionPair CreatePair(LSBody body1, LSBody body2)
 		{
 			CollisionPair pair;
-			if (CachedCollisionPairs.Count > 0) {
-				pair = CachedCollisionPairs.Pop();
+			if (PooledCollisionPairs.Count > 0) {
+				pair = PooledCollisionPairs.Pop();
 			} else {
 				pair = new CollisionPair();
 			}
@@ -337,7 +336,7 @@ namespace Lockstep
 		{
 			pair.Deactivate();
 			if (LockstepManager.PoolingEnabled)
-				CachedCollisionPairs.Add(pair);
+				PooledCollisionPairs.Add(pair);
 		}
 
 		internal static void Dessimilate(LSBody body)
