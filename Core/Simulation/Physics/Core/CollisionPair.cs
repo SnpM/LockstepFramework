@@ -167,13 +167,6 @@ namespace Lockstep
 				DistY = Body1._position.y - Body2._position.y;
 				dist = FixedMath.Sqrt ((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT);
 
-				if (dist == 0 && DistY == 0) {
-					//If objects are on the same position, give them push in random direction
-					const long randomMax = FixedMath.One / 32;
-					DistX += LSUtility.GetRandomLong (randomMax) - randomMax / 2;
-					DistY += LSUtility.GetRandomLong (randomMax) - randomMax / 2;
-					return;
-				}
 				depth = (Body1.Radius + Body2.Radius - dist);
 
 				DistX = (DistX * depth / dist);
