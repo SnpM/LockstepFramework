@@ -157,23 +157,26 @@ namespace Lockstep
 		static long dist, depth;
 
 
-		private void DistributeCollision ()
+		internal void DistributeCollision ()
 		{
 			if (!DoPhysics)
 				return;
 			switch (LeCollisionType) {
 			case CollisionType.Circle_Circle:
-				DistX = Body1._position.x - Body2._position.x;
-				DistY = Body1._position.y - Body2._position.y;
-				dist = FixedMath.Sqrt ((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT);
+				dist = FixedMath.Sqrt (FastDistance >> FixedMath.SHIFT_AMOUNT);
 
 				depth = (Body1.Radius + Body2.Radius - dist);
 
-				DistX = (DistX * depth / dist);
-				DistY = (DistY * depth / dist);
+
 				if (depth <= 0) {
 					return;
 				}
+
+				if (dist == 0)
+					dist = 1;
+				//Minimum vector to no longer be colliding
+				DistX = (DistX * depth / dist);
+				DistY = (DistY * depth / dist);
 				//Resolving collision
 				//Note: Immovable bodies don't check collision against each other so this case doesn't need to be considered
 				if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority)) {
@@ -239,7 +242,7 @@ namespace Lockstep
 			body._position.y += DistY;
 			body.PositionChanged = true;
 
-			if (true) {
+			if (false) {
 				body._velocity.x += DistX / 8;
 				body._velocity.y += DistY / 8;
 				body.VelocityChanged = true;
@@ -269,14 +272,16 @@ namespace Lockstep
 			if (!Active) {
 				return;
 			}
-			if (_ranIndex < 0) {
-				_ranIndex = PhysicsManager.RanCollisionPairs.Add (new PhysicsManager.InstanceCollisionPair (_Version, this));
+			if (OnlyAffectBody1 == false) {
+				if (_ranIndex < 0) {
+					_ranIndex = PhysicsManager.RanCollisionPairs.Add (new PhysicsManager.InstanceCollisionPair (_Version, this));
+				}
 			}
 			IsCollidingChanged = false;
 			LastFrame = LockstepManager.FrameCount;
 			CurrentCollisionPair = this;
 			if (CullCounter <= 0) {
-				GenerateCircleValues ();
+				GenerateInitialValues ();
 				if (CheckHeight ()) {
 					bool result = CheckCollision ();
 
@@ -284,7 +289,7 @@ namespace Lockstep
 						IsColliding = result;
 						IsCollidingChanged = true;
 					}
-					if (CheckCollision ()) {
+					if (result) {
 						DistributeCollision ();
 					} 
 				}
@@ -452,8 +457,9 @@ namespace Lockstep
 			return false;
 		}
 
-		internal void GenerateCircleValues () {
-			if (Body1 == null || Body2 == null)
+		internal void GenerateInitialValues () {
+			//if (Body1 == null || Body2 == null) What?
+			DistX = Body1._position.x - Body2._position.x;
 			DistY = Body1._position.y - Body2._position.y;
 			FastDistance = DistX * DistX + DistY * DistY;
 		}

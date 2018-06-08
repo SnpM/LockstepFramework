@@ -67,16 +67,8 @@ namespace Lockstep.Extras {
 			var pair = GetCollisionPair (ghost, ID2);
 			if (pair == null)
 				return;
-			pair.GenerateCircleValues ();
-			if (pair.CheckHeight ()) {
-				bool result = pair.CheckCollision ();
-
-				if (pair.CheckCollision ()) {
-					//Note: Ensure that ghost body is lower priority so it doesn't move the other body
-					//TODO: This is extremely dangerous. Should copy-paste functions be made to not allow room for desync?
-					pair.CheckAndDistributeCollision ();
-				} 
-			}
+			//CollisionPair.OnlyAffectBody1 should solve simulation-polluting
+			pair.CheckAndDistributeCollision ();
 			pair.NotifyBody1 ();
 
 		}

@@ -346,11 +346,14 @@ namespace Lockstep
 
 		public void Add (LSInfluencer influencer)
 		{
+			if (LinkedScanNode != null)
 			LinkedScanNode.Add (influencer);
 		}
 
 		public void Remove (LSInfluencer influencer)
 		{
+			if (LinkedScanNode != null)
+
 			LinkedScanNode.Remove (influencer);
 		}
 
