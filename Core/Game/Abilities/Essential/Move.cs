@@ -113,7 +113,7 @@ namespace Lockstep
 		public Vector2d AveragePosition { get; set; }
 
 		private long timescaledAcceleration;
-		public long timescaledDecceleration;
+		private long timescaledDecceleration;
 		bool decellerating;
 
 		private Vector2d lastTargetPos;

@@ -182,6 +182,7 @@ namespace Lockstep.Legacy
 		public Vector2d[] Edges;
 		public Vector2d[] EdgeNorms;
 
+		public bool ChangedPartition { get; set; }
         
 		public long XMin { get; private set; }
 

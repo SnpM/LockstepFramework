@@ -108,5 +108,54 @@ namespace Lockstep
             y = reader.ReadLong();
             z = reader.ReadLong();
         }
+
+		#region Operators
+
+		public static Vector3d operator +(Vector3d v1, Vector3d v2)
+		{
+			return new Vector3d(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+		}
+
+		public static Vector3d operator -(Vector3d v1, Vector3d v2)
+		{
+			return new Vector3d(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+		}
+
+		public static Vector3d operator *(Vector3d v1, long mag)
+		{
+			return new Vector3d((v1.x * mag) >> FixedMath.SHIFT_AMOUNT, (v1.y * mag) >> FixedMath.SHIFT_AMOUNT, (v1.z * mag) >> FixedMath.SHIFT_AMOUNT);
+		}
+
+		public static Vector3d operator *(Vector3d v1, int mag)
+		{
+			return new Vector3d((v1.x * mag), (v1.y * mag), (v1.z * mag));
+		}
+
+		public static Vector3d operator /(Vector3d v1, long div)
+		{
+			return new Vector3d(((v1.x << FixedMath.SHIFT_AMOUNT) / div), (v1.y << FixedMath.SHIFT_AMOUNT) / div, (v1.z << FixedMath.SHIFT_AMOUNT) / div);
+		}
+
+		public static Vector3d operator /(Vector3d v1, int div)
+		{
+			return new Vector3d((v1.x / div), v1.y / div, v1.z / div);
+		}
+
+		public static Vector3d operator >>(Vector3d v1, int shift)
+		{
+			return new Vector3d(v1.x >> shift, v1.y >> shift, v1.z >> shift);
+		}
+
+		public static bool operator ==(Vector3d v1, Vector3d v2)
+		{
+			return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;
+		}
+
+		public static bool operator !=(Vector3d v1, Vector3d v2)
+		{
+			return v1.x != v2.x || v1.y != v2.y || v1.z != v2.z;
+		}
+
+		#endregion
     }
 }

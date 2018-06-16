@@ -77,7 +77,6 @@ namespace Lockstep
 					id2 = ContainedImmovableObjects [k];
 					ProcessPair ();
 				}
-
 			}
 
 
@@ -86,8 +85,9 @@ namespace Lockstep
 		void ProcessPair ()
 		{
 			Partition.count++;
-			pair = PhysicsManager.GetCollisionPair (id1, id2);
+			pair = PhysicsManager.GetCollisionPairRaw (id1, id2);
 			if (pair.IsNotNull ()) {
+				//Ensures collision pairs are not run twice
 				if (pair.PartitionVersion != Partition._Version) {
 					pair.PartitionVersion = Partition._Version;
 					pair.CheckAndDistributeCollision ();

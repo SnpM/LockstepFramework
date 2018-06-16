@@ -26,7 +26,8 @@ namespace Lockstep
 
 			turnSin = _turnRate.y;
 			turnCos = _turnRate.x;
-			collisionTurnThreshold = Agent.Body.Radius / LockstepManager.FrameRate;
+
+			collisionTurnThreshold = Agent.Body.Radius / (LockstepManager.FrameRate / 2);
 			collisionTurnThreshold *= collisionTurnThreshold;
 			Agent.Body.onContact += HandleContact;
 		}
@@ -41,9 +42,22 @@ namespace Lockstep
 			bufferStartTurn = false;
 		}
 
+		bool isColliding;
+		void CheckAutoturn () {
+			if (isColliding) {
+				isColliding = false;
+				//autoturn direction will be culmination of positional changes
+				if (targetReached == true && Agent.IsCasting == false && !(Agent.Body.Immovable || Agent.Body.IsTrigger)) {
+					Vector2d delta = this.Agent.Body._position - this.Agent.Body.LastPosition;
+					if (delta.FastMagnitude () > collisionTurnThreshold) {
+						delta.Normalize ();
+						this.StartTurnDirection (delta);
+					}
+				}
+			}
+		}
 		protected override void OnSimulate ()
 		{
-
 
 			if (targetReached == false) {
 				if (cachedBeginCheck != 0) {
@@ -66,6 +80,7 @@ namespace Lockstep
 			}
 		}
 
+
 		protected override void OnLateSimulate ()
 		{
 			if (targetReached == false) {
@@ -73,6 +88,9 @@ namespace Lockstep
 				if (check == 0 || ((cachedBeginCheck < 0) != (check < 0))) {
 					Arrive ();
 				}
+			} else {
+				CheckAutoturn ();
+
 			}
 			if (bufferStartTurn) {
 				bufferStartTurn = false;
@@ -136,13 +154,8 @@ namespace Lockstep
 
 		private void HandleContact (LSBody other)
 		{
-			if (targetReached == true && Agent.IsCasting == false && !(Agent.Body.Immovable || Agent.Body.IsTrigger)) {
-				Vector2d delta = this.Agent.Body._position - this.Agent.Body.LastPosition;
-				if (delta.FastMagnitude () > collisionTurnThreshold) {
-					delta.Normalize ();
-					this.StartTurnDirection (delta);
-				}
-			}
+			isColliding = true;
+
 		}
 	}
 }

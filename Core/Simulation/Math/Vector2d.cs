@@ -339,7 +339,33 @@ namespace Lockstep
 		{
 			return x.MoreThanEpsilon() || y.MoreThanEpsilon();
 		}
+		public void ClampMagnitude (long min, long max) {
+			long mag = this.FastMagnitude ();
+			long fastMin;
+			long fastMax;
+			long normal;
+			//Check if normalization is needed and if so, set scale to normalize to
+			if (mag < (fastMin = min * min)) {
+				normal = fastMin;
+			} else if (mag > (fastMax = max * max)) {
+				normal = fastMax;
+			} else {
+				return;
+			}
 
+			mag = FixedMath.Sqrt (mag >> FixedMath.SHIFT_AMOUNT);
+
+			if (mag.MoreThanEpsilon ()) {
+				//convert from fast multiplied value
+				normal = FixedMath.Sqrt(normal >> FixedMath.SHIFT_AMOUNT);
+				//Shift unneeded as fixed fraction canceled through mul then div
+				x = x * normal / mag;
+				y = y * normal / mag;
+			} else {
+				x = 0;
+				y = 0;
+			}
+		}
 		#endregion
 
 		#region Static Math

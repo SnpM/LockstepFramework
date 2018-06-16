@@ -14,13 +14,20 @@ namespace Lockstep
 	{
 		public LSBody Body1;
 		public LSBody Body2;
-		private long CacheSqrDistance;
+		private long FastCollideDistance;
+		private long FastDistance;
 		private CollisionType LeCollisionType;
 		private bool DoPhysics = true;
 		public bool Active;
 		public uint PartitionVersion;
 
 		public ushort _Version = 1;
+		//If negative, prevent culling altogether
+		internal short CullCounter;
+		internal bool PreventDistanceCull;
+		internal int LastCollidedFrame;
+		private long FastDistanceOffset;
+
 		public bool _isColliding;
 
 		public bool IsColliding {
@@ -42,20 +49,30 @@ namespace Lockstep
 
 		bool IsValid { get; set; }
 
+		//Used for ghost body collisions
+		internal static bool OnlyAffectBody1 { get; set; }
+
 		public void Initialize (LSBody b1, LSBody b2)
 		{
+
 			IsValid = true;
 			if (!IsValid)
 				return;
 
-			if (b1.ID < b2.ID) {
+			if (OnlyAffectBody1) {
 				Body1 = b1;
 				Body2 = b2;
-			} else {
-				Body1 = b2;
-				Body2 = b1;
 			}
-
+			else {
+				if (b1.ID < b2.ID) {
+					Body1 = b1;
+					Body2 = b2;
+				} else {
+					Body1 = b2;
+					Body2 = b1;
+				}
+			}
+		
 			_ranIndex = -1;
 
 			_isColliding = false;
@@ -65,9 +82,8 @@ namespace Lockstep
 			PenetrationX = 0;
 			PenetrationY = 0;
 
-			CacheSqrDistance = b1.Radius + b2.Radius;
-			CacheSqrDistance *= CacheSqrDistance;
-
+			FastCollideDistance = b1.Radius + b2.Radius;
+			FastCollideDistance *= FastCollideDistance;
 			LeCollisionType = CollisionType.None;
 			if (Body1.Shape == ColliderType.None || Body2.Shape == ColliderType.None) {
 			} else if (Body1.Shape == ColliderType.Circle) {
@@ -101,6 +117,26 @@ namespace Lockstep
 			if (DoPhysics) {
 
 			}
+
+
+			//TODO: Space out checks when culled
+			//TODO: The time between collision checks might cause goofy behavior
+			//Maybe use a distance or velocity heuristic for culling instead of time since last collision
+			//It wouldn't be able to replace partitions because of raycasts and fast-moving objects
+			//Let's see if this works well or if something better is needed. 
+			if (Body1.PreventCulling || Body2.PreventCulling) {
+				//Never cull
+				CullCounter = -1;
+			}
+			else {
+				//Immediately check collision
+				CullCounter = 0;
+				//If collision distance is too large, don't cull based on distance
+				PreventDistanceCull = FastCollideDistance > PhysicsManager.CullFastDistanceMax;
+				LastCollidedFrame = LockstepManager.FrameCount;
+				FastDistanceOffset = FixedMath.Sqrt (FastCollideDistance >> FixedMath.SHIFT_AMOUNT) + FixedMath.One * 2;
+				FastDistanceOffset *= FastDistanceOffset;
+			}
 			Active = true;
 			_Version++;
 		}
@@ -112,58 +148,54 @@ namespace Lockstep
 				Body2.NotifyContact (Body1, false, IsColliding);
 			}
 			Active = false;
+			if (_ranIndex >= 0) {
+				PhysicsManager.RanCollisionPairs.RemoveAt (_ranIndex);
+				_ranIndex = -1;
+			}
 		}
 
 		static long dist, depth;
 
-		private void DistributeCollision ()
+
+		internal void DistributeCollision ()
 		{
 			if (!DoPhysics)
 				return;
-
 			switch (LeCollisionType) {
 			case CollisionType.Circle_Circle:
-				DistX = Body1._position.x - Body2._position.x;
-				DistY = Body1._position.y - Body2._position.y;
-				dist = FixedMath.Sqrt ((DistX * DistX + DistY * DistY) >> FixedMath.SHIFT_AMOUNT);
-
-				if (dist == 0) {
-					//If objects are on the same position, give them push in random direction
-					const long randomMax = FixedMath.One / 32;
-					Body1._position.x += LSUtility.GetRandomLong (randomMax) - randomMax / 2;
-					Body1._position.y += LSUtility.GetRandomLong (randomMax) - randomMax / 2;
-					Body1.PositionChanged = true;
-					Body2._position.x += LSUtility.GetRandomLong (randomMax) - randomMax / 2;
-					Body2._position.y += LSUtility.GetRandomLong (randomMax) - randomMax / 2;
-					Body2.PositionChanged = true;
-					return;
-				}
-
+				dist = FixedMath.Sqrt (FastDistance >> FixedMath.SHIFT_AMOUNT);
 
 				depth = (Body1.Radius + Body2.Radius - dist);
+
 
 				if (depth <= 0) {
 					return;
 				}
+
+				if (dist == 0)
+					dist = 1;
+				//Minimum vector to no longer be colliding
 				DistX = (DistX * depth / dist);
 				DistY = (DistY * depth / dist);
-
 				//Resolving collision
-
-
+				//Note: Immovable bodies don't check collision against each other so this case doesn't need to be considered
 				if (Body1.Immovable || (Body2.Immovable == false && Body1.Priority > Body2.Priority)) {
+					//Invert adjustment values when Body2 is being moved
 					DistX *= -1;
 					DistY *= -1;
 					DistributeCircle_CirclePriority (Body1, Body2);
-				} else if (Body2.Immovable || Body2.Priority > Body1.Priority) {
-					DistributeCircle_CirclePriority (Body2, Body1);
 				} else {
-					DistX /= 2;
-					DistY /= 2;
-					DistributeCircle (Body1);
-					DistX *= -1;
-					DistY *= -1;
-					DistributeCircle (Body2);
+					if (OnlyAffectBody1) return;
+					if (Body2.Immovable || Body2.Priority > Body1.Priority) {
+						DistributeCircle_CirclePriority (Body2, Body1);
+					} else {
+						DistX /= 2;
+						DistY /= 2;
+						DistributeCircle (Body1);
+						DistX *= -1;
+						DistY *= -1;
+						DistributeCircle (Body2);
+					}
 				}
 				break;
 			case CollisionType.Circle_AABox:
@@ -184,7 +216,7 @@ namespace Lockstep
 			}
 		}
 
-		void DistributeCircle_CirclePriority (LSBody higherPriority, LSBody lowerPriority)
+		internal void DistributeCircle_CirclePriority (LSBody higherPriority, LSBody lowerPriority)
 		{
 
 
@@ -210,7 +242,7 @@ namespace Lockstep
 			body._position.y += DistY;
 			body.PositionChanged = true;
 
-			if (true) {
+			if (false) {
 				body._velocity.x += DistX / 8;
 				body._velocity.y += DistY / 8;
 				body.VelocityChanged = true;
@@ -228,40 +260,91 @@ namespace Lockstep
 		}
 
 		public int _ranIndex;
-
+		/// <summary>
+		/// Used for GhostLSBodies
+		/// </summary>
+		internal void NotifyBody1 () {
+			Body1.NotifyContact (Body2, IsColliding, IsCollidingChanged);
+		}
 		public void CheckAndDistributeCollision ()
 		{
-
+			
 			if (!Active) {
 				return;
 			}
-			if (_ranIndex < 0) { 
-				_ranIndex = PhysicsManager.RanCollisionPairs.Add (new PhysicsManager.InstanceCollisionPair (_Version, this));
+			if (OnlyAffectBody1 == false) {
+				if (_ranIndex < 0) {
+					_ranIndex = PhysicsManager.RanCollisionPairs.Add (new PhysicsManager.InstanceCollisionPair (_Version, this));
+				}
 			}
+			IsCollidingChanged = false;
 			LastFrame = LockstepManager.FrameCount;
 			CurrentCollisionPair = this;
-    
-			IsCollidingChanged = false;
-			if (CheckHeight ()) {
-				bool result = CheckCollision ();
-				if (result != IsColliding) {
-					IsColliding = result;
-					IsCollidingChanged = true;
+			if (CullCounter <= 0) {
+				GenerateInitialValues ();
+				if (CheckHeight ()) {
+					bool result = CheckCollision ();
+
+					if (result != IsColliding) {
+						IsColliding = result;
+						IsCollidingChanged = true;
+					}
+					if (result) {
+						DistributeCollision ();
+					} 
 				}
-				if (CheckCollision ()) {
-					DistributeCollision ();
-				} 
+				Body1.NotifyContact (Body2, IsColliding, IsCollidingChanged);
+				Body2.NotifyContact (Body1, IsColliding, IsCollidingChanged);
+				if (IsColliding == false) {
+					//A negative cull counter means a Body is preventing culling
+					if (CullCounter >= 0) {
+
+						if (PreventDistanceCull) {
+							CullCounter = (short)(
+								(LockstepManager.FrameCount - LastCollidedFrame) / PhysicsManager.CullTimeStep);
+							if (CullCounter > PhysicsManager.CullTimeMax)
+								CullCounter = PhysicsManager.CullTimeMax;
+						} else {
+							//Set number of frames until next collision check based on distance
+							var distCull = (
+										((FastDistance - FastDistanceOffset) >> FixedMath.SHIFT_AMOUNT)
+							                      / PhysicsManager.CullDistanceStep + PhysicsManager.CullDistributor
+							                  );
+							if (distCull > PhysicsManager.CullDistanceMax)
+								distCull = PhysicsManager.CullDistanceMax;
+							if (distCull < 0)
+								distCull = 0;
+
+							var timeCull = (LockstepManager.FrameCount - LastCollidedFrame) / PhysicsManager.CullTimeStep;
+							if (timeCull > PhysicsManager.CullTimeMax)
+								timeCull = PhysicsManager.CullTimeMax;
+
+							CullCounter = (short)(timeCull + distCull);
+						}
+
+					}
+				} else {
+					LastCollidedFrame = LockstepManager.FrameCount;
+				}
+			} else {
+				if (Body1.PartitionChanged || Body2.PartitionChanged) {
+					//New partition so collision culling may not be calculated yet
+					CullCounter = 0;
+					CheckAndDistributeCollision ();
+				} else {
+					//Culled and counter 1 step closer until checking again
+					CullCounter--;
+				}
 			}
-			Body1.NotifyContact (Body2, IsColliding, IsCollidingChanged);
-			Body2.NotifyContact (Body1, IsColliding, IsCollidingChanged);
+
 		}
 
-		public bool CheckHeight ()
+		internal bool CheckHeight ()
 		{
 			return Body1.HeightMax >= Body2.HeightMin && Body1.HeightMin <= Body2.HeightMax;
 		}
 
-		public bool CheckCollision ()
+		internal bool CheckCollision ()
 		{
 			if (!Body1.PositionChangedBuffer && !Body2.PositionChangedBuffer && !Body1.RotationChangedBuffer && !Body2.RotationChangedBuffer) {
 				return IsColliding;
@@ -374,21 +457,21 @@ namespace Lockstep
 			return false;
 		}
 
-		public bool CheckCircle ()
-		{
-
+		internal void GenerateInitialValues () {
+			//if (Body1 == null || Body2 == null) What?
 			DistX = Body1._position.x - Body2._position.x;
 			DistY = Body1._position.y - Body2._position.y;
-			if ((DistX * DistX + DistY * DistY) <= CacheSqrDistance) {
+			FastDistance = DistX * DistX + DistY * DistY;
+		}
+		private bool CheckCircle ()
+		{
+			if (FastDistance<= FastCollideDistance) {
 				return true;
 			}
-
-
-
 			return false;
 		}
 
-		public bool CheckBox ()
+		private bool CheckBox ()
 		{
 			if (Body1.XMin <= Body2.XMax) {
 				if (Body1.XMax >= Body2.XMin) {
@@ -403,7 +486,7 @@ namespace Lockstep
 			return false;
 		}
 
-		public static bool CheckBox_Poly (LSBody box, LSBody poly)
+		private static bool CheckBox_Poly (LSBody box, LSBody poly)
 		{
 			bool Right = poly._position.x > box._position.x;
 			bool Top = poly._position.y > box._position.y;
@@ -445,7 +528,7 @@ namespace Lockstep
 		private static long ClosestAxisProjection;
 
 
-		public static bool CheckCircle_Poly (LSBody circle, LSBody poly)
+		private static bool CheckCircle_Poly (LSBody circle, LSBody poly)
 		{
 			int EdgeCount = poly.EdgeNorms.Length;
 			ClosestDist = long.MaxValue;
@@ -489,7 +572,7 @@ namespace Lockstep
 		static bool Collided;
 		static long xAbs, yAbs;
 
-		public void DistributeCircle_Box (LSBody box, LSBody circle)
+		private void DistributeCircle_Box (LSBody box, LSBody circle)
 		{
 			xMore = circle._position.x > box._position.x;
 			yMore = circle._position.y > box._position.y;
@@ -546,7 +629,7 @@ namespace Lockstep
 			circle.BuildBounds ();
 		}
 
-		public static bool CheckCircle_Box (LSBody box, LSBody circle)
+		internal static bool CheckCircle_Box (LSBody box, LSBody circle)
 		{
 			Collided = false;
 
@@ -595,7 +678,7 @@ namespace Lockstep
 			return Collided;
 		}
 
-		public static bool CheckPoly_Poly (LSBody poly1, LSBody poly2)
+		internal static bool CheckPoly_Poly (LSBody poly1, LSBody poly2)
 		{
 			int Poly1EdgeCount = poly1.EdgeNorms.Length;
 			int EdgeCount = Poly1EdgeCount + poly2.EdgeNorms.Length;
@@ -619,7 +702,7 @@ namespace Lockstep
 			return true;
 		}
 
-		public static void ProjectPolygon (long AxisX, long AxisY, LSBody Poly, out long Min, out long Max)
+		internal static void ProjectPolygon (long AxisX, long AxisY, LSBody Poly, out long Min, out long Max)
 		{
 			Min = Poly.RealPoints [0].Dot (AxisX, AxisY);
 			Max = Min;

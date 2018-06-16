@@ -88,7 +88,7 @@ namespace Lockstep
 		protected bool _trackAttackAngle = true;
 		[FixedNumberAngle, SerializeField]
 		protected long _attackAngle = FixedMath.TenDegrees;
-		[SerializeField]
+		[SerializeField, Tooltip ("Important: With Vector3d, the Z axis represents height!")]
 		protected Vector3d _projectileOffset;
 		[SerializeField]
 		protected Vector3d[] _secondaryProjectileOffsets;
@@ -516,6 +516,7 @@ namespace Lockstep
 					fastRangeToTarget *= fastRangeToTarget;
 
 					if (!CheckRange ()) {
+						if (CanMove)
 						cachedMove.StartMove (Target.Body.Position);
 					}
 				}

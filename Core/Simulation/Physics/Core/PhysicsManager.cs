@@ -20,7 +20,28 @@ namespace Lockstep
 
 		public const bool SimulatePhysics = true;
 
+		#region Culling
+		//After a certain amount of frames have passed without collision, culling frequency will increase
+		//Currently scales to have BlockSize result in CulFrequencyMax
+		internal const long CullDistanceStep =
+			(((Partition.BlockSize + FixedMath.One * 2) * (Partition.BlockSize + FixedMath.One * 2)) >> FixedMath.SHIFT_AMOUNT)
+			/ CullDistanceMax;
+		//Maximum amount of frames to wait between checks
+		internal const int CullDistanceMax = LockstepManager.FrameRate / 3;
+		internal const long CullFastDistanceMax = (FixedMath.One * 4) * (FixedMath.One * 4);
 
+		internal const int CullTimeStep = LockstepManager.FrameRate * 3;
+		internal const int CullTimeMax = LockstepManager.FrameRate / 5;
+		#endregion
+
+		static int _cullDistributor;
+		internal static int CullDistributor {
+			get {
+				if (_cullDistributor > 1)
+					_cullDistributor = -1;
+				return _cullDistributor++;
+			}
+		}
 		static double FixedDeltaTime {
 			get {
 				return 1d / LockstepManager.FrameRate;
@@ -163,8 +184,8 @@ namespace Lockstep
 		public static bool ResetAccumulation {get; private set;}
 		public static void LateSimulate()
 		{
-			//2 seconds before turning off
-			int inactiveFrameThreshold = 0;
+			
+			int inactiveFrameThreshold = LockstepManager.FrameRate * 1;
 
 			for (int i = 0; i < RanCollisionPairs.PeakCount; i++) {
 				if (RanCollisionPairs.arrayAllocation[i]) {
@@ -172,49 +193,36 @@ namespace Lockstep
 					var pair = RanCollisionPairs[i].Pair;
 
 					if (instancePair.Version != instancePair.Pair._Version) {
-						RanCollisionPairs.RemoveAt(i);
-						pair._ranIndex = -1;
-
+						//pair is removed at Deactivate so no longer possible
 					} else {
-						if (pair.LastFrame == LockstepManager.FrameCount) {
-
-						} else if (pair._ranIndex >= 0) {
-#if false
-							if (!RanCollisionPairs.SafeRemoveAt(pair._ranIndex, instancePair))
-						{
-							Debug.Log("Removal Failed");
-						}
-#else
+						if (pair._ranIndex >= 0) {
 							RanCollisionPairs.RemoveAt(pair._ranIndex);
-#endif
-
 							pair._ranIndex = -1;
-
 							InactiveCollisionPairs.Add(instancePair);
 						}
 					}
 				}
 			}
 
+			//Clear the buffer of collision pairs to turn off and pool
 			while (InactiveCollisionPairs.Count > 0) {
 				var instancePair = InactiveCollisionPairs.Peek();
 				var pair = instancePair.Pair;
-				if (instancePair.Version != pair._Version) {
+
+				if (pair.Active) {
+					//It's active again! Get it out of inactives and move on to the next guy.
 					InactiveCollisionPairs.Remove();
+				}
+
+				var passedFrames = LockstepManager.FrameCount - pair.LastFrame;
+				if (passedFrames >= inactiveFrameThreshold) {
+					InactiveCollisionPairs.Remove ();
+					FullDeactivateCollisionPair (pair);
 				} else {
-					int dif = LockstepManager.FrameCount - pair.LastFrame;
-					if (dif == 0) {
-						InactiveCollisionPairs.Remove();
-					} else {
-						if (dif >= inactiveFrameThreshold) {
-							FullDeactivateCollisionPair(pair);
-							InactiveCollisionPairs.Remove();
-						} else {
-							break;
-						}
-					}
+					break;
 				}
 			}
+
 			for (int i = 0; i < DynamicSimObjects.PeakCount; i++) {
 				LSBody b1 = DynamicSimObjects.innerArray[i];
 				if (b1.IsNotNull()) {
@@ -285,13 +293,13 @@ namespace Lockstep
 			return id;
 		}
 
-		private static FastStack<CollisionPair> CachedCollisionPairs = new FastStack<CollisionPair>();
+		private static FastStack<CollisionPair> PooledCollisionPairs = new FastStack<CollisionPair>();
 
 		private static CollisionPair CreatePair(LSBody body1, LSBody body2)
 		{
 			CollisionPair pair;
-			if (CachedCollisionPairs.Count > 0) {
-				pair = CachedCollisionPairs.Pop();
+			if (PooledCollisionPairs.Count > 0) {
+				pair = PooledCollisionPairs.Pop();
 			} else {
 				pair = new CollisionPair();
 			}
@@ -328,7 +336,7 @@ namespace Lockstep
 		{
 			pair.Deactivate();
 			if (LockstepManager.PoolingEnabled)
-				CachedCollisionPairs.Add(pair);
+				PooledCollisionPairs.Add(pair);
 		}
 
 		internal static void Dessimilate(LSBody body)
@@ -349,8 +357,31 @@ namespace Lockstep
 				body.DynamicID = -1;
 			}
 		}
+		/// <summary>
+		/// Takes away some safety checks
+		/// </summary>
 
+		internal static CollisionPair GetCollisionPairRaw (int ID1, int ID2) {
+			LSBody body1;
+			LSBody body2;
+			if ((body1 = SimObjects[ID1]).IsNotNull() && (body2 = SimObjects[ID2]).IsNotNull()) {
+				if (body1.ID < body2.ID) {
+				} else {
+					var temp = body1;
+					body1 = body2;
+					body2 = temp;
+				}
 
+				CollisionPair pair;
+				if (!body1.CollisionPairs.TryGetValue(body2.ID, out pair)) {
+					pair = CreatePair(body1, body2);
+					body1.CollisionPairs.Add(body2.ID, pair);
+					body2.CollisionPairHolders.Add(body1.ID);
+				}
+				return pair;
+			}
+			return null;
+		}
 		public static CollisionPair GetCollisionPair(int ID1, int ID2)
 		{
 			LSBody body1;

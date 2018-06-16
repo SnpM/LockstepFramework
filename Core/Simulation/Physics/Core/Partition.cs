@@ -14,9 +14,10 @@ namespace Lockstep
 	public static class Partition
 	{
 		#region Settings
-		public const int DefaultCount = 512;
-		public const int AdditionalShiftSize = 2;
+		public const int DefaultCount = 256;
+		public const int AdditionalShiftSize = 3;
 		public const int ShiftSize = FixedMath.SHIFT_AMOUNT + AdditionalShiftSize;
+		public const long BlockSize = 1L << ShiftSize;
 		public static int BoundX { get; private set; } //Lower bound X
 		public static int BoundY { get; private set; } //Lower bound Y
 													   //Offset due to partition nodes being centered on grid positions
@@ -57,9 +58,7 @@ namespace Lockstep
 
 		public static void UpdateObject (LSBody Body, bool repartition = true)
 		{
-
 			GetGridBounds (Body);
-
 			if (
 				repartition == false ||
 				(Body.PastGridXMin != GridXMin ||
@@ -67,6 +66,7 @@ namespace Lockstep
 				Body.PastGridYMin != GridYMin ||
 			     Body.PastGridYMax != GridYMax)) {
 
+				//Remove from all partitions no longer located on
 				for (int o = Body.PastGridXMin; o <= Body.PastGridXMax; o++) {
 					for (int p = Body.PastGridYMin; p <= Body.PastGridYMax; p++) {
 						PartitionNode node = GetNode (o, p);
@@ -80,7 +80,16 @@ namespace Lockstep
 				if (repartition) {
 					PartitionObject (Body, true);
 				}
+			}
+		}
+		public static void GetTouchingPartitions (LSBody Body, FastList<PartitionNode> output) {
+			GetGridBounds (Body);
 
+			for (int i = GridXMin; i <= GridXMax; i++) {
+				for (int j = GridYMin; j <= GridYMax; j++) {
+					PartitionNode node = GetNode (i, j);
+					output.Add (node);
+				}
 			}
 		}
 
@@ -138,6 +147,7 @@ namespace Lockstep
 
 		public static void PartitionObject (LSBody Body, bool gridBoundsCalculated = false)
 		{
+			//TODO: Ensure that bodies are partitioned accurately
 			if (gridBoundsCalculated == false)
 				GetGridBounds (Body);
 
@@ -149,6 +159,7 @@ namespace Lockstep
 			for (int i = GridXMin; i <= GridXMax; i++) {
 				for (int j = GridYMin; j <= GridYMax; j++) {
 					PartitionNode node = GetNode (i, j);
+					Body.PartitionChanged = true;
 					if (Body.Immovable)
                     {
                         node.AddImmovable (Body.ID);
