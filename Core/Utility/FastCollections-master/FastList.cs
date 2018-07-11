@@ -59,16 +59,6 @@ namespace FastCollections
 
 		}
 
-		/// <summary>
-		/// Overwrites item at index or expands list with null items until index is valid.
-		/// </summary>
-		/// <param name="item">Item.</param>
-		/// <param name="index">Index.</param>
-		public void AddAt (T item, int index) {
-			EnsureCapacity (index + 1);
-			this [index] = item;
-		}
-
 		public void AddRange (FastList<T> items)
 		{
 			int arrayLength = items.Count;

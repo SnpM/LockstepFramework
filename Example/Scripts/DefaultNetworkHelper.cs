@@ -62,7 +62,7 @@ namespace Lockstep.NetworkHelpers
 			}
 		}
 
-		void LateUpdate ()
+		void Update ()
 		{
 			if (SimulateLag == false) return;
 
@@ -78,12 +78,11 @@ namespace Lockstep.NetworkHelpers
 			return;*/
 			for (int i = 0; i < Packets.Count; i++) {
 				var packet = Packets [i];
-				packet.TimeTillArrival -= Time.unscaledDeltaTime * 1d;
+				packet.TimeTillArrival -= Time.unscaledDeltaTime * 1000d;
 				if (packet.TimeTillArrival <= 0) {
 					base.OnSendMessageToAll (packet.MessageType, packet.Data);
 					Packets.RemoveAt (i);
 					i--;
-
 				} else {
 					Packets [i] = packet;
 				}

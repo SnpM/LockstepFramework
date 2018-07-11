@@ -58,7 +58,9 @@ namespace Lockstep
 
 		public static void UpdateObject (LSBody Body, bool repartition = true)
 		{
+
 			GetGridBounds (Body);
+
 			if (
 				repartition == false ||
 				(Body.PastGridXMin != GridXMin ||
@@ -80,16 +82,7 @@ namespace Lockstep
 				if (repartition) {
 					PartitionObject (Body, true);
 				}
-			}
-		}
-		public static void GetTouchingPartitions (LSBody Body, FastList<PartitionNode> output) {
-			GetGridBounds (Body);
 
-			for (int i = GridXMin; i <= GridXMax; i++) {
-				for (int j = GridYMin; j <= GridYMax; j++) {
-					PartitionNode node = GetNode (i, j);
-					output.Add (node);
-				}
 			}
 		}
 
@@ -147,7 +140,6 @@ namespace Lockstep
 
 		public static void PartitionObject (LSBody Body, bool gridBoundsCalculated = false)
 		{
-			//TODO: Ensure that bodies are partitioned accurately
 			if (gridBoundsCalculated == false)
 				GetGridBounds (Body);
 

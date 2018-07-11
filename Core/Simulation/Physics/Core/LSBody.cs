@@ -206,7 +206,6 @@ namespace Lockstep
         /// <summary>
         /// TODO: Do away with CollisionPairs? Just dynamically collide... much easier and less memory for mobile.
         /// Potentially faster especially for less physics objects.
-		/// E: No longer possible as frame culling is now implemented.
         /// </summary>
         internal Dictionary<int, CollisionPair> CollisionPairs {
 			get {
@@ -214,7 +213,6 @@ namespace Lockstep
 			}
 		}
 
-		//TODO: Make this a more efficient collection
 		internal HashSet<int> CollisionPairHolders {
 			get {
 				return _collisionPairHolders ?? (_collisionPairHolders = new HashSet<int>());
@@ -259,22 +257,22 @@ namespace Lockstep
 		public ColliderType Shape { get { return _shape; } }
 
 		[SerializeField]
-		protected bool _isTrigger;
+		private bool _isTrigger;
 
 		public bool IsTrigger { get { return _isTrigger; } }
 
 		[SerializeField]
-		protected int _layer;
+		private int _layer;
 
 		public int Layer { get { return _layer; } }
 
 		[SerializeField, FixedNumber]
-		protected long _halfWidth = FixedMath.Half;
+		private long _halfWidth = FixedMath.Half;
 
 		public long HalfWidth { get { return _halfWidth; } }
 
 		[SerializeField, FixedNumber]
-		protected long _halfHeight = FixedMath.Half;
+		public long _halfHeight = FixedMath.Half;
 
 		public long HalfHeight { get { return _halfHeight; } }
 
@@ -296,29 +294,29 @@ namespace Lockstep
 		public bool Immovable { get; private set; }
 
 		[SerializeField]
-		protected int _basePriority;
+		private int _basePriority;
 
 		public int BasePriority { get { return _basePriority; } }
 
 		[SerializeField]
-		protected Vector2d[] _vertices;
+		private Vector2d[] _vertices;
 
 		public Vector2d[] Vertices { get { return _vertices; } }
 
 		[SerializeField, FixedNumber]
-		protected long _height = FixedMath.One;
+		private long _height = FixedMath.One;
 
 		public long Height { get { return _height; } }
 
 
 		[SerializeField]
-		protected Transform _positionalTransform;
+		private Transform _positionalTransform;
 
 		public Transform PositionalTransform { get; set; }
 
 
 		[SerializeField]
-		protected Transform _rotationalTransform;
+		private Transform _rotationalTransform;
 
 		public Transform RotationalTransform { get; set; }
 
@@ -409,15 +407,9 @@ namespace Lockstep
 				FastRadius = this.Radius * this.Radius;
 			}
 		}
-		public virtual void Initialize (Vector3d StartPosition, Vector2d StartRotation, bool isDynamic = true) {
-			InitializeVariables (StartPosition, StartRotation, isDynamic);
-			ID = PhysicsManager.Assimilate(this, isDynamic);
-			Partition.PartitionObject(this);
-		}
 
-		public void InitializeVariables(Vector3d StartPosition, Vector2d StartRotation, bool isDynamic = true)
+		public void Initialize(Vector3d StartPosition, Vector2d StartRotation, bool isDynamic = true)
 		{
-			//TODO: Ensure that this function does not affect any simulation system so that "ghost" bodies can be made
 			Active = true;
 			PositionalTransform = _positionalTransform;
 			RotationalTransform = _rotationalTransform;
@@ -450,6 +442,7 @@ namespace Lockstep
 			YMin = 0;
 			YMax = 0;
 
+
 			PastGridXMin = int.MaxValue;
 			PastGridXMax = int.MaxValue;
 			PastGridYMin = int.MaxValue;
@@ -460,7 +453,8 @@ namespace Lockstep
 				BuildBounds();
 			}
 
-
+			ID = PhysicsManager.Assimilate(this, isDynamic);
+			Partition.PartitionObject(this);
 			if (PositionalTransform != null) {
 				CanSetVisualPosition = true;
 				_visualPosition = _position.ToVector3(HeightPos.ToFloat());
@@ -477,14 +471,13 @@ namespace Lockstep
 			} else {
 				CanSetVisualRotation = false;
 			}
+			SetVisuals ();
 			velocityPosition = Vector3.zero;
             this.ImmovableCollisionDirection = Vector2d.zero;
 			PartitionChanged = true;
-			SetVisuals ();
+
 
 		}
-
-
 
 		void CheckVariables()
 		{
@@ -559,8 +552,10 @@ namespace Lockstep
 				}
 			}
 		}
-		#region Moddability
-		public void _SimVelocity () {
+
+
+		public void Simulate()
+		{
 			if (VelocityChanged)
 			{
 				VelocityMagnitude = _velocity.Magnitude();
@@ -575,17 +570,6 @@ namespace Lockstep
 				_position.y += _velocity.y / LockstepManager.FrameRate;
 				PositionChanged = true;
 			}
-		}
-		public void _SimVisualsCounter () {
-			if (SettingVisuals) {
-				_settingVisualsCounter--;
-			}
-		}
-		#endregion
-
-		public void Simulate()
-		{
-			_SimVelocity ();
 
 			BuildChangedValues();
 
@@ -595,14 +579,16 @@ namespace Lockstep
 				Partition.UpdateObject(this);
 			}
 
-			_SimVisualsCounter ();
+			if (SettingVisuals) {
+				_settingVisualsCounter--;
+			}
 		}
 
 		Quaternion GetVisualRot () {
 			return Quaternion.LookRotation (Forward.ToVector3 (0));
 		}
 
-		public void BuildChangedValues()
+		void BuildChangedValues()
 		{
 			if (PositionChanged || RotationChanged)
 			{

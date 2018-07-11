@@ -2,12 +2,11 @@
 using System.Collections; using FastCollections;
 using UnityEditor;
 using Lockstep;
-using Lockstep.Extras;
 #if true
-namespace Lockstep.Extras.Integration
+namespace Lockstep.Integration
 {
-    [CustomEditor(typeof(UnityGhostLSBody), true),UnityEditor.CanEditMultipleObjects]
-	public class EditorGhostLSBody : Editor
+    [CustomEditor(typeof(UnityLSBody), true),UnityEditor.CanEditMultipleObjects]
+	public class EditorLSBody : Editor
     {
 
         SerializedProperty Shape;
@@ -76,19 +75,14 @@ namespace Lockstep.Extras.Integration
             {
 
                 EditorGUI.BeginChangeCheck();
-				//TODO: Implement
-				/*
-				if (GUILayout.Button ("Copy Main Body")) {
-					
-				}*/
                 if (GUILayout.Button("Reset Transforms"))
                 {
                     for (int i = 0; i < targets.Length; i++)
                     {
                         SerializedObject ser = new SerializedObject(targets [i]);
 
-                        ser.FindProperty("_internalBody").FindPropertyRelative("_positionalTransform").objectReferenceValue = ((UnityGhostLSBody)targets [i]).transform;
-                        ser.FindProperty("_internalBody").FindPropertyRelative("_rotationalTransform").objectReferenceValue = ((UnityGhostLSBody)targets [i]).transform;
+                        ser.FindProperty("_internalBody").FindPropertyRelative("_positionalTransform").objectReferenceValue = ((UnityLSBody)targets [i]).transform;
+                        ser.FindProperty("_internalBody").FindPropertyRelative("_rotationalTransform").objectReferenceValue = ((UnityLSBody)targets [i]).transform;
                         ser.ApplyModifiedProperties();
                     }
                     so.Update();
@@ -106,8 +100,8 @@ namespace Lockstep.Extras.Integration
 
                     EditorGUILayout.Space();
                     EditorGUILayout.LabelField("General Collider Settings", EditorStyles.boldLabel);
-					//Automatically the lowest possible priority
-					//BasePriority.Draw();
+                    Layer.Draw();
+					BasePriority.Draw();
                     IsTrigger.Draw();
                     if (IsTrigger.boolValue == false)
                         Immovable.Draw();
@@ -172,8 +166,8 @@ namespace Lockstep.Extras.Integration
             if (shape == ColliderType.None)
                 return;
             Handles.color = Color.blue;
-			LSBody Body = ((UnityGhostLSBody)target).InternalBody;
-			Transform transform = ((UnityGhostLSBody)target).transform;
+			LSBody Body = ((UnityLSBody)target).InternalBody;
+			Transform transform = ((UnityLSBody)target).transform;
             Vector3 targetPos = transform.position;
             const int ImprecisionLimit = 100000;
             if (Mathf.Abs(targetPos.x) >= ImprecisionLimit ||
