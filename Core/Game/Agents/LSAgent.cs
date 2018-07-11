@@ -523,7 +523,7 @@ namespace Lockstep
 				Animator.CurrentAnimState = animState;
 			}
 		}
-			
+
 		public void ApplyImpulse(AnimImpulse animImpulse, int rate = 0)
 		{
 			if (Animator.IsNotNull())
@@ -557,8 +557,7 @@ namespace Lockstep
 		{
 			_cachedTransform = base.transform;
 			_cachedGameObject = base.gameObject;
-			//TODO: Ensure that this isn't GhostLSBody or any other bodies attached to the GO
-			_unityBody = GetComponent<UnityLSBody> ();
+			_unityBody = GetComponent<UnityLSBody>();
 			_animator = GetComponent<LSAnimatorBase>();
 			_attachedAbilities = GetComponents<Ability>();
 		}
