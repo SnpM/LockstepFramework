@@ -84,7 +84,7 @@ namespace Lockstep
 					var body = bufferBodies [i];
 					var agent = body.Agent;
 					//we have to check agent's controller since we did not filter it through buckets
-					if (bucketConditional (agent.Controller.ControllerID)) {
+					if (agent.IsNotNull() && bucketConditional (agent.Controller.ControllerID)) {
 						if (agentConditional (agent)) {
 							output.Add (agent);
 						}

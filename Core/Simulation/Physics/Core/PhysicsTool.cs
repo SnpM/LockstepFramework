@@ -27,7 +27,7 @@ namespace Lockstep {
 			for (int i = gridXMin; i <= gridXMax; i++) {
 				for (int j = gridYMin; j <= gridYMax; j++) {
 					PartitionNode node = Partition.GetNode (i, j);
-					for (int k = 0; k < node.ContainedDynamicObjects.Count; k++) {
+					for (int k = node.ContainedDynamicObjects.Count;k>=0;k--) {
 						var body = PhysicsManager.SimObjects [node.ContainedDynamicObjects [k]];
 						long minFastDist = body.Radius + radius;
 						//unnormalized distance value for comparison
@@ -37,6 +37,17 @@ namespace Lockstep {
 							//Body touches circle!
 							output.Add(body);
 						}
+					}
+					for (int l = node.ContainedImmovableObjects.Count; l >=0; l--) {
+						var body = PhysicsManager.SimObjects [node.ContainedImmovableObjects [l]];
+						long minFastDist = body.Radius + radius;
+						//unnormalized distance value for comparison
+						minFastDist *= minFastDist;
+
+						if (body.Position.FastDistance (position) <= minFastDist) {
+							//Body touches circle!
+							output.Add(body);
+						}		
 					}
 				}
 			}
