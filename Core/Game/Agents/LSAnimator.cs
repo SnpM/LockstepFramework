@@ -1,7 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
-using System;
 
 namespace Lockstep
 {
@@ -16,8 +13,8 @@ namespace Lockstep
 		[SerializeField]
 		private string engaging = "engaging";
 
-        [SerializeField]
-        private string specialEngaging = "specialEngaging";
+		[SerializeField]
+		private string specialEngaging = "specialEngaging";
 
 		[SerializeField]
 		private string dying = "dying";
@@ -25,10 +22,10 @@ namespace Lockstep
 		[Space(10f), SerializeField]
 		private string fire = "fire";
 
-        [SerializeField]
-        private string specialFire = "specialFire";
+		[SerializeField]
+		private string specialFire = "specialFire";
 
-        [SerializeField]
+		[SerializeField]
 		private string specialAttack = "specialAttack";
 
 		[SerializeField]
@@ -36,13 +33,13 @@ namespace Lockstep
 
 
 		private AnimationClip idlingClip;
-		private  AnimationClip movingClip;
-		private  AnimationClip engagingClip;
-		private  AnimationClip dyingClip;
-        private AnimationClip specialEngagingClip;
+		private AnimationClip movingClip;
+		private AnimationClip engagingClip;
+		private AnimationClip dyingClip;
+		private AnimationClip specialEngagingClip;
 
-		private  AnimationClip fireClip;
-        private AnimationClip specialFireClip;
+		private AnimationClip fireClip;
+		private AnimationClip specialFireClip;
 
 		private AnimationClip specialAttackClip;
 		private AnimationClip extraClip;
@@ -58,23 +55,23 @@ namespace Lockstep
 		public override void Initialize()
 		{
 			base.Initialize();
-            animator = GetComponent<Animation>();
-            if (animator == null)
-                animator = this.GetComponentInChildren<Animation>();
-            if (CanAnimate = (animator != null))
-            {
-                //States
-                idlingClip = animator.GetClip(idling);
-                movingClip = animator.GetClip(moving);
-                engagingClip = animator.GetClip(engaging);
-                dyingClip = animator.GetClip(dying);
-                specialEngagingClip = animator.GetClip(this.specialEngaging);
-                //Impulses
-                fireClip = animator.GetClip(fire);
-                specialFireClip = animator.GetClip(specialFire);
+			animator = GetComponent<Animation>();
+			if (animator == null)
+				animator = this.GetComponentInChildren<Animation>();
+			if (CanAnimate = (animator != null))
+			{
+				//States
+				idlingClip = animator.GetClip(idling);
+				movingClip = animator.GetClip(moving);
+				engagingClip = animator.GetClip(engaging);
+				dyingClip = animator.GetClip(dying);
+				specialEngagingClip = animator.GetClip(this.specialEngaging);
+				//Impulses
+				fireClip = animator.GetClip(fire);
+				specialFireClip = animator.GetClip(specialFire);
 				specialAttackClip = animator.GetClip(specialAttack);
 				extraClip = animator.GetClip(extra);
-            }
+			}
 			Play(AnimState.Idling);
 		}
 
@@ -86,7 +83,7 @@ namespace Lockstep
 				AnimationClip clip = GetStateClip(state);
 				if (clip.IsNotNull())
 				{
-					animator.CrossFade(clip.name,fadeLength);
+					animator.CrossFade(clip.name, fadeLength);
 				}
 			}
 		}
@@ -96,12 +93,12 @@ namespace Lockstep
 			base.Play(impulse, rate);
 
 			if (CanAnimate)
-			{ 
+			{
 				AnimationClip clip = GetImpulseClip(impulse);
 				if (clip.IsNotNull())
 				{
 					//animator.Blend(clip.name,.8f,fadeLength);
-                    animator.Play(clip.name);
+					animator.Play(clip.name);
 				}
 			}
 		}
@@ -118,8 +115,8 @@ namespace Lockstep
 					return engagingClip;
 				case AnimState.Dying:
 					return dyingClip;
-                case AnimState.SpecialEngaging:
-                    return this.specialEngagingClip;
+				case AnimState.SpecialEngaging:
+					return this.specialEngagingClip;
 			}
 			return idlingClip;
 		}
@@ -136,8 +133,8 @@ namespace Lockstep
 					return engaging;
 				case AnimState.Dying:
 					return dying;
-                case AnimState.SpecialEngaging:
-                    return this.specialEngaging;
+				case AnimState.SpecialEngaging:
+					return this.specialEngaging;
 			}
 			return idling;
 		}
@@ -148,9 +145,9 @@ namespace Lockstep
 			{
 				case AnimImpulse.Fire:
 					return fire;
-                case AnimImpulse.SpecialFire:
-                    return specialFire;
-                case AnimImpulse.SpecialAttack:
+				case AnimImpulse.SpecialFire:
+					return specialFire;
+				case AnimImpulse.SpecialAttack:
 					return specialAttack;
 				case AnimImpulse.Extra:
 					return extra;
@@ -164,12 +161,12 @@ namespace Lockstep
 			{
 				case AnimImpulse.Fire:
 					return fireClip;
-                case AnimImpulse.SpecialFire:
-                    return specialFireClip;
-                case AnimImpulse.SpecialAttack:
+				case AnimImpulse.SpecialFire:
+					return specialFireClip;
+				case AnimImpulse.SpecialAttack:
 					return specialAttackClip;
 				case AnimImpulse.Extra:
-						return extraClip;
+					return extraClip;
 			}
 			return idlingClip;
 		}

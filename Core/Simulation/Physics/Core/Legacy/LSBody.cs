@@ -4,34 +4,33 @@
 // (See accompanying file LICENSE or copy at
 // http://opensource.org/licenses/MIT)
 //=======================================================================
-
-
 using UnityEngine;
 using UnityEngine.Serialization;
 using System.Collections.Generic;
 using FastCollections;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace Lockstep.Legacy
 {
-	[System.Obsolete ("This class is only used for automatically swapping legacy LSBodies.")]
+	[System.Obsolete("This class is only used for automatically swapping legacy LSBodies.")]
 	public partial class LSBody : MonoBehaviour
 	{
 
-        private void Awake()
-        {
-            if (Application.isEditor == false)
-            {
-                throw new System.Exception("Legacy.LSBody on the object '" + this.gameObject + "' should not be in a build. It should automatically replace itself with UnityLSBody in the eidtor.");
-            }
-        }
+		private void Awake()
+		{
+			if (Application.isEditor == false)
+			{
+				throw new System.Exception("Legacy.LSBody on the object '" + this.gameObject + "' should not be in a build. It should automatically replace itself with UnityLSBody in the eidtor.");
+			}
+		}
 
-        #region Core deterministic variables
+		#region Core deterministic variables
 
-        [SerializeField] //For inspector debugging
-        internal Vector2d _position;
+		[SerializeField] //For inspector debugging
+		internal Vector2d _position;
 		[SerializeField]
 		internal Vector2d _rotation = Vector2d.up;
 		[SerializeField, FixedNumber]
@@ -39,26 +38,30 @@ namespace Lockstep.Legacy
 		[SerializeField]
 		public Vector2d _velocity;
 
-        #endregion
+		#endregion
 
 
-        #region Lockstep variables
+		#region Lockstep variables
 
-        private bool _forwardNeedsSet = false;
+		private bool _forwardNeedsSet = false;
 
-		private bool ForwardNeedsSet {
+		private bool ForwardNeedsSet
+		{
 			get { return _forwardNeedsSet; }
 			set { _forwardNeedsSet = value; }
 		}
 
 		private Vector2d _forward;
 
-		public Vector2d Forward {
-			get {
-				return Rotation.ToDirection ();
+		public Vector2d Forward
+		{
+			get
+			{
+				return Rotation.ToDirection();
 			}
-			set {
-				Rotation = value.ToRotation ();
+			set
+			{
+				Rotation = value.ToRotation();
 			}
 		}
 
@@ -66,11 +69,14 @@ namespace Lockstep.Legacy
 		public bool PositionChanged { get; set; }
 
 		[Lockstep]
-		public Vector2d Position {
-			get {
+		public Vector2d Position
+		{
+			get
+			{
 				return _position;
 			}
-			set {
+			set
+			{
 				_position = value;
 				this.PositionChanged = true;
 			}
@@ -79,11 +85,14 @@ namespace Lockstep.Legacy
 		private bool _rotationChanged;
 
 		[Lockstep]
-		public bool RotationChanged {
-			get {
+		public bool RotationChanged
+		{
+			get
+			{
 				return _rotationChanged;
 			}
-			set {
+			set
+			{
 				if (value)
 					ForwardNeedsSet = true;
 				_rotationChanged = value;
@@ -92,11 +101,14 @@ namespace Lockstep.Legacy
 
 
 		[Lockstep]
-		public Vector2d Rotation {
-			get {
+		public Vector2d Rotation
+		{
+			get
+			{
 				return _rotation;
 			}
-			set {
+			set
+			{
 				_rotation = value;
 				this.RotationChanged = true;
 			}
@@ -106,9 +118,11 @@ namespace Lockstep.Legacy
 		public bool HeightPosChanged { get; set; }
 
 		[Lockstep]
-		public long HeightPos {
+		public long HeightPos
+		{
 			get { return _heightPos; }
-			set {
+			set
+			{
 				_heightPos = value;
 				this.HeightPosChanged = true;
 			}
@@ -118,9 +132,11 @@ namespace Lockstep.Legacy
 		public bool VelocityChanged { get; set; }
 
 		[Lockstep]
-		public Vector2d Velocity {
+		public Vector2d Velocity
+		{
 			get { return _velocity; }
-			set {
+			set
+			{
 				_velocity = value;
 				VelocityChanged = true;
 			}
@@ -130,11 +146,11 @@ namespace Lockstep.Legacy
 
 		internal uint RaycastVersion { get; set; }
 
-        #endregion
+		#endregion
 
 
-        #region Other variables
-        internal Vector3 _visualPosition;
+		#region Other variables
+		internal Vector3 _visualPosition;
 
 		public Vector3 VisualPosition { get { return _visualPosition; } }
 
@@ -147,7 +163,7 @@ namespace Lockstep.Legacy
 		public bool SetPositionBuffer { get; private set; }
 		//ND
 
-		
+
 		public bool RotationChangedBuffer { get; private set; }
 		//D
 		private bool SetRotationBuffer { get; set; }
@@ -159,22 +175,22 @@ namespace Lockstep.Legacy
 
 		private bool Setted { get; set; }
 
-		
+
 		public long VelocityFastMagnitude { get; private set; }
 
-        #endregion
-        
-        #region Extra Processes
-        private void AddChild (LSBody child)
+		#endregion
+
+		#region Extra Processes
+		private void AddChild(LSBody child)
 		{
 			if (Children == null)
-				Children = new FastBucket<LSBody> ();
-			Children.Add (child);
+				Children = new FastBucket<LSBody>();
+			Children.Add(child);
 		}
 
-		private void RemoveChild (LSBody child)
+		private void RemoveChild(LSBody child)
 		{
-			Children.Remove (child);
+			Children.Remove(child);
 		}
 
 		private FastBucket<LSBody> Children;
@@ -183,7 +199,7 @@ namespace Lockstep.Legacy
 		public Vector2d[] EdgeNorms;
 
 		public bool ChangedPartition { get; set; }
-        
+
 		public long XMin { get; private set; }
 
 		public long XMax { get; private set; }
@@ -201,37 +217,46 @@ namespace Lockstep.Legacy
 
 		public long HeightMax { get; private set; }
 
-		public delegate void CollisionFunction (LSBody other);
+		public delegate void CollisionFunction(LSBody other);
 
-		private Dictionary<int,CollisionPair> _collisionPairs;
+		private Dictionary<int, CollisionPair> _collisionPairs;
 		private HashSet<int> _collisionPairHolders;
 
-		internal Dictionary<int,CollisionPair> CollisionPairs {
-			get {
-				return _collisionPairs.IsNotNull () ? _collisionPairs : (_collisionPairs = new Dictionary<int, CollisionPair> ());
-			}
-		}
-
-		internal HashSet<int> CollisionPairHolders {
-			get {
-				return _collisionPairHolders ?? (_collisionPairHolders = new HashSet<int> ());
-			}
-		}
-
-		internal void NotifyContact (LSBody other, bool isColliding, bool isChanged)
+		internal Dictionary<int, CollisionPair> CollisionPairs
 		{
-			if (isColliding) {
-				if (isChanged) {
-					if (onContactEnter.IsNotNull ())
-						onContactEnter (other);
+			get
+			{
+				return _collisionPairs.IsNotNull() ? _collisionPairs : (_collisionPairs = new Dictionary<int, CollisionPair>());
+			}
+		}
+
+		internal HashSet<int> CollisionPairHolders
+		{
+			get
+			{
+				return _collisionPairHolders ?? (_collisionPairHolders = new HashSet<int>());
+			}
+		}
+
+		internal void NotifyContact(LSBody other, bool isColliding, bool isChanged)
+		{
+			if (isColliding)
+			{
+				if (isChanged)
+				{
+					if (onContactEnter.IsNotNull())
+						onContactEnter(other);
 				}
 				if (onContact != null)
-					onContact (other);
-				
-			} else {
-				if (isChanged) {
+					onContact(other);
+
+			}
+			else
+			{
+				if (isChanged)
+				{
 					if (onContactExit != null)
-						onContactExit (other);
+						onContactExit(other);
 				}
 			}
 		}
@@ -250,32 +275,32 @@ namespace Lockstep.Legacy
 
 		#region Serialized
 
-		[SerializeField, FormerlySerializedAs ("Shape")]
+		[SerializeField, FormerlySerializedAs("Shape")]
 		protected ColliderType _shape = ColliderType.None;
 
 		public ColliderType Shape { get { return _shape; } }
 
-		[SerializeField, FormerlySerializedAs ("IsTrigger")]
+		[SerializeField, FormerlySerializedAs("IsTrigger")]
 		private bool _isTrigger;
 
 		public bool IsTrigger { get { return _isTrigger; } }
 
-		[SerializeField, FormerlySerializedAs ("Layer")]
+		[SerializeField, FormerlySerializedAs("Layer")]
 		private int _layer;
 
 		public int Layer { get { return _layer; } }
 
-		[SerializeField,FixedNumber, FormerlySerializedAs ("HalfWidth")]
+		[SerializeField, FixedNumber, FormerlySerializedAs("HalfWidth")]
 		private long _halfWidth = FixedMath.Half;
 
 		public long HalfWidth { get { return _halfWidth; } }
 
-		[SerializeField,FixedNumber, FormerlySerializedAs ("HalfHeight")]
+		[SerializeField, FixedNumber, FormerlySerializedAs("HalfHeight")]
 		public long _halfHeight = FixedMath.Half;
 
 		public long HalfHeight { get { return _halfHeight; } }
 
-		[SerializeField,FixedNumber, FormerlySerializedAs ("Radius")]
+		[SerializeField, FixedNumber, FormerlySerializedAs("Radius")]
 		protected long _radius = FixedMath.Half;
 
 		public long Radius { get { return _radius; } }
@@ -285,12 +310,12 @@ namespace Lockstep.Legacy
 
 		public bool Immovable { get; private set; }
 
-		[SerializeField, FormerlySerializedAs ("_priority")]
+		[SerializeField, FormerlySerializedAs("_priority")]
 		private int _basePriority;
 
 		public int BasePriority { get { return _basePriority; } }
 
-		[SerializeField, FormerlySerializedAs ("Vertices")]
+		[SerializeField, FormerlySerializedAs("Vertices")]
 		private Vector2d[] _vertices;
 
 		public Vector2d[] Vertices { get { return _vertices; } }
@@ -298,21 +323,24 @@ namespace Lockstep.Legacy
 		[SerializeField, FixedNumber]
 		private long _height = FixedMath.One;
 
-		[Lockstep (true)]
-		public long Height { get {return _height;}}
+		[Lockstep(true)]
+		public long Height { get { return _height; } }
 
 		[SerializeField]
 		private Transform _positionalTransform;
 
-		public Transform PositionalTransform { get ; set; }
+		public Transform PositionalTransform { get; set; }
 
 		private bool _canSetVisualPosition;
 
-		public bool CanSetVisualPosition {
-			get {
+		public bool CanSetVisualPosition
+		{
+			get
+			{
 				return _canSetVisualPosition;
 			}
-			set {
+			set
+			{
 				_canSetVisualPosition = value && PositionalTransform != null;
 			}
 		}
@@ -326,18 +354,23 @@ namespace Lockstep.Legacy
 
 		private bool _canSetVisualRotation;
 
-		public bool CanSetVisualRotation {
-			get {
+		public bool CanSetVisualRotation
+		{
+			get
+			{
 				return _canSetVisualRotation && RotationalTransform != null;
 			}
-			set {
+			set
+			{
 				_canSetVisualRotation = value;
 			}
 		}
 
-		public Vector3d Position3d {
-			get {
-				return this.Position.ToVector3d (this.HeightPos);
+		public Vector3d Position3d
+		{
+			get
+			{
+				return this.Position.ToVector3d(this.HeightPos);
 			}
 		}
 
@@ -345,7 +378,7 @@ namespace Lockstep.Legacy
 
 		private Vector2d[] RotatedPoints;
 
-		public void Setup (LSAgent agent)
+		public void Setup(LSAgent agent)
 		{
 
 		}
@@ -354,99 +387,101 @@ namespace Lockstep.Legacy
 
 		public bool OutMoreThan { get; private set; }
 
-		public void GeneratePoints ()
+		public void GeneratePoints()
 		{
 
 		}
 
-		public void GenerateBounds ()
-		{
-			
-		}
-
-		public void Initialize (Vector3d StartPosition, Vector2d StartRotation, bool isDynamic = true)
-		{
-			
-		}
-
-		void CheckVariables ()
+		public void GenerateBounds()
 		{
 
 		}
 
-		public void BuildPoints ()
-		{
-			
-		}
-
-		public void BuildBounds ()
+		public void Initialize(Vector3d StartPosition, Vector2d StartRotation, bool isDynamic = true)
 		{
 
 		}
 
-
-		public void Simulate ()
-		{}
-
-		
-		public void BuildChangedValues ()
-		{
-			
-		}
-
-		public void SetVisuals ()
+		void CheckVariables()
 		{
 
 		}
 
-		private void DoSetVisualPosition (Vector3 pos)
-		{
-	
-		}
-
-		private void DoSetVisualRotation (Vector2d rot)
+		public void BuildPoints()
 		{
 
 		}
 
-		public void SetExtrapolatedVisuals ()
+		public void BuildBounds()
 		{
-            
+
+		}
+
+
+		public void Simulate()
+		{ }
+
+
+		public void BuildChangedValues()
+		{
+
+		}
+
+		public void SetVisuals()
+		{
+
+		}
+
+		private void DoSetVisualPosition(Vector3 pos)
+		{
+
+		}
+
+		private void DoSetVisualRotation(Vector2d rot)
+		{
+
+		}
+
+		public void SetExtrapolatedVisuals()
+		{
+
 		}
 
 		Vector3 lastVisualPos;
 		Quaternion lastVisualRot;
 		//Quaternion visualRot = Quaternion.identity;
 
-		public void Visualize ()
+		public void Visualize()
 		{
 		}
 
-		public void LerpOverReset ()
+		public void LerpOverReset()
 		{
-            
+
 		}
 
-	
-		
-	
 
 
-		void Reset ()
+
+
+
+		void Reset()
 		{
-			
+
 		}
 
-		void OnDrawGizmos ()
+		void OnDrawGizmos()
 		{
 		}
 
-#endregion
+		#endregion
 
-        #if UNITY_EDITOR
-        public void Replace () {
-            Debug.Log("1");
-			if (this.gameObject.GetComponent<UnityLSBody>() != null) {
+#if UNITY_EDITOR
+		public void Replace()
+		{
+			Debug.Log("1");
+			if (this.gameObject.GetComponent<UnityLSBody>() != null)
+			{
 				return;
 			}
 			var uBody = this.gameObject.AddComponent<UnityLSBody>();
@@ -505,9 +540,9 @@ namespace Lockstep.Legacy
 			so.ApplyModifiedProperties();
 			EditorUtility.SetDirty(uBody);
 		}
-        #endif
+#endif
 
-    }
+	}
 
 
 }

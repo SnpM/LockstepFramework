@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using System.Collections.Generic;
+﻿using System.Collections;
+using FastCollections;
 using System;
 
 namespace Lockstep
@@ -68,25 +67,29 @@ namespace Lockstep
 			return FindClosestAgent(position, bufferAgents);
 		}
 
-        static FastList<FastBucket<LSInfluencer>> bufferBuckets = new FastList<FastBucket<LSInfluencer>>();
+		static FastList<FastBucket<LSInfluencer>> bufferBuckets = new FastList<FastBucket<LSInfluencer>>();
 		public static FastList<LSAgent> bufferAgents = new FastList<LSAgent>();
-		private static FastList<LSBody> bufferBodies = new FastList<LSBody> ();
+		private static FastList<LSBody> bufferBodies = new FastList<LSBody>();
 		public static void ScanAll(Vector2d position, long radius, Func<LSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, FastList<LSAgent> output)
 		{
 			//If radius is too big and we scan too many tiles, performance will be bad
 			const long circleCastRadius = FixedMath.One * 16;
 			output.FastClear();
 
-			if (radius >= circleCastRadius) {
-				bufferBodies.FastClear ();
-				PhysicsTool.CircleCast (position, radius, bufferBodies);
-				for (int i = 0; i < bufferBodies.Count; i++) {
-					var body = bufferBodies [i];
+			if (radius >= circleCastRadius)
+			{
+				bufferBodies.FastClear();
+				PhysicsTool.CircleCast(position, radius, bufferBodies);
+				for (int i = 0; i < bufferBodies.Count; i++)
+				{
+					var body = bufferBodies[i];
 					var agent = body.Agent;
 					//we have to check agent's controller since we did not filter it through buckets
-					if (agent.IsNotNull() && bucketConditional (agent.Controller.ControllerID)) {
-						if (agentConditional (agent)) {
-							output.Add (agent);
+					if (agent.IsNotNull() && bucketConditional(agent.Controller.ControllerID))
+					{
+						if (agentConditional(agent))
+						{
+							output.Add(agent);
 						}
 					}
 				}
@@ -111,11 +114,11 @@ namespace Lockstep
 					{
 						if (tempNode.AgentCount > 0)
 						{
-                            bufferBuckets.FastClear();
-                            tempNode.GetBucketsWithAllegiance(bucketConditional,bufferBuckets);
-                            for (int i = 0; i < bufferBuckets.Count; i++)
+							bufferBuckets.FastClear();
+							tempNode.GetBucketsWithAllegiance(bucketConditional, bufferBuckets);
+							for (int i = 0; i < bufferBuckets.Count; i++)
 							{
-                                FastBucket<LSInfluencer> tempBucket = bufferBuckets[i];
+								FastBucket<LSInfluencer> tempBucket = bufferBuckets[i];
 								BitArray arrayAllocation = tempBucket.arrayAllocation;
 								for (int j = 0; j < tempBucket.PeakCount; j++)
 								{
@@ -132,7 +135,8 @@ namespace Lockstep
 												output.Add(tempAgent);
 											}
 										}
-										else {
+										else
+										{
 										}
 									}
 								}

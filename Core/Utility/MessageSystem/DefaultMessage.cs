@@ -1,9 +1,6 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-
-namespace Lockstep
+﻿namespace Lockstep
 {
-    public class DefaultMessage : IMessage
-    {
-    }
+	public class DefaultMessage : IMessage
+	{
+	}
 }

@@ -1,3 +1,4 @@
-﻿namespace Lockstep {
-public interface IMessage {}
+﻿namespace Lockstep
+{
+	public interface IMessage { }
 }

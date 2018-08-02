@@ -1,23 +1,20 @@
 ﻿#if UNITY_EDITOR
 using Lockstep.Rotorz.ReorderableList;
-#endif
 using System;
 
 namespace Lockstep.Data
 {
-	#if UNITY_EDITOR
-
-	public class DataItemAttribute : System.Attribute
+	public class DataItemAttribute : Attribute
 	{
-		public DataItemAttribute ()
+		public DataItemAttribute()
 		{
 			_writableName = true;
-			_listFlags = Rotorz.ReorderableList.ReorderableListFlags.DisableReordering;
+			_listFlags = ReorderableListFlags.DisableReordering;
 		}
 
-		public DataItemAttribute (
-			bool writableName, 
-			ReorderableListFlags listFlags, 
+		public DataItemAttribute(
+			bool writableName,
+			ReorderableListFlags listFlags,
 			bool autoGenerate,
 			bool useFilter,
 			Type scriptBaseType)
@@ -48,6 +45,6 @@ namespace Lockstep.Data
 
 		public Type ScriptBaseType { get { return _scriptBaseType; } }
 	}
-	#endif
-
 }
+
+#endif

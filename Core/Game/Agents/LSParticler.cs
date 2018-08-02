@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 
 namespace Lockstep
 {
@@ -7,18 +6,18 @@ namespace Lockstep
 	{
 		LSAnimatorBase animator;
 
-		void Awake ()
+		void Awake()
 		{
-			animator = GetComponent<LSAnimatorBase> ();
+			animator = GetComponent<LSAnimatorBase>();
 			animator.OnStatePlay += HandleOnStatePlay;
 			animator.OnImpulsePlay += HandleOnImpulsePlay;
 		}
 
-		void HandleOnImpulsePlay (AnimImpulse obj, int rate)
+		void HandleOnImpulsePlay(AnimImpulse obj, int rate)
 		{
 		}
 
-		void HandleOnStatePlay (AnimState obj)
+		void HandleOnStatePlay(AnimState obj)
 		{
 
 		}

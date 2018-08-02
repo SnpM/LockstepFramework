@@ -4,12 +4,11 @@ namespace Lockstep
 {
 	public class Turn : Ability
 	{
-
 		#region Serialized
-		[SerializeField, VectorRotation (true)]
-		private Vector2d
-		_turnRate = Vector2d.CreateRotation (FixedMath.One / 8);
+		[SerializeField, VectorRotation(true)]
+		private Vector2d _turnRate = Vector2d.CreateRotation(FixedMath.One / 8);
 		#endregion
+		
 		private bool targetReached;
 		private Vector2d targetRotation;
 		private long turnSin;
@@ -20,7 +19,7 @@ namespace Lockstep
 
 		private long collisionTurnThreshold;
 
-		protected override void OnSetup ()
+		protected override void OnSetup()
 		{
 			Agent.Body = Agent.Body;
 
@@ -32,7 +31,7 @@ namespace Lockstep
 			Agent.Body.onContact += HandleContact;
 		}
 
-		protected override void OnInitialize ()
+		protected override void OnInitialize()
 		{
 			targetReached = true;
 			targetRotation = Vector2d.up;
@@ -43,37 +42,51 @@ namespace Lockstep
 		}
 
 		bool isColliding;
-		void CheckAutoturn () {
-			if (isColliding) {
+		void CheckAutoturn()
+		{
+			if (isColliding)
+			{
 				isColliding = false;
 				//autoturn direction will be culmination of positional changes
-				if (targetReached == true && Agent.IsCasting == false && !(Agent.Body.Immovable || Agent.Body.IsTrigger)) {
+				if (targetReached == true && Agent.IsCasting == false && !(Agent.Body.Immovable || Agent.Body.IsTrigger))
+				{
 					Vector2d delta = this.Agent.Body._position - this.Agent.Body.LastPosition;
-					if (delta.FastMagnitude () > collisionTurnThreshold) {
-						delta.Normalize ();
-						this.StartTurnDirection (delta);
+					if (delta.FastMagnitude() > collisionTurnThreshold)
+					{
+						delta.Normalize();
+						this.StartTurnDirection(delta);
 					}
 				}
 			}
 		}
-		protected override void OnSimulate ()
+		protected override void OnSimulate()
 		{
 
-			if (targetReached == false) {
-				if (cachedBeginCheck != 0) {
+			if (targetReached == false)
+			{
+				if (cachedBeginCheck != 0)
+				{
 					{
-						if (cachedBeginCheck < 0) {
-							Agent.Body.Rotate (turnCos, turnSin);
-						} else {
-							Agent.Body.Rotate (turnCos, -turnSin);
+						if (cachedBeginCheck < 0)
+						{
+							Agent.Body.Rotate(turnCos, turnSin);
+						}
+						else
+						{
+							Agent.Body.Rotate(turnCos, -turnSin);
 						}
 					}
 
-				} else {
-					if (Agent.Body._rotation.Dot (targetRotation.x, targetRotation.y) < 0) {
-						Agent.Body.Rotate (turnCos, turnSin);
-					} else {
-						Arrive ();
+				}
+				else
+				{
+					if (Agent.Body._rotation.Dot(targetRotation.x, targetRotation.y) < 0)
+					{
+						Agent.Body.Rotate(turnCos, turnSin);
+					}
+					else
+					{
+						Arrive();
 					}
 				}
 				Agent.Body.RotationChanged = true;
@@ -81,78 +94,90 @@ namespace Lockstep
 		}
 
 
-		protected override void OnLateSimulate ()
+		protected override void OnLateSimulate()
 		{
-			if (targetReached == false) {
-				long check = Agent.Body._rotation.Cross (targetRotation.x, targetRotation.y);
-				if (check == 0 || ((cachedBeginCheck < 0) != (check < 0))) {
-					Arrive ();
+			if (targetReached == false)
+			{
+				long check = Agent.Body._rotation.Cross(targetRotation.x, targetRotation.y);
+				if (check == 0 || ((cachedBeginCheck < 0) != (check < 0)))
+				{
+					Arrive();
 				}
-			} else {
-				CheckAutoturn ();
+			}
+			else
+			{
+				CheckAutoturn();
 
 			}
-			if (bufferStartTurn) {
+			if (bufferStartTurn)
+			{
 				bufferStartTurn = false;
-				_StartTurn (bufferTargetRot);
+				_StartTurn(bufferTargetRot);
 			}
 		}
 
-		private void Arrive ()
+		private void Arrive()
 		{
 			Agent.Body._rotation = targetRotation;
 			Agent.Body.RotationChanged = true;
 			targetReached = true;
 		}
-		public void StartTurnVector (Vector2d targetVector)
+		public void StartTurnVector(Vector2d targetVector)
 		{
-			targetVector.Normalize ();
-			StartTurnDirection (targetVector);
+			targetVector.Normalize();
+			StartTurnDirection(targetVector);
 		}
-		public void StartTurnDirection (Vector2d targetDirection)
+		public void StartTurnDirection(Vector2d targetDirection)
 		{
 			bufferStartTurn = true;
-			bufferTargetRot = targetDirection.ToRotation ();
+			bufferTargetRot = targetDirection.ToRotation();
 		}
 		//TODO: Implement this!
-		public void SetDefaultTurn (Vector2d targetDirection) {
+		public void SetDefaultTurn(Vector2d targetDirection)
+		{
 
 		}
 
-		private void _StartTurn (Vector2d targetRot)
+		private void _StartTurn(Vector2d targetRot)
 		{
 			long tempCheck;
-			if (targetRot.NotZero () &&
-			   (((tempCheck = Agent.Body._rotation.Cross (targetRot.x, targetRot.y)) != 0) ||
-				(Agent.Body._rotation.Dot (targetRot.x, targetRot.y) < 0))
-			   ) {
-				if (tempCheck.AbsLessThan (turnSin) && Agent.Body._rotation.Dot (targetRot.x, targetRot.y) > 0) {
+			if (targetRot.NotZero() &&
+			   (((tempCheck = Agent.Body._rotation.Cross(targetRot.x, targetRot.y)) != 0) ||
+				(Agent.Body._rotation.Dot(targetRot.x, targetRot.y) < 0))
+			   )
+			{
+				if (tempCheck.AbsLessThan(turnSin) && Agent.Body._rotation.Dot(targetRot.x, targetRot.y) > 0)
+				{
 					targetRotation = targetRot;
-					Arrive ();
-				} else {
+					Arrive();
+				}
+				else
+				{
 					cachedBeginCheck = tempCheck;
 					targetRotation = targetRot;
 					targetReached = false;
 				}
-			} else {
+			}
+			else
+			{
 
 			}
 		}
 		bool bufferStartTurn;
 		Vector2d bufferTargetRot;
 
-		public void StopTurn ()
+		public void StopTurn()
 		{
 			targetReached = true;
 		}
 
-		protected override void OnStopCast ()
+		protected override void OnStopCast()
 		{
-			StopTurn ();
+			StopTurn();
 		}
 
 
-		private void HandleContact (LSBody other)
+		private void HandleContact(LSBody other)
 		{
 			isColliding = true;
 

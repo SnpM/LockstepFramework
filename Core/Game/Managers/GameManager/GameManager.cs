@@ -1,5 +1,4 @@
-﻿using Lockstep;
-using UnityEngine;
+﻿using UnityEngine;
 using Lockstep.NetworkHelpers;
 
 namespace Lockstep

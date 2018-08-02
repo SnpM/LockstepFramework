@@ -1,10 +1,7 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-
-namespace Lockstep.Data
+﻿namespace Lockstep.Data
 {
-    public interface IEffectData : INamedData
-    {
-        LSEffect GetEffect ();
-    }
+	public interface IEffectData : INamedData
+	{
+		LSEffect GetEffect();
+	}
 }

@@ -1,30 +1,29 @@
-﻿using System.Collections; using FastCollections;
-using System.Collections.Generic;
-using UnityEngine;
-namespace Lockstep
+﻿namespace Lockstep
 {
 	[System.Serializable]
 	public class LSNetworkSettings
 	{
 		private static LSNetworkSettings _settings;
-		public static LSNetworkSettings Settings {
-			get {
-				return _settings ?? (_settings = new LSNetworkSettings ());
+		public static LSNetworkSettings Settings
+		{
+			get
+			{
+				return _settings ?? (_settings = new LSNetworkSettings());
 			}
-			set {
+			set
+			{
 				_settings = value;
 			}
 		}
-		public JitterSettings JitterSettings = new JitterSettings (2f, .1f, .004f);
-				
+		public JitterSettings JitterSettings = new JitterSettings(2f, .1f, .004f);
+
 
 	}
+	
 	[System.Serializable]
 	public struct JitterSettings
 	{
-		
-
-		public JitterSettings (float compensation, float sensitivity, float degrade)
+		public JitterSettings(float compensation, float sensitivity, float degrade)
 		{
 			JitterCompensation = compensation;
 			JitterSensitivity = sensitivity;

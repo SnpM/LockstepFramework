@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 using System;
-using UnityEngine.EventSystems;
 using Lockstep.Data;
+
 namespace Lockstep
 {
 	public static class RTSInterfacing
 	{
 		public static Camera mainCamera { get { return Camera.main; } }
 
-		public static void Initialize ()
+		public static void Initialize()
 		{
 			CachedDidHit = false;
 		}
@@ -30,56 +29,68 @@ namespace Lockstep
 			Command curCom = null;
 			switch (facer.InformationGather)
 			{
-			case InformationGatherType.Position:
-				curCom = new Command(facer.ListenInputID);
-				curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
-				break;
-			case InformationGatherType.Target:
-				curCom = new Command(facer.ListenInputID);
-				if (RTSInterfacing.MousedAgent.IsNotNull())
-				{
-					curCom.SetData<DefaultData>(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.LocalID));
-				}
-				break;
-			case InformationGatherType.PositionOrTarget:
-				curCom = new Command(facer.ListenInputID);
-				if (RTSInterfacing.MousedAgent.IsNotNull())
-				{
-					curCom.Add<DefaultData>(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.GlobalID));
-				} else
-				{
+				case InformationGatherType.Position:
+					curCom = new Command(facer.ListenInputID);
 					curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
-				}
-				break;
-			case InformationGatherType.None:
-				curCom = new Command(facer.ListenInputID);
-				break;
+					break;
+				case InformationGatherType.Target:
+					curCom = new Command(facer.ListenInputID);
+					if (RTSInterfacing.MousedAgent.IsNotNull())
+					{
+						curCom.SetData<DefaultData>(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.LocalID));
+					}
+					break;
+				case InformationGatherType.PositionOrTarget:
+					curCom = new Command(facer.ListenInputID);
+					if (RTSInterfacing.MousedAgent.IsNotNull())
+					{
+						curCom.Add<DefaultData>(new DefaultData(DataType.UShort, RTSInterfacing.MousedAgent.GlobalID));
+					}
+					else
+					{
+						curCom.Add<Vector2d>(RTSInterfacing.GetWorldPosD(Input.mousePosition));
+					}
+					break;
+				case InformationGatherType.None:
+					curCom = new Command(facer.ListenInputID);
+					break;
 			}
 
 			return curCom;
 		}
 
-		public static LSAgent GetScreenAgent (Vector2 screenPos, Func<LSAgent, bool> conditional = null)
+		public static LSAgent GetScreenAgent(Vector2 screenPos, Func<LSAgent, bool> conditional = null)
 		{
 			if (conditional == null)
-				conditional = (agent) => {
-					return true;};
+				conditional = (agent) =>
+				{
+					return true;
+				};
 			agentFound = false;
-			Ray ray = Camera.main.ScreenPointToRay (screenPos);
+			Ray ray = Camera.main.ScreenPointToRay(screenPos);
 			checkDir = ray.direction;
 			checkOrigin = ray.origin;
-			for (int i = 0; i < AgentController.PeakGlobalID; i++) {
-				if (AgentController.GlobalAgentActive [i]) {
-					LSAgent agent = AgentController.GlobalAgents [i];
-					if (agent.IsVisible) {
-						if (conditional (agent)) {
-							if (AgentIntersects (agent)) {
-								if (agentFound) {
-									if (heightDif < closestDistance) {
+			for (int i = 0; i < AgentController.PeakGlobalID; i++)
+			{
+				if (AgentController.GlobalAgentActive[i])
+				{
+					LSAgent agent = AgentController.GlobalAgents[i];
+					if (agent.IsVisible)
+					{
+						if (conditional(agent))
+						{
+							if (AgentIntersects(agent))
+							{
+								if (agentFound)
+								{
+									if (heightDif < closestDistance)
+									{
 										closestDistance = heightDif;
 										closestAgent = agent;
 									}
-								} else {
+								}
+								else
+								{
 									agentFound = true;
 									closestAgent = agent;
 									closestDistance = heightDif;
@@ -94,14 +105,15 @@ namespace Lockstep
 			return null;
 		}
 
-		public static void Visualize ()
+		public static void Visualize()
 		{
 
-			if (mainCamera .IsNotNull ()) {
-				CachedRay = mainCamera.ScreenPointToRay (Input.mousePosition);
-				CachedDidHit = NDRaycast.Raycast (CachedRay, out CachedHit);
+			if (mainCamera.IsNotNull())
+			{
+				CachedRay = mainCamera.ScreenPointToRay(Input.mousePosition);
+				CachedDidHit = NDRaycast.Raycast(CachedRay, out CachedHit);
 
-				MousedAgent = GetScreenAgent (Input.mousePosition, (agent) => {return true;});
+				MousedAgent = GetScreenAgent(Input.mousePosition, (agent) => { return true; });
 			}
 		}
 
@@ -115,48 +127,52 @@ namespace Lockstep
 
 		public static bool CachedDidHit { get; private set; }
 
-		public static Vector2d GetWorldPosHeight (Vector2 screenPos, float height = 0) {
+		public static Vector2d GetWorldPosHeight(Vector2 screenPos, float height = 0)
+		{
 			if (Camera.main == null) return Vector2d.zero;
-			Ray ray = Camera.main.ScreenPointToRay (screenPos);
+			Ray ray = Camera.main.ScreenPointToRay(screenPos);
 			//RaycastHit hit;
 
 			Vector3 hitPoint = ray.origin - ray.direction * ((ray.origin.y - height) / ray.direction.y);
 			//return new Vector2d(hitPoint.x * LockstepManager.InverseWorldScale, hitPoint.z * LockstepManager.InverseWorldScale);
-			return new Vector2d (hitPoint.x, hitPoint.z);
+			return new Vector2d(hitPoint.x, hitPoint.z);
 		}
-		public static Vector2d GetWorldPosD (Vector2 screenPos)
+		public static Vector2d GetWorldPosD(Vector2 screenPos)
 		{
-            Ray ray = Camera.main.ScreenPointToRay (screenPos);
+			Ray ray = Camera.main.ScreenPointToRay(screenPos);
 			RaycastHit hit;
-			if (NDRaycast.Raycast (ray, out hit)) {
+			if (NDRaycast.Raycast(ray, out hit))
+			{
 				//return new Vector2d(hit.point.x * LockstepManager.InverseWorldScale, hit.point.z * LockstepManager.InverseWorldScale);
-				return new Vector2d (hit.point.x, hit.point.z);
+				return new Vector2d(hit.point.x, hit.point.z);
 			}
 			Vector3 hitPoint = ray.origin - ray.direction * (ray.origin.y / ray.direction.y);
 			//return new Vector2d(hitPoint.x * LockstepManager.InverseWorldScale, hitPoint.z * LockstepManager.InverseWorldScale);
-			return new Vector2d (hitPoint.x, hitPoint.z);
+			return new Vector2d(hitPoint.x, hitPoint.z);
 		}
-		
-		public static Vector2 GetWorldPos (Vector2 screenPos)
+
+		public static Vector2 GetWorldPos(Vector2 screenPos)
 		{
 			if (mainCamera == null)
-				return default (Vector2);
-			Ray ray = mainCamera.ScreenPointToRay (screenPos);
+				return default(Vector2);
+			Ray ray = mainCamera.ScreenPointToRay(screenPos);
 			RaycastHit hit;
-			if (NDRaycast.Raycast (ray, out hit)) {
+			if (NDRaycast.Raycast(ray, out hit))
+			{
 				//return new Vector2(hit.point.x * LockstepManager.InverseWorldScale, hit.point.z * LockstepManager.InverseWorldScale);
-				return new Vector2 (hit.point.x, hit.point.z);
+				return new Vector2(hit.point.x, hit.point.z);
 			}
 			Vector3 hitPoint = ray.origin - ray.direction * (ray.origin.y / ray.direction.y);
 			//return new Vector2(hitPoint.x * LockstepManager.InverseWorldScale, hitPoint.z * LockstepManager.InverseWorldScale);
-			return new Vector2 (hitPoint.x, hitPoint.z);
+			return new Vector2(hitPoint.x, hitPoint.z);
 		}
 
-		public static Vector3 GetWorldPos3 (Vector2 screenPos)
+		public static Vector3 GetWorldPos3(Vector2 screenPos)
 		{
-			Ray ray = mainCamera.ScreenPointToRay (screenPos);
+			Ray ray = mainCamera.ScreenPointToRay(screenPos);
 			RaycastHit hit;
-			if (NDRaycast.Raycast (ray, out hit)) {
+			if (NDRaycast.Raycast(ray, out hit))
+			{
 				//return new Vector2(hit.point.x * LockstepManager.InverseWorldScale, hit.point.z * LockstepManager.InverseWorldScale);
 				return hit.point;
 			}
@@ -165,9 +181,9 @@ namespace Lockstep
 			return hitPoint;
 		}
 
-		public static void ActivateMarkerOnMouse (MarkerType markerType)
+		public static void ActivateMarkerOnMouse(MarkerType markerType)
 		{
-            #if false
+#if false
             if (CachedDidHit) {
                 PlayerManager.OrderMarker.PlayOneShot (CachedHit.point, CachedHit.normal, markerType);
                 return;
@@ -175,15 +191,16 @@ namespace Lockstep
             Vector3 hitPoint = CachedRay.origin - CachedRay.direction * (CachedRay.origin.y / CachedRay .direction.y);
                      if (PlayerManager.OrderMarker != null)
             PlayerManager.OrderMarker.PlayOneShot (hitPoint, Vector3.up, markerType);
-            #endif
+#endif
 		}
 
 		private static Vector3 checkDir;
 		private static Vector3 checkOrigin;
 
-		private static bool AgentIntersects (LSAgent agent)
+		private static bool AgentIntersects(LSAgent agent)
 		{
-			if (agent.IsVisible) {
+			if (agent.IsVisible)
+			{
 				Vector3 agentPos = agent.VisualCenter.position;
 				heightDif = checkOrigin.y - agentPos.y;
 				float scaler = heightDif / checkDir.y;
@@ -191,7 +208,8 @@ namespace Lockstep
 				levelPos.x = (checkOrigin.x - (checkDir.x * scaler)) - agentPos.x;
 				levelPos.y = (checkOrigin.z - (checkDir.z * scaler)) - agentPos.z;
 
-				if (levelPos.sqrMagnitude <= agent.SelectionRadiusSquared) {
+				if (levelPos.sqrMagnitude <= agent.SelectionRadiusSquared)
+				{
 					return true;
 				}
 			}

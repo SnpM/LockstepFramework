@@ -1,24 +1,24 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
 namespace Lockstep.Data
 {
 	[System.Serializable]
-	public class AgentControllerDataItem : DataItem {
-		[SerializeField]
-		protected AllegianceType _defaultAllegiance;
+	public class AgentControllerDataItem : DataItem
+	{
+		[SerializeField] protected AllegianceType _defaultAllegiance;
 		public AllegianceType DefaultAllegiance { get { return _defaultAllegiance; } }
 
-		[SerializeField]
-		protected bool _playerManaged;
+		[SerializeField] protected bool _playerManaged;
 
-		[SerializeField,DataCode ("Agents")]
+		[SerializeField, DataCode("Agents")]
 		private string _commanderCode;
-		public string CommanderCode {get {return _commanderCode;}}
+
+		public string CommanderCode { get { return _commanderCode; } }
 
 		public bool PlayerManaged { get { return _playerManaged; } }
 
-		public AgentControllerDataItem (string name) {
+		public AgentControllerDataItem(string name)
+		{
 			_name = name;
 		}
 	}

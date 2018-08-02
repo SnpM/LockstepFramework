@@ -1,10 +1,8 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-namespace Lockstep
+﻿namespace Lockstep
 {
 	public class AttackerInfo
 	{
-		public AttackerInfo (LSAgent attacker, AgentController controller)
+		public AttackerInfo(LSAgent attacker, AgentController controller)
 		{
 			Attacker = attacker;
 			Controller = controller;

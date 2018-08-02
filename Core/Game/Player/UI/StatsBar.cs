@@ -1,114 +1,112 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using UnityEngine.UI;
 using System;
 
 namespace Lockstep.UI
 {
 	public class StatsBar : MonoBehaviour
 	{
-		[SerializeField]
-		private BarElement
-			_shield;
-		[SerializeField]
-		private BarElement
-			_health;
-		[SerializeField]
-		private BarElement
-			_energy;
+		[SerializeField] private BarElement _shield;
+		[SerializeField] private BarElement _health;
+		[SerializeField] private BarElement _energy;
 
-        Vector3 _offset;
-        Vector3 Offset { get { return _offset; } }
+		Vector3 _offset;
+		Vector3 Offset { get { return _offset; } }
 
 		public LSAgent TrackedAgent { get; private set; }
 
-		void Awake ()
+		void Awake()
 		{
-            _offset = Vector3.zero;
-			gameObject.SetActive (false);
+			_offset = Vector3.zero;
+			gameObject.SetActive(false);
 		}
 
-		public void Setup (LSAgent agent)
+		public void Setup(LSAgent agent)
 		{
 			TrackedAgent = agent;
-			GameObject.DontDestroyOnLoad (gameObject);
-			this.gameObject.name = agent.ToString ();
+			GameObject.DontDestroyOnLoad(gameObject);
+			this.gameObject.name = agent.ToString();
 		}
 
-		private static StatBarType[] statTypes = (StatBarType[])Enum.GetValues (typeof(StatBarType));
+		private static StatBarType[] statTypes = (StatBarType[])Enum.GetValues(typeof(StatBarType));
 
-		public void Initialize ()
+		public void Initialize()
 		{
-			gameObject.SetActive (true);
-			foreach (StatBarType statType in statTypes) {
-				SetFill (statType, 1f);
+			gameObject.SetActive(true);
+			foreach (StatBarType statType in statTypes)
+			{
+				SetFill(statType, 1f);
 			}
-			UpdatePos ();
-			UpdateScale ();
+			UpdatePos();
+			UpdateScale();
 		}
 
-		public void Visualize ()
+		public void Visualize()
 		{
-            if (RTSInterfacingHelper.GUIManager.CameraChanged && TrackedAgent.IsVisible) {
-				this.UpdatePos ();
-				this.UpdateScale ();
-			} else if (TrackedAgent.VisualPositionChanged) {
-				this.UpdatePos ();
+			if (RTSInterfacingHelper.GUIManager.CameraChanged && TrackedAgent.IsVisible)
+			{
+				this.UpdatePos();
+				this.UpdateScale();
+			}
+			else if (TrackedAgent.VisualPositionChanged)
+			{
+				this.UpdatePos();
 			}
 		}
 
-        static GUIManager GUIManager {get {return RTSInterfacingHelper.GUIManager;}}
+		static GUIManager GUIManager { get { return RTSInterfacingHelper.GUIManager; } }
 		static Camera MainCam { get { return GUIManager.MainCam; } }
 
 		static Vector3 screenPos;
 
-		private void UpdatePos ()
+		private void UpdatePos()
 		{
 			if (GUIManager.CanHUD == false) return;
-			screenPos = MainCam.WorldToScreenPoint (TrackedAgent.VisualCenter.position + Offset);
+			screenPos = MainCam.WorldToScreenPoint(TrackedAgent.VisualCenter.position + Offset);
 			transform.position = screenPos;
 		}
 
 		static Vector3 tempScale;
 
-		private void UpdateScale ()
+		private void UpdateScale()
 		{
 			if (GUIManager.CanHUD == false) return;
-			float scale = Mathf.Max (TrackedAgent.SelectionRadius / 1f, .1f);
+			float scale = Mathf.Max(TrackedAgent.SelectionRadius / 1f, .1f);
 			tempScale.x = GUIManager.CameraScale * scale;
 			tempScale.y = GUIManager.CameraScale;
 			transform.localScale = tempScale;
 		}
 
-		public void SetFill (StatBarType statType, float amount)
+		public void SetFill(StatBarType statType, float amount)
 		{
 			BarElement element = null;
-			switch (statType) {
-			case StatBarType.Shield:
-				element = _shield;
-				break;
-			case StatBarType.Health:
-				element = _health;
-				break;
-			case StatBarType.Energy:
-				element = _energy;
-				break;
+			switch (statType)
+			{
+				case StatBarType.Shield:
+					element = _shield;
+					break;
+				case StatBarType.Health:
+					element = _health;
+					break;
+				case StatBarType.Energy:
+					element = _energy;
+					break;
 			}
-			if (TrackedAgent.IsVisible == false ||  (amount >= 1f && !GUIManager.ShowHealthWhenFull)) {
+			if (TrackedAgent.IsVisible == false || (amount >= 1f && !GUIManager.ShowHealthWhenFull))
+			{
 
-				element.gameObject.SetActive (false);
+				element.gameObject.SetActive(false);
 				return;
 			}
 			{
-				element.SetFill (amount);
-				element.gameObject.SetActive (true);
+				element.SetFill(amount);
+				element.gameObject.SetActive(true);
 			}
 		}
 
-		public void Deactivate ()
+		public void Deactivate()
 		{
-            if (gameObject == null) return;
-				gameObject.SetActive (false);
+			if (gameObject == null) return;
+			gameObject.SetActive(false);
 		}
 	}
 

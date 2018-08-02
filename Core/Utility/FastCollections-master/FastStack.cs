@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using System;
+﻿using System;
+
 namespace FastCollections
 {
 	public class FastStack<T>
@@ -9,69 +9,74 @@ namespace FastCollections
 		public int Count = 0;
 		public int Capacity;
 
-		public FastStack (int StartCapacity)
+		public FastStack(int StartCapacity)
 		{
 			Capacity = StartCapacity;
-			Initialize ();
+			Initialize();
 		}
-		public FastStack ()
+		public FastStack()
 		{
 			Capacity = DefaultCapacity;
-			Initialize ();
+			Initialize();
 		}
-		
-		private void Initialize ()
+
+		private void Initialize()
 		{
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			if (Capacity <= 0)
 			{
-				UnityEngine.Debug.LogError ("Initializing list with capacity less than or equal to zero isn't supported");
+				UnityEngine.Debug.LogError("Initializing list with capacity less than or equal to zero isn't supported");
 			}
-			#endif
+#endif
 			innerArray = new T[Capacity];
 		}
-		
-		public void Add (T item)
+
+		public void Add(T item)
 		{
-			EnsureCapacity ();
- 			innerArray [Count++] = item;
+			EnsureCapacity();
+			innerArray[Count++] = item;
 		}
-		
-		public T Pop ()
+
+		public T Pop()
 		{
 			return (innerArray[--Count]);
 		}
 
-		public T Peek ()
+		public T Peek()
 		{
 			return innerArray[Count - 1];
 		}
-		
-		private void EnsureCapacity ()
+
+		private void EnsureCapacity()
 		{
-            EnsureCapacity (Count + 1);
+			EnsureCapacity(Count + 1);
 		}
-        public void EnsureCapacity (int min) {
-            if (Capacity < min) {
-                Capacity *= 2;
-                if (Capacity < min)
-                    Capacity = min;
-                T[] newItems = new T[Capacity];
-                Array.Copy (innerArray, 0, newItems, 0, Count);
-                innerArray = newItems;  
-            }
-        }
-		
-		public T this [int index] {
-			get {
-				return innerArray [index];
-			}
-			set {
-				innerArray [index] = value;
+		public void EnsureCapacity(int min)
+		{
+			if (Capacity < min)
+			{
+				Capacity *= 2;
+				if (Capacity < min)
+					Capacity = min;
+				T[] newItems = new T[Capacity];
+				Array.Copy(innerArray, 0, newItems, 0, Count);
+				innerArray = newItems;
 			}
 		}
 
-		public void Clear ()
+		public T this[int index]
+		{
+			get
+			{
+				return innerArray[index];
+			}
+			set
+			{
+				innerArray[index] = value;
+			}
+		}
+
+		public void Clear()
 		{
 			innerArray = new T[Capacity];
 		}
@@ -79,23 +84,23 @@ namespace FastCollections
 		/// <summary>
 		/// Marks elements for overwriting. Note: After using FastClear(), this list will still keep any references to objects it previously had.
 		/// </summary>
-		public void FastClear ()
+		public void FastClear()
 		{
 			Count = 0;
 		}
-		
-		public override string ToString ()
+
+		public override string ToString()
 		{
 			if (Count <= 0)
-				return base.ToString ();
+				return base.ToString();
 			string output = string.Empty;
 			for (int i = 0; i < Count - 1; i++)
-				output += innerArray [i] + ", ";
-			
-			return base.ToString () + ": " + output + innerArray [Count - 1];
+				output += innerArray[i] + ", ";
+
+			return base.ToString() + ": " + output + innerArray[Count - 1];
 		}
 
 
-		
+
 	}
 }

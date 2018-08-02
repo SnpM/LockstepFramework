@@ -1,8 +1,4 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using Lockstep;
-using Lockstep.Abilities;
-using Lockstep.Utility;
+﻿
 namespace Lockstep
 {
 	public class BuildGridNode
@@ -15,7 +11,7 @@ namespace Lockstep
 		public BuildGridManager ParentGrid { get; private set; }
 		public Coordinate Position { get; private set; }
 		public bool Occupied { get { return RegisteredBuilding != null; } }
-		public Lockstep.IBuildable RegisteredBuilding { get; set;}
+		public Lockstep.IBuildable RegisteredBuilding { get; set; }
 		public bool IsNeighbor
 		{
 			get
