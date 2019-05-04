@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Lockstep.Rotorz.ReorderableList {
+namespace Lockstep_Rotorz.ReorderableList {
 
 	/// <summary>
 	/// Reorderable list adaptor for generic list.
@@ -28,8 +28,8 @@ namespace Lockstep.Rotorz.ReorderableList {
 		/// <summary>
 		/// Fixed height of each list item.
 		/// </summary>
-		public Func<T, float> ItemHeightGetter;
 		public float FixedItemHeight;
+
 		/// <summary>
 		/// Gets the underlying list data structure.
 		/// </summary>
@@ -56,17 +56,11 @@ namespace Lockstep.Rotorz.ReorderableList {
 		/// <param name="list">The list which can be reordered.</param>
 		/// <param name="itemDrawer">Callback to draw list item.</param>
 		/// <param name="itemHeight">Height of list item in pixels.</param>
-		public GenericListAdaptor(
-			IList<T> list,
-		    ReorderableListControl.ItemDrawer<T> itemDrawer, 
-			float itemHeight = 50,
-			Func<T, float> itemHeightGetter = null) {
+		public GenericListAdaptor(IList<T> list, ReorderableListControl.ItemDrawer<T> itemDrawer, float itemHeight) {
 			this._list = list;
 			this._itemDrawer = itemDrawer ?? ReorderableListGUI.DefaultItemDrawer;
 			this.FixedItemHeight = itemHeight;
-			this.ItemHeightGetter = itemHeightGetter;
 		}
-
 
 		#endregion
 
@@ -141,7 +135,6 @@ namespace Lockstep.Rotorz.ReorderableList {
 
 		/// <inheritdoc/>
 		public virtual float GetItemHeight(int index) {
-			if (ItemHeightGetter != null) return ItemHeightGetter (_list[index]);
 			return FixedItemHeight;
 		}
 

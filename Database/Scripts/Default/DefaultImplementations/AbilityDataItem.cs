@@ -7,7 +7,7 @@ namespace Lockstep.Data
 #if UNITY_EDITOR
 	[DataItemAttribute(
 		false,
-		Rotorz.ReorderableList.ReorderableListFlagsUtility.DefinedItems,
+		Lockstep_Rotorz.ReorderableList.ReorderableListFlagsUtility.DefinedItems,
 		true,
 		true,
 		typeof(ActiveAbility))]

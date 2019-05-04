@@ -1,12 +1,12 @@
 // Copyright (c) Rotorz Limited. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root.
 
-using Lockstep.Rotorz.ReorderableList.Internal;
+using Lockstep_Rotorz.ReorderableList.Internal;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lockstep.Rotorz.ReorderableList {
-	
+namespace Lockstep_Rotorz.ReorderableList {
+
 	/// <summary>
 	/// Styles for the <see cref="ReorderableListControl"/>.
 	/// </summary>
@@ -16,7 +16,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 			Title = new GUIStyle();
 			Title.border = new RectOffset(2, 2, 2, 1);
 			Title.margin = new RectOffset(5, 5, 5, 0);
-			Title.padding = new RectOffset(5, 5, 0, 0);
+			Title.padding = new RectOffset(5, 5, 3, 3);
 			Title.alignment = TextAnchor.MiddleLeft;
 			Title.normal.background = ReorderableListResources.GetTexture(ReorderableListTexture.TitleBackground);
 			Title.normal.textColor = EditorGUIUtility.isProSkin
@@ -25,7 +25,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 
 			Container = new GUIStyle();
 			Container.border = new RectOffset(2, 2, 2, 2);
-			Container.margin = new RectOffset(5, 5, 5, 5);
+			Container.margin = new RectOffset(5, 5, 0, 0);
 			Container.padding = new RectOffset(2, 2, 2, 2);
 			Container.normal.background = ReorderableListResources.GetTexture(ReorderableListTexture.ContainerBackground);
 

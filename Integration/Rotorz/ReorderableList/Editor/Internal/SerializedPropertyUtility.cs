@@ -1,11 +1,11 @@
 // Copyright (c) Rotorz Limited. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root.
-#if UNITY_EDITOR
+
 using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lockstep.Rotorz.ReorderableList.Internal {
+namespace Lockstep_Rotorz.ReorderableList.Internal {
 
 	/// <summary>
 	/// Utility functionality for <see cref="SerializedPropertyAdaptor"/> implementations.
@@ -72,6 +72,10 @@ namespace Lockstep.Rotorz.ReorderableList.Internal {
 				case SerializedPropertyType.Gradient:
 					//!TODO: Amend when Unity add a public API for setting the gradient.
 					break;
+			}
+
+			if (property.isArray) {
+				property.arraySize = 0;
 			}
 
 			ResetChildPropertyValues(property);
@@ -173,4 +177,3 @@ namespace Lockstep.Rotorz.ReorderableList.Internal {
 	}
 
 }
-#endif
