@@ -156,50 +156,61 @@ namespace Lockstep
 
 					//refresh source in case the map changed
 					var source = NeighborNodes[_clearanceSource];
-					var prevSourceClearance = source.ClearanceDegree;
-					if (source.ClearanceDegree < _clearanceDegree)
-					{
-						source.UpdateValues();
-						//It can no longer be trusted!
-						if (source.ClearanceDegree != prevSourceClearance)
-						{
-							_clearanceDegree = DEFAULT_DEGREE;
-							_clearanceSource = DEFAULT_SOURCE;
-						}
-					}
-					else
-					{
-						_clearanceDegree = (byte)(source.ClearanceDegree + 1);
-					}
-				}
-
-				//This method isn't always 100% accurate but after several updates, it will have a better picture of the map
-				//TODO: Test this thoroughly and visualize
-				for (int i = 7; i >= 0; i--)
-				{
-					var neighbor = NeighborNodes[i];
-					if (neighbor.IsNull() || neighbor.Unwalkable)
-					{
-						_clearanceDegree = 1;
-						_clearanceSource = (byte)i;
-						break;
-					}
-					if (neighbor._clearanceDegree < ClearanceDegree)
-					{
-						_clearanceDegree = (byte)(neighbor._clearanceDegree + 1);
-						_clearanceSource = (byte)i;
-					}
-				}
+                    if (source.IsNull() == false)
+                    {
+                        var prevSourceDegree = source.ClearanceDegree;
+                        if (source.ClearanceDegree < _clearanceDegree)
+                        {
+                            source.UpdateValues();
+                            //Clearance from source can no longer be trusted!
+                            if (source.ClearanceDegree != prevSourceDegree)
+                            {
+                                _clearanceDegree = DEFAULT_DEGREE;
+                                _clearanceSource = DEFAULT_SOURCE;
+                            }
+                        }
+                        else
+                        {
+                            _clearanceDegree = (byte)(source.ClearanceDegree + 1);
+                        }
+                    }
+                    //This method isn't always 100% accurate but after several updates, it will have a better picture of the map
+                    //Clarification: _clearanceSource is the source of a blockage. It's cached so that when the map is changed, the source of the major block can be rechecked for changes.
+                    //TODO: Test this thoroughly and visualize
+                    for (int i = 7; i >= 0; i--)
+                    {
+                        CheckNeighbor(NeighborNodes[i]);
+                        if (_clearanceDegree == 1)
+                        {
+                            break;
+                        }
+                    }
+                }
 			}
 		}
+        void CheckNeighbor(GridNode neighbor) {
+            if (neighbor.IsNull() || neighbor.Unwalkable)
+            {
+                _clearanceDegree = 1;
+                _clearanceSource = (byte)i;
+            }
+            if (neighbor._clearanceDegree < ClearanceDegree)
+            {
+                _clearanceDegree = (byte)(neighbor._clearanceDegree + 1);
+                _clearanceSource = (byte)i;
+            }
+        }
 
+        /// <summary>
+        /// Returns true if clearance degree changed.
+        /// </summary>
+        /// <returns></returns>
 		void UpdateValues()
 		{
 			GridVersion = GridManager.GridVersion;
 
 			//fast enough to just do it
 			UpdateClearance();
-
 		}
 
 		#region CombinePath
