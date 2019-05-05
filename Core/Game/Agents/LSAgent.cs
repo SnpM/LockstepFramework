@@ -467,6 +467,10 @@ namespace Lockstep
 			}
 		}
 
+        /// <summary>
+        /// Do not call this to destroy the agent. Use AgentController.DestroyAgent().
+        /// </summary>
+        /// <param name="Immediate"></param>
 		internal void Deactivate(bool Immediate = false)
 		{
 			if (IsActive == false)
