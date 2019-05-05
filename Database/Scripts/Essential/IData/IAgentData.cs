@@ -1,10 +1,7 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using Lockstep;
-namespace Lockstep.Data
+﻿namespace Lockstep.Data
 {
-    public interface IAgentData : INamedData
-    {
-        LSAgent GetAgent ();
-    }
+	public interface IAgentData : INamedData
+	{
+		LSAgent GetAgent();
+	}
 }

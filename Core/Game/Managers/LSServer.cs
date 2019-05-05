@@ -1,28 +1,29 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
+﻿using FastCollections;
 using System;
+
 namespace Lockstep
 {
 	public static class LSServer
 	{
 		public static uint InfluenceFrameCount { get; private set; }
-		public static void Setup () {
+		public static void Setup()
+		{
 		}
 
-        static void HandleOnRegisterData (byte[] obj)
-        {
-            InitedPlayerCount++;
-            if (InitedPlayerCount == ClientManager.RoomSize) {
-                StartGame ();
-            }
-        }
+		static void HandleOnRegisterData(byte[] obj)
+		{
+			InitedPlayerCount++;
+			if (InitedPlayerCount == ClientManager.RoomSize)
+			{
+				StartGame();
+			}
+		}
 
-
-		public static void Initialize ()
+		public static void Initialize()
 		{
 			ClientManager.NetworkHelper.OnInputData += HandleOnInputData;
 			ClientManager.NetworkHelper.OnRegisterData += HandleOnRegisterData;
-            InitedPlayerCount = 0;
+			InitedPlayerCount = 0;
 			InfluenceFrameCount = 0;
 			GameStarted = false;
 			bufferBytes.EnsureCapacity(4096);
@@ -34,13 +35,14 @@ namespace Lockstep
 			ClientManager.NetworkHelper.OnRegisterData -= HandleOnRegisterData;
 		}
 
-		static void HandleOnInputData (byte[] obj)
+		static void HandleOnInputData(byte[] obj)
 		{
-			receivedBytes.AddRange (obj);
+			receivedBytes.AddRange(obj);
 		}
 
-		public static void StartGame () {
-			ClientManager.NetworkHelper.SendMessageToAll (MessageType.Init, new byte[0]);
+		public static void StartGame()
+		{
+			ClientManager.NetworkHelper.SendMessageToAll(MessageType.Init, new byte[0]);
 			GameStarted = true;
 		}
 
@@ -48,21 +50,23 @@ namespace Lockstep
 		private static readonly FastList<byte> receivedBytes = new FastList<byte>();
 		static bool GameStarted = false;
 
-        private static int InitedPlayerCount;
+		private static int InitedPlayerCount;
 
-		public static void Simulate ()
+		public static void Simulate()
 		{
 
-			if (GameStarted == false) {
+			if (GameStarted == false)
+			{
 			}
-			else {
-                
-				bufferBytes.FastClear ();
-				bufferBytes.AddRange (BitConverter.GetBytes (InfluenceFrameCount));
-				bufferBytes.AddRange (receivedBytes);
-				receivedBytes.FastClear ();
-				ClientManager.NetworkHelper.SendMessageToAll (MessageType.Frame, bufferBytes.ToArray ());
-                InfluenceFrameCount++;
+			else
+			{
+
+				bufferBytes.FastClear();
+				bufferBytes.AddRange(BitConverter.GetBytes(InfluenceFrameCount));
+				bufferBytes.AddRange(receivedBytes);
+				receivedBytes.FastClear();
+				ClientManager.NetworkHelper.SendMessageToAll(MessageType.Frame, bufferBytes.ToArray());
+				InfluenceFrameCount++;
 
 			}
 		}

@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using System;
+﻿using System;
 
 namespace Lockstep
 {

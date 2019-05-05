@@ -1,10 +1,7 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-
-namespace Lockstep.Data
+﻿namespace Lockstep.Data
 {
-    public interface IProjectileDataProvider
-    {
-        IProjectileData[] ProjectileData {get;}
-    }
+	public interface IProjectileDataProvider
+	{
+		IProjectileData[] ProjectileData { get; }
+	}
 }

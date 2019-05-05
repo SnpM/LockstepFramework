@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using Lockstep;
 
 namespace Lockstep
 {
@@ -10,49 +8,55 @@ namespace Lockstep
 		private SpawnInfo[] Spawns;
 		public bool AutoCommand = true;
 
-		protected override void OnInitialize ()
+		protected override void OnInitialize()
 		{
 		}
 
-		public void LaunchSpawns () {
+		public void LaunchSpawns()
+		{
 
-			for (int i = 0; i < Spawns.Length; i++) {
-				SpawnInfo info = Spawns [i];
+			for (int i = 0; i < Spawns.Length; i++)
+			{
+				SpawnInfo info = Spawns[i];
 
-				var controller = AgentControllerHelper.Instance.GetInstanceManager (info.ControllerCode);
-				
-				for (int j = 0; j < info.Count; j++) {
-					LSAgent agent = controller.CreateAgent (info.AgentCode, info.Position);
+				var controller = AgentControllerHelper.Instance.GetInstanceManager(info.ControllerCode);
+
+				for (int j = 0; j < info.Count; j++)
+				{
+					LSAgent agent = controller.CreateAgent(info.AgentCode, info.Position);
 					if (AutoCommand)
-						Selector.Add (agent);
+						Selector.Add(agent);
 				}
 			}
 
-			if (AutoCommand) {
+			if (AutoCommand)
+			{
 
 				//Find average of spawn positions
 				Vector2d battlePos = Vector2d.zero;
-				for (int i = 0; i < Spawns.Length; i++) {
-					battlePos += Spawns [i].Position;
+				for (int i = 0; i < Spawns.Length; i++)
+				{
+					battlePos += Spawns[i].Position;
 				}
 				battlePos /= Spawns.Length;
-				Command com = new Command (Lockstep.Data.AbilityDataItem.FindInterfacer<Scan> ().ListenInputID);
-				com.Add<Vector2d> (battlePos);
+				Command com = new Command(Lockstep.Data.AbilityDataItem.FindInterfacer<Scan>().ListenInputID);
+				com.Add<Vector2d>(battlePos);
 
-				PlayerManager.SendCommand (com);
-				Selector.Clear ();
+				PlayerManager.SendCommand(com);
+				Selector.Clear();
 
 			}
 		}
-        protected override void OnVisualize()
-        {
-			if (Input.GetKeyDown (KeyCode.M)) {
-				LaunchSpawns ();
-			}
-        }
-        protected override void OnGameStart ()
+		protected override void OnVisualize()
 		{
-			LaunchSpawns ();
+			if (Input.GetKeyDown(KeyCode.M))
+			{
+				LaunchSpawns();
+			}
+		}
+		protected override void OnGameStart()
+		{
+			LaunchSpawns();
 
 		}
 	}
@@ -61,10 +65,10 @@ namespace Lockstep
 	public struct SpawnInfo
 	{
 
-		[DataCode ("Agents")]
+		[DataCode("Agents")]
 		public string AgentCode;
 		public int Count;
-		[DataCode ("AgentControllers")]
+		[DataCode("AgentControllers")]
 		public string ControllerCode;
 		public Vector2d Position;
 	}

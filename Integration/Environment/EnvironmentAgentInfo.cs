@@ -1,13 +1,9 @@
-﻿using System.Collections; using FastCollections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Lockstep
+﻿namespace Lockstep
 {
 	[System.Serializable]
 	public class EnvironmentAgentInfo
 	{
-		public EnvironmentAgentInfo (string agentCode, LSAgent agent, Vector3d pos, Vector2d rot)
+		public EnvironmentAgentInfo(string agentCode, LSAgent agent, Vector3d pos, Vector2d rot)
 		{
 			AgentCode = agentCode;
 			Agent = agent;

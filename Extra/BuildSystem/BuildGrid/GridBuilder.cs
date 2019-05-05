@@ -1,9 +1,6 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using Lockstep;
-using Lockstep.Utility;
-using Lockstep.Abilities;
-using System.Collections.Generic; 
+﻿using Lockstep;
+using System.Collections.Generic;
+
 public static class GridBuilder
 {
 	public static IBuildable Target { get; private set; }
@@ -106,7 +103,8 @@ public static class GridBuilder
 			Target.IsValidOnGrid = true;
 			return PlacementResult.Returned;
 		}
-		else {
+		else
+		{
 			return PlacementResult.Limbo;
 		}
 		//return PlacementResult.Returned;

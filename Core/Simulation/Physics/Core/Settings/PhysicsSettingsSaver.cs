@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-namespace Lockstep
+﻿namespace Lockstep
 {
-    public class PhysicsSettingsSaver : EnvironmentSaver
-    {
-        
-    }
+	public class PhysicsSettingsSaver : EnvironmentSaver
+	{
+
+	}
 }

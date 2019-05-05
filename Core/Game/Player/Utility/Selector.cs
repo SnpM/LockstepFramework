@@ -13,17 +13,17 @@ namespace Lockstep
 
 		private static LSAgent _mainAgent;
 
-		static Selector ()
+		static Selector()
 		{
-			onAdd += (a) => Change ();
-			onRemove += (a) => Change ();
-			onClear += () => Change ();
+			onAdd += (a) => Change();
+			onRemove += (a) => Change();
+			onClear += () => Change();
 		}
 
-		private static void Change ()
+		private static void Change()
 		{
 			if (onChange != null)
-				onChange ();
+				onChange();
 		}
 
 		public static LSAgent MainSelectedAgent { get { return _mainAgent; } private set { _mainAgent = value; } }
@@ -32,50 +32,57 @@ namespace Lockstep
 
 		private static FastSorter<LSAgent> SelectedAgents { get { return _selectedAgents; } }
 
-		public static void Initialize ()
+		public static void Initialize()
 		{
-			_selectedAgents = new FastSorter<LSAgent> ();
+			_selectedAgents = new FastSorter<LSAgent>();
 		}
 
-		public static void Add (LSAgent agent)
+		public static void Add(LSAgent agent)
 		{
-			if (agent.IsSelected == false) {
-				agent.Controller.AddToSelection (agent);
+			if (agent.IsSelected == false)
+			{
+				agent.Controller.AddToSelection(agent);
 				agent.IsSelected = true;
 				if (MainSelectedAgent == null)
 					MainSelectedAgent = agent;
-				onAdd (agent);
+				onAdd(agent);
 			}
-			else {
+			else
+			{
 			}
 		}
 
-		public static void Remove (LSAgent agent)
+		public static void Remove(LSAgent agent)
 		{
-			agent.Controller.RemoveFromSelection (agent);
+			agent.Controller.RemoveFromSelection(agent);
 			agent.IsSelected = false;
-			if (agent == MainSelectedAgent) {
-				agent = SelectedAgents.Count > 0 ? SelectedAgents.PopMax () : null;
+			if (agent == MainSelectedAgent)
+			{
+				agent = SelectedAgents.Count > 0 ? SelectedAgents.PopMax() : null;
 			}
-			onRemove (agent);
+			onRemove(agent);
 		}
 
-		public static void Clear ()
+		public static void Clear()
 		{
-			for (int i = 0; i < PlayerManager.AgentControllers.PeakCount; i++) {
-				if (PlayerManager.AgentControllers.arrayAllocation [i]) {
-					FastBucket<LSAgent> selectedAgents = PlayerManager.AgentControllers [i].SelectedAgents;
-					for (int j = 0; j < selectedAgents.PeakCount; j++) {
-						if (selectedAgents.arrayAllocation [j]) {
-							selectedAgents [j].IsSelected = false;
-							onRemove (selectedAgents [j]);
+			for (int i = 0; i < PlayerManager.AgentControllers.PeakCount; i++)
+			{
+				if (PlayerManager.AgentControllers.arrayAllocation[i])
+				{
+					FastBucket<LSAgent> selectedAgents = PlayerManager.AgentControllers[i].SelectedAgents;
+					for (int j = 0; j < selectedAgents.PeakCount; j++)
+					{
+						if (selectedAgents.arrayAllocation[j])
+						{
+							selectedAgents[j].IsSelected = false;
+							onRemove(selectedAgents[j]);
 						}
 					}
-					selectedAgents.FastClear ();
+					selectedAgents.FastClear();
 				}
 			}
 			MainSelectedAgent = null;
-			onClear ();
+			onClear();
 
 		}
 	}

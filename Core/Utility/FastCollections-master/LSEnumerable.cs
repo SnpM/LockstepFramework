@@ -5,6 +5,6 @@ namespace FastCollections
 {
 	public interface FastEnumerable<T>
 	{
-		void Enumerate (FastList<T> output);
+		void Enumerate(FastList<T> output);
 	}
 }

@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Text;
 
 namespace Lockstep
 {
 	public static class Compressor
-	{		
+	{
 		public static byte[] Compress(byte[] buffer)
 		{
 			MemoryStream ms = new MemoryStream();

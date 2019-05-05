@@ -1,12 +1,10 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-
-namespace Lockstep
+﻿namespace Lockstep
 {
-    public sealed class PhysicsSettings
-    {
-        public PhysicsSettings () {
-            //TODO:
-        }
-    }
+	public sealed class PhysicsSettings
+	{
+		public PhysicsSettings()
+		{
+			//TODO:
+		}
+	}
 }

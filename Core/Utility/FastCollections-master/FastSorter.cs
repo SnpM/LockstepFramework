@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System;
+﻿using System;
 
 namespace FastCollections
 {
@@ -9,7 +7,7 @@ namespace FastCollections
 	/// </summary>
 	public class FastSorter<T>
 	{
-		public delegate int SortCompare<CompareT> (CompareT source, CompareT other);
+		public delegate int SortCompare<CompareT>(CompareT source, CompareT other);
 		private const int defaultCapacity = 4;
 
 		public int Count { get; private set; }
@@ -18,25 +16,29 @@ namespace FastCollections
 		private T[] innerArray;
 		private int _offset;
 
-		private int Offset {
-			get {
+		private int Offset
+		{
+			get
+			{
 				return _offset;
 			}
-			set {
+			set
+			{
 				_offset = value;
 			}
 		}
 
 		public SortCompare<T> Comparer;
-		public FastSorter () {
-			_Init (CompareWithIComparable, defaultCapacity);
-		}
-		public FastSorter (SortCompare<T> comparer)
+		public FastSorter()
 		{
-			_Init (comparer, defaultCapacity);
+			_Init(CompareWithIComparable, defaultCapacity);
+		}
+		public FastSorter(SortCompare<T> comparer)
+		{
+			_Init(comparer, defaultCapacity);
 		}
 
-		private void _Init (SortCompare<T> comparer, int startCapacity)
+		private void _Init(SortCompare<T> comparer, int startCapacity)
 		{
 			Comparer = comparer;
 			Capacity = startCapacity;
@@ -44,36 +46,45 @@ namespace FastCollections
 			Offset = 0;
 		}
 
-		public void Add (T item)
+		public void Add(T item)
 		{
-			if (Count > 0) {
+			if (Count > 0)
+			{
 				int min = 0;
 				int max = Count;
-				int split = GetSplit (min, max);
+				int split = GetSplit(min, max);
 
-				while (min < max) {
-					int compare = Comparer (item, innerArray [GetIndex (split)]);
-					if (compare == 0) {
+				while (min < max)
+				{
+					int compare = Comparer(item, innerArray[GetIndex(split)]);
+					if (compare == 0)
+					{
 						min = split + 1;
 						break;
-					} else if (compare > 0) {
+					}
+					else if (compare > 0)
+					{
 						min = split + 1;
-					} else {
+					}
+					else
+					{
 						max = split;
 					}
-					split = GetSplit (min, max);
+					split = GetSplit(min, max);
 				}
-				Insert (item, min);
-			} else {
-				Insert (item, 0);
+				Insert(item, min);
+			}
+			else
+			{
+				Insert(item, 0);
 			}
 			Count++;
 		}
 
-		public T PopMin ()
+		public T PopMin()
 		{
-			int index = GetIndex (0);
-			T ret = innerArray [index];
+			int index = GetIndex(0);
+			T ret = innerArray[index];
 			innerArray[index] = default(T);
 			Offset++;
 			Count--;
@@ -82,97 +93,114 @@ namespace FastCollections
 			return ret;
 		}
 
-		public T PeekMin () {
+		public T PeekMin()
+		{
 			return innerArray[GetIndex(0)];
 		}
 
-		public T PopMax ()
+		public T PopMax()
 		{
-			int index = GetIndex (--Count);
-			T ret = innerArray [index];
+			int index = GetIndex(--Count);
+			T ret = innerArray[index];
 			innerArray[index] = default(T);
 			if (Count == 0)
 				Offset = 0;
 			return ret;
 		}
 
-		public T PeekMax () {
-			return innerArray[GetIndex (Count - 1)];
+		public T PeekMax()
+		{
+			return innerArray[GetIndex(Count - 1)];
 		}
 
-		public void Clear (bool fast = true)
+		public void Clear(bool fast = true)
 		{
-			if (fast == false) {
-				Array.Clear (innerArray, GetIndex(0), Count);
+			if (fast == false)
+			{
+				Array.Clear(innerArray, GetIndex(0), Count);
 			}
 			Count = 0;
 			Offset = 0;
 
 		}
 
-		private int GetSplit (int min, int max)
+		private int GetSplit(int min, int max)
 		{
 			return min + ((max - min) / 2);
 		}
 
-		private int GetIndex (int place)
+		private int GetIndex(int place)
 		{
 			return place + Offset;
 		}
 
-		private void Insert (T item, int place)
+		private void Insert(T item, int place)
 		{
-			int index = GetIndex (place);
+			int index = GetIndex(place);
 			bool capped = Count + Offset >= Capacity;
 			bool forceLeftShift = false;
-			if (capped) {
-				if (forceLeftShift = Offset != 0) {
+			if (capped)
+			{
+				if (forceLeftShift = Offset != 0)
+				{
 
-				} else {
-					CheckCapacity (Count + Offset + 1);
+				}
+				else
+				{
+					CheckCapacity(Count + Offset + 1);
 				}
 			}
 
-			if (Count > 0) {
+			if (Count > 0)
+			{
 				int distanceToHead = Count - place;
 				int distanceToTail = place + 1;
 
-				if (forceLeftShift || Offset != 0 && (distanceToHead >= distanceToTail)) {
-					Shift (innerArray, Offset--, index, -1);
-				} else {
-					Shift (innerArray, index, Count + Offset, 1);
+				if (forceLeftShift || Offset != 0 && (distanceToHead >= distanceToTail))
+				{
+					Shift(innerArray, Offset--, index, -1);
 				}
-				if (Offset == 0 || (!capped && distanceToHead < distanceToTail)) {
-					if (distanceToHead > 0) {
+				else
+				{
+					Shift(innerArray, index, Count + Offset, 1);
+				}
+				if (Offset == 0 || (!capped && distanceToHead < distanceToTail))
+				{
+					if (distanceToHead > 0)
+					{
 
 					}
-				} else {
+				}
+				else
+				{
 
 				}
 			}
 
-			innerArray [GetIndex (place)] = item;
+			innerArray[GetIndex(place)] = item;
 		}
 
-		private void CheckCapacity (int min)
+		private void CheckCapacity(int min)
 		{
-			if (Capacity < min) {
+			if (Capacity < min)
+			{
 				Capacity *= 2;
 				if (Capacity < min)
 					Capacity = min;
-				Array.Resize (ref innerArray, Capacity);
+				Array.Resize(ref innerArray, Capacity);
 			}
 		}
 
 
-		private static void Shift (Array array, int min, int max, int shiftAmount) {
+		private static void Shift(Array array, int min, int max, int shiftAmount)
+		{
 			if (shiftAmount == 0) return;
-			Array.Copy (array, min, array, min + shiftAmount, max - min);
+			Array.Copy(array, min, array, min + shiftAmount, max - min);
 		}
 
 		#region Default SortCompares
-		public static SortCompare<T> CompareWithIComparable = 
-		(obj, other) => {return ((IComparable)obj).CompareTo (other);};
+		public static SortCompare<T> CompareWithIComparable =
+		(obj, other) => { return ((IComparable)obj).CompareTo(other); };
 
 		#endregion
 	}

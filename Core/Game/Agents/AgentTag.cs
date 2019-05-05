@@ -1,5 +1,7 @@
-﻿namespace Lockstep {
-	public enum AgentTag {
+﻿namespace Lockstep
+{
+	public enum AgentTag
+	{
 		None,
 		ArmoredVehicle,
 		LightVehicle,

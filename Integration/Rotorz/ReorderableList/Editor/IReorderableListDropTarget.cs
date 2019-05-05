@@ -1,7 +1,7 @@
 // Copyright (c) Rotorz Limited. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root.
 
-namespace Lockstep.Rotorz.ReorderableList {
+namespace Lockstep_Rotorz.ReorderableList {
 
 	/// <summary>
 	/// Can be implemented along with <see cref="IReorderableListAdaptor"/> when drop
@@ -15,7 +15,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 	/// </remarks>
 	/// <see cref="IReorderableListAdaptor"/>
 	public interface IReorderableListDropTarget {
-		
+
 		/// <summary>
 		/// Determines whether an item is being dragged and that it can be inserted
 		/// or moved by dropping somewhere into the reorderable list control.

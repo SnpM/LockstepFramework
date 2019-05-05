@@ -23,7 +23,6 @@ namespace Lockstep
 	/// </summary>
 	public class LSAgent : MonoBehaviour, IMousable
 	{
-
 		Vector3 IMousable.WorldPosition
 		{
 			get { return this.Body._visualPosition; }
@@ -96,17 +95,20 @@ namespace Lockstep
 		/// The index of this agent in the pool.
 		/// </summary>
 		/// <value>The index of the type.</value>
-		public ushort TypeIndex {
-			get {
+		public ushort TypeIndex
+		{
+			get
+			{
 				return _typeIndex;
 			}
-			set {
+			set
+			{
 				_typeIndex = value;
 				_typeIndex = AgentController.UNREGISTERED_TYPE_INDEX;
 			}
 		}
 
-		public int ReferenceIndex { get; set;}
+		public int ReferenceIndex { get; set; }
 
 		public Vector2 Position2 { get { return new Vector2(CachedTransform.position.x, CachedTransform.position.z); } }
 		public FastList<AbilityDataItem> Interfacers { get { return abilityManager.Interfacers; } }
@@ -117,8 +119,8 @@ namespace Lockstep
 		public Ability[] AttachedAbilities { get { return _attachedAbilities; } }
 		//[SerializeField]
 		private UnityLSBody _unityBody;
-		public UnityLSBody UnityBody {get {return _unityBody;}}
-		public LSBody Body { get; set;}
+		public UnityLSBody UnityBody { get { return _unityBody; } }
+		public LSBody Body { get; set; }
 		//[SerializeField]
 		private LSAnimatorBase _animator;
 		public LSAnimatorBase Animator { get { return _animator; } }
@@ -357,9 +359,10 @@ namespace Lockstep
 
 		bool Setuped;
 		//Initialize this agent with basic functions and Ability system
-		public void InitializeBare () {
+		public void InitializeBare()
+		{
 			IsActive = true;
-			abilityManager.Initialize ();
+			abilityManager.Initialize();
 		}
 		public void Initialize(
 			Vector2d position = default(Vector2d),
@@ -476,11 +479,12 @@ namespace Lockstep
 			{
 				if (Animator.IsNotNull())
 					Animator.Play(AnimState.Dying);
-				
+
 				poolCoroutine = CoroutineManager.StartCoroutine(PoolDelayer());
 			}
-			else {
-				AgentController.CompleteLife (this);
+			else
+			{
+				AgentController.CompleteLife(this);
 			}
 		}
 		private void _Deactivate()
@@ -507,12 +511,12 @@ namespace Lockstep
 		private IEnumerator<int> PoolDelayer()
 		{
 			deathingIndex = AgentController.DeathingAgents.Add(this);
-	
+
 
 			yield return _deathTime;
 			AgentController.DeathingAgents.RemoveAt(deathingIndex);
 
-			AgentController.CompleteLife (this);
+			AgentController.CompleteLife(this);
 		}
 
 

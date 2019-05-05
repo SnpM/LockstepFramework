@@ -1,12 +1,9 @@
-﻿using System.Collections; using FastCollections;
-using System.Collections.Generic;
-using UnityEngine;
-namespace Lockstep
+﻿namespace Lockstep
 {
 	public class LSNetworkSettingsSaver : EnvironmentSaver
 	{
-		public LSNetworkSettings SavedSettings = new LSNetworkSettings ();
-		protected override void OnEarlyApply ()
+		public LSNetworkSettings SavedSettings = new LSNetworkSettings();
+		protected override void OnEarlyApply()
 		{
 			LSNetworkSettings.Settings = SavedSettings;
 		}

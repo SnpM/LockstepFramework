@@ -6,7 +6,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lockstep.Rotorz.ReorderableList {
+namespace Lockstep_Rotorz.ReorderableList.Internal {
 
 	/// <summary>
 	/// Utility functions to assist with GUIs.
@@ -17,11 +17,13 @@ namespace Lockstep.Rotorz.ReorderableList {
 		static GUIHelper() {
 			var tyGUIClip = Type.GetType("UnityEngine.GUIClip,UnityEngine");
 			if (tyGUIClip != null) {
-				var piVisibleRect = tyGUIClip.GetProperty("visibleRect", BindingFlags.Static | BindingFlags.Public);
-				if (piVisibleRect != null)
-					VisibleRect = (Func<Rect>)Delegate.CreateDelegate(typeof(Func<Rect>), piVisibleRect.GetGetMethod());
+				var piVisibleRect = tyGUIClip.GetProperty("visibleRect", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+				if (piVisibleRect != null) {
+					var getMethod = piVisibleRect.GetGetMethod(true) ?? piVisibleRect.GetGetMethod(false);
+					VisibleRect = (Func<Rect>)Delegate.CreateDelegate(typeof(Func<Rect>), getMethod);
+				}
 			}
-			
+
 			var miFocusTextInControl = typeof(EditorGUI).GetMethod("FocusTextInControl", BindingFlags.Static | BindingFlags.Public);
 			if (miFocusTextInControl == null)
 				miFocusTextInControl = typeof(GUI).GetMethod("FocusControl", BindingFlags.Static | BindingFlags.Public);
@@ -105,7 +107,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 						bool isActive = GUIUtility.hotControl == controlID && position.Contains(Event.current.mousePosition);
 						s_TempIconContent.image = isActive ? iconActive : iconNormal;
 						position.height -= 1;
-                        style.Draw(position, s_TempIconContent, isActive, isActive, false, false);
+						style.Draw(position, s_TempIconContent, isActive, isActive, false, false);
 					}
 					break;
 			}

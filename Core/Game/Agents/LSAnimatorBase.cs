@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
 using System;
 
 namespace Lockstep
@@ -26,9 +24,9 @@ namespace Lockstep
 
 		public virtual void ApplyImpulse(AnimImpulse animImpulse, int rate = 0)
 		{
-			Play (animImpulse, rate);
+			Play(animImpulse, rate);
 		}
-			
+
 		public virtual void Play(AnimState state)
 		{
 			if (OnStatePlay.IsNotNull())
@@ -52,7 +50,8 @@ namespace Lockstep
 				if (value != lastAnimState)
 				{
 					animStateChanged = true;
-				} else
+				}
+				else
 				{
 
 				}
@@ -60,7 +59,7 @@ namespace Lockstep
 			}
 		}
 
-        private bool isImpulsing = false;
+		private bool isImpulsing = false;
 		private bool animStateChanged;
 		private AnimState lastAnimState;
 
@@ -87,13 +86,13 @@ namespace Lockstep
 		Moving,
 		Dying,
 		Engaging,
-        SpecialEngaging
+		SpecialEngaging
 	}
 
 	public enum AnimImpulse
 	{
 		Fire,
-        SpecialFire,
+		SpecialFire,
 		SpecialAttack,
 		Extra
 	}

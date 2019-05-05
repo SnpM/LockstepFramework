@@ -8,7 +8,8 @@ namespace Lockstep
 		public long hash;
 		public string Name;
 		public string Date;
-		public float Seconds {
+		public float Seconds
+		{
 			get { return (float)FrameManager.LoadedFrames / (float)LockstepManager.FrameRate; }
 		}
 

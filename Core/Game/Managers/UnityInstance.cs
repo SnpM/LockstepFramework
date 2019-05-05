@@ -8,7 +8,8 @@ namespace Lockstep
 
 		public static UnityInstance Instance
 		{
-			get {
+			get
+			{
 				if (instance == null)
 				{
 					instance = new GameObject("UnityInstance").AddComponent<UnityInstance>();

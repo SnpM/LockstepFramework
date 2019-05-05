@@ -1,11 +1,11 @@
 // Copyright (c) Rotorz Limited. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root.
-#if UNITY_EDITOR
+
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lockstep.Rotorz.ReorderableList {
+namespace Lockstep_Rotorz.ReorderableList {
 
 	/// <summary>
 	/// Utility class for drawing reorderable lists.
@@ -149,8 +149,8 @@ namespace Lockstep.Rotorz.ReorderableList {
 		/// <param name="title">Content for title control.</param>
 		public static void Title(GUIContent title) {
 			Rect position = GUILayoutUtility.GetRect(title, ReorderableListStyles.Title);
-			position.height += 6;
 			Title(position, title);
+			GUILayout.Space(-1);
 		}
 
 		/// <summary>
@@ -574,4 +574,3 @@ namespace Lockstep.Rotorz.ReorderableList {
 	}
 
 }
-#endif

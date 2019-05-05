@@ -1,23 +1,22 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using System;
+﻿using FastCollections;
 using Lockstep.NetworkHelpers;
+
 namespace Lockstep
 {
 	public class ClientManager
 	{
 		public static NetworkHelper NetworkHelper;
-        private static int _roomSize = 1;
+		private static int _roomSize = 1;
 		public static int RoomSize { get { return _roomSize; } private set { _roomSize = value; } }
 		const ushort Port = ushort.MaxValue / 2;
 		public static string IP = "127.0.0.1";
-        //HomePublicIP =67.0.141.231
-        //HomeLocalIP = 192.168.0.15
+		//HomePublicIP =67.0.141.231
+		//HomeLocalIP = 192.168.0.15
 
-        private static bool _simulateNetworking = false;
-        public static bool SimulateNetworking { get { return _simulateNetworking; } }
+		private static bool _simulateNetworking = false;
+		public static bool SimulateNetworking { get { return _simulateNetworking; } }
 
-        public static bool GameStarted { get; private set; }
+		public static bool GameStarted { get; private set; }
 
 		public static int ClientID
 		{
@@ -59,7 +58,7 @@ namespace Lockstep
 			NetworkHelper = networkHelper;
 			NetworkHelper.OnFrameData += HandleFrameData;
 			NetworkHelper.OnInitData += HandleInitData;
-			NetworkHelper.Initialize ();
+			NetworkHelper.Initialize();
 
 			LSServer.Initialize();
 			GameStarted = false;
@@ -67,7 +66,8 @@ namespace Lockstep
 			{
 				ServerSimulator.Initialize();
 			}
-			else {
+			else
+			{
 
 			}
 			Registered = false;
@@ -108,7 +108,8 @@ namespace Lockstep
 			{
 
 			}
-			else {
+			else
+			{
 				if (isConnected)
 				{
 					while (bufferedSendData.Count > 0)
@@ -132,13 +133,15 @@ namespace Lockstep
 			{
 				ServerSimulator.Receive(data);
 			}
-			else {
+			else
+			{
 				if (isConnected)
 				{
 
 					SendMessageToServer(MessageType.Input, data);
 				}
-				else {
+				else
+				{
 					bufferedSendData.Add(data);
 				}
 			}

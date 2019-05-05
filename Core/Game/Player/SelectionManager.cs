@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using System.Collections.Generic;
-using Lockstep.UI;
+using FastCollections;
 using UnityEngine.EventSystems;
 
 namespace Lockstep
@@ -196,7 +194,7 @@ namespace Lockstep
 				if (IsGathering == false && Input.GetMouseButtonDown(0))
 				{
 					_checkBoxDistance = true;
-					StartBoxing (MousePosition);
+					StartBoxing(MousePosition);
 
 				}
 
@@ -204,7 +202,8 @@ namespace Lockstep
 
 		}
 
-		public static void StartBoxing (Vector2 boxStart) {
+		public static void StartBoxing(Vector2 boxStart)
+		{
 			Boxing = true;
 			BoxingTime = 0f;
 			BoxStart = MousePosition;

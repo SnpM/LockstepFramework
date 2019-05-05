@@ -1,5 +1,4 @@
-﻿
-namespace Lockstep
+﻿namespace Lockstep
 {
 	public interface ILockstepEventsHandler
 	{

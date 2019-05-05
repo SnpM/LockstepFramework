@@ -11,22 +11,28 @@ namespace Lockstep
 
 		public long BaseHealth { get { return _maxHealth; } }
 
-		public long MaxHealth {
+		public long MaxHealth
+		{
 			get { return _maxHealth + MaxHealthModifier; }
 		}
 
 		private long _maxHealthModifier;
 
-		[Lockstep (true)]
-		public long MaxHealthModifier {
-			get {
+		[Lockstep(true)]
+		public long MaxHealthModifier
+		{
+			get
+			{
 				return _maxHealthModifier;
 			}
-			set {
-				if (value != _maxHealthModifier) {
+			set
+			{
+				if (value != _maxHealthModifier)
+				{
 					long dif = _maxHealthModifier - value;
-					if (dif > 0) {
-						this.TakeDamage (-dif);
+					if (dif > 0)
+					{
+						this.TakeDamage(-dif);
 						_maxHealthModifier = value;
 					}
 				}
@@ -37,14 +43,18 @@ namespace Lockstep
 		public event Action onHealthChange;
 		public event Action<long> onHealthDelta;
 
-		public bool CanLose {
-			get {
+		public bool CanLose
+		{
+			get
+			{
 				return HealthAmount > 0;
 			}
 		}
 
-		public bool CanGain {
-			get {
+		public bool CanGain
+		{
+			get
+			{
 				return HealthAmount < MaxHealth;
 			}
 		}
@@ -52,27 +62,30 @@ namespace Lockstep
 		[SerializeField, FixedNumber]
 		private long _currentHealth;
 
-		public long HealthAmount {
-			get {
+		public long HealthAmount
+		{
+			get
+			{
 				return _currentHealth;
 			}
-			set {
+			set
+			{
 				long delta = value - _currentHealth;
 				_currentHealth = value;
 				if (onHealthChange != null)
-					onHealthChange ();
+					onHealthChange();
 				if (onHealthDelta != null)
-					onHealthDelta (delta);
+					onHealthDelta(delta);
 			}
 
 		}
 
 
-		protected override void OnSetup ()
+		protected override void OnSetup()
 		{
 		}
 
-		protected override void OnInitialize ()
+		protected override void OnInitialize()
 		{
 			HealthAmount = MaxHealth;
 			OnTakeProjectile = null;
@@ -80,38 +93,47 @@ namespace Lockstep
 			LastAttacker = null;
 		}
 
-		public void TakeProjectile (LSProjectile projectile)
+		public void TakeProjectile(LSProjectile projectile)
 		{
-			if (Agent.IsActive && HealthAmount >= 0) {
-				if (OnTakeProjectile.IsNotNull ()) {
-					OnTakeProjectile (projectile);
+			if (Agent.IsActive && HealthAmount >= 0)
+			{
+				if (OnTakeProjectile.IsNotNull())
+				{
+					OnTakeProjectile(projectile);
 				}
-				TakeDamage (projectile.CheckExclusiveDamage (Agent.Tag));
+				TakeDamage(projectile.CheckExclusiveDamage(Agent.Tag));
 			}
 		}
 
 		AttackerInfo LastAttacker;
-		public void TakeDamage (long damage, AttackerInfo attackerInfo = null)
+		public void TakeDamage(long damage, AttackerInfo attackerInfo = null)
 		{
-			if (damage >= 0) {
+			if (damage >= 0)
+			{
 				HealthAmount -= damage;
-				if (attackerInfo != null) {
+				if (attackerInfo != null)
+				{
 					LastAttacker = attackerInfo;
 				}
 				// don't let the health go below zero
-				if (HealthAmount <= 0) {
+				if (HealthAmount <= 0)
+				{
 					HealthAmount = 0;
 
-					if (HealthAmount <= 0) {
+					if (HealthAmount <= 0)
+					{
 
-						Die ();
+						Die();
 						return;
 					}
 
 				}
-			} else {
+			}
+			else
+			{
 				HealthAmount -= damage;
-				if (HealthAmount >= this.MaxHealth) {
+				if (HealthAmount >= this.MaxHealth)
+				{
 					HealthAmount = MaxHealth;
 				}
 			}
@@ -120,20 +142,22 @@ namespace Lockstep
 
 		public event Action<Health, AttackerInfo> onDie;
 
-		public void Die ()
+		public void Die()
 		{
-			if (Agent.IsActive) {
+			if (Agent.IsActive)
+			{
 				if (onDie != null)
-					this.onDie (this, this.LastAttacker);
-				AgentController.DestroyAgent (Agent);
-				if (Agent.Animator.IsNotNull ()) {
-					Agent.SetState (AnimState.Dying);
-					Agent.Animator.Visualize ();
+					this.onDie(this, this.LastAttacker);
+				AgentController.DestroyAgent(Agent);
+				if (Agent.Animator.IsNotNull())
+				{
+					Agent.SetState(AnimState.Dying);
+					Agent.Animator.Visualize();
 				}
 			}
 		}
 
-		protected override void OnDeactivate ()
+		protected override void OnDeactivate()
 		{
 			OnTakeProjectile = null;
 		}

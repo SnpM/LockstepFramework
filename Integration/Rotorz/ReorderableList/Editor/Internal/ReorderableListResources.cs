@@ -5,7 +5,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lockstep.Rotorz.ReorderableList {
+namespace Lockstep_Rotorz.ReorderableList.Internal {
 
 	/// <exclude/>
 	public enum ReorderableListTexture {
@@ -158,7 +158,11 @@ namespace Lockstep.Rotorz.ReorderableList {
 				tex.hideFlags = HideFlags.HideAndDontSave;
 				tex.name = "(Generated) ReorderableList:" + i;
 				tex.filterMode = FilterMode.Point;
-				tex.LoadImage(imageData);
+#if UNITY_2017_1_OR_NEWER
+                ImageConversion.LoadImage(tex, imageData, markNonReadable: true);
+#else
+                tex.LoadImage(imageData);
+#endif
 
 				s_Cached[i] = tex;
 			}

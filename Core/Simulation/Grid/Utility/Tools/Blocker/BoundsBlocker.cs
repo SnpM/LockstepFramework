@@ -1,18 +1,17 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 
 namespace Lockstep
 {
 	public class BoundsBlocker : EnvironmentObject
 	{
-		[SerializeField,FixedNumber]
+		[SerializeField, FixedNumber]
 		private long _mapWidth;
-		[SerializeField,FixedNumber]
+		[SerializeField, FixedNumber]
 		private long _mapHeight;
 
-		protected override void OnLateInitialize ()
+		protected override void OnLateInitialize()
 		{
-			long gridWidth = FixedMath.Create (GridManager.Width);
+			long gridWidth = FixedMath.Create(GridManager.Width);
 			long gridHeight = FixedMath.Create(GridManager.Height);
 			long widthEdgeOffset = (gridWidth - _mapWidth) / 2;
 			long heightEdgeOffset = (gridHeight - _mapHeight) / 2;
@@ -30,7 +29,7 @@ namespace Lockstep
 			);
 
 			//block top
-			ManualBlocker.BlockArea (new Area(
+			ManualBlocker.BlockArea(new Area(
 				gridArea.XMin,
 				noBlockArea.YMax,
 				gridArea.XMax,
@@ -62,10 +61,11 @@ namespace Lockstep
 
 		}
 
-		void BlockNode (long x, long y) {
-			var node = GridManager.GetNode (x, y);
+		void BlockNode(long x, long y)
+		{
+			var node = GridManager.GetNode(x, y);
 			if (node.IsNotNull())
-				node.AddObstacle ();
+				node.AddObstacle();
 		}
 	}
 }

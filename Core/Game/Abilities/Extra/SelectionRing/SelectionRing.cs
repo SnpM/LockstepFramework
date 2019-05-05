@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections; using FastCollections;
 
 namespace Lockstep
 {
-    public class SelectionRing : MonoBehaviour
-    {
+	public class SelectionRing : MonoBehaviour
+	{
 		[SerializeField]
 		private Color _selectedColor = new Color(0f, .6f, 0f);
 		Color SelectedColor { get { return _selectedColor; } }

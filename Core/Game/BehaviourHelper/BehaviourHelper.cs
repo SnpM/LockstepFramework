@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using Lockstep;
 
 namespace Lockstep
 {

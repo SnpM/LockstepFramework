@@ -1,80 +1,78 @@
 ﻿using System;
-using UnityEngine;
-using System.Collections.Generic;
 
 namespace Lockstep
 {
-    public class LSInfluencer
-    {
-        #region Static Helpers
+	public class LSInfluencer
+	{
+		#region Static Helpers
 
-        static LSAgent tempAgent;
-        static GridNode tempNode;
+		static LSAgent tempAgent;
+		static GridNode tempNode;
 
-        #endregion
+		#endregion
 
-        #region Collection Helper
+		#region Collection Helper
 
-        [NonSerialized]
-        public int bucketIndex = -1;
+		[NonSerialized]
+		public int bucketIndex = -1;
 
-        #endregion
+		#endregion
 
-        #region ScanNode Helper
+		#region ScanNode Helper
 
-        public int NodeTicket;
+		public int NodeTicket;
 
-        #endregion
+		#endregion
 
-        public GridNode LocatedNode { get; private set; }
+		public GridNode LocatedNode { get; private set; }
 
-        public LSBody Body { get; private set; }
+		public LSBody Body { get; private set; }
 
-        public LSAgent Agent { get; private set; }
+		public LSAgent Agent { get; private set; }
 
-        public void Setup(LSAgent agent)
-        {
-            Agent = agent;
-            Body = agent.Body;
-        }
+		public void Setup(LSAgent agent)
+		{
+			Agent = agent;
+			Body = agent.Body;
+		}
 
-        public void Initialize()
-        {
-            LocatedNode = GridManager.GetNode(Body._position.x, Body._position.y);
+		public void Initialize()
+		{
+			LocatedNode = GridManager.GetNode(Body._position.x, Body._position.y);
 
-            LocatedNode.Add(this);
-        }
+			LocatedNode.Add(this);
+		}
 
-        public void Simulate()
-        {
+		public void Simulate()
+		{
 
-            if (Body.PositionChangedBuffer)
-            {
-                tempNode = GridManager.GetNode(Body._position.x, Body._position.y);
+			if (Body.PositionChangedBuffer)
+			{
+				tempNode = GridManager.GetNode(Body._position.x, Body._position.y);
 
-                if (tempNode.IsNull())
-                    return;
-				
-                if (System.Object.ReferenceEquals(tempNode, LocatedNode) == false)
-                {
-                    if (LocatedNode != null)
-                        LocatedNode.Remove(this);
-                    tempNode.Add(this);
-                    LocatedNode = tempNode;
-                }
-            }
-        }
+				if (tempNode.IsNull())
+					return;
 
-        public void Deactivate()
-        {
-            if (LocatedNode != null)
-            {
-                LocatedNode.Remove(this);
-                LocatedNode = null;
-            }
-        }
+				if (System.Object.ReferenceEquals(tempNode, LocatedNode) == false)
+				{
+					if (LocatedNode != null)
+						LocatedNode.Remove(this);
+					tempNode.Add(this);
+					LocatedNode = tempNode;
+				}
+			}
+		}
 
-    }
+		public void Deactivate()
+		{
+			if (LocatedNode != null)
+			{
+				LocatedNode.Remove(this);
+				LocatedNode = null;
+			}
+		}
+
+	}
 
 
 }

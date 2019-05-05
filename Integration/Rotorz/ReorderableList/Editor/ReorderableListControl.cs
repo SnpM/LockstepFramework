@@ -1,13 +1,13 @@
 // Copyright (c) Rotorz Limited. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root.
-#if UNITY_EDITOR
-using Lockstep.Rotorz.ReorderableList.Internal;
+
+using Lockstep_Rotorz.ReorderableList.Internal;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Lockstep.Rotorz.ReorderableList {
-	
+namespace Lockstep_Rotorz.ReorderableList {
+
 	/// <summary>
 	/// Base class for custom reorderable list control.
 	/// </summary>
@@ -23,7 +23,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 		/// <example>
 		/// <para>The following listing presents a text field for each list item:</para>
 		/// <code language="csharp"><![CDATA[
-        /// using Rotorz.ReorderableList;
+		/// using Rotorz.ReorderableList;
 		/// using System.Collections.Generic;
 		/// using UnityEditor;
 		/// using UnityEngine;
@@ -43,8 +43,8 @@ namespace Lockstep.Rotorz.ReorderableList {
 		///     }
 		/// }
 		/// ]]></code>
-        /// <code language="unityscript"><![CDATA[
-        /// import Rotorz.ReorderableList;
+		/// <code language="unityscript"><![CDATA[
+		/// import Rotorz.ReorderableList;
 		/// import System.Collections.Generic;
 		/// 
 		/// class ExampleWindow extends EditorWindow {
@@ -79,8 +79,8 @@ namespace Lockstep.Rotorz.ReorderableList {
 		/// </remarks>
 		/// <example>
 		/// <para>The following listing displays a label for empty list control:</para>
-        /// <code language="csharp"><![CDATA[
-        /// using Rotorz.ReorderableList;
+		/// <code language="csharp"><![CDATA[
+		/// using Rotorz.ReorderableList;
 		/// using System.Collections.Generic;
 		/// using UnityEditor;
 		/// using UnityEngine;
@@ -100,8 +100,8 @@ namespace Lockstep.Rotorz.ReorderableList {
 		///     }
 		/// }
 		/// ]]></code>
-        /// <code language="unityscript"><![CDATA[
-        /// import Rotorz.ReorderableList;
+		/// <code language="unityscript"><![CDATA[
+		/// import Rotorz.ReorderableList;
 		/// import System.Collections.Generic;
 		/// 
 		/// class ExampleWindow extends EditorWindow {
@@ -310,10 +310,16 @@ namespace Lockstep.Rotorz.ReorderableList {
 		}
 
 		/// <summary>
-		/// Gets a value indicating whether one or more footer buttons are shown.
+		/// Gets a value indicating whether any footer controls are shown.
 		/// </summary>
-		private bool HasFooterButtons {
-			get { return HasAddButton || HasAddMenuButton; }
+		private bool HasFooterControls {
+			get { return HasSizeField || HasAddButton || HasAddMenuButton; }
+		}
+		/// <summary>
+		/// Gets a value indicating whether the size field is shown.
+		/// </summary>
+		private bool HasSizeField {
+			get { return (_flags & ReorderableListFlags.ShowSizeField) != 0; }
 		}
 		/// <summary>
 		/// Gets a value indicating whether add button is shown.
@@ -333,10 +339,18 @@ namespace Lockstep.Rotorz.ReorderableList {
 			get { return (_flags & ReorderableListFlags.HideRemoveButtons) == 0; }
 		}
 
+		private float _verticalSpacing = 10f;
 		private GUIStyle _containerStyle;
 		private GUIStyle _footerButtonStyle;
 		private GUIStyle _itemButtonStyle;
 
+		/// <summary>
+		/// Gets or sets the vertical spacing below the reorderable list control.
+		/// </summary>
+		public float VerticalSpacing {
+			get { return _verticalSpacing; }
+			set { _verticalSpacing = value; }
+		}
 		/// <summary>
 		/// Gets or sets style used to draw background of list control.
 		/// </summary>
@@ -508,7 +522,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 			_itemButtonStyle = ReorderableListStyles.ItemButton;
 
 			_horizontalLineColor = ReorderableListStyles.HorizontalLineColor;
-        }
+		}
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="ReorderableListControl"/>.
@@ -558,6 +572,11 @@ namespace Lockstep.Rotorz.ReorderableList {
 		private float _insertionPosition;
 
 		/// <summary>
+		/// New size input value.
+		/// </summary>
+		private int _newSizeInput;
+
+		/// <summary>
 		/// Prepare initial state for list control.
 		/// </summary>
 		/// <param name="controlID">Unique ID of list control.</param>
@@ -578,7 +597,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 			// The value of this field is reset each time the control is drawn and may
 			// be invalidated when list items are drawn.
 			_allowDropInsertion = true;
-        }
+		}
 
 		private static int CountDigits(int number) {
 			return Mathf.Max(2, Mathf.CeilToInt(Mathf.Log10((float)number)));
@@ -674,7 +693,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 
 		// Micro-optimisation to avoid repeated construction.
 		private static Rect s_RemoveButtonPosition;
-		
+
 		private void DrawListItem(Rect position, IReorderableListAdaptor adaptor, int itemIndex) {
 			bool isRepainting = Event.current.type == EventType.Repaint;
 			bool isVisible = (position.y < _visibleRect.yMax && position.yMax > _visibleRect.y);
@@ -707,7 +726,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 				itemContentPosition.width -= 27;
 
 			try {
-                s_CurrentItemStack.Push(new ItemInfo(itemIndex, position));
+				s_CurrentItemStack.Push(new ItemInfo(itemIndex, position));
 				EditorGUI.BeginChangeCheck();
 
 				if (isRepainting && isVisible) {
@@ -782,7 +801,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 
 				GUI.color = TargetBackgroundColor;
 				GUIHelper.DrawTexture(targetPosition, EditorGUIUtility.whiteTexture);
-				
+
 				// Fill background of item which is being dragged.
 				--s_DragItemPosition.x;
 				s_DragItemPosition.width += 2;
@@ -828,7 +847,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 			Vector2 mousePosition = Event.current.mousePosition;
 
 			int newTargetIndex = s_TargetIndex;
-			
+
 			// Position of first item in list.
 			float firstItemY = position.y + ContainerStyle.padding.top;
 			// Maximum position of dragged item.
@@ -850,7 +869,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 			}
 
 			switch (eventType) {
-                case EventType.MouseDown:
+				case EventType.MouseDown:
 					if (_tracking) {
 						// Cancel drag when other mouse button is pressed.
 						s_TrackingCancelBlockContext = true;
@@ -962,18 +981,6 @@ namespace Lockstep.Rotorz.ReorderableList {
 						newTargetIndex = i + 1;*/
 				}
 
-				// The following may break use of tab key to navigate through controls :/
-				if ((Flags & ReorderableListFlags.DisableClipping) == 0) {
-					// Clip list item? Performance boost!
-					if (itemPosition.yMax < _visibleRect.y - itemPosition.height) {
-						// Let's try and trick Unity into maintaining tab key support...
-						GUIUtility.GetControlID(FocusType.Keyboard, itemPosition);
-						continue;
-					}
-					if (itemPosition.y > _visibleRect.yMax + itemPosition.height)
-						break;
-				}
-
 				// Draw list item.
 				DrawListItem(itemPosition, adaptor, i);
 
@@ -985,7 +992,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 					--i;
 					continue;
 				}
-				
+
 				// Event has already been used, skip to next item.
 				if (Event.current.type != EventType.Used) {
 					switch (eventType) {
@@ -1060,7 +1067,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 						_insertionPosition = itemPosition.yMax;
 					}
 					_allowDropInsertion = true;
-                }
+				}
 			}
 
 			// Fake control to catch input focus if auto focus was not possible.
@@ -1102,9 +1109,9 @@ namespace Lockstep.Rotorz.ReorderableList {
 
 		private void HandleDropInsertion(Rect position, IReorderableListAdaptor adaptor) {
 			var target = adaptor as IReorderableListDropTarget;
-            if (target == null || !_allowDropInsertion)
+			if (target == null || !_allowDropInsertion)
 				return;
-			
+
 			if (target.CanDropInsert(_insertionIndex)) {
 				++s_DropTargetNestedCounter;
 
@@ -1159,19 +1166,31 @@ namespace Lockstep.Rotorz.ReorderableList {
 				s_AutoFocusIndex = -1;
 			}
 		}
-		
+
 		/// <summary>
 		/// Draw additional controls below list control and highlight drop target.
 		/// </summary>
 		/// <param name="position">Position of list control in GUI.</param>
 		/// <param name="adaptor">Reorderable list adaptor.</param>
 		private void DrawFooterControls(Rect position, IReorderableListAdaptor adaptor) {
-			if (HasFooterButtons) {
+			if (HasFooterControls) {
 				Rect buttonPosition = new Rect(position.xMax - 30, position.yMax - 1, 30, FooterButtonStyle.fixedHeight);
 
 				Rect menuButtonPosition = buttonPosition;
 				var menuIconNormal = ReorderableListResources.GetTexture(ReorderableListTexture.Icon_AddMenu_Normal);
 				var menuIconActive = ReorderableListResources.GetTexture(ReorderableListTexture.Icon_AddMenu_Active);
+
+				if (HasSizeField) {
+					// Draw size field.
+					Rect sizeFieldPosition = new Rect(
+						position.x,
+						position.yMax + 1,
+						Mathf.Max(150f, position.width / 3f),
+						16f
+					);
+
+					DrawSizeFooterControl(sizeFieldPosition, adaptor);
+				}
 
 				if (HasAddButton) {
 					// Draw add menu drop-down button.
@@ -1194,7 +1213,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 						AddItem(adaptor);
 					}
 				}
-				
+
 				if (HasAddMenuButton) {
 					// Draw add menu drop-down button.
 					if (GUIHelper.IconButton(menuButtonPosition, true, menuIconNormal, menuIconActive, FooterButtonStyle)) {
@@ -1208,6 +1227,15 @@ namespace Lockstep.Rotorz.ReorderableList {
 					}
 				}
 			}
+		}
+
+		private void DrawSizeFooterControl(Rect position, IReorderableListAdaptor adaptor) {
+			float restoreLabelWidth = EditorGUIUtility.labelWidth;
+			EditorGUIUtility.labelWidth = 60f;
+
+			DrawSizeField(position, adaptor);
+
+			EditorGUIUtility.labelWidth = restoreLabelWidth;
 		}
 
 		/// <summary>
@@ -1246,8 +1274,11 @@ namespace Lockstep.Rotorz.ReorderableList {
 			Rect position = GetListRectWithAutoLayout(adaptor, padding);
 
 			// Make room for footer buttons?
-			if (HasFooterButtons)
+			if (HasFooterControls)
 				position.height -= FooterButtonStyle.fixedHeight;
+
+			// Make room for vertical spacing below footer buttons.
+			position.height -= VerticalSpacing;
 
 			s_CurrentListStack.Push(new ListInfo(_controlID, position));
 			try {
@@ -1259,7 +1290,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 			}
 			finally {
 				s_CurrentListStack.Pop();
-            }
+			}
 
 			CheckForAutoFocusControl();
 
@@ -1297,7 +1328,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 			EditorGUILayout.EndVertical();
 
 			// Allow room for footer buttons?
-			if (HasFooterButtons)
+			if (HasFooterControls)
 				GUILayoutUtility.GetRect(0, FooterButtonStyle.fixedHeight - 1);
 
 			return position;
@@ -1379,8 +1410,11 @@ namespace Lockstep.Rotorz.ReorderableList {
 			PrepareState(controlID, adaptor);
 
 			// Allow for footer area.
-			if (HasFooterButtons)
+			if (HasFooterControls)
 				position.height -= FooterButtonStyle.fixedHeight;
+
+			// Make room for vertical spacing below footer buttons.
+			position.height -= VerticalSpacing;
 
 			s_CurrentListStack.Push(new ListInfo(_controlID, position));
 			try {
@@ -1419,6 +1453,98 @@ namespace Lockstep.Rotorz.ReorderableList {
 		public void Draw(Rect position, IReorderableListAdaptor adaptor) {
 			int controlID = GetReorderableListControlID();
 			Draw(position, controlID, adaptor, null);
+		}
+
+		#endregion
+
+		#region Size Field
+
+		private static readonly GUIContent s_Temp = new GUIContent();
+		private static readonly GUIContent s_SizePrefixLabel = new GUIContent("Size");
+
+		/// <summary>
+		/// Draw list size field with absolute positioning and a custom prefix label.
+		/// </summary>
+		/// <remarks>
+		/// <para>Specify a value of <c>GUIContent.none</c> for argument <paramref name="label"/>
+		/// to omit prefix label from the drawn control.</para>
+		/// </remarks>
+		/// <param name="position">Position of list control in GUI.</param>
+		/// <param name="label">Prefix label for the control.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		public void DrawSizeField(Rect position, GUIContent label, IReorderableListAdaptor adaptor) {
+			int sizeControlID = GUIUtility.GetControlID(FocusType.Passive);
+			string sizeControlName = "ReorderableListControl.Size." + sizeControlID;
+			GUI.SetNextControlName(sizeControlName);
+
+			if (GUI.GetNameOfFocusedControl() == sizeControlName) {
+				if (Event.current.rawType == EventType.KeyDown) {
+					switch (Event.current.keyCode) {
+						case KeyCode.Return:
+						case KeyCode.KeypadEnter:
+							ResizeList(adaptor, _newSizeInput);
+							Event.current.Use();
+							break;
+					}
+				}
+				_newSizeInput = EditorGUI.IntField(position, label, _newSizeInput);
+			}
+			else {
+				EditorGUI.IntField(position, label, adaptor.Count);
+				_newSizeInput = adaptor.Count;
+			}
+		}
+
+		/// <summary>
+		/// Draw list size field with absolute positioning and a custom prefix label.
+		/// </summary>
+		/// <param name="position">Position of list control in GUI.</param>
+		/// <param name="label">Prefix label for the control.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		public void DrawSizeField(Rect position, string label, IReorderableListAdaptor adaptor) {
+			s_Temp.text = label;
+			DrawSizeField(position, s_Temp, adaptor);
+		}
+
+		/// <summary>
+		/// Draw list size field with absolute positioning with the default prefix label.
+		/// </summary>
+		/// <param name="position">Position of list control in GUI.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		public void DrawSizeField(Rect position, IReorderableListAdaptor adaptor) {
+			DrawSizeField(position, s_SizePrefixLabel, adaptor);
+		}
+
+		/// <summary>
+		/// Draw list size field with automatic layout and a custom prefix label.
+		/// </summary>
+		/// <remarks>
+		/// <para>Specify a value of <c>GUIContent.none</c> for argument <paramref name="label"/>
+		/// to omit prefix label from the drawn control.</para>
+		/// </remarks>
+		/// <param name="label">Prefix label for the control.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		public void DrawSizeField(GUIContent label, IReorderableListAdaptor adaptor) {
+			Rect position = GUILayoutUtility.GetRect(0, EditorGUIUtility.singleLineHeight);
+			DrawSizeField(position, label, adaptor);
+		}
+
+		/// <summary>
+		/// Draw list size field with automatic layout and a custom prefix label.
+		/// </summary>
+		/// <param name="label">Prefix label for the control.</param>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		public void DrawSizeField(string label, IReorderableListAdaptor adaptor) {
+			s_Temp.text = label;
+			DrawSizeField(s_Temp, adaptor);
+		}
+
+		/// <summary>
+		/// Draw list size field with automatic layout and the default prefix label.
+		/// </summary>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		public void DrawSizeField(IReorderableListAdaptor adaptor) {
+			DrawSizeField(s_SizePrefixLabel, adaptor);
 		}
 
 		#endregion
@@ -1671,7 +1797,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 		public float CalculateListHeight(IReorderableListAdaptor adaptor) {
 			FixStyles();
 
-			float totalHeight = ContainerStyle.padding.vertical - 1;
+			float totalHeight = ContainerStyle.padding.vertical - 1 + VerticalSpacing;
 
 			// Take list items into consideration.
 			int count = adaptor.Count;
@@ -1681,7 +1807,7 @@ namespace Lockstep.Rotorz.ReorderableList {
 			totalHeight += 4 * count;
 
 			// Add height of footer buttons.
-			if (HasFooterButtons)
+			if (HasFooterControls)
 				totalHeight += FooterButtonStyle.fixedHeight;
 
 			return totalHeight;
@@ -1698,13 +1824,13 @@ namespace Lockstep.Rotorz.ReorderableList {
 		public float CalculateListHeight(int itemCount, float itemHeight) {
 			FixStyles();
 
-			float totalHeight = ContainerStyle.padding.vertical - 1;
+			float totalHeight = ContainerStyle.padding.vertical - 1 + VerticalSpacing;
 
 			// Take list items into consideration.
 			totalHeight += (itemHeight + 4) * itemCount;
 
 			// Add height of footer buttons.
-			if (HasFooterButtons)
+			if (HasFooterControls)
 				totalHeight += FooterButtonStyle.fixedHeight;
 
 			return totalHeight;
@@ -1839,10 +1965,36 @@ namespace Lockstep.Rotorz.ReorderableList {
 			return true;
 		}
 
+		/// <summary>
+		/// Set count of items in list by adding or removing items.
+		/// </summary>
+		/// <param name="adaptor">Reorderable list adaptor.</param>
+		/// <param name="newCount">New count of items.</param>
+		/// <returns>
+		/// Returns a value of <c>false</c> if operation was cancelled.
+		/// </returns>
+		protected bool ResizeList(IReorderableListAdaptor adaptor, int newCount) {
+			if (newCount < 0) {
+				// Do nothing when new count is negative.
+				return true;
+			}
+
+			int removeCount = Mathf.Max(0, adaptor.Count - newCount);
+			int addCount = Mathf.Max(0, newCount - adaptor.Count);
+
+			while (removeCount-- > 0) {
+				if (!RemoveItem(adaptor, adaptor.Count - 1))
+					return false;
+			}
+			while (addCount-- > 0) {
+				AddItem(adaptor);
+			}
+
+			return true;
+		}
+
 		#endregion
 
 	}
 
 }
-
-#endif

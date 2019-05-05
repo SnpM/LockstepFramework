@@ -1,12 +1,8 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-using Lockstep;
-
-namespace Lockstep.Data
+﻿namespace Lockstep.Data
 {
 	public interface IUnitConfigDataProvider
 	{
-		IUnitConfigDataItem [] UnitConfigData { get; }
-		UnitConfigElementDataItem [] UnitConfigElementData { get; }
+		IUnitConfigDataItem[] UnitConfigData { get; }
+		UnitConfigElementDataItem[] UnitConfigElementData { get; }
 	}
 }

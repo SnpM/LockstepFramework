@@ -1,11 +1,7 @@
-﻿using UnityEngine;
-using System.Collections; using FastCollections;
-
-namespace Lockstep.Data
+﻿namespace Lockstep.Data
 {
-    public interface INamedData
-    {
-        string Name { get; }
-    }
-
+	public interface INamedData
+	{
+		string Name { get; }
+	}
 }
