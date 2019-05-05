@@ -1,24 +1,23 @@
 ﻿using UnityEngine;
 using FastCollections;
 using Lockstep;
-using System.Collections.Generic;
 
 //Blocker for static environment pieces in a scene.
 [RequireComponent(typeof(UnityLSBody))]
 public class Blocker : EnvironmentObject
 {
-    static readonly FastList<Vector2d> bufferCoordinates = new FastList<Vector2d>();
+	static readonly FastList<Vector2d> bufferCoordinates = new FastList<Vector2d>();
 
-    [SerializeField]
-    private bool _blockPathfinding = true;
-    public bool BlockPathfinding { get { return _blockPathfinding; } }
+	[SerializeField]
+	private bool _blockPathfinding = true;
+	public bool BlockPathfinding { get { return _blockPathfinding; } }
 
 
-    public LSBody CachedBody { get; private set; }
+	public LSBody CachedBody { get; private set; }
 
-    protected override void OnLateInitialize()
-    {
-        base.OnInitialize();
+	protected override void OnLateInitialize()
+	{
+		base.OnInitialize();
 
         CachedBody = this.GetComponent<UnityLSBody>().InternalBody;
 
