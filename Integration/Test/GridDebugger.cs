@@ -68,8 +68,8 @@ namespace Lockstep
 				else
 					Gizmos.color = Color.green; //I'm part colorblind... grey doesn't work very well with red
 				Gizmos.DrawCube(node.WorldPos.ToVector3(LeHeight), nodeScale);
-
-				if (node.ClearanceSource != GridNode.DEFAULT_SOURCE)
+                
+                if (node.ClearanceDegree != GridNode.DEFAULT_DEGREE)
 				{
 #if UNITY_EDITOR
 					UnityEditor.Handles.color = Color.red;
