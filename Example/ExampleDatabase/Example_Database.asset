@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -15,7 +16,7 @@ MonoBehaviour:
   - _name: TestAgent
     _description: 
     _icon: {fileID: 0}
-    _prefab: {fileID: 100310, guid: 7adf26d256267454bb6f9b55470051d7, type: 2}
+    _prefab: {fileID: 100310, guid: 7adf26d256267454bb6f9b55470051d7, type: 3}
   _inputData:
   - _name: Attack
   - _name: Move
@@ -25,7 +26,7 @@ MonoBehaviour:
   - _name: TestBullet
     _description: 
     _icon: {fileID: 0}
-    _prefab: {fileID: 167620, guid: 479c1b29b5d8046428adaddf16b43ce8, type: 2}
+    _prefab: {fileID: 167620, guid: 479c1b29b5d8046428adaddf16b43ce8, type: 3}
   _effectData: []
   _abilityData:
   - _name: Move
@@ -62,12 +63,16 @@ MonoBehaviour:
   - _name: Neutral
     _defaultAllegiance: 1
     _playerManaged: 0
+    _commanderCode: 
   - _name: Hostile
     _defaultAllegiance: 1
     _playerManaged: 0
+    _commanderCode: 
   - _name: Player 1
     _defaultAllegiance: 4
     _playerManaged: 1
+    _commanderCode: 
   - _name: Player 2
     _defaultAllegiance: 4
     _playerManaged: 1
+    _commanderCode: 
