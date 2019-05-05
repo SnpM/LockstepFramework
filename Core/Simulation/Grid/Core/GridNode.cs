@@ -174,32 +174,29 @@ namespace Lockstep
                             _clearanceDegree = (byte)(source.ClearanceDegree + 1);
                         }
                     }
-                    //This method isn't always 100% accurate but after several updates, it will have a better picture of the map
-                    //Clarification: _clearanceSource is the source of a blockage. It's cached so that when the map is changed, the source of the major block can be rechecked for changes.
-                    //TODO: Test this thoroughly and visualize
-                    for (int i = 7; i >= 0; i--)
+                }
+                //This method isn't always 100% accurate but after several updates, it will have a better picture of the map
+                //Clarification: _clearanceSource is the source of a blockage. It's cached so that when the map is changed, the source of the major block can be rechecked for changes.
+                //TODO: Test this thoroughly and visualize
+                for (int i = 7; i >= 0; i--)
+                {
+                    var neighbor = (NeighborNodes[i]);
+                    if (neighbor.IsNull() || neighbor.Unwalkable)
                     {
-                        CheckNeighbor(NeighborNodes[i]);
-                        if (_clearanceDegree == 1)
-                        {
-                            break;
-                        }
+                        _clearanceDegree = 1;
+                        _clearanceSource = (byte)i;
+                        break;
+                    }
+                    //Cap clearance to 8. Something larger than that won't work very well with pathfinding.
+                    if (neighbor._clearanceDegree < ClearanceDegree && neighbor._clearanceDegree < 8)
+                    {
+                        _clearanceDegree = (byte)(neighbor._clearanceDegree + 1);
+                        _clearanceSource = (byte)i;
                     }
                 }
-			}
+            }
 		}
-        void CheckNeighbor(GridNode neighbor) {
-            if (neighbor.IsNull() || neighbor.Unwalkable)
-            {
-                _clearanceDegree = 1;
-                _clearanceSource = (byte)i;
-            }
-            if (neighbor._clearanceDegree < ClearanceDegree)
-            {
-                _clearanceDegree = (byte)(neighbor._clearanceDegree + 1);
-                _clearanceSource = (byte)i;
-            }
-        }
+
 
         /// <summary>
         /// Returns true if clearance degree changed.
@@ -392,6 +389,7 @@ namespace Lockstep
 
 		#endregion
 
+        //TODO: Get rid of static microoptimization
 		static int i, j, checkX, checkY, leIndex;
 
 		public override int GetHashCode()
