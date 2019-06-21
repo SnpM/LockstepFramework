@@ -8,8 +8,9 @@ Created by John Pan (https://github.com/SnpM).
 
 NOTE: LSF is no longer being actively developed. The [latest commit](https://github.com/SnpM/LockstepFramework/commit/d7819df4005316d8c0e3148728794f7c2b921a7a) targets Unity 2019.1f1.
 
+
 Features
-__________
+------------------------
 - Deterministic math library and simulation
 - Custom 2D physics engine on the X-Z plane
 - Behaviour system for both individual agents and globally
