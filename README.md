@@ -34,9 +34,6 @@ To find out more about Lockstep Framework, please explore the wiki (https://gith
 
 Check out tutorial series here: https://github.com/SnpM/LockstepFramework/wiki/Tutorial-Series
 
-Road Map
----------
-- DOCUMENTATION - Tutorials for the major features of LS and descriptions of important methods and variables
 
 License
 --------
