@@ -6,6 +6,8 @@ Special thanks to Liv Games (http://www.livgames.com), 360 Studio (http://www.36
 
 Created by John Pan (https://github.com/SnpM).
 
+NOTE: LSF is no longer being actively developed. The [latest commit](https://github.com/SnpM/LockstepFramework/commit/d7819df4005316d8c0e3148728794f7c2b921a7a) targets Unity 2019.1f1.
+
 Features
 __________
 - Deterministic math library and simulation
