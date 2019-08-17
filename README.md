@@ -6,9 +6,7 @@ Special thanks to Liv Games (http://www.livgames.com), 360 Studio (http://www.36
 
 Created by John Pan (https://github.com/SnpM).
 
-NOTE: LSF is no longer being actively developed. The [latest commit](https://github.com/SnpM/LockstepFramework/commit/d7819df4005316d8c0e3148728794f7c2b921a7a) targets Unity 2019.1f1.
-
-UPDATE: [Dave](https://github.com/mrdav30) is working on LockstepRTSEngine, an open-source continuation of Lockstep Framework that features UI and Worker Construction. Check it out here: https://github.com/mrdav30/LockstepRTSEngine.
+NOTE: LSF is no longer being actively developed. The [latest commit](https://github.com/SnpM/LockstepFramework/commit/d7819df4005316d8c0e3148728794f7c2b921a7a) targets Unity 2019.1f1. [Dave](https://github.com/mrdav30) is working on LockstepRTSEngine, an open-source continuation of Lockstep Framework that features UI and Worker Construction. Check it out here: https://github.com/mrdav30/LockstepRTSEngine.
 
 
 Features
