@@ -9,11 +9,11 @@ namespace Lockstep
 		void Awake()
 		{
 			animator = GetComponent<LSAnimatorBase>();
-			animator.OnStatePlay += HandleOnStatePlay;
-			animator.OnImpulsePlay += HandleOnImpulsePlay;
+			animator.onStatePlay += HandleOnStatePlay;
+			animator.onImpulsePlay += HandleOnImpulsePlay;
 		}
 
-		void HandleOnImpulsePlay(AnimImpulse obj, int rate)
+		void HandleOnImpulsePlay(AnimImpulse obj)
 		{
 		}
 

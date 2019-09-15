@@ -4,35 +4,36 @@ namespace Lockstep
 {
 	public class LSAnimator : LSAnimatorBase
 	{
-		[SerializeField]
-		private string idling = "idling";
+        //Sphagetti :D
+        [SerializeField]
+        protected string _idling = "idling";
 
-		[SerializeField]
-		private string moving = "moving";
+        [SerializeField]
+        protected string _moving = "moving";
 
-		[SerializeField]
-		private string engaging = "engaging";
+        [SerializeField]
+        protected string _engaging = "engaging";
 
-		[SerializeField]
-		private string specialEngaging = "specialEngaging";
+        [SerializeField]
+        protected string _specialEngaging = "specialEngaging";
 
-		[SerializeField]
-		private string dying = "dying";
+        [SerializeField]
+        protected string _dying = "dying";
 
-		[Space(10f), SerializeField]
-		private string fire = "fire";
+        [Space(10f), SerializeField]
+        protected string _fire = "fire";
 
-		[SerializeField]
-		private string specialFire = "specialFire";
+        [SerializeField]
+        protected string _specialFire = "specialFire";
 
-		[SerializeField]
-		private string specialAttack = "specialAttack";
+        [SerializeField]
+        protected string _specialAttack = "specialAttack";
 
-		[SerializeField]
-		private string extra = "extra";
+        [SerializeField]
+        protected string _extra = "extra";
 
 
-		private AnimationClip idlingClip;
+        private AnimationClip idlingClip;
 		private AnimationClip movingClip;
 		private AnimationClip engagingClip;
 		private AnimationClip dyingClip;
@@ -46,59 +47,54 @@ namespace Lockstep
 
 		private Animation animator;
 
-		public override void Setup()
-		{
-			base.Setup();
-
+		protected override void OnSetup()
+        { 
 		}
 
-		public override void Initialize()
+        protected override void OnInitialize()
 		{
-			base.Initialize();
 			animator = GetComponent<Animation>();
 			if (animator == null)
 				animator = this.GetComponentInChildren<Animation>();
 			if (CanAnimate = (animator != null))
 			{
 				//States
-				idlingClip = animator.GetClip(idling);
-				movingClip = animator.GetClip(moving);
-				engagingClip = animator.GetClip(engaging);
-				dyingClip = animator.GetClip(dying);
-				specialEngagingClip = animator.GetClip(this.specialEngaging);
+				idlingClip = animator.GetClip(_idling);
+				movingClip = animator.GetClip(_moving);
+				engagingClip = animator.GetClip(_engaging);
+				dyingClip = animator.GetClip(_dying);
+				specialEngagingClip = animator.GetClip(_specialEngaging);
 				//Impulses
-				fireClip = animator.GetClip(fire);
-				specialFireClip = animator.GetClip(specialFire);
-				specialAttackClip = animator.GetClip(specialAttack);
-				extraClip = animator.GetClip(extra);
+				fireClip = animator.GetClip(_fire);
+				specialFireClip = animator.GetClip(_specialFire);
+				specialAttackClip = animator.GetClip(_specialAttack);
+				extraClip = animator.GetClip(_extra);
 			}
 			Play(AnimState.Idling);
 		}
 
-		public override void Play(AnimState state)
+		const float fadeLength = .5f;
+
+        protected override void OnApplyImpulse(AnimImpulse animImpulse, double speed)
+        {
+            if (CanAnimate)
+            {
+                AnimationClip clip = GetImpulseClip(animImpulse);
+                if (clip.IsNotNull())
+                {
+                    animator.Play(clip.name, PlayMode.StopSameLayer);
+                }
+            }
+        }
+        protected override void OnPlay(AnimState state, double speed)
 		{
-			base.Play(state);
 			if (CanAnimate)
 			{
 				AnimationClip clip = GetStateClip(state);
 				if (clip.IsNotNull())
 				{
-					animator.CrossFade(clip.name, fadeLength);
-				}
-			}
-		}
-		const float fadeLength = .5f;
-		public override void Play(AnimImpulse impulse, int rate = 0)
-		{
-			base.Play(impulse, rate);
-
-			if (CanAnimate)
-			{
-				AnimationClip clip = GetImpulseClip(impulse);
-				if (clip.IsNotNull())
-				{
 					//animator.Blend(clip.name,.8f,fadeLength);
-					animator.Play(clip.name);
+					animator.CrossFade(clip.name, fadeLength);
 				}
 			}
 		}
@@ -119,40 +115,6 @@ namespace Lockstep
 					return this.specialEngagingClip;
 			}
 			return idlingClip;
-		}
-
-		public string GetStateName(AnimState state)
-		{
-			switch (state)
-			{
-				case AnimState.Moving:
-					return moving;
-				case AnimState.Idling:
-					return idling;
-				case AnimState.Engaging:
-					return engaging;
-				case AnimState.Dying:
-					return dying;
-				case AnimState.SpecialEngaging:
-					return this.specialEngaging;
-			}
-			return idling;
-		}
-
-		public string GetImpulseName(AnimImpulse impulse)
-		{
-			switch (impulse)
-			{
-				case AnimImpulse.Fire:
-					return fire;
-				case AnimImpulse.SpecialFire:
-					return specialFire;
-				case AnimImpulse.SpecialAttack:
-					return specialAttack;
-				case AnimImpulse.Extra:
-					return extra;
-			}
-			return idling;
 		}
 
 		private AnimationClip GetImpulseClip(AnimImpulse impulse)
