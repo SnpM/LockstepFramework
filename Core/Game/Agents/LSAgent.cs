@@ -214,10 +214,11 @@ namespace Lockstep
 			}
 		}
 
+        Renderer _cachedRenderer;
 		public bool IsVisible
 		{
-			//get { return cachedRenderer == null || (cachedRenderer.enabled && cachedRenderer.isVisible); }
-			get { return true; } //TODO: Return true only if viable GladFox: seen for what kind of camera? :)
+			get { return _cachedRenderer == null || (_cachedRenderer.enabled && _cachedRenderer.isVisible); }
+			//get { return true; } //TODO: Return true only if viable GladFox: seen for what kind of camera? :)
 		}
 
 		public AllegianceType GetAllegiance(LSAgent other)
@@ -565,6 +566,7 @@ namespace Lockstep
 		{
 			_cachedTransform = base.transform;
 			_cachedGameObject = base.gameObject;
+            _cachedRenderer = GetComponent<Renderer>();
 			_unityBody = GetComponent<UnityLSBody>();
 			_animator = GetComponent<LSAnimatorBase>();
 			_attachedAbilities = GetComponents<Ability>();

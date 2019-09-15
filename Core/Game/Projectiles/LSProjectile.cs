@@ -367,7 +367,6 @@ namespace Lockstep
 
 		private void Hit(bool destroy = true)
 		{
-
 			this.OnHit();
 			if (this.onHit.IsNotNull())
 			{
@@ -410,7 +409,8 @@ namespace Lockstep
 
 		public bool Deterministic { get; private set; }
 
-		internal void Prepare(int id, Vector3d projectilePosition, Func<LSAgent, bool> agentConditional, Func<byte, bool> bucketConditional, Action<LSAgent> onHit, bool deterministic)
+		internal void Prepare(int id, Vector3d projectilePosition, Func<LSAgent, bool> agentConditional,
+            Func<byte, bool> bucketConditional, Action<LSAgent> onHit, bool deterministic)
 		{
 			this.Deterministic = deterministic;
 
@@ -447,13 +447,19 @@ namespace Lockstep
 
 		}
 
-		public void InitializeTimed(Vector2d forward)
+		public void InitializeTimed(LSAgent target)
 		{
-			Forward = forward;
-			Direction = forward.ToVector3d();
-		}
+            this.Target = target;
+            this.TargetVersion = this.Target.SpawnVersion;
+        }
+        public void InitializeTimed(Vector3d targetPos)
+        {
+            this.TargetPosition = targetPos.ToVector2d();
+            this.Position = targetPos;
+            this.TargetVersion = this.Target.SpawnVersion;
+        }
 
-		Func<LSBody, bool> BodyConditional;
+        Func<LSBody, bool> BodyConditional;
 
 		public void InitializeFree(Vector3d direction, Func<LSBody, bool> bodyConditional, bool useGravity = false)
 		{
@@ -658,12 +664,17 @@ namespace Lockstep
 				ProjectileManager.EndProjectile(this);
 				return;
 			}
-			switch (this.TargetingBehavior)
+
+            switch (this.TargetingBehavior)
 			{
 				case TargetingType.Timed:
 					this.CountDown--;
-
-					if (!IsLasting)
+                    if (this.HitBehavior == HitType.Single && this.Target.SpawnVersion != this.TargetVersion)
+                    {
+                        ProjectileManager.EndProjectile(this);
+                        break;
+                    }
+                    if (!IsLasting)
 					{
 						if (this.CountDown <= 0)
 						{
@@ -682,7 +693,7 @@ namespace Lockstep
 					}
 					break;
 				case TargetingType.Homing:
-					if (this.TargetingBehavior == TargetingType.Homing && this.HitBehavior == HitType.Single && this.Target.SpawnVersion != this.TargetVersion)
+					if (this.HitBehavior == HitType.Single && this.Target.SpawnVersion != this.TargetVersion)
 					{
 						//Switch to positional to move to target's last position and not seek deceased target
 						this.TargetingBehavior = TargetingType.Positional;

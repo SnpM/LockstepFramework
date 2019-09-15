@@ -49,7 +49,8 @@ namespace Lockstep
             string animation = GetImpulseState(animImpulse);
             if (!string.IsNullOrEmpty(animation))
             {
-                animator.Play(animation);
+                animator.Play(animation,-1,0f);
+            
             }
         }
         private string GetStateState(AnimState state)

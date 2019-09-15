@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using Lockstep.Data;
-
+using System.Collections.Generic;
 namespace Lockstep
 {
 	public static class RTSInterfacing
@@ -59,46 +59,46 @@ namespace Lockstep
 			return curCom;
 		}
 
-		public static LSAgent GetScreenAgent(Vector2 screenPos, Func<LSAgent, bool> conditional = null)
-		{
+        public static LSAgent GetScreenAgent(Vector2 screenPos, Func<LSAgent, bool> conditional = null)
+        {
+            Camera cam = Camera.main;
 			if (conditional == null)
-				conditional = (agent) =>
+                conditional = (agent) =>
+                {
+                    return true;
+                };
+            agentFound = false;
+            Ray ray = cam.ScreenPointToRay(screenPos);
+            checkDir = ray.direction;
+            checkOrigin = ray.origin;
+
+            //Raycast to plane Z-0
+            var start = new Vector3d(ray.origin);
+            Vector3d end;
+            end = new Vector3d(ray.origin + ray.direction * 50);
+
+            if (ray.direction.y < -.05f) 
+            {
+                float planeDist = ray.origin.y / -ray.direction.y;
+                if (planeDist < 100)
+                {
+                    end = new Vector3d(ray.origin + ray.direction * planeDist);
+                }
+            }
+            IEnumerable<LSBody> raycast = Lockstep.Raycaster.RaycastAll(start, end );
+
+
+            foreach (var body in raycast) {
+                if (body.Agent == null) continue;
+                LSAgent agent = body.Agent;
+				if (agent.IsVisible)
 				{
-					return true;
-				};
-			agentFound = false;
-			Ray ray = Camera.main.ScreenPointToRay(screenPos);
-			checkDir = ray.direction;
-			checkOrigin = ray.origin;
-			for (int i = 0; i < AgentController.PeakGlobalID; i++)
-			{
-				if (AgentController.GlobalAgentActive[i])
-				{
-					LSAgent agent = AgentController.GlobalAgents[i];
-					if (agent.IsVisible)
+					if (conditional(agent))
 					{
-						if (conditional(agent))
-						{
-							if (AgentIntersects(agent))
-							{
-								if (agentFound)
-								{
-									if (heightDif < closestDistance)
-									{
-										closestDistance = heightDif;
-										closestAgent = agent;
-									}
-								}
-								else
-								{
-									agentFound = true;
-									closestAgent = agent;
-									closestDistance = heightDif;
-								}
-							}
-						}
+                        return agent;
 					}
 				}
+				
 			}
 			if (agentFound)
 				return closestAgent;

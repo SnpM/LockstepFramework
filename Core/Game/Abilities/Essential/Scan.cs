@@ -512,7 +512,7 @@ namespace Lockstep
 					currentProjectile.InitializeHoming(target);
 					break;
 				case TargetingType.Timed:
-					currentProjectile.InitializeTimed(Agent.Body.Forward);
+					currentProjectile.InitializeTimed(target);
 					break;
 				case TargetingType.Positional:
 					currentProjectile.InitializePositional(target.Body.Position.ToVector3d(target.Body.HeightPos));
@@ -544,7 +544,7 @@ namespace Lockstep
 			switch (currentProjectile.TargetingBehavior)
 			{
 				case TargetingType.Timed:
-					currentProjectile.InitializeTimed(Agent.Body.Forward);
+					currentProjectile.InitializeTimed(targetPos);
 					break;
 				case TargetingType.Positional:
 					currentProjectile.InitializePositional(targetPos);

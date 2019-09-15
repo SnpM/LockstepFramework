@@ -86,5 +86,17 @@ namespace Lockstep
 				helper.Deactivate();
 			}
 		}
+        public static THelper GetHelper<THelper> () where THelper : ILockstepEventsHandler
+        {
+            foreach (var helper in Helpers)
+            {
+                if (helper is THelper)
+                {
+                    return (THelper)helper;
+                    break;
+                }
+            }
+            return default(THelper);
+        }
 	}
 }
