@@ -209,7 +209,7 @@ namespace Lockstep
 		{
 		}
 
-		public void Deactivate()
+		internal void Deactivate()
 		{
 			IsCasting = false;
 			OnDeactivate();
@@ -218,5 +218,14 @@ namespace Lockstep
 		protected virtual void OnDeactivate()
 		{
 		}
+
+        internal void EndLife ()
+        {
+            OnCompleteLife();
+        }
+        protected virtual void OnCompleteLife()
+        {
+
+        }
 	}
 }

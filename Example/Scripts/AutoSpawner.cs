@@ -7,6 +7,8 @@ namespace Lockstep
 		[SerializeField]
 		private SpawnInfo[] Spawns;
 		public bool AutoCommand = true;
+        //Spawns all units with the first SpawnInfo
+        public bool MakeAllUnits = false;
 
 		protected override void OnInitialize()
 		{
@@ -14,9 +16,10 @@ namespace Lockstep
 
 		public void LaunchSpawns()
 		{
-
+            
 			for (int i = 0; i < Spawns.Length; i++)
 			{
+
 				SpawnInfo info = Spawns[i];
 
 				var controller = AgentControllerHelper.Instance.GetInstanceManager(info.ControllerCode);
@@ -27,7 +30,16 @@ namespace Lockstep
 					if (AutoCommand)
 						Selector.Add(agent);
 				}
-			}
+                if (MakeAllUnits && i == 0)
+                {
+                    foreach (var s in AgentController.AgentCodes)
+                    {
+                        LSAgent agent = controller.CreateAgent(s, info.Position);
+                        if (AutoCommand)
+                            Selector.Add(agent);
+                    }
+                }
+            }
 
 			if (AutoCommand)
 			{

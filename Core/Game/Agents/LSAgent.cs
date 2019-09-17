@@ -136,6 +136,7 @@ namespace Lockstep
 		public LSInfluencer Influencer { get; private set; }
 
 		public bool IsActive { get; private set; }
+        public bool IsLive { get; private set; }
 
 		public event Action<LSAgent> onDeactivate;
 
@@ -363,6 +364,7 @@ namespace Lockstep
 		public void InitializeBare()
 		{
 			IsActive = true;
+            IsLive = true;
 			abilityManager.Initialize();
 		}
 		public void Initialize(
@@ -371,6 +373,7 @@ namespace Lockstep
 		{
 
 			IsActive = true;
+            IsLive = true;
 			CheckCasting = true;
 
 
@@ -472,13 +475,13 @@ namespace Lockstep
         /// Do not call this to destroy the agent. Use AgentController.DestroyAgent().
         /// </summary>
         /// <param name="Immediate"></param>
-		internal void Deactivate(bool Immediate = false)
+		internal void _Deactivate(bool Immediate = false)
 		{
 			if (IsActive == false)
 				Debug.Log("NOASER");
 			if (onDeactivate != null)
 				this.onDeactivate(this);
-			_Deactivate();
+		    DeactivateCore();
 
 			if (Immediate == false)
 			{
@@ -489,10 +492,10 @@ namespace Lockstep
 			}
 			else
 			{
-				AgentController.CompleteLife(this);
+				AgentController.EndLife(this);
 			}
 		}
-		private void _Deactivate()
+		private void DeactivateCore()
 		{
 			this.StopCast();
 
@@ -513,6 +516,7 @@ namespace Lockstep
 		int deathingIndex;
 		public Coroutine poolCoroutine;
 
+
 		private IEnumerator<int> PoolDelayer()
 		{
 			deathingIndex = AgentController.DeathingAgents.Add(this);
@@ -521,10 +525,17 @@ namespace Lockstep
 			yield return _deathTime;
 			AgentController.DeathingAgents.RemoveAt(deathingIndex);
 
-			AgentController.CompleteLife(this);
+			AgentController.EndLife(this);
 		}
 
-
+        internal void _EndLife()
+        {
+            this.IsLive = false;
+            for (var k = 0; k < this.abilityManager.Abilitys.Length; k++)
+            {
+                this.abilityManager.Abilitys[k].EndLife();
+            }
+        }
 		public void SetState(AnimState animState)
 		{
 			if (Animator.IsNotNull())

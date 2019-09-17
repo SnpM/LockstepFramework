@@ -134,7 +134,7 @@ namespace Lockstep
 				if (DeathingAgents.arrayAllocation[i])
 				{
 					LSAgent agent = DeathingAgents[i];
-					AgentController.CompleteLife(agent);
+					AgentController.EndLife(agent);
 				}
 			}
 			DeathingAgents.FastClear();
@@ -201,7 +201,8 @@ namespace Lockstep
 		{
 			for (int iterator = 0; iterator < PeakGlobalID; iterator++)
 			{
-				if (GlobalAgentActive[iterator])
+                LSAgent agent = GlobalAgents[iterator];
+                if (agent.IsLive)
 				{
 					GlobalAgents[iterator].Visualize();
 				}
@@ -212,9 +213,10 @@ namespace Lockstep
 		{
 			for (int iterator = 0; iterator < PeakGlobalID; iterator++)
 			{
-				if (GlobalAgentActive[iterator])
-				{
-					GlobalAgents[iterator].LateVisualize();
+                LSAgent agent = GlobalAgents[iterator];
+                if (agent.IsLive)
+                {
+                    GlobalAgents[iterator].LateVisualize();
 				}
 			}
 		}
@@ -285,7 +287,7 @@ namespace Lockstep
 				return;
 			bool immediate = data.Immediate;
 
-			agent.Deactivate(immediate);
+			agent._Deactivate(immediate);
 			ChangeController(agent, null);
 
 			//Pool if the agent is registered
@@ -304,10 +306,12 @@ namespace Lockstep
 		/// Completes the life of the agent and pools or destroys it.
 		/// </summary>
 		/// <param name="agent">Agent.</param>
-		public static void CompleteLife(LSAgent agent)
+		public static void EndLife(LSAgent agent)
 		{
 			if (agent.CachedGameObject != null)
 				agent.CachedGameObject.SetActive(false);
+
+            agent._EndLife();
 			if (agent.TypeIndex != UNREGISTERED_TYPE_INDEX)
 			{
 				AgentController.CacheAgent(agent);
