@@ -49,7 +49,7 @@ namespace Lockstep
             string animation = GetImpulseState(animImpulse);
             if (!string.IsNullOrEmpty(animation))
             {
-                animator.Play(animation,-1,0f);
+                animator.Play(animation);//,-1,0f);
             
             }
         }
