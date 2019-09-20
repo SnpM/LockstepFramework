@@ -52,7 +52,7 @@ namespace Lockstep
 		{
 			if (string.IsNullOrEmpty(controllerCode))
 			{
-				Debug.Log("controllerCode is null or empty.");
+				Debug.Log("ControllerCode '" + controllerCode + "' is null or empty.");
 				return null;
 			}
 			byte id;
