@@ -337,8 +337,8 @@ namespace Lockstep
 			for (int i = 0; i < InstanceManagers.Count; i++)
 			{
 				var other = InstanceManagers[i];
-				other.SetAllegiance(newCont, other.DefaultAllegiance);
-				newCont.SetAllegiance(other, newCont.DefaultAllegiance);
+				other.SetAllegiance(newCont, newCont.DefaultAllegiance);
+				newCont.SetAllegiance(other, other.DefaultAllegiance);
 			}
 		}
 
