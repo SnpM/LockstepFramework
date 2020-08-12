@@ -8,8 +8,6 @@ Created by John Pan (https://github.com/SnpM).
 
 NOTE: LSF is no longer being actively developed. The [latest commit](https://github.com/SnpM/LockstepFramework/commit/d7819df4005316d8c0e3148728794f7c2b921a7a) targets Unity 2019.1f1.
 
-Check out [LockstepRTSEngine](https://github.com/mrdav30/LockstepRTSEngine), a complete RTS framework based on LSF.
-
 Features
 ------------------------
 - Deterministic math library and simulation
