@@ -11,6 +11,7 @@ NOTE: LSF is no longer being actively developed. The [latest commit](https://git
 Features
 ------------------------
 - Deterministic math library and simulation
+- - Deterministic math library and simulation
 - Custom 2D physics engine on the X-Z plane
 - Behaviour system for both individual agents and globally
 - Lockstep variables - know when and where desyncs happen
